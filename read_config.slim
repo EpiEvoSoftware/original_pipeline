@@ -1,0 +1,32 @@
+str_pars = c("model", "ref_path", "causal_gene_path", "contact_network_path", "cwdir", "seeds_vcf");
+int_pars = c("host_size", "n_generation", "seed_size", "n_causal_genes", "cap_withinhost", "burn_in_generations", "burn_in_Ne", "dr_efsize");
+float_pars = c("Infection_rate", "Recovery_rate", "mut_rate", "sample_rate", "within_host_reproduct_rate", "latent_prob", "activate_rate", "IE_rate", "IS_rate", "ER_rate", "RS_rate", "burn_in_mutrate");
+list_pars = c("epoch_gens");
+bin_pars = c("super_infection", "within_host_evolution", "multiple_epochs");
+
+defineGlobal("configs", readFile("params.config"));
+print(configs);
+for(l in configs)
+{
+	ll = strsplit(l, ":");
+	if (any(ll[0]==int_pars))
+	{
+		defineGlobal(ll[0], asInteger(ll[1]));
+	}
+	else if (any(ll[0]==str_pars))
+	{
+		defineGlobal(ll[0], ll[1]);
+	}
+	else if (any(ll[0]==float_pars))
+	{
+		defineGlobal(ll[0], asFloat(ll[1]));	
+	}
+	else if (any(ll[0]==list_pars))
+	{
+		defineGlobal(ll[0], strsplit(ll[1], sep=","));	
+	}
+	else if (any(ll[0]==bin_pars))
+	{
+		defineGlobal(ll[0], asLogical(ll[1]));	
+	}
+}
