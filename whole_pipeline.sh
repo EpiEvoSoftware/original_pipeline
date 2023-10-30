@@ -20,7 +20,9 @@
 ####################################################
 ## Environmental variables for preparation (Reading in a config file):
 config_file="/Users/px54/Documents/TB_software/test/params.config"
+# TODO: change to relative paths
 codes_dir="/Users/px54/Documents/TB_software/V1_codes"
+# TODO: change to relative paths
 
 while IFS=":" read -r key value; do
     declare "$key=$value"
