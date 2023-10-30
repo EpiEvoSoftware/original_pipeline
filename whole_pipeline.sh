@@ -20,9 +20,9 @@
 ####################################################
 ## Environmental variables for preparation (Reading in a config file):
 config_file="/Users/px54/Documents/TB_software/test/params.config"
-# TODO: change to relative paths
+# TODO: change to relative paths, "./test/params.config"
 codes_dir="/Users/px54/Documents/TB_software/V1_codes"
-# TODO: change to relative paths
+# TODO: change to relative paths, "./V1_codes"
 
 while IFS=":" read -r key value; do
     declare "$key=$value"
@@ -61,7 +61,7 @@ cd ${cwdir}
 #python ${codes_dir}/seeds_vcf_split.py -wk_dir ${cwdir}/       # This will generate seed.x.vcf, x in [0:seed_size-1]
 #mkdir ${cwdir}/originalvcfs                  # Create a new subdirectory to store these new vcf files.
 #mv ${cwdir}/seed.*.vcf ./originalvcfs/
-#rm ${cwdir}/seeds.vcf
+#rm ${cwdir}/seeds.vcf  
 
 
 
