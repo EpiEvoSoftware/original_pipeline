@@ -1,21 +1,18 @@
-library("optparse")
 library("Biostrings")
 
-option_list = list(
-  make_option(c("-wk_dir", "--working_directory"), type="character", default="User", help="Working directory", metavar="character"),
-  make_option(c("-ref_path", "--ref_path"), type="character", default="User", help="Reference genome path", metavar="character")
-)
-
-opts = parse_args(OptionParser(option_list=option_list))
-
-ref <- DNAString(paste(readLines(opts$ref_path), collapse=""))
-
-snps_fas <- readBStringSet(paste0(opts$wk_dir, "all_snps.fasta"))
+args <- commandArgs(trailingOnly = TRUE)
+wk_dir <- args[1]          ## wk_dir: the working directory (read from command line)
+ref_path <- args[2]   ## Reference genome path
 
 
-real_header = as.list(strsplit(readLines(paste0(opts$wk_dir, "samples.merged.modified.vcf"))[1], "\t"))
+ref <- DNAString(paste(readLines(ref_path), collapse=""))
 
-vcf <- read.table(paste0(opts$wk_dir, "samples.merged.modified.vcf"), sep="\t", col.names=real_header[[1]])
+snps_fas <- readBStringSet(paste0(wk_dir, "all_snps.fasta"))
+
+
+real_header = as.list(strsplit(readLines(paste0(wk_dir, "samples.merged.modified.vcf"))[1], "\t"))
+
+vcf <- read.table(paste0(wk_dir, "samples.merged.modified.vcf"), sep="\t", col.names=real_header[[1]])
 vcf_lists <- as.list(vcf[,10:ncol(vcf)])
 
 vcf2fasta <- function(vcf_ind, vcf_info, ref)
@@ -41,7 +38,7 @@ vcf2fasta <- function(vcf_ind, vcf_info, ref)
 
 sampled_genomes <- DNAStringSet(sapply(vcf_lists, vcf2fasta, vcf_info=vcf[,c("POS", "REF", "ALT")], ref=ref))
 
-writeXStringSet(sampled_genomes, filepath=paste0(opts$wk_dir, "sample.fasta"), format="fasta")
+writeXStringSet(sampled_genomes, filepath=paste0(wk_dir, "sample.fasta"), format="fasta")
 
 
 

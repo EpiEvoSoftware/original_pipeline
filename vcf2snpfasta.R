@@ -1,16 +1,11 @@
-library("optparse")
 library("Biostrings")
 
+args <- commandArgs(trailingOnly = TRUE)
+wk_dir <- args[1]  
 
-option_list = list(
-  make_option(c("-wk_dir", "--working_directory"), type="character", default="User", help="Working directory", metavar="character")
-)
+real_header = as.list(strsplit(readLines(paste0(wk_dir, "samples.merged.modified.vcf"))[1], "\t"))
 
-opts = parse_args(OptionParser(option_list=option_list))
-
-real_header = as.list(strsplit(readLines(paste0(opts$working_directory, "samples.merged.modified.vcf"))[1], "\t"))
-
-vcf <- read.table(paste0(opts$working_directory, "samples.merged.modified.vcf"), sep="\t", col.names=real_header[[1]])
+vcf <- read.table(paste0(wk_dir, "samples.merged.modified.vcf"), sep="\t", col.names=real_header[[1]])
 new_table = vcf[,10:ncol(vcf)]
 
 row_condition <- apply(new_table, 1, function(row) all(row == row[1]))
@@ -27,7 +22,7 @@ for (i in vcf_info_$REF)
     a = paste0(a, i)
 }
 dna_string = DNAString(a)
-writeXStringSet(DNAStringSet(dna_string), filepath=paste0(opts$working_directory, "reference.snpsonly.fasta"), format="fasta")
+writeXStringSet(DNAStringSet(dna_string), filepath=paste0(wk_dir, "reference.snpsonly.fasta"), format="fasta")
 
 
 vcf2fasta <- function(vcf_ind, vcf_info)

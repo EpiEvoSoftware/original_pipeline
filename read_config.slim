@@ -1,11 +1,11 @@
 str_pars = c("model", "ref_path", "causal_gene_path", "contact_network_path", "cwdir", "seeds_vcf");
-int_pars = c("host_size", "n_generation", "seed_size", "n_causal_genes", "cap_withinhost", "burn_in_generations", "burn_in_Ne", "dr_efsize");
-float_pars = c("Infection_rate", "Recovery_rate", "mut_rate", "sample_rate", "within_host_reproduct_rate", "latent_prob", "activate_rate", "IE_rate", "IS_rate", "ER_rate", "RS_rate", "burn_in_mutrate");
-list_pars = c("epoch_gens");
+int_pars = c("host_size", "n_generation", "seed_size", "n_causal_genes_1", "n_causal_genes_2", "cap_withinhost", "burn_in_generations", "burn_in_Ne", "dr_efsize");
+float_pars = c("Infection_rate", "Recovery_rate", "mut_rate", "sample_rate", "within_host_reproduct_rate", "latent_prob", "activate_rate", "IE_rate", "IS_rate", "ER_rate", "RS_rate", "burn_in_mutrate", "treatment_recovery_rate");
+list_pars = c("treatment_gens");
 bin_pars = c("super_infection", "within_host_evolution", "multiple_epochs");
 
 defineGlobal("configs", readFile("params.config"));
-print(configs);
+
 for(l in configs)
 {
 	ll = strsplit(l, ":");

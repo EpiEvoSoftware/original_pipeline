@@ -1,48 +1,34 @@
 import numpy as np
 from random import sample
+import statistics
 import os
 import argparse
 
 
 ### We already have the right format, just count the muts
-def count_muts(mss):
+def calc_sum_effsize_raw(mss, dict_c_g):
 	c = 0
-	counts = []
-	seeds = os.listdir(mss)
+	calc_sum = []
+	seeds = os.listdir(mss + "originalvcfs/")
 	for seed in seeds:
-		with open(mss + seed, "r") as seed_vcf:
-			counts.append(0)
+		calc_sum.append(0)
+		with open(mss + "originalvcfs/" + seed, "r") as seed_vcf:
 			for line in seed_vcf:
 				if line.startswith("#"):
 					continue
 				else:
-					counts[c] = counts[c] + 1
+					ll = line.rstrip("\n")
+					l = ll.split("\t")
+					for gene in dict_c_g:
+						if int(l[1]) >= dict_c_g[gene][0] and int(l[1]) <= dict_c_g[gene][1]:
+							calc_sum[c] = calc_sum[c] + dict_c_g[gene][2]
+					#counts[c] = counts[c] + 1
 			c = c + 1
-	return(max(counts))
-
-def modify_vcf(starts, ends, coe, mss, causal_size, k):
-	seeds = os.listdir(mss)
-	for seed in seeds:
-		with open(mss + seed, "r") as seed_vcf:
-			with open(mss + seed.rstrip(".vcf") + ".coe.vcf", "w") as out_vcf:
-				for line in seed_vcf:
-					in_causal = False
-					if line.startswith("#"):
-						out_vcf.write(line)
-					else:
-						ll = line.rstrip("\n")
-						l = ll.split("\t")
-						for i in range(causal_size):
-							if int(l[1])>=int(starts[i]) and int(l[1])<=int(ends[i]):
-								out_vcf.write("\t".join(l[:7]) + "\t" + "S=" + str(k * coe[i]) + ";DOM=1;TO=1;MT=" +str(i+1) + ";AC=1;DP=1000;AA=" + l[3] + "\tGT\t1\n")
-								in_causal = True
-								break
-						if in_causal==False:
-							out_vcf.write(line)
+	return(statistics.mean(calc_sum))
 
 
 
-def generate_eff(gff_, causal, es_low, es_high, mss):
+def generate_eff(gff_, causal, es_low, es_high, mss, n_gen, mut_rate):
 	g_len = 0
 	with open(gff_, "r") as gff:
 		for line in gff:
@@ -52,6 +38,8 @@ def generate_eff(gff_, causal, es_low, es_high, mss):
 				g_len = g_len + 1
 
 	genes = sample(range(int(g_len)), int(causal))
+
+	dict_causal_genes = {}
 
 	causal_length = []
 	names = []
@@ -66,48 +54,83 @@ def generate_eff(gff_, causal, es_low, es_high, mss):
 				ll = line.rstrip("\n")
 				l = ll.split("\t")
 				info = l[8].split(";")
-				names.append(info[2].split("=")[1])
-				coe.append(np.random.uniform(float(es_low), float(es_high), 1)[0])
+				#names.append(info[2].split("=")[1])
+				#coe.append(np.random.uniform(float(es_low), float(es_high), 1)[0])
 				causal_length.append(int(l[4])-int(l[3]))
-				starts.append(l[3])
-				ends.append(l[4])
+				#starts.append(l[3])
+				#ends.append(l[4])
+				dict_causal_genes[info[2].split("=")[1]] = [int(l[3]), int(l[4]), np.random.uniform(float(es_low), float(es_high), 1)[0]]
 			index = index + 1
-	#print(coe)
-	max_muts = count_muts(mss)
-	total_sum = 0
-	for i in range(causal):
-		total_sum = total_sum + (((max_muts + 100 * 1.6e-6) * causal_length[i]) / 4411532 ) * coe[i]
+		dict_causal_genes = normalization_by_mutscounts(mss, dict_causal_genes, n_gen, mut_rate)
+	return(dict_causal_genes)
+
+def normalization_by_mutscounts(mss, dict_c_g, n_gen, mut_rate):
+	avg_muts = calc_sum_effsize_raw(mss, dict_c_g)
+	total_sum = avg_muts
+	for i in dict_c_g:
+		total_sum = total_sum + (n_gen * mut_rate) * (dict_c_g[i][1] - dict_c_g[i][0]) * dict_c_g[i][2]
 	k = 1 / total_sum
-	#print(k)
+	for i in dict_c_g:
+		dict_c_g[i][2] = k * dict_c_g[i][2]
+	return(dict_c_g)
+
+
+
+def generate_csv(t1_causal, t2_causal, t1_es_low, t2_es_low, t1_es_high, t2_es_high, gff_, mss, n_gen, mut_rate):
+	t1_dict = generate_eff(gff_, t1_causal, t1_es_low, t1_es_high, mss, n_gen, mut_rate)
+	t2_dict = generate_eff(gff_, t2_causal, t2_es_low, t2_es_high, mss, n_gen, mut_rate)
+
+	all_dict = {}
+	overlap = set(t1_dict.keys()).intersection(set(t2_dict.keys()))
+	for gene in t1_dict:
+		if gene in overlap:
+			all_dict[gene] = t1_dict[gene]
+			all_dict[gene].append(t2_dict[gene][2])
+		else:
+			all_dict[gene] = t1_dict[gene]
+			all_dict[gene].append(0)
+	for gene in t2_dict:
+		if gene in overlap:
+			continue
+		else:
+			all_dict[gene] = t2_dict[gene][:2]
+			all_dict[gene].append(0)
+			all_dict[gene].append(t2_dict[gene][2])
 
 	with open("causal_gene_info.csv", "w") as csv:
-		csv.write("gene_name,start,end,eff_size\n")
-		for i in range(causal):
-			csv.write(names[i] + "," + starts[i] + "," + ends[i] + "," + str(k * coe[i]) + "\n")
-			index = index + 1
+		csv.write("gene_name,start,end,eff_size_t1,eff_size_t2\n")
+		for i in all_dict:
+			csv.write(i + "," + str(all_dict[i][0]) + "," + str(all_dict[i][1]) + "," + str(all_dict[i][2]) + "," + str(all_dict[i][3]) + "\n")
 
-	modify_vcf(starts, ends, coe, mss, causal, k)
 
-	
 
 
 def main():
 	parser = argparse.ArgumentParser(description='Generate the selection coefficient modifying part of the slim script.')
 	parser.add_argument('-gff', action='store',dest='gff', required=True)
-	parser.add_argument('-causal', action='store',dest='causal', required=True, type=int)
-	parser.add_argument('-es_low', action='store',dest='es_low', required=True, type=float)
-	parser.add_argument('-es_high', action='store',dest='es_high', required=True, type=float)
-	parser.add_argument('-seeds_dir', action='store',dest='seeds_dir', required=True)
+	parser.add_argument('-causal_1', action='store',dest='causal_1', required=True, type=int)
+	parser.add_argument('-causal_2', action='store',dest='causal_2', required=True, type=int)
+	parser.add_argument('-es_low_1', action='store',dest='es_low_1', required=True, type=float)
+	parser.add_argument('-es_high_1', action='store',dest='es_high_1', required=True, type=float)
+	parser.add_argument('-es_low_2', action='store',dest='es_low_2', required=True, type=float)
+	parser.add_argument('-es_high_2', action='store',dest='es_high_2', required=True, type=float)
+	parser.add_argument('-wk_dir', action='store',dest='wk_dir', required=True)
+	parser.add_argument('-sim_generation', action='store',dest='sim_generation', required=True, type=float)
+	parser.add_argument('-mut_rate', action='store',dest='mut_rate', required=True, type=float)
 
 	args = parser.parse_args()
 	gff_in = args.gff
-	causal_size = args.causal
-	effsize_low = args.es_low
-	effsize_high = args.es_high
-	mss = args.seeds_dir
+	causal_size_1 = args.causal_1
+	causal_size_2 = args.causal_2
+	effsize_low_1 = args.es_low_1
+	effsize_high_1 = args.es_high_1
+	effsize_low_2 = args.es_low_2
+	effsize_high_2 = args.es_high_2
+	mss = args.wk_dir
+	n_gen = args.sim_generation
+	mut_rate = args.mut_rate
 
-
-	generate_eff(gff_in, causal_size, effsize_low, effsize_high, mss)
+	generate_csv(causal_size_1, causal_size_2, effsize_low_1, effsize_low_2, effsize_high_1, effsize_high_2, gff_in, mss, n_gen, mut_rate)
     
 
 if __name__ == "__main__":

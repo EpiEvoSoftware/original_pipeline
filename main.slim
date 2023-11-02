@@ -29,7 +29,16 @@ initialize() {
 	// s5, end of simulation block
 	community.rescheduleScriptBlock(s5, ticks = n_generation);
 	// s6, change effect size block, only activated in certain epoch changing generations
-	if (multiple_epochs==T) { community.rescheduleScriptBlock(s6, ticks = asInteger(epoch_gens)); }
+	if (multiple_epochs==T) 
+	{
+		treatment_start = asInteger(treatment_gens[0]);
+		treatment_end = asInteger(treatment_gens[1]);
+		treatment_start_1 = treatment_start - 1;
+		treatment_end_1 = treatment_end + 1;
+		community.rescheduleScriptBlock(s6, ticks = treatment_start:treatment_end);
+		ori_gen = c(2:treatment_start_1, treatment_end_1:n_generation);
+		community.rescheduleScriptBlock(s3, ticks = ori_gen);
+	}
 	else { community.rescheduleScriptBlock(s6, ticks = asInteger(5000)); }
 }
 
@@ -47,7 +56,7 @@ initialize() {
 			sim.subpopulations[i - 1].tag = i-1;
 			sim.subpopulations[i - 1].individuals.tag = host_size; // Infected State
 			labels = c(labels, 2);
-			sim.subpopulations[i - 1].genomes.readFromVCF(paste0(cwdir, "/originalvcfs/seed.", seed_count, ".coe.vcf"));
+			sim.subpopulations[i - 1].genomes.readFromVCF(paste0(cwdir, "/originalvcfs/seed.", seed_count, ".vcf"));
 			writeFile(paste0(cwdir, "/seeds.name"), paste0(seed_count, ",", "p", i-1), append=T);
 			if (seed_count < 9)
 			{
@@ -119,7 +128,11 @@ s1 reproduction()
 		if (length(contact_ids)>0)
 		{
 			infector_pathogen = sample(infector_subpop.individuals, 1);
-			transmissibility = sum(infector_pathogen.genome1.mutations.selectionCoeff);
+			muts_info = rep(0, length(range_genes));
+			contains_or_not = match(infector_pathogen.genome1.mutations.position, range_genes);
+			muts_info[contains_or_not[which(contains_or_not >= 0)]] = 1;
+			transmissibility = sum(traits_transmissibility * muts_info);
+			//transmissibility = sum(infector_pathogen.genome1.mutations.selectionCoeff);
 			trans_event = rbinom(length(contact_ids), 1, Infection_rate * transmissibility);
 			contacts_states = Host_states[contact_ids];
 			
@@ -157,9 +170,8 @@ s1 reproduction()
 }
 
 
-
-// SEIR state transition
-s3 early()
+// SEIR state transition with drug treatment and resistance
+s6 early()
 {
 	inds = sim.subpopulations.individuals;
 	sim.killIndividuals(inds[inds.age > 0]);
@@ -172,7 +184,7 @@ s3 early()
 	
 	// Deal with exposed individuals
 	e_inds = which(Host_states==1); // deal with 1&2 first
-	sim.subpopulations[e_inds].individuals.tag = host_size;
+	//sim.subpopulations[e_inds].individuals.tag = host_size;
 	draw_uniform = runif(length(e_inds));
 	state_transition = findInterval(draw_uniform, c(0, activate_rate, activate_rate + ER_rate));
 	Host_states[e_inds[which(state_transition==0)]]=2; // state_transition=0 means going from latent to active state (1>2)
@@ -191,7 +203,117 @@ s3 early()
 	
 	// Deal with infected individuals
 	i_inds = which(Host_states==2);
-	sim.subpopulations[i_inds].individuals.tag = host_size;
+	//sim.subpopulations[i_inds].individuals.tag = host_size;
+	draw_uniform = runif(length(i_inds));
+	state_transition = findInterval(draw_uniform, c(0, treatment_recovery_rate*sample_rate, treatment_recovery_rate, treatment_recovery_rate + IE_rate));
+	recover_from_i = i_inds[which(state_transition<=1)];
+	Host_states[recover_from_i]=3;
+	sampled_inds = i_inds[which(state_transition==0)];
+	
+	if (length(sampled_inds)>0)
+	{
+		sampled_inds_genomes = c();
+		for (ind in sampled_inds)
+		{
+			line1 = paste(community.tick, ind);
+			writeFile(paste0(cwdir, "/sample.txt"), line1, append=T);
+			sampled_inds_genomes = c(sampled_inds_genomes, sample(sim.subpopulations[ind].individuals, 1));
+		}
+		sampled_inds_genomes.genomes.outputVCF(filePath=paste0(cwdir, "/sample_vcfs/", community.tick, ".sampled.vcf"));
+	}
+	
+	actually_recovered = c();
+	if (length(recover_from_i)>0)
+	{
+		for (ind in recover_from_i)
+		{
+			muts_info = rep(0, length(range_genes));
+			sample_1_pathogen = sample(sim.subpopulations[ind].individuals, 1);
+			contains_or_not = match(sample_1_pathogen.genome1.mutations.position, range_genes);
+			muts_info[contains_or_not[which(contains_or_not >= 0)]] = 1;
+			recovery_success_rate = 1.5 - sum(traits_recoveryrate * muts_info); // 1.5 could be changed, the bigger the effect size for drug resistance mutation is, the smaller the recovery success
+			if (runif(1) < recovery_success_rate)
+			{
+				// print(recovery_success_rate);
+				line1 = paste(community.tick, ind);
+				writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T);
+				actually_recovered = c(actually_recovered, ind);
+			}
+		}
+		sim.killIndividuals(sim.subpopulations[actually_recovered].individuals);
+	}
+	
+	
+	
+	// Deal with susceptible individuals
+	s_inds = which((Host_states==0)&(sim.subpopulations.individualCount>0));
+	if (super_infection==F)
+	{
+		for (s_ind in s_inds)
+		{
+			s_ind_pathogens = sim.subpopulations[s_ind].individuals;
+			remain_strain_tag = sample(s_ind_pathogens, 1).tag;
+			sim.killIndividuals(s_ind_pathogens[which(s_ind_pathogens.tag!=remain_strain_tag)]);
+			line = paste(community.tick, remain_strain_tag, s_ind);
+			writeFile(paste0(cwdir, "/infection.txt"), line, append=T);
+			remain_strain_tag = host_size;
+		}
+	}
+	else
+	{
+		sim.subpopulations[s_ind].individuals.tag = host_size;
+	}
+
+	draw_uniform = runif(length(s_inds));
+	state_transition = findInterval(draw_uniform, c(0, latent_prob));
+	Host_states[s_inds[which(state_transition==0)]]=1; //state_transition=0 means going to latent state while =1 means going to active state
+	Host_states[s_inds[which(state_transition > 0)]]=2;
+	
+	
+	// Deal with recovered individuals
+	r_inds = which(Host_states==3);
+	draw_uniform = runif(length(r_inds));
+	state_transition = findInterval(draw_uniform, c(0, RS_rate));
+	Host_states[r_inds[which(state_transition==0)]]=0;
+	Host_states[actually_recovered]=3;
+	
+
+}
+
+// SEIR state transition without drug treatment and resistance
+s3 early()
+{
+	inds = sim.subpopulations.individuals;
+	sim.killIndividuals(inds[inds.age > 0]);
+	
+	//defineGlobal("sampled_hosts", c());
+	hosts = sim.subpopulations;
+	recovered_genomes = c();
+	recovered_hosts = c();
+	popsizeminus1 = host_size-1;
+	
+	// Deal with exposed individuals
+	e_inds = which(Host_states==1); // deal with 1&2 first
+	//sim.subpopulations[e_inds].individuals.tag = host_size;
+	draw_uniform = runif(length(e_inds));
+	state_transition = findInterval(draw_uniform, c(0, activate_rate, activate_rate + ER_rate));
+	Host_states[e_inds[which(state_transition==0)]]=2; // state_transition=0 means going from latent to active state (1>2)
+	recover_from_e = e_inds[which(state_transition==1)];
+	if (length(recover_from_e)>0)
+	{
+		Host_states[recover_from_e]=3;
+		for (ind in recover_from_e)
+		{
+			line1 = paste(community.tick, ind);
+			writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T);
+		}
+		sim.killIndividuals(sim.subpopulations[recover_from_e].individuals);
+	}
+	
+	
+	// Deal with infected individuals
+	i_inds = which(Host_states==2);
+	//sim.subpopulations[i_inds].individuals.tag = host_size;
 	draw_uniform = runif(length(i_inds));
 	state_transition = findInterval(draw_uniform, c(0, Recovery_rate*sample_rate, Recovery_rate, Recovery_rate + IE_rate));
 	recover_from_i = i_inds[which(state_transition<=1)];
@@ -250,10 +372,7 @@ s3 early()
 	state_transition = findInterval(draw_uniform, c(0, RS_rate));
 	Host_states[r_inds[which(state_transition==0)]]=0;
 	
-	
-	
-	
-	//sapply(0:popsizeminus1, "host_manipulation_by_type(applyValue);");
+
 }
 
 // Log
@@ -267,9 +386,4 @@ s5 late()
 	sim.simulationFinished();
 }
 
-// change effect size block, only activated in certain epoch changing generations
-s6 5000 first() {
-	epoch = epoch + 1;
-	defineGlobal("effsize_pos", readCSV(paste0(epoch, ".", causal_gene_path), colNames = T));
-}
 
