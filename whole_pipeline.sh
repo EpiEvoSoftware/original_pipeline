@@ -19,8 +19,14 @@
 
 ####################################################
 ## Environmental variables for preparation (Reading in a config file):
+<<<<<<< HEAD
 config_file="/Users/px54/Documents/TB_software/test3/params.config"
+=======
+config_file="/Users/px54/Documents/TB_software/test/params.config"
+# TODO: change to relative paths, "./test/params.config"
+>>>>>>> 976214c0390819fda95351d83bee4645f5344e29
 codes_dir="/Users/px54/Documents/TB_software/V1_codes"
+# TODO: change to relative paths, "./V1_codes"
 
 while IFS=":" read -r key value; do
     declare "$key=$value"
@@ -58,11 +64,18 @@ fi
 
 ## 0.1 Split the seeds' vcf files
 cd ${cwdir}
+<<<<<<< HEAD
 python ${codes_dir}/seeds_vcf_split.py -wk_dir ${cwdir}/       # This will generate seed.x.vcf, x in [0:seed_size-1]
 mkdir ${cwdir}/originalvcfs                  # Create a new subdirectory to store these new vcf files.
 mv ${cwdir}/seed.*.vcf ./originalvcfs/
 rm ${cwdir}/seeds.vcf
 
+=======
+#python ${codes_dir}/seeds_vcf_split.py -wk_dir ${cwdir}/       # This will generate seed.x.vcf, x in [0:seed_size-1]
+#mkdir ${cwdir}/originalvcfs                  # Create a new subdirectory to store these new vcf files.
+#mv ${cwdir}/seed.*.vcf ./originalvcfs/
+#rm ${cwdir}/seeds.vcf  
+>>>>>>> 976214c0390819fda95351d83bee4645f5344e29
 
 
 
