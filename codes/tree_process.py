@@ -1,5 +1,4 @@
 import tskit
-import sys
 import re
 import argparse
 

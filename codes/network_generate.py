@@ -3,21 +3,31 @@ import numpy as np
 import argparse
 import random
 
+def write_network(ntwk_, wk_dir, pop_size):
+    with open(wk_dir + "contact_network.adjlist.modified", "w") as adjl:
+        for i in range(pop_size):
+            int_list = list(ntwk_.adj[i])
+            if len(int_list) > 0:
+                adjl.write(str(i) + " " + " ".join([str(x) for x in int_list]) + "\n")
+            else:
+                adjl.write(str(i) + "\n")
 
-def ER_generate(pop_size, wk_dir, p_ER):
+
+def ER_generate(pop_size, p_ER):
      
         ## Generate an Erdős-Rényi graph with 1000 nodes and probability of edge generation being 0.15
     er_graph = nx.erdos_renyi_graph(pop_size, p_ER)
 
+    return(er_graph)
     ## Read the adjascent list and write them into a matrix
-    with open(wk_dir + "contact_network.adjlist.modified", "w") as adjl:
-        for i in range(pop_size):
-            int_list = list(er_graph.adj[i])
-            adjl.write(str(i) + " " + " ".join([str(x) for x in int_list]) + "\n")
+    #with open(wk_dir + "contact_network.adjlist.modified", "w") as adjl:
+    #    for i in range(pop_size):
+    #        int_list = list(er_graph.adj[i])
+    #        adjl.write(str(i) + " " + " ".join([str(x) for x in int_list]) + "\n")
 
 
 
-def rp_generate(rp_size, wk_dir, p_within, p_between):
+def rp_generate(rp_size, p_within, p_between):
     ## Generate a random partition graph with 2 groups, each group having a probability of within-group edge, and there is a between-group edge probability
     rp_graph = nx.random_partition_graph(rp_size, p_within[1], p_between)
     if p_within[0]==p_within[1]:
@@ -29,10 +39,11 @@ def rp_generate(rp_size, wk_dir, p_within, p_between):
                 else:
                     if np.random.uniform(0, 1, 1)[0] <= (p_within[0] - p_within[1]) / (1 - p_within[1]):
                         rp_graph.add_edge(i ,j)
-    with open(wk_dir + "contact_network.adjlist.modified", "w") as adjl:
-        for i in range(sum(rp_size)):
-            int_list = list(rp_graph.adj[i])
-            adjl.write(str(i) + " " + " ".join([str(x) for x in int_list]) + "\n")
+    return(rp_graph)
+    #with open(wk_dir + "contact_network.adjlist.modified", "w") as adjl:
+    #    for i in range(sum(rp_size)):
+    #        int_list = list(rp_graph.adj[i])
+    #        adjl.write(str(i) + " " + " ".join([str(x) for x in int_list]) + "\n")
 
 def _random_subset(seq,m):
 
@@ -42,7 +53,7 @@ def _random_subset(seq,m):
         targets.add(x)
     return targets
 
-def ba_generate(wk_dir, pop_size, m):
+def ba_generate(pop_size, m):
     G=nx.empty_graph(m)
     G.name="barabasi_albert_graph(%s,%s)"%(pop_size,m)
     # Target nodes for new edges
@@ -58,10 +69,11 @@ def ba_generate(wk_dir, pop_size, m):
         targets = _random_subset(repeated_nodes,m)
         source += 1
     ba_graph = G
-    with open(wk_dir + "contact_network.adjlist.modified", "w") as adjl:
-        for i in range(pop_size):
-            int_list = list(ba_graph.adj[i])
-            adjl.write(str(i) + " " + " ".join([str(x) for x in int_list]) + "\n")
+    return(ba_graph)
+    #with open(wk_dir + "contact_network.adjlist.modified", "w") as adjl:
+    #    for i in range(pop_size):
+    #        int_list = list(ba_graph.adj[i])
+    #        adjl.write(str(i) + " " + " ".join([str(x) for x in int_list]) + "\n")
     #adj_mx = np.zeros((pop_size,pop_size))
     #for i in adj:
     #    a = int(i)
@@ -102,13 +114,13 @@ def main():
     m = args.m
     
     if mtd == "ER":
-        ER_generate(pop_size, wk_dir, p_ER)
+        write_network(ER_generate(pop_size, wk_dir, p_ER), wk_dir, pop_size)
 
     elif mtd == "rd_part":
-        rp_generate(rp_size, wk_dir, p_within, p_between)
+        write_network(rp_generate(rp_size, wk_dir, p_within, p_between), wk_dir, pop_size)
 
     elif mtd=="ba":
-        ba_generate(wk_dir, pop_size, m)
+         write_network(ba_generate(wk_dir, pop_size, m), wk_dir, pop_size)
 
     else:
         print("Illegal method provided!")

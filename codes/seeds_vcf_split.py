@@ -2,7 +2,7 @@ import argparse
 
 
 ## Split the vcfs to make them separate vcf files for each seed to facilitate SLiM to read
-def modify_vcf(wkdir):
+def split_vcf(wkdir):
     with open(wkdir + "seeds.vcf", "r") as vcf:
         for line in vcf:
             if line.startswith("##"):
@@ -41,7 +41,7 @@ def main():
 
     args = parser.parse_args()
     wk_dir_ = args.wk_dir
-    modify_vcf(wk_dir_)
+    split_vcf(wk_dir_)
 
 if __name__ == "__main__":
     main()
