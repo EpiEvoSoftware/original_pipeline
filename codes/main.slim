@@ -14,6 +14,23 @@ initialize() {
 }
 
 
+mutation(m2) {
+
+	// draw mutational effects for the new m2 mutation 
+	// effects = rmvnorm(1, QTL_mu, QTL_sigma); 
+	which_gene =asInteger((findInterval(muts.position, trait_locs) + 1) / 2);
+	mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3)); 
+	mut.setValue("e1", effsize_pos.subset(which_gene - 1, 4)); 
+
+	// remember all drawn effects, for our final output 
+	//old_effects = sim.getValue("all_effects"); 
+	//sim.setValue("all_effects", rbind(old_effects, effects));
+
+return T;
+
+}
+
+
 1 first() {
 	//// Define blocks to run
 	// s0, an epoch-controlling block
@@ -73,6 +90,28 @@ initialize() {
 	// change default mutation type and selection coefficient
 	
 	print(effsize_pos);
+	
+	allmuts = sim.subpopulations.individuals.genome1.mutations;
+	for (mut in allmuts)
+	{
+		if (any(mut.position == range_genes))
+		{
+			mut.setMutationType(1);
+			which_gene = asInteger((findInterval(mut.position, trait_locs) + 1) / 2);
+			mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3)); 
+			mut.setValue("e1", effsize_pos.subset(which_gene - 1, 4)); 	
+		}
+	}
+	//pos_mutated = setIntersection(allmuts.position, range_genes);
+	//muts = allmuts[which(any(allmuts.position == pos_mutated))];
+	//print(muts.position);
+	//muts.setMutationType(1);
+	//muts = sim.subpopulations.individuals.genome1.mutationsOfType(1);
+	//which_gene = asInteger((findInterval(muts.position, trait_locs) + 1) / 2);
+	//print(which_gene);
+	//
+	//
+	
 
 	defineGlobal("Host_states", labels);
 	//sim.outputFull("initial.output");
@@ -86,24 +125,32 @@ initialize() {
 	for (l in lines_contact)
 	{
 		ll = strsplit(l, " ");
-		host = asInteger(ll[0]);
-		contacts = c();
-		if (length(ll) > 1)
+		ll = asInteger(strsplit(l, " "));
+		host = ll[0];
+		contact_size = length(ll) - 1;
+		//if (length(ll) > 1)
+		//{
+		//	end_index = length(ll) - 1;
+		//	for (cont in ll[1:end_index])
+		//	{
+		//		if (cont=="")  // Make sure input is correct and get rid of this
+		//		{
+		//			contacts = c(contacts);
+		//		}
+		//		else
+		//		{
+		//			contacts = c(contacts, asInteger(cont));
+		//		}
+		//	}
+		//}
+		if (contact_size > 0)
 		{
-			end_index = length(ll) - 1;
-			for (cont in ll[1:end_index])
-			{
-				if (cont=="")
-				{
-					contacts = c(contacts);
-				}
-				else
-				{
-					contacts = c(contacts, asInteger(cont));
-				}
-			}
+			sim.subpopulations[host].setValue("Contacts", ll[1:contact_size]);
 		}
-		sim.subpopulations[host].setValue("Contacts", contacts);
+		else
+		{
+			sim.subpopulations[host].setValue("Contacts", c());
+		}
 	}
 }
 
@@ -128,11 +175,14 @@ s1 reproduction()
 		if (length(contact_ids)>0)
 		{
 			infector_pathogen = sample(infector_subpop.individuals, 1);
-			muts_info = rep(0, length(range_genes));
-			contains_or_not = match(infector_pathogen.genome1.mutations.position, range_genes);
-			muts_info[contains_or_not[which(contains_or_not >= 0)]] = 1;
-			transmissibility = sum(traits_transmissibility * muts_info);
-			//transmissibility = sum(infector_pathogen.genome1.mutations.selectionCoeff);
+			//muts_info = rep(0, length(range_genes));
+			//contains_or_not = match(infector_pathogen.genome1.mutations.position, range_genes);
+			//muts_info[contains_or_not[which(contains_or_not >= 0)]] = 1;
+			//transmissibility = sum(traits_transmissibility * muts_info);
+			muts = infector_pathogen.genome1.mutationsOfType(1);
+			transmissibility = size(muts) ? sum(muts.getValue("e0")) else 0.0;
+
+
 			trans_event = rbinom(length(contact_ids), 1, Infection_rate * transmissibility);
 			contacts_states = Host_states[contact_ids];
 			
@@ -207,7 +257,6 @@ s6 early()
 	draw_uniform = runif(length(i_inds));
 	state_transition = findInterval(draw_uniform, c(0, treatment_recovery_rate*sample_rate, treatment_recovery_rate, treatment_recovery_rate + IE_rate));
 	recover_from_i = i_inds[which(state_transition<=1)];
-	Host_states[recover_from_i]=3;
 	sampled_inds = i_inds[which(state_transition==0)];
 	
 	if (length(sampled_inds)>0)
@@ -227,11 +276,10 @@ s6 early()
 	{
 		for (ind in recover_from_i)
 		{
-			muts_info = rep(0, length(range_genes));
-			sample_1_pathogen = sample(sim.subpopulations[ind].individuals, 1);
-			contains_or_not = match(sample_1_pathogen.genome1.mutations.position, range_genes);
-			muts_info[contains_or_not[which(contains_or_not >= 0)]] = 1;
-			recovery_success_rate = 1.5 - sum(traits_recoveryrate * muts_info); // 1.5 could be changed, the bigger the effect size for drug resistance mutation is, the smaller the recovery success
+			pathogen = sample(sim.subpopulations[ind].individuals, 1);
+			muts = pathogen.genome1.mutationsOfType(1);
+			traits_recoveryrate = size(muts) ? sum(muts.getValue("e1")) else 0.0;
+			recovery_success_rate = 1.5 - traits_recoveryrate; // 1.5 could be changed, the bigger the effect size for drug resistance mutation is, the smaller the recovery success
 			if (runif(1) < recovery_success_rate)
 			{
 				// print(recovery_success_rate);
@@ -240,6 +288,7 @@ s6 early()
 				actually_recovered = c(actually_recovered, ind);
 			}
 		}
+		Host_states[actually_recovered]=3;
 		sim.killIndividuals(sim.subpopulations[actually_recovered].individuals);
 	}
 	
@@ -317,7 +366,6 @@ s3 early()
 	draw_uniform = runif(length(i_inds));
 	state_transition = findInterval(draw_uniform, c(0, Recovery_rate*sample_rate, Recovery_rate, Recovery_rate + IE_rate));
 	recover_from_i = i_inds[which(state_transition<=1)];
-	Host_states[recover_from_i]=3;
 	sampled_inds = i_inds[which(state_transition==0)];
 	
 	if (length(sampled_inds)>0)

@@ -83,14 +83,17 @@ def generate_csv(t1_causal, t2_causal, t1_es_low, t2_es_low, t1_es_high, t2_es_h
 	t2_dict = generate_eff(gff_, t2_causal, t2_es_low, t2_es_high, mss, n_gen, mut_rate)
 
 	all_dict = {}
+	start_pos_dict = {}
 	overlap = set(t1_dict.keys()).intersection(set(t2_dict.keys()))
 	for gene in t1_dict:
 		if gene in overlap:
 			all_dict[gene] = t1_dict[gene]
 			all_dict[gene].append(t2_dict[gene][2])
+			start_pos_dict[all_dict[gene][0]] = gene
 		else:
 			all_dict[gene] = t1_dict[gene]
 			all_dict[gene].append(0)
+			start_pos_dict[all_dict[gene][0]] = gene
 	for gene in t2_dict:
 		if gene in overlap:
 			continue
@@ -98,8 +101,13 @@ def generate_csv(t1_causal, t2_causal, t1_es_low, t2_es_low, t1_es_high, t2_es_h
 			all_dict[gene] = t2_dict[gene][:2]
 			all_dict[gene].append(0)
 			all_dict[gene].append(t2_dict[gene][2])
+			start_pos_dict[all_dict[gene][0]] = gene
+	myKeys = list(start_pos_dict.keys())
+	myKeys.sort()
+	sorted_dict = {i: start_pos_dict[i] for i in myKeys}
+	sorted_all_dict = {start_pos_dict[i]: all_dict[start_pos_dict[i]] for i in sorted_dict}
 
 	with open("causal_gene_info.csv", "w") as csv:
 		csv.write("gene_name,start,end,eff_size_t1,eff_size_t2\n")
-		for i in all_dict:
-			csv.write(i + "," + str(all_dict[i][0]) + "," + str(all_dict[i][1]) + "," + str(all_dict[i][2]) + "," + str(all_dict[i][3]) + "\n")
+		for i in sorted_all_dict:
+			csv.write(i + "," + str(sorted_all_dict[i][0]) + "," + str(sorted_all_dict[i][1]) + "," + str(sorted_all_dict[i][2]) + "," + str(sorted_all_dict[i][3]) + "\n")
