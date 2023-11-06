@@ -1,11 +1,25 @@
-## This script includes all functions about contact network generation
+"""
+Functions for generating contact networks.
 
+Author: Perry Xu
+Date: November 6, 2023
+"""
 
 import networkx as nx
 import numpy as np
 import random
 
 def write_network(ntwk_, wk_dir, pop_size):
+    """
+    Create an adjlist file to store a given network.
+
+    :param ntwk_: The given network.
+    :type ntwk: ?
+    :param wk_dir: The path to store network adjlist file.
+    :type wk_dir: str
+    :param pop_size: The population size of the network.
+    :type pop_size: int
+    """
     with open(wk_dir + "contact_network.adjlist.modified", "w") as adjl:
         for i in range(pop_size):
             int_list = list(ntwk_.adj[i])
@@ -16,7 +30,16 @@ def write_network(ntwk_, wk_dir, pop_size):
 
 
 def ER_generate(pop_size, p_ER):
-     
+    """
+    Returns an Erdős-Rényi graph with specified parameters.
+
+    :param pop_size: The population size of the network.
+    :type pop_size: int
+    :param p_ER: The probability of connection between two individuals.
+    :type p_ER: float
+    :return: The ER network.
+    :rtype: ?
+    """
         ## Generate an Erdős-Rényi graph with 1000 nodes and probability of edge generation being 0.15
     er_graph = nx.erdos_renyi_graph(pop_size, p_ER)
 
@@ -25,6 +48,18 @@ def ER_generate(pop_size, p_ER):
 
 
 def rp_generate(rp_size, p_within, p_between):
+    """
+    Returns a random partition graph of ? groups with sepcified parameters.
+    
+    :param rp_size: The population sizes of each group.
+    :typr rp_size: list[int]
+    :param p_within: The probabilities of within group connection.
+    :type p_within: list[float]
+    :param p_between: The probabilities of intergroup connection.
+    :type p_between: list[float]
+    :return: The RP network.
+    :rtype: ?
+    """
     ## Generate a random partition graph with 2 groups, each group having a probability of within-group edge, and there is a between-group edge probability
     rp_graph = nx.random_partition_graph(rp_size, p_within[1], p_between)
     if p_within[0]==p_within[1]:
@@ -40,7 +75,16 @@ def rp_generate(rp_size, p_within, p_between):
 
 
 def _random_subset(seq,m):
+    """
+    Returns randomly selected m objects from seq.
 
+    :param seq: ?
+    :type seq: ?
+    :param m: ?
+    :type m: int
+    :return: ?
+    :rtype: list[?]
+    """
     targets=set()
     while len(targets)<m:
         x=random.choice(seq)
@@ -48,6 +92,16 @@ def _random_subset(seq,m):
     return targets
 
 def ba_generate(pop_size, m):
+    """
+    Returns a Barabási-Albert graph with sepcified parameters.
+    
+    :param pop_size: The population size of the network.
+    :type pop_size: int
+    :param m:
+    :type m:
+    :return: The BA network.
+    :rtype: ?
+    """
     G=nx.empty_graph(m)
     G.name="barabasi_albert_graph(%s,%s)"%(pop_size,m)
     # Target nodes for new edges

@@ -1,6 +1,21 @@
-## This script contains all functions that will process the log files generated during simulated transmission
+"""
+Functions for processing the log files generated during simulated transmission.
+
+Author: Perry Xu
+Date: November 6, 2023
+"""
 
 def find_range_fit(range_list, query):
+    """
+    Return how many times an individual has been infected from the start to the current generation (inclusive).
+
+    :param range_list: The list of generations during which recoveries happened for an individual.
+    :type range_list: list[int]
+    :param query: The current generation.
+    :type query: int
+    :return: The number of times an individual has been infected.
+    :rtype: int
+    """
     if len(range_list)==0:
         return(1)
     elif query <= min(range_list):
@@ -15,6 +30,14 @@ def find_range_fit(range_list, query):
 
 
 def rename_logfiles(wk_dir_, pop_size_):
+    """
+    Create a new log file with renamed infection information to incorporate the repetitive infections of an individual. More specifically, host_id is replaced by host_id_x, x being the times host_id has been infected. For example, host_id is originally 2023. It will be renamed to 2023_3 if the piece of log information is relevant to 2023's third infection.
+
+    :param wk_dir_: The data directory for log files.
+    :type wk_dir_: str
+    :param pop_size_: The population size of host individuals.
+    :type pop_size_: int
+    """
     recover_matrix = {}
 
     for i in range(pop_size_):
