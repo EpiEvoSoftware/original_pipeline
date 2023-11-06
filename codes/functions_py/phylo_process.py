@@ -1,5 +1,5 @@
 """
-Functions for dealing with trees (convert .trees to .nwk or rename .nwk file)
+Functions for dealing with trees (convert .trees to .nwk or rename .nwk file).
 
 Author: Perry Xu
 Date: November 6, 2023
@@ -12,7 +12,7 @@ def rename_by_host(wkdir):
 	"""
 	Create a newick file for seeds' phylogeny with replaced seed ids.
 
-	:param wkdir: The data directory of input seeds' phylogeny
+	:param wkdir: The data directory of input seeds' phylogeny.
 	:type wkdir: str
 	"""
 	all_names = {}

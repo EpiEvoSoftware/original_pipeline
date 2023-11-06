@@ -1,5 +1,5 @@
 """
-Functions for modifying vcf files (intermediate files or input files)
+Functions for modifying vcf files (intermediate files or input files).
 
 Author: Perry Xu
 Date: November 6, 2023
