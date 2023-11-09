@@ -15,14 +15,14 @@ jobs:
       with:
         auto-update-conda: true
         environment-file: environment.yml
-        activate-environment: your-environment-name
+        activate-environment: trans_slim
 
     - name: Install Dependencies
       run: |
-        conda env update --file environment.yml --name your-environment-name
+        conda env update --file environment.yml --name trans_slim
 
     - name: Run tests
       run: |
-        conda activate your-environment-name
+        conda activate trans_slim
         cd codes/test
         pytest
