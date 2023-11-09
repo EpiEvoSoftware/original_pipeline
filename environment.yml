@@ -16,8 +16,7 @@ dependencies:
   - libcxx=16.0.6
   - libexpat=2.5.0
   - libffi=3.4.2
-  - libgfortran=5.0.0
-  - libgfortran5=13.2.0
+  - libgfortran
   - liblapack=3.9.0
   - libopenblas=0.3.24
   - libsqlite=3.43.2
