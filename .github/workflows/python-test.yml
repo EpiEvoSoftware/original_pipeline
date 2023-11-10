@@ -1,3 +1,7 @@
+name: Python Tests
+
+on: [push, pull_request]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,3 +25,4 @@ jobs:
         source activate trans_slim
         cd codes/test
         pytest
+
