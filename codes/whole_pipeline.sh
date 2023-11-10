@@ -19,12 +19,8 @@
 
 ####################################################
 ## Environmental variables for preparation (Reading in a config file):
-<<<<<<< HEAD
-config_file="/Users/px54/Documents/TB_software/test3/params.config"
-=======
+
 config_file="/Users/px54/Documents/TB_software/test/params.config"
-# TODO: change to relative paths, "./test/params.config"
->>>>>>> 976214c0390819fda95351d83bee4645f5344e29
 codes_dir="/Users/px54/Documents/TB_software/V1_codes"
 # TODO: change to relative paths, "./V1_codes"
 
