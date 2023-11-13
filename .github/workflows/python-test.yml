@@ -1,0 +1,25 @@
+name: Python Tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Miniconda
+      uses: conda-incubator/setup-miniconda@v2.2.0
+      with:
+        activate-environment: trans_slim
+        environment-file: environment.yml
+        auto-activate-base: false
+
+    - name: Run Pytest
+      shell: bash -l {0}
+      run: |
+        conda activate trans_slim
+        cd codes/test
+        pytest
