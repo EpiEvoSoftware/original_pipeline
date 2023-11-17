@@ -15,7 +15,7 @@ def write_network(ntwk_, wk_dir, pop_size):
 
 def ER_generate(pop_size, p_ER):
      
-        ## Generate an Erdős-Rényi graph with 1000 nodes and probability of edge generation being 0.15
+    ## Generate an Erdős-Rényi graph with 1000 nodes and probability of edge generation being 0.15
     er_graph = nx.erdos_renyi_graph(pop_size, p_ER)
 
     return(er_graph)
