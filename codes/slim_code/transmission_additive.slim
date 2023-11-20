@@ -1,0 +1,33 @@
+s1 reproduction()
+{
+	// Transmission
+	infectors = which(Host_states==2);
+	
+	for (infector in infectors)
+	{	
+		infector_subpop = sim.subpopulations[infector];
+		contact_ids = infector_subpop.getValue("Contacts");
+		if (length(contact_ids)>0)
+		{
+			infector_pathogen = sample(infector_subpop.individuals, 1);
+			muts = infector_pathogen.genome1.mutationsOfType(1);
+			transmissibility = additive_trait(muts, "e0", cap_1);
+			//transmissibility = size(muts) ? sum(muts.getValue("e0")) else 0.0;
+
+
+			trans_event = rbinom(length(contact_ids), 1, Infection_rate * transmissibility);
+			contacts_states = Host_states[contact_ids];
+			
+			if (super_infection==T) { infectee_id = contact_ids[which((trans_event==1)&(sim.subpopulations[contact_ids].individualCount < cap_withinhost))]; }
+			else { infectee_id = contact_ids[which((trans_event==1)&(contacts_states==0))]; }
+			for (i in infectee_id)
+			{
+				child = sim.subpopulations[i].addRecombinant(infector_pathogen.genome1, NULL, NULL, NULL, NULL, NULL);
+				child.tag = infector_pathogen.tag;
+				line = paste(community.tick, infector, i);
+				writeFile(paste0(cwdir, "/infection_raw.txt"), line, append=T);
+			}
+		}
+	}
+	self.active=F;
+}
