@@ -1,8 +1,8 @@
-str_pars = c("model", "ref_path", "causal_gene_path", "contact_network_path", "cwdir", "seeds_vcf");
+str_pars = c("model", "ref_path", "causal_gene_path", "contact_network_path", "cwdir", "seeds_vcf", "dr_type", "trans_type");
 int_pars = c("host_size", "n_generation", "seed_size", "n_causal_genes_1", "n_causal_genes_2", "cap_withinhost", "burn_in_generations", "burn_in_Ne", "dr_efsize");
-float_pars = c("Infection_rate", "Recovery_rate", "mut_rate", "sample_rate", "within_host_reproduct_rate", "latent_prob", "activate_rate", "IE_rate", "IS_rate", "ER_rate", "RS_rate", "burn_in_mutrate", "treatment_recovery_rate");
-list_pars = c("treatment_gens");
-bin_pars = c("super_infection", "within_host_evolution", "multiple_epochs");
+float_pars = c("Infection_rate", "Recovery_rate", "mut_rate", "sample_rate", "within_host_reproduct_rate", "latent_prob", "activate_rate", "IE_rate", "IS_rate", "ER_rate", "RS_rate", "burn_in_mutrate", "treatment_recovery_rate", "cap_1", "cap_2");
+list_pars = c("treatment_gens", "massive_samp_gens", "massive_samp_prob", "recover_after_samp_rate");
+bin_pars = c("super_infection", "within_host_evolution", "massive_sampling", "multiple_epochs");
 
 defineGlobal("configs", readFile("params.config"));
 
@@ -30,3 +30,5 @@ for(l in configs)
 		defineGlobal(ll[0], asLogical(ll[1]));	
 	}
 }
+
+print(massive_sampling);

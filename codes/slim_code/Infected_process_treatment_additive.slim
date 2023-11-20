@@ -1,0 +1,56 @@
+s7 early(){
+	i_inds = which(Host_states==2);
+
+	draw_uniform = runif(length(i_inds));
+	state_transition = findInterval(draw_uniform, c(0, treatment_recovery_rate*sample_rate, treatment_recovery_rate, treatment_recovery_rate + IE_rate));
+	recover_from_i = i_inds[which(state_transition<=1)];
+	sampled_inds = i_inds[which(state_transition==0)];
+	
+	if (length(sampled_inds)>0)
+	{
+		sampled_inds_genomes = c();
+		for (ind in sampled_inds)
+		{
+			line1 = paste(community.tick, ind + 1);
+			writeFile(paste0(cwdir, "/sample.txt"), line1, append=T);
+			sampled_inds_genomes = c(sampled_inds_genomes, sample(sim.subpopulations[ind].individuals, 1));
+		}
+		sim.treeSeqRememberIndividuals(sampled_inds_genomes);
+		//sampled_inds_genomes.genomes.outputVCF(filePath=paste0(cwdir, "/sample_vcfs/", community.tick, ".sampled.vcf"));
+	}
+	
+	actually_recovered = c();
+	if (length(recover_from_i)>0)
+	{
+		for (ind in recover_from_i)
+		{
+			recover_or_not = c();
+			pathogens = sim.subpopulations[ind].individuals;
+			for (pathogen in pathogens)
+			{
+				muts = pathogen.genome1.mutationsOfType(1);
+				treatment_failed_rate = additive_trait(muts, "e1", cap_2);
+
+				//the bigger the effect size for drug resistance mutation is, the more probable that the treatment fails
+				if (runif(1) > treatment_failed_rate)
+				{
+					// print(recovery_success_rate);
+					line1 = paste(community.tick, ind + 1);
+					writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T);
+					actually_recovered = c(actually_recovered, pathogen);
+					recover_or_not = c(recover_or_not, T);
+				}
+				else
+				{
+					recover_or_not = c(recover_or_not, F);
+				}
+			}
+			if (all(recover_or_not==T))
+			{
+				Host_states[ind]=3;
+			}
+		}
+		sim.killIndividuals(actually_recovered);
+	}
+
+}
