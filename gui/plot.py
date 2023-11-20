@@ -62,6 +62,7 @@ class NetworkGraphApp:
             G = rp_generate([500, 500], [p_in, p_in], p_out)
         elif graph_type == "Barabási-Albert":
             m = int(self.parameter_entries["m"].get())
+            # TODO error handling: ValueError: invalid literal for int() with base 10: ''
             G = ba_generate(1000, m)
 
         degrees = [G.degree(n) for n in G.nodes()]
