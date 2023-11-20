@@ -1,0 +1,9 @@
+mutation(m1) {
+	// Set mutational effects for new m2 mutation 
+	which_gene =asInteger((findInterval(mut.position, trait_locs) + 1) / 2);
+	mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3)); 
+	mut.setValue("e1", effsize_pos.subset(which_gene - 1, 4)); 
+	
+	return T;
+
+}

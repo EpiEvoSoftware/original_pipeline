@@ -19,14 +19,8 @@
 
 ####################################################
 ## Environmental variables for preparation (Reading in a config file):
-<<<<<<< HEAD
-config_file="/Users/px54/Documents/TB_software/test3/params.config"
-=======
-config_file="/Users/px54/Documents/TB_software/test/params.config"
-# TODO: change to relative paths, "./test/params.config"
->>>>>>> 976214c0390819fda95351d83bee4645f5344e29
+config_file="/Users/px54/Documents/TB_software/covid_test/params.config"
 codes_dir="/Users/px54/Documents/TB_software/V1_codes"
-# TODO: change to relative paths, "./V1_codes"
 
 while IFS=":" read -r key value; do
     declare "$key=$value"
@@ -64,18 +58,12 @@ fi
 
 ## 0.1 Split the seeds' vcf files
 cd ${cwdir}
-<<<<<<< HEAD
-python ${codes_dir}/seeds_vcf_split.py -wk_dir ${cwdir}/       # This will generate seed.x.vcf, x in [0:seed_size-1]
+python ${codes_dir}/seeds_vcf_split.py -wk_dir ${cwdir}/  \
+    -seed_size ${seed_size}     # This will generate seed.x.vcf, x in [0:seed_size-1]
 mkdir ${cwdir}/originalvcfs                  # Create a new subdirectory to store these new vcf files.
 mv ${cwdir}/seed.*.vcf ./originalvcfs/
 rm ${cwdir}/seeds.vcf
 
-=======
-#python ${codes_dir}/seeds_vcf_split.py -wk_dir ${cwdir}/       # This will generate seed.x.vcf, x in [0:seed_size-1]
-#mkdir ${cwdir}/originalvcfs                  # Create a new subdirectory to store these new vcf files.
-#mv ${cwdir}/seed.*.vcf ./originalvcfs/
-#rm ${cwdir}/seeds.vcf  
->>>>>>> 976214c0390819fda95351d83bee4645f5344e29
 
 
 
@@ -85,13 +73,11 @@ if [ -f "${causal_gene_path}" ]; then
     cat ${causal_gene_path} > causal_gene_info.csv
     ## A script to check and convert user_input file to standard format, for now just store it in the standard file name  *********NOT FINISHED YET***************
 else
-    echo "holder"
     python ${codes_dir}/effsize.py \
         -gff ${gff} \
         -causal_1 ${n_causal_genes_1} -es_low_1 ${efsize_min_1} -es_high_1 ${efsize_max_1} \
         -causal_2 ${n_causal_genes_2} -es_low_2 ${efsize_min_2} -es_high_2 ${efsize_max_2} \
         -wk_dir ${cwdir}/ -sim_generation ${n_generation} -mut_rate ${mut_rate}
-    # This will generate a set of seed.x.coe.vcf, with the newly generated effect size for existing mutation inside the *.coe.vcf file
     # Effect size now is randomly generated uniformly between efsize_min and efsize_max, then normalize to the expected number of mutations at the end of the simulation
     # i.e. Average for the sum of effect size per genome is expected to be 1 at the end of the simulation
     # This definitely needs further refinement
@@ -116,17 +102,26 @@ else
 fi
 echo "Network generated!"
 
+## 0.4 Match seeds with hosts
+python ${codes_dir}/seed_host_match.py -wk_dir ${cwdir}/ \
+    -seed_size ${seed_size} -host_size ${host_size} \
+    -match_method random
 
 
 
 ####################################################
 ## STEP 1: SLIM SIMULATION
 
-## 1.1 Run the SLiM simulation
+## 1.1 Generate SLiM script
+cd ${codes_dir}/slim_code/
+bash generate_slim.sh
+cd ..
+cp ${codes_dir}/slim_code/main_generated.slim .
+## 1.2 Run the SLiM simulation
 # Now, the seeded individuals are randomly chosen in SLiM and SLiM will store the ids of the seeded hosts.
 mkdir ${cwdir}/sample_vcfs
 cd ${codes_dir}
-slim ${codes_dir}/main.slim
+slim ${codes_dir}/main_generated.slim
 echo "SLiM finished!"
 python ${codes_dir}/rename_seedtree.py -wk_dir ${cwdir}/
 
@@ -163,7 +158,7 @@ Rscript  ${codes_dir}/transtree.r ${cwdir} ${cwdir}/seeds.renamed.DOESNT_EXIST.n
 
 
 
-
+: << 'END_COMMENT'
 ## 2.5 Convert the sampled.vcf files of SLiM output to fastas
 cd ${cwdir}/sample_vcfs/
 # Compress all sampled vcf, and index them
@@ -226,6 +221,15 @@ mv ${cwdir}/*.txt ${cwdir}/epidemiology_log
 
 
 
+####################################################
+## STEP 3: Visualization of results
+## 3.1 Plot the SEIR trajectory
+Rscript SEIR_trajectory.R ${cwdir}/SIR_trajectory.txt ${cwdir}/
 
-: << 'END_COMMENT'
+## 3.2 Plot the strain distribution (color the drug treatment time in the background)
+
+## 3.3 Plot the transmission tree
+
+
+
 

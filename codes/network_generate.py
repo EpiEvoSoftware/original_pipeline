@@ -114,13 +114,13 @@ def main():
     m = args.m
     
     if mtd == "ER":
-        write_network(ER_generate(pop_size, wk_dir, p_ER), wk_dir, pop_size)
+        write_network(ER_generate(pop_size, p_ER), wk_dir, pop_size)
 
     elif mtd == "rd_part":
-        write_network(rp_generate(rp_size, wk_dir, p_within, p_between), wk_dir, pop_size)
+        write_network(rp_generate(rp_size, p_within, p_between), wk_dir, pop_size)
 
     elif mtd=="ba":
-         write_network(ba_generate(wk_dir, pop_size, m), wk_dir, pop_size)
+         write_network(ba_generate(pop_size, m), wk_dir, pop_size)
 
     else:
         print("Illegal method provided!")
