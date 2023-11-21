@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import networkx as nx
 import numpy as np
 from network import *
@@ -11,9 +11,28 @@ import codes.network_generate as network_generate
 
 
 class NetworkGraphApp:
-    def __init__(self, root):
+    """
+    A class providing a visualization app.
+    """
+    def __init__(self, root, config_file):
+        """
+        Initializes the visualization app.
+
+        Parameter k: The initial number of clusters
+        Precondition: k is an int
+
+        Parameter config_file: The configuration file, as a python dictionary
+        Precondition: config_file is a valid dictionary
+        """
         self.root = root
-        root.title("Network Graph Visualization")
+        self.root.title("Network Graph Visualization")
+        self.pop_size = int(config_file["host_size"])
+
+        self.network_dict = {
+            "Erdős–Rényi": "ER",
+            "Barabási-Albert": "BA", 
+            "Random Partition": "RP"
+        }
 
         style = ttk.Style()
         style.configure('Large.TButton', font=(
@@ -21,11 +40,11 @@ class NetworkGraphApp:
         style.configure('Large.TLabel', font=(
             'Helvetica', 12))
 
-        self.control_frame = ttk.Frame(root, width=300)
+        self.control_frame = ttk.Frame(self.root, width=300)
         self.control_frame.pack(side=tk.RIGHT, fill=tk.Y,
                                 padx=10, pady=10)
 
-        self.graph_frame = ttk.Frame(root)
+        self.graph_frame = ttk.Frame(self.root)
         self.graph_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         self.graph_type = tk.StringVar()
@@ -55,18 +74,23 @@ class NetworkGraphApp:
 
     def plot_degree_distribution(self):
         graph_type = self.graph_type.get()
-        if graph_type == "Erdős–Rényi":
+        selected_graph_type = self.network_dict[graph_type]
+
+        if selected_graph_type == "ER":
             p = float(self.parameter_entries["p"].get())
-            G = network_generate.ER_generate(1000, p)
-        elif graph_type == "Random Partition":
+            G = network_generate.ER_generate(self.pop_size, p)
+        elif selected_graph_type == "RP":
             p_in = float(self.parameter_entries["p_in"].get())
             p_out = float(self.parameter_entries["p_out"].get())
 
             G = network_generate.rp_generate([500, 500], [p_in, p_in], p_out)
-        elif graph_type == "Barabási-Albert":
+            # TODO: replace with parameters in the config file
+        elif selected_graph_type == "BA":
             m = int(self.parameter_entries["m"].get())
             # TODO error handling: ValueError: invalid literal for int() with base 10: ''
-            G = network_generate.ba_generate(1000, m)
+            G = network_generate.ba_generate(self.pop_size, m)
+        else:
+            messagebox.showwarning('Error','Unsupported Graph Type')
 
         degrees = [G.degree(n) for n in G.nodes()]
 
@@ -89,14 +113,17 @@ class NetworkGraphApp:
         self.parameter_entries.clear()
 
         graph_type = self.graph_type.get()
+        selected_graph_type = self.network_dict[graph_type]
         params = []
 
-        if graph_type == "Erdős–Rényi":
+        if selected_graph_type == "ER":
             params = [("p", "float")]
-        elif graph_type == "Random Partition":
+        elif selected_graph_type == "RP":
             params = [("p_in", "float"), ("p_out", "float")]
-        elif graph_type == "Barabási-Albert":
+        elif selected_graph_type == "BA":
             params = [("m", "int")]
+        else:
+            messagebox.showwarning('Error','Unsupported Graph Type')
 
         # create new parameters
         for param, dtype in params:
@@ -112,7 +139,7 @@ class NetworkGraphApp:
         self.degree_button.pack()
 
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = NetworkGraphApp(root)
-    root.mainloop()
+# if __name__ == "__main__":
+#     root = tk.Tk()
+#     app = NetworkGraphApp(root)
+#     root.mainloop()
