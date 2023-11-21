@@ -3,12 +3,11 @@ An application for visualizing networks
 
 This file is the main entry-point for the GUI application. 
 """
-# To handle command line options
 import argparse
 import os.path
 import tkinter as tk
 
-def load_config_as_dict(config_file = "../codes/params.config"):
+def load_config_as_dict(config_file):
     """
     Loads the configuration from a file into a dictionary.
 
@@ -38,7 +37,7 @@ def parse_args():
         argparse.Namespace: Parsed command line arguments.
     """
     parser = argparse.ArgumentParser(prog='cluster', description='Application to view GUI')
-    parser.add_argument('config_path', type=str, help='path to the configuration file')
+    parser.add_argument('--config_path', type=str, help='path to the configuration file', default="codes/params.config")
     parser.add_argument('-v', '--view', action='store_true', help='visualize network graph')
     return parser.parse_args()
     

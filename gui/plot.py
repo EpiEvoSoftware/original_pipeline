@@ -28,6 +28,11 @@ class NetworkGraphApp:
         self.root.title("Network Graph Visualization")
         self.pop_size = int(config_file["host_size"])
 
+        # window_width = 800  
+        # window_height = 600  
+        # self.root.geometry(f"{window_width}x{window_height}")   
+        # For controlling GUI height and width   
+
         self.network_dict = {
             "Erdős–Rényi": "ER",
             "Barabási-Albert": "BA", 
@@ -57,6 +62,7 @@ class NetworkGraphApp:
                     "Random Partition"],
             style='Large.TButton'
         )
+        # TODO: Look for more responsive tk classes to replace Combobox
         graph_type_dropdown.pack()
         graph_type_dropdown.bind(
             "<<ComboboxSelected>>", self.update_parameters)
@@ -84,7 +90,7 @@ class NetworkGraphApp:
             p_out = float(self.parameter_entries["p_out"].get())
 
             G = network_generate.rp_generate([500, 500], [p_in, p_in], p_out)
-            # TODO: replace with parameters in the config file
+            # TODO: replace with correct parameters in the config file
         elif selected_graph_type == "BA":
             m = int(self.parameter_entries["m"].get())
             # TODO error handling: ValueError: invalid literal for int() with base 10: ''
