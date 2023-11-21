@@ -5,6 +5,9 @@ import numpy as np
 from network import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import sys, os, os.path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import codes.network_generate as network_generate
 
 
 class NetworkGraphApp:
@@ -54,16 +57,16 @@ class NetworkGraphApp:
         graph_type = self.graph_type.get()
         if graph_type == "Erdős–Rényi":
             p = float(self.parameter_entries["p"].get())
-            G = ER_generate(1000, p)
+            G = network_generate.ER_generate(1000, p)
         elif graph_type == "Random Partition":
             p_in = float(self.parameter_entries["p_in"].get())
             p_out = float(self.parameter_entries["p_out"].get())
 
-            G = rp_generate([500, 500], [p_in, p_in], p_out)
+            G = network_generate.rp_generate([500, 500], [p_in, p_in], p_out)
         elif graph_type == "Barabási-Albert":
             m = int(self.parameter_entries["m"].get())
             # TODO error handling: ValueError: invalid literal for int() with base 10: ''
-            G = ba_generate(1000, m)
+            G = network_generate.ba_generate(1000, m)
 
         degrees = [G.degree(n) for n in G.nodes()]
 
