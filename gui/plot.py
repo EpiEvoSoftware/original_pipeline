@@ -100,13 +100,58 @@ class NetworkGraphApp:
 
         degrees = [G.degree(n) for n in G.nodes()]
 
+        # --------- by x axis
+
+        partitions = [25, 50, 75]
+
         self.ax.clear()
-        self.ax.hist(degrees, bins=range(
-            min(degrees), max(degrees) + 1, 1), edgecolor='black')
+        self.ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+
+        # Draw vertical lines for partitions
+        for partition in partitions:
+            self.ax.axvline(x=partition, color='k', linestyle='--')
+
+        # Setting titles and labels
         self.ax.set_title("Degree Distribution")
         self.ax.set_xlabel("Degree")
         self.ax.set_ylabel("Number of Nodes")
         self.canvas.draw()
+
+        # Creating a dictionary to hold nodes for each partition
+        partitioned_nodes = {partition: [] for partition in partitions + [100]}
+        
+        # Assign nodes to partitions
+        for node, degree in enumerate(degrees):
+            for partition in partitions:
+                if degree <= partition:
+                    partitioned_nodes[partition].append(node)
+                    break
+            else:
+                # For nodes with degree greater than the last partition value
+                partitioned_nodes[100].append(node)
+
+        return partitioned_nodes
+    
+        # --------- by node values
+
+        # Calculate quartiles
+        Q1, median, Q3 = np.percentile(degrees, [25, 50, 75])
+
+        self.ax.clear()
+        self.ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+
+        # Draw vertical lines for quartiles
+        for quartile in [Q1, median, Q3]:
+            self.ax.axvline(x=quartile, color='k', linestyle='--')
+
+        # Setting titles and labels
+        self.ax.set_title("Degree Distribution")
+        self.ax.set_xlabel("Degree")
+        self.ax.set_ylabel("Number of Nodes")
+        self.canvas.draw()
+
+        # Returning the quartile values
+        return Q1, median, Q3
 
     def update_parameters(self, event=None):
         # clear existing parameters
