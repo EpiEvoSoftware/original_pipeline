@@ -28,10 +28,11 @@ class NetworkGraphApp:
         self.root.title("Network Graph Visualization")
         self.pop_size = int(config_file["host_size"])
 
-        # window_width = 800  
-        # window_height = 600  
-        # self.root.geometry(f"{window_width}x{window_height}")   
-        # For controlling GUI height and width   
+        # For controlling GUI height and width
+        window_width = root.winfo_screenwidth()
+        window_height = root.winfo_screenheight()
+        self.root.geometry(f"{window_width}x{window_height}")   
+        # ------------------------------------
 
         self.network_dict = {
             "Erdős–Rényi": "ER",
@@ -97,11 +98,11 @@ class NetworkGraphApp:
         self.table.heading('t2', text='t2')
         self.table.heading('host_id', text='host_id')
 
-        # Defining the headings
-        self.table.heading('id', text='ID')
-        self.table.heading('t1', text='t1')
-        self.table.heading('t2', text='t2')
-        self.table.heading('host_id', text='host_id')
+        # # Defining the headings
+        # self.table.heading('id', text='ID')
+        # self.table.heading('t1', text='t1')
+        # self.table.heading('t2', text='t2')
+        # self.table.heading('host_id', text='host_id')
         # TODO: generate from text file, will have t3, t4
         # TODO: limit x axis when to the right, its too to the left
 
@@ -242,9 +243,3 @@ class NetworkGraphApp:
 
         self.degree_button.pack_forget()
         self.degree_button.pack()
-
-
-# if __name__ == "__main__":
-#     root = tk.Tk()
-#     app = NetworkGraphApp(root)
-#     root.mainloop()
