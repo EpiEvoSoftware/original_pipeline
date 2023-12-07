@@ -97,6 +97,7 @@ class NetworkGraphApp:
         self.table.column('t1', width=50)
         self.table.column('t2', width=50)
         self.table.column('host_id', width=100)
+        # TODO: after choosing the quantile, match it to the specific node
         
         # Defining the columns
         self.table.heading('id', text='ID')
@@ -149,7 +150,14 @@ class NetworkGraphApp:
             messagebox.showwarning('Error','Unsupported Graph Type')
 
         degrees = [G.degree(n) for n in G.nodes()]
+        # TODO: after user picks the partition, find all the nodes that have degree in partition
+                # TODO: within that group, select a random node, regenerate seed, 
+                # TODO: after selecting partition,  
         # TODO: do by the nodes not the x axis
+        # TODO: also add option for highest connected node, node ranking
+            # TODO: highest connected node, top ten node, random selection
+            
+
         # integrate, density
 
         # --------- by x axis
