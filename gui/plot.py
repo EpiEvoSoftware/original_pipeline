@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 import networkx as nx
 import numpy as np
 from network import *
+from tools import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import sys, os, os.path
@@ -39,6 +40,11 @@ class NetworkGraphApp:
             "Barabási-Albert": "BA", 
             "Random Partition": "RP"
         }
+
+        # TODO: fix read_txt and list_files so that it reads from the txt file for the table
+        # read_txt("./files/trait_vals_seeds.txt")
+        # list_files("./files")
+
 
         style = ttk.Style()
         style.configure('Large.TButton', font=(
@@ -119,6 +125,7 @@ class NetworkGraphApp:
 
         # Positioning the table in the GUI
         self.table.pack(side='right', fill='both', expand=True)
+    
 
     def plot_degree_distribution(self):
         graph_type = self.graph_type.get()
@@ -142,6 +149,8 @@ class NetworkGraphApp:
             messagebox.showwarning('Error','Unsupported Graph Type')
 
         degrees = [G.degree(n) for n in G.nodes()]
+        # TODO: do by the nodes not the x axis
+        # integrate, density
 
         # --------- by x axis
 
