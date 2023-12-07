@@ -88,7 +88,6 @@ class NetworkGraphApp:
         elif selected_graph_type == "RP":
             p_in = float(self.parameter_entries["p_in"].get())
             p_out = float(self.parameter_entries["p_out"].get())
-
             G = network_generate.rp_generate([500, 500], [p_in, p_in], p_out)
             # TODO: replace with correct parameters in the config file
         elif selected_graph_type == "BA":
@@ -102,20 +101,32 @@ class NetworkGraphApp:
 
         # --------- by x axis
 
-        partitions = [25, 50, 75]
+        # partitions = [25, 50, 75]
 
         self.ax.clear()
         self.ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+        self.ax.set_xlim(left=min(degrees) - 3, right=max(degrees) + 3)
 
         # Draw vertical lines for partitions
-        for partition in partitions:
-            self.ax.axvline(x=partition, color='k', linestyle='--')
+        # for partition in partitions:
+        #     self.ax.axvline(x=partition, color='k', linestyle='--')
 
         # Setting titles and labels
         self.ax.set_title("Degree Distribution")
         self.ax.set_xlabel("Degree")
         self.ax.set_ylabel("Number of Nodes")
+        
+        x_min = self.ax.get_xlim()[0]
+        current_range = self.ax.get_xlim()[1] - x_min
+
+        # partitions = [current_range//4, current_range//2, current_range*3//4]
+        partitions = [current_range/4 + x_min, current_range/2 + x_min, current_range*3/4 + x_min]
+        for partition in partitions:
+            self.ax.axvline(x=partition, color='k', linestyle='--')
+
         self.canvas.draw()
+
+        return
 
         # Creating a dictionary to hold nodes for each partition
         partitioned_nodes = {partition: [] for partition in partitions + [100]}
