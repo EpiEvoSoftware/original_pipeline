@@ -77,6 +77,47 @@ class NetworkGraphApp:
         self.degree_button = ttk.Button(
             self.control_frame, text="Plot Degree Distribution", command=self.plot_degree_distribution, style='Large.TButton')
         self.degree_button.pack()
+        # TODO: ask user for partition numbers, max 10
+
+
+        # -----------------------------------------
+        # Creating the table
+        # -----------------------------------------
+        self.table = ttk.Treeview(self.control_frame, columns=('id', 't1', 't2', 'host_id'), show='headings')
+
+        # Defining and setting the width of the columns
+        self.table.column('id', width=50)
+        self.table.column('t1', width=50)
+        self.table.column('t2', width=50)
+        self.table.column('host_id', width=100)
+        
+        # Defining the columns
+        self.table.heading('id', text='ID')
+        self.table.heading('t1', text='t1')
+        self.table.heading('t2', text='t2')
+        self.table.heading('host_id', text='host_id')
+
+        # Defining the headings
+        self.table.heading('id', text='ID')
+        self.table.heading('t1', text='t1')
+        self.table.heading('t2', text='t2')
+        self.table.heading('host_id', text='host_id')
+        # TODO: generate from text file, will have t3, t4
+        # TODO: limit x axis when to the right, its too to the left
+
+        # Adding rows to the table
+        data = [
+            ("1", "?", "?", "1111"),
+            ("2", "?", "?", "1111"),
+            ("3", "?", "?", "1111"),
+            ("4", "?", "?", "1111"),
+        ]
+
+        for row in data:
+            self.table.insert('', tk.END, values=row)
+
+        # Positioning the table in the GUI
+        self.table.pack(side='right', fill='both', expand=True)
 
     def plot_degree_distribution(self):
         graph_type = self.graph_type.get()
@@ -86,7 +127,9 @@ class NetworkGraphApp:
             p = float(self.parameter_entries["p"].get())
             G = network_generate.ER_generate(self.pop_size, p)
         elif selected_graph_type == "RP":
-            p_in = float(self.parameter_entries["p_in"].get())
+            # p_in_out = self.parameter_entries["p_in_out"].get()
+            # TODO: change this to list
+            p_in = float(self.parameter_entries["p_in_out"].get())
             p_out = float(self.parameter_entries["p_out"].get())
             G = network_generate.rp_generate([500, 500], [p_in, p_in], p_out)
             # TODO: replace with correct parameters in the config file
@@ -101,7 +144,6 @@ class NetworkGraphApp:
 
         # --------- by x axis
 
-        # partitions = [25, 50, 75]
 
         self.ax.clear()
         self.ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
@@ -125,6 +167,7 @@ class NetworkGraphApp:
             self.ax.axvline(x=partition, color='k', linestyle='--')
 
         self.canvas.draw()
+        # TODO: change names from t1, t2 to more descriptive name
 
         return
 
