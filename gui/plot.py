@@ -150,6 +150,7 @@ class NetworkGraphApp:
             messagebox.showwarning('Error','Unsupported Graph Type')
 
         degrees = [G.degree(n) for n in G.nodes()]
+
         # TODO: after user picks the partition, find all the nodes that have degree in partition
                 # TODO: within that group, select a random node, regenerate seed, 
                 # TODO: after selecting partition,  
@@ -157,11 +158,9 @@ class NetworkGraphApp:
         # TODO: also add option for highest connected node, node ranking
             # TODO: highest connected node, top ten node, random selection
             
-
         # integrate, density
 
         # --------- by x axis
-
 
         self.ax.clear()
         self.ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
@@ -179,8 +178,15 @@ class NetworkGraphApp:
         x_min = self.ax.get_xlim()[0]
         current_range = self.ax.get_xlim()[1] - x_min
 
+        quartile = 3
         # partitions = [current_range//4, current_range//2, current_range*3//4]
-        partitions = [current_range/4 + x_min, current_range/2 + x_min, current_range*3/4 + x_min]
+        partitions = []
+        n = len(degrees)
+        for partition in range(quartile):
+            partitions.append(degrees[n//partition])
+
+
+        # partitions = [current_range/4 + x_min, current_range/2 + x_min, current_range*3/4 + x_min]
         for partition in partitions:
             self.ax.axvline(x=partition, color='k', linestyle='--')
 
