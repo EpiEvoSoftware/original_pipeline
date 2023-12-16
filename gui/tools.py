@@ -4,6 +4,44 @@ This module is where we put the helpers that are used by multiple other modules.
 import traceback
 import os, sys
 
+def read_txt(filename):
+    try:
+        with open(filename, 'r') as file:
+            print("success")
+        #     lines = file.readlines()
+        # # Process each line
+        # for line in lines:
+        #     # Assuming your data is comma-separated, split the line into parts
+        #     parts = line.split(',')
+        #     # Now you can process each part as needed
+        #     print(parts)
+    except FileNotFoundError:
+        print("The directory does not exist.")
+    except PermissionError:
+        print("You don't have permission to access this directory.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+def list_files(directory):
+    """
+    Prints out all the files in the specified directory.
+    
+    :param directory: The path to the directory to list files from.
+    """
+    try:
+        for item in os.listdir(directory):
+            full_path = os.path.join(directory, item)
+            if os.path.isfile(full_path):
+                print(item)
+    except FileNotFoundError:
+        print("The directory does not exist.")
+    except PermissionError:
+        print("You don't have permission to access this directory.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
 
 def data_for_file(filename):
     """

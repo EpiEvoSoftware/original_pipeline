@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 import networkx as nx
 import numpy as np
 from network import *
+from tools import *
 import random
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -43,6 +44,11 @@ class NetworkGraphApp:
             "Random Partition": "RP"
         }
 
+        # TODO: fix read_txt and list_files so that it reads from the txt file for the table
+        # read_txt("./files/trait_vals_seeds.txt")
+        # list_files("./files")
+
+
         style = ttk.Style()
         style.configure('Large.TButton', font=(
             'Helvetica', 12))
@@ -80,6 +86,49 @@ class NetworkGraphApp:
         self.degree_button = ttk.Button(
             self.control_frame, text="Plot Degree Distribution", command=self.plot_degree_distribution, style='Large.TButton')
         self.degree_button.pack()
+        # TODO: ask user for partition numbers, max 10
+
+
+        # -----------------------------------------
+        # Creating the table
+        # -----------------------------------------
+        self.table = ttk.Treeview(self.control_frame, columns=('id', 't1', 't2', 'host_id'), show='headings')
+
+        # Defining and setting the width of the columns
+        self.table.column('id', width=50)
+        self.table.column('t1', width=50)
+        self.table.column('t2', width=50)
+        self.table.column('host_id', width=100)
+        # TODO: after choosing the quantile, match it to the specific node
+        
+        # Defining the columns
+        self.table.heading('id', text='ID')
+        self.table.heading('t1', text='t1')
+        self.table.heading('t2', text='t2')
+        self.table.heading('host_id', text='host_id')
+
+        # # Defining the headings
+        # self.table.heading('id', text='ID')
+        # self.table.heading('t1', text='t1')
+        # self.table.heading('t2', text='t2')
+        # self.table.heading('host_id', text='host_id')
+        # TODO: generate from text file, will have t3, t4
+        # TODO: limit x axis when to the right, its too to the left
+
+        # Adding rows to the table
+        data = [
+            ("1", "?", "?", "1111"),
+            ("2", "?", "?", "1111"),
+            ("3", "?", "?", "1111"),
+            ("4", "?", "?", "1111"),
+        ]
+
+        for row in data:
+            self.table.insert('', tk.END, values=row)
+
+        # Positioning the table in the GUI
+        self.table.pack(side='right', fill='both', expand=True)
+    
 
         self.create_table()
 
@@ -105,7 +154,26 @@ class NetworkGraphApp:
         self.ax.set_title("Degree Distribution")
         self.ax.set_xlabel("Degree")
         self.ax.set_ylabel("Number of Nodes")
+        
+        x_min = self.ax.get_xlim()[0]
+        current_range = self.ax.get_xlim()[1] - x_min
+
+        quartile = 3
+        # partitions = [current_range//4, current_range//2, current_range*3//4]
+        partitions = []
+        n = len(degrees)
+        for partition in range(quartile):
+            partitions.append(degrees[n//partition])
+
+
+        # partitions = [current_range/4 + x_min, current_range/2 + x_min, current_range*3/4 + x_min]
+        for partition in partitions:
+            self.ax.axvline(x=partition, color='k', linestyle='--')
+
         self.canvas.draw()
+        # TODO: change names from t1, t2 to more descriptive name
+
+        return
 
     # def plot_degree_distribution(self):
     #     graph_type = self.graph_type.get()
