@@ -6,6 +6,9 @@ This file is the main entry-point for the GUI application.
 import argparse
 import os.path
 import tkinter as tk
+from tkinter import ttk
+from plot import NetworkGraphApp
+
 
 def load_config_as_dict(config_file):
     """
@@ -29,6 +32,7 @@ def load_config_as_dict(config_file):
         print(f"Configuration file {config_file} not found.")
         return None
 
+
 def parse_args():
     """
     Parses command line arguments.
@@ -36,19 +40,32 @@ def parse_args():
     Returns:
         argparse.Namespace: Parsed command line arguments.
     """
-    parser = argparse.ArgumentParser(prog='cluster', description='Application to view GUI')
-    parser.add_argument('--config_path', type=str, help='path to the configuration file', default="codes/params.config")
-    parser.add_argument('-v', '--view', action='store_true', help='visualize network graph')
+    parser = argparse.ArgumentParser(
+        prog='cluster', description='Application to view GUI')
+    parser.add_argument('--config_path', type=str,
+                        help='path to the configuration file', default="codes/params.config")
+    parser.add_argument('-v', '--view', action='store_true',
+                        help='visualize network graph')
     return parser.parse_args()
-    
+
+
 def launch_gui(config_file):
     """
     Launches the gui application
     """
-    from plot import NetworkGraphApp
+
     root = tk.Tk()
-    app = NetworkGraphApp(root, config_file)
+
+    tab_parent = ttk.Notebook(root)
+    tab1 = ttk.Frame(tab_parent)
+    network_app = NetworkGraphApp(tab1, config_file)
+    tab2 = ttk.Frame(tab_parent)
+    tab_parent.add(tab1, text="Network Graph")
+    tab_parent.add(tab2, text="Add New Tab")
+    tab_parent.pack(expand=1, fill='both')
+
     root.mainloop()
+
 
 def execute():
     """
@@ -60,5 +77,6 @@ def execute():
         launch_gui(config)
     else:
         print("A valid configuration file is required to run the application.")
+
 
 execute()
