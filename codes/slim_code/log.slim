@@ -1,12 +1,15 @@
 s4 late()
 {
-	writeFile(paste0(cwdir, "/SIR_trajectory.txt"), paste0(sum(Host_states == 0), ", ", sum(Host_states == 1), ", ", sum(Host_states == 2), ", ", sum(Host_states == 3)), append=T);
+	writeFile(paste0(cwdir, "/SIR_trajectory.txt"), paste0(sum(Host_states == 0), ", ", sum(Host_states == 1), ", ", sum(Host_states == 2), ", ", sum(Host_states == 3)), append=T, compress=T);
 
 	all_pathogens = sim.subpopulations.individuals.tag;
-	line = sum(all_pathogens == 0);
-	for (seed in 2:seed_size)
+	line = asString(sum(all_pathogens == 0));
+	if (seed_size > 1)
 	{
-		line = paste0(line, ", ", sum(all_pathogens == seed - 1));
+		for (seed in 1:seed_size)
+		{
+			line = paste0(line, ", ", sum(all_pathogens == seed - 1));
+		}
 	}
-	writeFile(paste0(cwdir, "/strain_trajectory.txt"), line, append=T);
+	writeFile(paste0(cwdir, "/strain_trajectory.txt"), line, append=T, compress=T);
 }

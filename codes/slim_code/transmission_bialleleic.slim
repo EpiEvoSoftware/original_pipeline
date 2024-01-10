@@ -2,30 +2,29 @@ s1 reproduction()
 {
 	// Transmission
 	infectors = which(Host_states==2);
-	
-	for (infector in infectors)
+	subpops = sim.subpopulations;
+	infector_subpops = subpops[infectors];
+
+	for (infector_subpop in infector_subpops)
 	{	
-		infector_subpop = sim.subpopulations[infector];
 		contact_ids = infector_subpop.getValue("Contacts");
 		if (length(contact_ids)>0)
 		{
 			infector_pathogen = sample(infector_subpop.individuals, 1);
 			muts = infector_pathogen.genome1.mutationsOfType(1);
-			transmissibility = bialleleic_trait(muts, "e0", trait_locs, cap_1, effsize_pos);
-			//transmissibility = size(muts) ? sum(muts.getValue("e0")) else 0.0;
-
+			transmissibility = 1 + bialleleic_trait(muts, "e0", trait_locs, cap_transmissibility, effsize_pos);
 
 			trans_event = rbinom(length(contact_ids), 1, Infection_rate * transmissibility);
 			contacts_states = Host_states[contact_ids];
 			
-			if (super_infection==T) { infectee_id = contact_ids[which((trans_event==1)&(sim.subpopulations[contact_ids].individualCount < cap_withinhost))]; }
+			if (super_infection==T) { infectee_id = contact_ids[which((trans_event==1)&(subpops[contact_ids].individualCount < cap_withinhost))]; }
 			else { infectee_id = contact_ids[which((trans_event==1)&(contacts_states==0))]; }
 			for (i in infectee_id)
 			{
-				child = sim.subpopulations[i].addRecombinant(infector_pathogen.genome1, NULL, NULL, NULL, NULL, NULL);
+				child = subpops[i].addRecombinant(infector_pathogen.genome1, NULL, NULL, NULL, NULL, NULL);
 				child.tag = infector_pathogen.tag;
-				line = paste(community.tick, infector, i);
-				writeFile(paste0(cwdir, "/infection_raw.txt"), line, append=T);
+				line = paste(community.tick, infector_subpop.tag, i);
+				writeFile(paste0(cwdir, "/infection_raw.txt"), line, append=T, compress=T);
 			}
 		}
 	}

@@ -1,18 +1,20 @@
 s3 early(){
+	hosts = sim.subpopulations;
 	i_inds = which(Host_states==2);
 	draw_uniform = runif(length(i_inds));
-	state_transition = findInterval(draw_uniform, c(0, Recovery_rate*sample_rate, Recovery_rate, Recovery_rate + IE_rate));
-	recover_from_i = i_inds[which(state_transition<=1)];
-	sampled_inds = i_inds[which(state_transition==0)];
+	state_transition = findInterval(draw_uniform, c(0, sample_rate*sample_alive_prob, sample_rate, Recovery_rate + sample_rate, Recovery_rate + sample_rate + IE_rate));
+	recover_from_i = i_inds[which((state_transition==1)|(state_transition==2))];
+	sampled_inds = i_inds[which(state_transition<=1)];
 	
 	if (length(sampled_inds)>0)
 	{
 		sampled_inds_genomes = c();
 		for (ind in sampled_inds)
 		{
-			line1 = paste(community.tick, ind);
-			writeFile(paste0(cwdir, "/sample.txt"), line1, append=T);
-			sampled_inds_genomes = c(sampled_inds_genomes, sample(sim.subpopulations[ind].individuals, 1));
+			sampled_pathogen = sample(hosts[ind].individuals, 1);
+			line1 = paste(community.tick, ind, sampled_pathogen.tag, "I");
+			writeFile(paste0(cwdir, "/sample.txt"), line1, append=T, compress=T);
+			sampled_inds_genomes = c(sampled_inds_genomes, sampled_pathogen);
 		}
 		sim.treeSeqRememberIndividuals(sampled_inds_genomes);
 		//sampled_inds_genomes.genomes.outputVCF(filePath=paste0(cwdir, "/sample_vcfs/", community.tick, ".sampled.vcf"));
@@ -24,8 +26,8 @@ s3 early(){
 		for (ind in recover_from_i)
 		{
 			line1 = paste(community.tick, ind + 1);
-			writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T);
+			writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T, compress=T);
 		}
-		sim.killIndividuals(sim.subpopulations[recover_from_i].individuals);
+		sim.killIndividuals(hosts[recover_from_i].individuals);
 	}
 }

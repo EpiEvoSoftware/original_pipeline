@@ -14,9 +14,9 @@ function (numeric)additive_trait(o<Mutation> muts, s trait_type, f cap)
 
 function (numeric)bialleleic_trait(o<Mutation> muts, s trait_type, numeric trait_locations, f cap, o<DataFrame> effsize_df)
 {
-	which_gene = unique(sapply(muts.position, "asInteger((findInterval(applyValue.position, trait_locations) + 1) / 2)"));
+	which_gene = unique(sapply(muts.position, "asInteger((findInterval(applyValue, trait_locations) + 1) / 2);"));
 	which_trait = strsplit(trait_type, sep="e")[1];
-	trait_value = size(which_gene) ? sum(effsize_df.subsetColumns(which_trait + 3)[which_gene]) else 0.0;
+	trait_value = size(which_gene) ? sum( effsize_pos.subset(which_gene - 1, current_epoch + 3)) else 0.0;
 	if (trait_value < cap)
 	{
 		return(trait_value);
@@ -43,8 +43,12 @@ initialize() {
 mutation(m1) {
 	// Set mutational effects for new m2 mutation 
 	which_gene =asInteger((findInterval(mut.position, trait_locs) + 1) / 2);
-	mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3)); 
-	mut.setValue("e1", effsize_pos.subset(which_gene - 1, 4)); 
+	mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3));
+	// trait_range = ncol(effsize_pos) - 1;
+	for (t_num in 1:dr_epochs)
+	{
+		mut.setValue(paste0("e", t_num), effsize_pos.subset(which_gene - 1, t_num + 3)); 
+	}
 	
 	return T;
 
@@ -70,7 +74,7 @@ mutation(m1) {
 	// s6, kill all old pathogens, run at all generations as a complement of the mutation process
 	community.rescheduleScriptBlock(s6, ticks = 2:n_generation);
 	// s7, treatment block, will activate only at the generations specified by treatment_gens as substitution of s3
-	if (multiple_epochs==T) 
+	if (treatment==T) 
 	{
 		treatment_start = asInteger(treatment_gens[0]);
 		treatment_end = asInteger(treatment_gens[1]);
@@ -79,6 +83,14 @@ mutation(m1) {
 		community.rescheduleScriptBlock(s7, ticks = treatment_start:treatment_end);
 		ori_gen = c(2:treatment_start_1, treatment_end_1:n_generation);
 		community.rescheduleScriptBlock(s3, ticks = ori_gen);
+		// s12 epoch changing for drug resistance
+		if (multiple_epochs==T)
+		{
+			community.rescheduleScriptBlock(s12, ticks = asInteger(epoch_changing));
+		}
+		defineGlobal("cap_dr_current", asFloat(cap_dr[0]));
+		defineGlobal("dr_set", "e1");
+		defineGlobal("current_epoch", 1);
 	}
 	// s8, process the exposed hosts
 	if (model=="SEIR")
@@ -107,12 +119,12 @@ mutation(m1) {
 	seed_count = 0;
 	for (i in 1:host_size)
 	{
-		if (i == seeds_structure.subset(seed_count, 0))
+		if (i == seeds_structure.subset(seed_count, 0) + 1)
 		{
 			
 			sim.addSubpop(i, 1, haploid=T); // Infected hosts
 			sim.subpopulations[i - 1].tag = i-1;
-			sim.subpopulations[i - 1].individuals.tag = seed_count; // Infected State
+			sim.subpopulations[i - 1].individuals.tag = seeds_structure.subset(seed_count, 1); // Infected State
 			labels = c(labels, 2);
 			sim.subpopulations[i - 1].genomes.readFromVCF(paste0(cwdir, "/originalvcfs/seed.", seeds_structure.subset(seed_count, 1), ".vcf"));
 			// writeFile(paste0(cwdir, "/seeds.name"), paste0(seed_count, ",", "p", i-1), append=T);
@@ -130,7 +142,7 @@ mutation(m1) {
 	}
 	// change default mutation type and selection coefficient
 	
-	print(effsize_pos);
+	//print(effsize_pos);
 	
 	allmuts = sim.subpopulations.individuals.genome1.mutations;
 	for (mut in allmuts)
@@ -139,12 +151,16 @@ mutation(m1) {
 		{
 			mut.setMutationType(1);
 			which_gene = asInteger((findInterval(mut.position, trait_locs) + 1) / 2);
-			mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3)); 
-			mut.setValue("e1", effsize_pos.subset(which_gene - 1, 4)); 	
+			mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3));
+			//trait_range = ncol(effsize_pos) - 1;
+			for (t_num in 1:dr_epochs)
+			{
+				mut.setValue(paste0("e", t_num), effsize_pos.subset(which_gene - 1, t_num + 3)); 
+			}
+			//mut.setValue("e1", effsize_pos.subset(which_gene - 1, 4)); 
+			//defineGlobal("trait_range", trait_range);
 		}
 	}
-
-	
 
 	defineGlobal("Host_states", labels);
 }
@@ -171,38 +187,43 @@ mutation(m1) {
 }
 
 s0 reproduction() {
-	itself = individual.subpopulation.addRecombinant(individual.genome1, NULL, NULL, NULL, NULL, NULL);
-	itself.tag = individual.tag;
+	subpops_inds = sim.subpopulations.individuals;
+	subpops = subpops_inds.subpopulation;
+	num_inds = length(subpops_inds);
+	for (pathogen in 1:num_inds)
+	{
+		this_pathogen = subpops_inds[pathogen - 1];
+		subpops[pathogen - 1].addRecombinant(this_pathogen.genome1, NULL, NULL, NULL, NULL, NULL).tag = this_pathogen.tag;
+	}
+	self.active = 0;
 }
 
 s1 reproduction()
 {
 	// Transmission
 	infectors = which(Host_states==2);
-	
-	for (infector in infectors)
+	subpops = sim.subpopulations;
+	infector_subpops = subpops[infectors];
+
+	for (infector_subpop in infector_subpops)
 	{	
-		infector_subpop = sim.subpopulations[infector];
 		contact_ids = infector_subpop.getValue("Contacts");
 		if (length(contact_ids)>0)
 		{
 			infector_pathogen = sample(infector_subpop.individuals, 1);
 			muts = infector_pathogen.genome1.mutationsOfType(1);
-			transmissibility = additive_trait(muts, "e0", cap_1);
-			//transmissibility = size(muts) ? sum(muts.getValue("e0")) else 0.0;
-
+			transmissibility = 1 + additive_trait(muts, "e0", cap_transmissibility);
 
 			trans_event = rbinom(length(contact_ids), 1, Infection_rate * transmissibility);
 			contacts_states = Host_states[contact_ids];
 			
-			if (super_infection==T) { infectee_id = contact_ids[which((trans_event==1)&(sim.subpopulations[contact_ids].individualCount < cap_withinhost))]; }
+			if (super_infection==T) { infectee_id = contact_ids[which((trans_event==1)&(subpops[contact_ids].individualCount < cap_withinhost))]; }
 			else { infectee_id = contact_ids[which((trans_event==1)&(contacts_states==0))]; }
 			for (i in infectee_id)
 			{
-				child = sim.subpopulations[i].addRecombinant(infector_pathogen.genome1, NULL, NULL, NULL, NULL, NULL);
-				child.tag = infector_pathogen.tag;
-				line = paste(community.tick, infector, i);
-				writeFile(paste0(cwdir, "/infection_raw.txt"), line, append=T);
+				subpops[i].addRecombinant(infector_pathogen.genome1, NULL, NULL, NULL, NULL, NULL).tag = infector_pathogen.tag;
+				line = paste(community.tick, infector_subpop.tag, i);
+				writeFile(paste0(cwdir, "/infection_raw.txt"), line, append=T, compress=T);
 			}
 		}
 	}
@@ -235,27 +256,29 @@ s8 early()
 		for (ind in recover_from_e)
 		{
 			line1 = paste(community.tick, ind + 1);
-			writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T);
+			writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T, compress=T);
 		}
-		sim.killIndividuals(sim.subpopulations[recover_from_e].individuals);
+		sim.killIndividuals(hosts[recover_from_e].individuals);
 	}
 }
 
 s3 early(){
+	hosts = sim.subpopulations;
 	i_inds = which(Host_states==2);
 	draw_uniform = runif(length(i_inds));
-	state_transition = findInterval(draw_uniform, c(0, Recovery_rate*sample_rate, Recovery_rate, Recovery_rate + IE_rate));
-	recover_from_i = i_inds[which(state_transition<=1)];
-	sampled_inds = i_inds[which(state_transition==0)];
+	state_transition = findInterval(draw_uniform, c(0, sample_rate*sample_alive_prob, sample_rate, Recovery_rate + sample_rate, Recovery_rate + sample_rate + IE_rate));
+	recover_from_i = i_inds[which((state_transition==1)|(state_transition==2))];
+	sampled_inds = i_inds[which(state_transition<=1)];
 	
 	if (length(sampled_inds)>0)
 	{
 		sampled_inds_genomes = c();
 		for (ind in sampled_inds)
 		{
-			line1 = paste(community.tick, ind);
-			writeFile(paste0(cwdir, "/sample.txt"), line1, append=T);
-			sampled_inds_genomes = c(sampled_inds_genomes, sample(sim.subpopulations[ind].individuals, 1));
+			sampled_pathogen = sample(hosts[ind].individuals, 1);
+			line1 = paste(community.tick, ind, sampled_pathogen.tag, "I");
+			writeFile(paste0(cwdir, "/sample.txt"), line1, append=T, compress=T);
+			sampled_inds_genomes = c(sampled_inds_genomes, sampled_pathogen);
 		}
 		sim.treeSeqRememberIndividuals(sampled_inds_genomes);
 		//sampled_inds_genomes.genomes.outputVCF(filePath=paste0(cwdir, "/sample_vcfs/", community.tick, ".sampled.vcf"));
@@ -267,68 +290,21 @@ s3 early(){
 		for (ind in recover_from_i)
 		{
 			line1 = paste(community.tick, ind + 1);
-			writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T);
+			writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T, compress=T);
 		}
-		sim.killIndividuals(sim.subpopulations[recover_from_i].individuals);
+		sim.killIndividuals(hosts[recover_from_i].individuals);
 	}
-}
-
-s7 early(){
-	i_inds = which(Host_states==2);
-
-	draw_uniform = runif(length(i_inds));
-	state_transition = findInterval(draw_uniform, c(0, treatment_recovery_rate*sample_rate, treatment_recovery_rate, treatment_recovery_rate + IE_rate));
-	recover_from_i = i_inds[which(state_transition<=1)];
-	sampled_inds = i_inds[which(state_transition==0)];
-	
-	if (length(sampled_inds)>0)
-	{
-		sampled_inds_genomes = c();
-		for (ind in sampled_inds)
-		{
-			line1 = paste(community.tick, ind + 1);
-			writeFile(paste0(cwdir, "/sample.txt"), line1, append=T);
-			sampled_inds_genomes = c(sampled_inds_genomes, sample(sim.subpopulations[ind].individuals, 1));
-		}
-		sim.treeSeqRememberIndividuals(sampled_inds_genomes);
-		//sampled_inds_genomes.genomes.outputVCF(filePath=paste0(cwdir, "/sample_vcfs/", community.tick, ".sampled.vcf"));
-	}
-	
-	actually_recovered = c();
-	if (length(recover_from_i)>0)
-	{
-		for (ind in recover_from_i)
-		{
-			pathogen = sample(sim.subpopulations[ind].individuals, 1);
-			muts = pathogen.genome1.mutationsOfType(1);
-			treatment_failed_rate = additive_trait(muts, "e1", cap_2);
-			//print(treatment_failed_rate);
-			//the bigger the effect size for drug resistance mutation is, the more probable that the treatment fails
-			if (runif(1) > treatment_failed_rate)
-			{
-				// print(recovery_success_rate);
-				line1 = paste(community.tick, ind + 1);
-				writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T);
-				actually_recovered = c(actually_recovered, ind);
-			}
-		}
-		Host_states[actually_recovered]=3;
-		sim.killIndividuals(sim.subpopulations[actually_recovered].individuals);
-	}
-
 }
 
 s10 early(){
-	s_inds = which((Host_states==0)&(sim.subpopulations.individualCount>0));
+	hosts = sim.subpopulations;
+	s_inds = which((Host_states==0)&(hosts.individualCount>0));
 
 	for (s_ind in s_inds)
 	{
-		s_ind_pathogens = sim.subpopulations[s_ind].individuals;
-		remain_strain_tag = sample(s_ind_pathogens, 1).tag;
-		sim.killIndividuals(s_ind_pathogens[which(s_ind_pathogens.tag!=remain_strain_tag)]);
-		line = paste(community.tick, remain_strain_tag, s_ind);
-		writeFile(paste0(cwdir, "/infection.txt"), line, append=T);
-		//remain_strain_tag = host_size;
+		s_ind_pathogens = hosts[s_ind].individuals;
+		remain_strain = sample(s_ind_pathogens, 1);
+		sim.killIndividuals(s_ind_pathogens[which(s_ind_pathogens!=remain_strain)]);
 	}
 
 	draw_uniform = runif(length(s_inds));
@@ -346,7 +322,7 @@ s9 early(){
 
 s4 late()
 {
-	writeFile(paste0(cwdir, "/SIR_trajectory.txt"), paste0(sum(Host_states == 0), ", ", sum(Host_states == 1), ", ", sum(Host_states == 2), ", ", sum(Host_states == 3)), append=T);
+	writeFile(paste0(cwdir, "/SIR_trajectory.txt"), paste0(sum(Host_states == 0), ", ", sum(Host_states == 1), ", ", sum(Host_states == 2), ", ", sum(Host_states == 3)), append=T, compress=T);
 
 	all_pathogens = sim.subpopulations.individuals.tag;
 	line = sum(all_pathogens == 0);
@@ -354,7 +330,7 @@ s4 late()
 	{
 		line = paste0(line, ", ", sum(all_pathogens == seed - 1));
 	}
-	writeFile(paste0(cwdir, "/strain_trajectory.txt"), line, append=T);
+	writeFile(paste0(cwdir, "/strain_trajectory.txt"), line, append=T, compress=T);
 }
 
 s5 late() 

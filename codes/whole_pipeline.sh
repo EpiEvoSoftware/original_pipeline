@@ -119,12 +119,28 @@ cd ..
 cp ${codes_dir}/slim_code/main_generated.slim .
 ## 1.2 Run the SLiM simulation
 # Now, the seeded individuals are randomly chosen in SLiM and SLiM will store the ids of the seeded hosts.
-mkdir ${cwdir}/sample_vcfs
-cd ${codes_dir}
-slim ${codes_dir}/main_generated.slim
-echo "SLiM finished!"
-python ${codes_dir}/rename_seedtree.py -wk_dir ${cwdir}/
+#mkdir ${cwdir}/sample_vcfs
+#slim ${codes_dir}/main_generated.slim
+#echo "SLiM finished!"
 
+# bash run_slim.sh
+sim_count=0
+while [ ${sim_size} -gt ${sim_count} ]
+do
+    echo ${sim_count}
+    mkdir ${cwdir}/${sim_count}
+    mkdir ${cwdir}/sample_vcfs
+    slim ${codes_dir}/main_generated.slim > ${cwdir}/${sim_count}/slim.log
+    mv ${cwdir}/sample_vcfs ${cwdir}/${sim_count}
+    mv ${cwdir}/sampled_genomes.trees ${cwdir}/${sim_count}
+    mv ${cwdir}/*.txt.gz ${cwdir}/${sim_count}
+    gunzip ${cwdir}/${sim_count}/*.gz
+    # MacOS: gunzip ${cwdir}/*.gz
+    # Linux: bgzip -d ${cwdir}/*.gz
+    mkdir ${cwdir}/${sim_count}/transmission_tree
+    python ${codes_dir}/treeseq_post_processing.py -wk_dir ${cwdir}/${sim_count}
+    sim_count=$((sim_count+1))
+done
 
 
 
@@ -133,28 +149,13 @@ python ${codes_dir}/rename_seedtree.py -wk_dir ${cwdir}/
 ####################################################
 ## STEP 2: Tidying (and converting) SLiM output
 
-## 2.1 Further/2nd time sampling process
-## For now, just use all sampled individuals from SLiM, hopefully we'll add more down sampling features (like only sample from x-y generations)
-
-## 2.2 Rename all the log files by their order of infection (As user could permit R>S transition, some individuals could be infected not only 1 times, 
-## thus all individuals are renamed as hostid_times)
-python ${codes_dir}/rename_multiinfection.py \
-    -wk_dir ${cwdir}/ \
-    -pop_size ${host_size}
-echo "Multiple infections in same host renamed"
-
-## 2.3 Rename the sampled vcfs (They were of incorrect individual names when they were generated)
-python ${codes_dir}/rename_vcf.py \
-    -wk_dir ${cwdir}/
-echo "Samples renamed"
-
-
-
-
-## 2.4 Convert the <infection.txt> <sample.txt> etc. into a transmission tree (= genealogy here)
-## Also here do the sampling (we want 1000 samples right now)
+## 2.1 Producing transmission trees and metadata files for the tree, and vcf files
 mkdir ${cwdir}/transmission_tree
-Rscript  ${codes_dir}/transtree.r ${cwdir} ${cwdir}/seeds.renamed.DOESNT_EXIST.nwk
+python ${codes_dir}/treeseq_post_processing.py -wk_dir ${cwdir}/
+
+## 2.2 Generating a plot for the transmission tree (separately or jointly if seeds' genealogy is provided)
+Rscript 
+
 
 
 

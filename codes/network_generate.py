@@ -98,7 +98,6 @@ def main():
     parser.add_argument('-method', action='store',dest='method', required=True)
     parser.add_argument('-p_ER', action='store',dest='p_ER', required=False, type=float)
     parser.add_argument('-rp_size','--rp_size', nargs='+', help='Size of random partition graph groups', required=False, type=int)
-    #parser.add_argument('-p_within', action='store',dest='p_within', required=False, type=float)
     parser.add_argument('-p_within','--p_within', nargs='+', help='probability of edges for different groups (descending order), take 2 elements rn', required=False, type=float)
     parser.add_argument('-p_between', action='store',dest='p_between', required=False, type=float)
     parser.add_argument('-m', action='store',dest='m', required=False, type=int)

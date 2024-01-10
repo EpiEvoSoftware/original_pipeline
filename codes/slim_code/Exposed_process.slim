@@ -18,8 +18,8 @@ s8 early()
 		for (ind in recover_from_e)
 		{
 			line1 = paste(community.tick, ind + 1);
-			writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T);
+			writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T, compress=T);
 		}
-		sim.killIndividuals(sim.subpopulations[recover_from_e].individuals);
+		sim.killIndividuals(hosts[recover_from_e].individuals);
 	}
 }

@@ -36,16 +36,22 @@ else
 fi
 cat kill_old_pathogens.slim >> main_generated.slim
 echo -e "\n" >> main_generated.slim
-if [ ${model}="SEIR" ]; then
+if [ "${model}" == "SEIR" ]; then
 	cat Exposed_process.slim >> main_generated.slim
+	echo -e "\n" >> main_generated.slim
+fi
+if [ -z ${multiple_epochs} ]; then
+	true
+else
+	cat change_epoch.slim >> main_generated.slim
 	echo -e "\n" >> main_generated.slim
 fi
 cat Infected_process.slim >> main_generated.slim
 echo -e "\n" >> main_generated.slim
-if [ -z ${multiple_epochs} ]; then
+if [ -z ${treatment} ]; then
 	true
 else
-	if [ ${dr_type}="additive" ]; then
+	if [ "${dr_type}" == "additive" ]; then
 		cat Infected_process_treatment_additive.slim >> main_generated.slim
 	else
 		cat Infected_process_treatment_bialleleic.slim >> main_generated.slim

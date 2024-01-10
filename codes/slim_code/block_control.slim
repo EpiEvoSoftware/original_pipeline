@@ -18,7 +18,7 @@
 	// s6, kill all old pathogens, run at all generations as a complement of the mutation process
 	community.rescheduleScriptBlock(s6, ticks = 2:n_generation);
 	// s7, treatment block, will activate only at the generations specified by treatment_gens as substitution of s3
-	if (multiple_epochs==T) 
+	if (treatment==T) 
 	{
 		treatment_start = asInteger(treatment_gens[0]);
 		treatment_end = asInteger(treatment_gens[1]);
@@ -27,6 +27,14 @@
 		community.rescheduleScriptBlock(s7, ticks = treatment_start:treatment_end);
 		ori_gen = c(2:treatment_start_1, treatment_end_1:n_generation);
 		community.rescheduleScriptBlock(s3, ticks = ori_gen);
+		// s12 epoch changing for drug resistance
+		if (multiple_epochs==T)
+		{
+			community.rescheduleScriptBlock(s12, ticks = asInteger(epoch_changing));
+		}
+		defineGlobal("cap_dr_current", asFloat(cap_dr[0]));
+		defineGlobal("dr_set", "e1");
+		defineGlobal("current_epoch", 1);
 	}
 	// s8, process the exposed hosts
 	if (model=="SEIR")
