@@ -1,0 +1,69 @@
+{
+  "SimulationModel": {
+    "model": "SEIR",
+    "sim_start_y": 2015,
+    "sim_start_m": 6,
+    "sim_time_grid": "month"
+  },
+  "HostPopulation": {
+    "host_size": 1000,
+    "seed_size": 10,
+    "burn_in_Ne": 4000,
+    "burn_in_generations": 5000,
+    "burn_in_mutrate": 5.3e-8
+  },
+  "WithinHostParameters": {
+    "cap_withinhost": 5,
+    "n_generation": 360,
+    "within_host_evolution": null,
+    "within_host_reproduct_rate": 0.03
+  },
+  "DiseaseTransmissionDynamics": {
+    "Infection_rate": 0.02,
+    "Recovery_rate": 0.05,
+    "activate_rate": 0.125,
+    "latent_prob": 1,
+    "IE_rate": 0.01,
+    "ER_rate": 0,
+    "RS_rate": 0.02
+  },
+  "EvolutionaryAndGeneticParameters": {
+    "mut_rate": 4.4e-9,
+    "n_causal_genes": 20
+  },
+  "NetworkModelParameters": {
+    "network_model": "ER",
+    "p_ER": 0.01
+  },
+  "GeneticFilePaths": {
+    "ref_path": "/Users/px54/Documents/TB_transmissibility/GCF_000195955.2_ASM19595v2_genomic.fna",
+    "gff": "/Users/px54/Documents/TB_transmissibility/slim_scripts/GCF_000195955.2_ASM19595v2_genomic.overlap.gff"
+  },
+  "SamplingParameters": {
+    "sample_rate": 0.01
+  },
+  "MultipleEpochConfiguration": {
+    "multiple_epochs": null,
+    "epoch_gens": [50, 100]
+  },
+  "SuperinfectionParameters": {
+    "super_infection": null
+  },
+  "SeedVCFConfiguration": {
+    "seeds_vcf": null
+  },
+  "EffectivePopulationSizeRange": {
+    "efsize_min": 1,
+    "efsize_max": 5
+  },
+  "NetworkModelExtensionParameters": {
+    "rp_size": 0,
+    "p_within": 0,
+    "p_between": 0,
+    "ba_m": 0
+  },
+  "OptionalPaths": {
+    "causal_gene_path": null,
+    "contact_network_path": null
+  }
+}
