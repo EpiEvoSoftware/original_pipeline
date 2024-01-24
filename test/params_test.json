@@ -1,0 +1,114 @@
+{
+  "BasicRunConfiguration": {
+    "cwdir": "/Users/px54/Documents/TB_software/Haslemere_dt/redist"
+  },
+  "EvolutionModel": {
+    "n_generation": 360,
+    "mut_rate": 4.4e-9,
+    "trans_type": "additive",
+    "dr_type": "bialleleic",
+    "within_host_evolution": false,
+    "cap_withinhost": 5
+  },
+  "SeedsConfiguration": {
+    "seed_size": 5,
+    "seeds_vcf": {
+      "method": "SLiM_burnin_WF",
+      "user_input": {
+        "path_seeds_vcf": "PATH",
+        "path_seeds_phylogeny": "PATH",
+        "scaling_factor": 12
+      },
+      "SLiM_burnin_WF": {
+        "burn_in_Ne": 4000,
+        "burn_in_generations": 5000,
+        "burn_in_mutrate": 5.3e-8,
+        "scaling_factor": 12
+      },
+      "SLiM_burnin_epi": {
+        "burn_in_start_size": 1,
+        "burn_in_generations": 5000,
+        "burn_in_mutrate": 5.3e-8,
+        "scaling_factor": 12
+      }
+    }
+  },
+  "GenomeElement": {
+    "use_genetic_model": true,
+    "ref_path": "/Users/px54/Documents/TB_software/covid_test/EPI_ISL_402124.fasta",
+    "effect_size": {
+      "method": "user_input",
+      "user_input": {
+        "path_effsize_table": "PATH"
+      },
+      "randomly_generate": {
+        "gff": "/Users/px54/Documents/TB_transmissibility/slim_scripts/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
+        "traits_num": [1, 2],
+        "genes_num": [10, 5, 5],
+        "effsize_min": [1, 1, 1],
+        "effsize_max": [5, 5, 5],
+        "normalize": false
+      }
+    }
+  },
+  "NetworkModelParameters": {
+    "use_network_model": false,
+    "method": "randomly_generate",
+    "host_size": 10000,
+    "user_input": {
+      "path_network": "PATH"
+    },
+    "randomly_generate": {
+      "network_model": "ER",
+      "ER": {
+        "p_ER": 0.01
+      },
+      "RP": {
+        "rp_size": [5000, 5000],
+        "p_within": [0.01, 0.01],
+        "p_between": 0.005
+       },
+      "BA": {
+        "ba_m": 2
+      }
+    }
+  },
+  "SeedHostMatching": {
+    "user_input": {
+      "path_matching": "PATH"
+    },
+    "randomly_generate": {
+      "method": "random",
+      "random": null,
+      "ranking": [1, 250, 300, 400, 700],
+      "quantile": [[0, 25], [0, 25], [0, 25], [0, 25], [0, 25]]
+    }
+  },
+  "EpidemiologyModel": {
+    "model": "SEIR",
+    "epoch_changing": {
+      "epoch_num": 2,
+      "changing_generation": [200],
+      "transmission": [1, 1],
+      "treatment": [0, 2]
+    },
+    "transiton_rate": {
+      "S_IE_rate": [0.1, 0.1],
+      "I_R_rate": [0.1, 0.1],
+      "R_I_rate": [0.1, 0.1],
+      "latency_prob": [1, 1],
+      "E_I_rate": [0.1, 0.1],
+      "I_E_rate": [0.1, 0.1],
+      "E_R_rate": [0, 0],
+      "sample_rate": [0.1, 0.2],
+      "recovery_prob_after_sampling": [1, 1]
+    },
+    "massive_sampling": {
+      "event_num": 2,
+      "generation": [150, 300],
+      "sampling_prob": [0.1, 0.1],
+      "recovery_prob_after_sampling": [1, 1]
+    },
+    "super_infection": false
+  }
+}
