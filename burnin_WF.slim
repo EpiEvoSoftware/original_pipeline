@@ -1,0 +1,69 @@
+initialize() {
+	initializeSLiMModelType("WF");
+	initializeSLiMOptions(nucleotideBased=T);
+	defineConstant("L", initializeAncestralNucleotides(ref_path)); // Read in a reference genome
+	initializeRecombinationRate(0);
+
+	initializeMutationTypeNuc(0, 1, "f", 0.0); // Neutral mutations
+	initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mu)); // yearly
+	initializeGenomicElement(0, 0, L - 1);
+
+	initializeTreeSeq();
+}
+
+
+1 first()
+{
+	community.rescheduleScriptBlock(s0, ticks = n_gen);
+	if (strsuffix("/", wk_dir)==F)
+	{
+		defineConstant("cwdir", paste0(wk_dir, "/"));
+	}
+	else
+	{
+		defineConstant("cwdir", wk_dir);
+	}
+}
+
+
+1 early() {
+    sim.addSubpop("p1", Ne);
+    p1.setCloningRate(1.0);
+}
+
+1: early()
+{
+    sim.subpopulations.individuals.genome2.removeMutations();
+
+	// remove mutations in the haploid genomes that have fixed
+	muts = sim.mutationsOfType(0);
+	freqs = sim.mutationFrequencies(NULL, muts);
+	if (any(freqs == 0.5)) 
+		sim.subpopulations.genomes.removeMutations(muts[freqs == 0.5], T);
+}
+
+s0 late()
+{
+	// At the end of the burn-in process, sample the number of seeds from the last generation and assign number (0:seedsize-1) randomly to them. 
+	sizeminus1 = Ne - 1;
+	sampled_individuals_id = sample(0:sizeminus1, seed_size);
+	sampled_individuals = c();
+	c = 0;
+	for (i in sampled_individuals_id)
+	{
+		writeFile(paste0(wk_dir, "seeds.tree.id.txt"), paste(c, i), append=T);
+		sampled_individuals = c(sampled_individuals, sim.subpopulations.individuals[i]);
+		c = c + 1;
+	}
+	sampled_individuals_genomes = c();
+	for (i in sampled_individuals)
+	{
+		sampled_individuals_genomes = c(sampled_individuals_genomes, i.genome1);
+		sampled_individuals_genomes = c(sampled_individuals_genomes, i.genome2);
+	}
+  	sampled_individuals_genomes.outputVCF(filePath=paste0(wk_dir, "seeds.vcf"));
+	sim.treeSeqOutput(paste0(wk_dir, "seeds.trees"));
+	sim.simulationFinished();
+}
+
+
