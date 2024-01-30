@@ -1,5 +1,5 @@
 cwdir:/Users/px54/Documents/TB_software/V2_code/test
-n_replicates:2
+n_replicates:1
 n_generation:360
 mut_rate:4.4e-09
 trans_type:additive

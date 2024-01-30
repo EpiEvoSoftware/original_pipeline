@@ -1,7 +1,7 @@
 {
   "BasicRunConfiguration": {
     "cwdir": "/Users/px54/Documents/TB_software/V2_code/test",
-    "n_replicates": 2
+    "n_replicates": 1
   },
   "EvolutionModel": {
     "n_generation": 360,
