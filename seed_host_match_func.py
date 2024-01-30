@@ -77,7 +77,7 @@ def write_match(match_dict, wk_dir):
 	###        wk_dir: working directory
 	### Output: no return value
 	sorted_match = dict(sorted(match_dict.items()))
-	with open(os.path.join(wk_dir, "seed_host_match.txt"), "w") as txt:
+	with open(os.path.join(wk_dir, "seed_host_match.csv"), "w") as txt:
 		for i in sorted_match:
 			txt.write(",".join([str(i), str(sorted_match[i])]) + "\n")
 

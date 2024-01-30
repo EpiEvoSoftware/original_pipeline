@@ -182,7 +182,7 @@ def write_seeds_trait(wk_dir, seeds_trait_vals):
 			csv_file.write(str(i) + "," + ",".join([str(seeds_trait_vals[j][i]) for j in range(len(seeds_trait_vals))]) + "\n")
 
 
-def read_effvals(wk_dir, effsize_path):
+def read_effvals(wk_dir, effsize_path, trait_n):
 	## A function to read a user-specified csv file of effect size, return the seeds' trait values accordingly
 	### Input: wk_dir: Working directory
 	###        effsize_path: Full path to the effect size file (.csv)
@@ -192,19 +192,23 @@ def read_effvals(wk_dir, effsize_path):
 	if os.path.exists(effsize_path):
 		### Check if the file format is right
 		### If effsize_path for mat correct: do
-		subprocess.run(["cp", effsize_path, os.path.join(wk_dir, "causal_gene_info.csv")])
 		csv_df = pd.read_csv(effsize_path)
 		traits_num = len(csv_df.columns) - 3
-		if traits_num < 1:
+		if sum(traits_num) < 1:
 			print("Format error, need to have at least 1 trait (transmissibility).")
+		elif sum(traits_num) != traits_num:
+			print("Format error, need to have at sum of traits number being the column of the effect size file provided.")
+		elif length(traits_num) > 2:
+			print("Wrong trait number format, need to have at most two traits number (for transmissibility and/or drug resistance).")
 		else:
 			gene_names = csv_df["gene_name"].tolist()
 			start_pos = csv_df["start"].tolist()
 			end_pos = csv_df["end"].tolist()
 			traits = []
-			trans_effsize = csv_df["eff_size_transmissibility"].tolist()
-			traits.append(trans_effsize)
-			if traits_num > 1:
+			if traits_num[0] > 0:
+				for i in range(traits_num[0] - 1):
+					traits.append(csv_df["eff_size_transmissibility" + str(i + 1)].tolist())
+			if traits_num[1] > 0:
 				for i in range(traits_num - 1):
 					traits.append(csv_df["eff_size_dr" + str(i + 1)].tolist())
 			seeds_trait_vals = []
@@ -242,6 +246,8 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[
 		if effsize_path=="":
 			print("Need to specify a path to the effect size csv file in user_input mode.")
 			run_check = False
+		if sum(trait_n)<1:
+			print("Please provide a number of trait or a list of number of traits that sums to the number of traits in the effect size file.")
 	elif method=="randomly_generate":
 		if sum(trait_n)<1:
 			print("Please provide a number of trait being at least 1.")
@@ -268,7 +274,7 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[
 
 	if run_check:
 		if method=="user_input":
-			write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path))
+			write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path, trait_n))
 		elif method=="randomly_generate":
 			generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, norm_or_not)
 	else:

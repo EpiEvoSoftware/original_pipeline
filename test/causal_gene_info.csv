@@ -1,4 +1,4 @@
-gene_name,start,end,eff_size_transmissibility,eff_size_dr1,eff_size_dr2
+gene_name,start,end,eff_size_transmissibility1,eff_size_dr1,eff_size_dr2
 region1,100,400,0.15,0,0
 region_dr,9124,9126,0,0.7,0
 region3,15000,15500,0,0,0.6

@@ -1,13 +1,15 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "/Users/px54/Documents/TB_software/Haslemere_dt/redist"
+    "cwdir": "/Users/px54/Documents/TB_software/V2_code/test",
+    "n_replicates": 2
   },
   "EvolutionModel": {
     "n_generation": 360,
     "mut_rate": 4.4e-9,
     "trans_type": "additive",
     "dr_type": "bialleleic",
-    "within_host_evolution": false,
+    "within_host_reproduction": false,
+    "within_host_reproduction_rate": 0.01,
     "cap_withinhost": 5
   },
   "SeedsConfiguration": {
@@ -52,7 +54,7 @@
     }
   },
   "NetworkModelParameters": {
-    "use_network_model": false,
+    "use_network_model": true,
     "method": "randomly_generate",
     "host_size": 10000,
     "user_input": {
@@ -87,15 +89,19 @@
   "EpidemiologyModel": {
     "model": "SEIR",
     "epoch_changing": {
-      "epoch_num": 2,
-      "changing_generation": [200],
-      "transmission": [1, 1],
-      "treatment": [0, 2]
+      "n_epoch": 2,
+      "epoch_changing_generation": [200]
+    },
+    "genetic_architecture": {
+      "transmissibility": [1, 1],
+      "cap_transmissibility": [1, 0.9],
+      "drug_resistance": [0, 1],
+      "cap_drugresist": [0, 0.8]
     },
     "transiton_rate": {
       "S_IE_rate": [0.1, 0.1],
       "I_R_rate": [0.1, 0.1],
-      "R_I_rate": [0.1, 0.1],
+      "R_S_rate": [0.1, 0.1],
       "latency_prob": [1, 1],
       "E_I_rate": [0.1, 0.1],
       "I_E_rate": [0.1, 0.1],

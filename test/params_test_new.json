@@ -1,9 +1,0 @@
-{"S_IE_rate": [0.1, 0.1],
-      "I_R_rate": [0.1, 0.1],
-      "R_I_rate": [0.1, 0.1],
-      "latency_prob": [1, 1],
-      "E_I_rate": [0.1, 0.1],
-      "I_E_rate": [0.1, 0.1],
-      "E_R_rate": [0, 0],
-      "sample_rate": [0.1, 0.2],
-      "recovery_prob_after_sampling": [1, 1]}
