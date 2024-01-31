@@ -7,8 +7,12 @@ import argparse
 import os.path
 import tkinter as tk
 from tkinter import ttk
-from plot import NetworkGraphApp
 
+from tabs.t1_evolutionary_model import EvoModel
+from tabs.t2_seeds import Seeds
+from tabs.t3_genome_effsize import GenomeEffSize
+from tabs.t4_network_seedhost import NetworkGraphApp
+from tabs.t5_epi_model import EpiModel
 
 def load_config_as_dict(config_file):
     """
@@ -58,10 +62,21 @@ def launch_gui(config_file):
 
     tab_parent = ttk.Notebook(root)
     tab1 = ttk.Frame(tab_parent)
-    network_app = NetworkGraphApp(tab1, config_file)
     tab2 = ttk.Frame(tab_parent)
-    tab_parent.add(tab1, text="Network Graph")
-    tab_parent.add(tab2, text="Add New Tab")
+    tab3 = ttk.Frame(tab_parent)
+    tab4 = ttk.Frame(tab_parent)
+    tab5 = ttk.Frame(tab_parent)
+    network_app = EvoModel(tab1, tab_parent, config_file)
+    network_app = Seeds(tab2, tab_parent, config_file)
+    network_app = GenomeEffSize(tab3, tab_parent, config_file)
+    network_app = NetworkGraphApp(tab4, tab_parent, config_file)
+    network_app = EpiModel(tab5, tab_parent, config_file)
+    tab_parent.add(tab1, text="Evolutionary Model")
+    tab_parent.add(tab2, text="Seeds")
+    tab_parent.add(tab3, text="Genome Effect Size")
+    tab_parent.add(tab4, text="Network Graph")
+    tab_parent.add(tab5, text="Epidemiological Model")
+
     tab_parent.pack(expand=1, fill='both')
 
     root.mainloop()

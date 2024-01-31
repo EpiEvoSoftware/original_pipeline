@@ -1,3 +1,4 @@
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 import networkx as nx
@@ -10,7 +11,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import sys
 import os
 import os.path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
 
 class NetworkGraphApp:
@@ -18,7 +19,7 @@ class NetworkGraphApp:
     A class providing a visualization app.
     """
 
-    def __init__(self, parent, config_file):
+    def __init__(self, parent, tab_parent, config_file):
         """
         Initializes the visualization app.
 
@@ -29,6 +30,8 @@ class NetworkGraphApp:
         Precondition: config_file is a valid dictionary
         """
         self.parent = parent
+        self.tab_parent = tab_parent
+
         if isinstance(parent, tk.Tk):
             self.parent.title("Network Graph Visualization")
         self.pop_size = int(config_file["host_size"])
@@ -128,9 +131,19 @@ class NetworkGraphApp:
 
         # Positioning the table in the GUI
         self.table.pack(side='right', fill='both', expand=True)
-    
+
+        next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
+        next_button.pack()
 
         self.create_table()
+
+        # self.table = ttk.Treeview(self.control_frame, columns=('id', 't1', 't2', 'host_id'), show='headings')
+        # You may need to pack or grid the table as well depending on your layout requirements
+
+    def go_to_next_tab(self):
+        current_tab_index = self.tab_parent.index(self.tab_parent.select())
+        next_tab_index = (current_tab_index + 1) % self.tab_parent.index("end")
+        self.tab_parent.select(next_tab_index)
 
     def plot_degree_distribution(self):
         graph_type = self.graph_type.get()
@@ -164,7 +177,6 @@ class NetworkGraphApp:
         n = len(degrees)
         for partition in range(quartile):
             partitions.append(degrees[n//partition])
-
 
         # partitions = [current_range/4 + x_min, current_range/2 + x_min, current_range*3/4 + x_min]
         for partition in partitions:
