@@ -7,26 +7,26 @@ class EpiModel:
         self.parent = parent
         self.tab_parent = tab_parent
 
-        self.canvas = tk.Canvas(self.parent)
-        self.scrollbar = ttk.Scrollbar(self.parent, orient="vertical", command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        # self.canvas = tk.Canvas(self.parent)
+        # self.scrollbar = ttk.Scrollbar(self.parent, orient="vertical", command=self.canvas.yview)
+        # self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
-        # Place the canvas and the scrollbar in the parent frame
-        self.scrollbar.pack(side='right', fill='y')
-        self.canvas.pack(side='left', fill='both', expand=True)
+        # # Place the canvas and the scrollbar in the parent frame
+        # self.scrollbar.pack(side='right', fill='y')
+        # self.canvas.pack(side='left', fill='both', expand=True)
 
-        # Create a frame inside the canvas
-        self.control_frame = ttk.Frame(self.canvas)
+        # # Create a frame inside the canvas
+        # self.control_frame = ttk.Frame(self.canvas)
 
-        # Add the new frame to a window in the canvas
-        self.canvas_frame = self.canvas.create_window((0,0), window=self.control_frame, anchor='nw')
+        # # Add the new frame to a window in the canvas
+        # self.canvas_frame = self.canvas.create_window((0,0), window=self.control_frame, anchor='nw')
         
-        # Bind the frame's width to the canvas's width and configure the canvas's scrollregion
-        self.control_frame.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
-        self.canvas.bind('<Configure>', self.frame_width)
+        # # Bind the frame's width to the canvas's width and configure the canvas's scrollregion
+        # self.control_frame.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        # self.canvas.bind('<Configure>', self.frame_width) #fix
 
-        # self.control_frame = ttk.Frame(self.parent, width=300)
-        # self.control_frame.pack(fill='both', expand=True)  # Pack the frame
+        self.control_frame = ttk.Frame(self.parent, width=300)
+        self.control_frame.pack(fill='both', expand=True)  # Pack the frame
 
         self.surname_label = ttk.Label(self.control_frame, text="Model")
         self.surname_label.pack()
