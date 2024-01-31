@@ -5,6 +5,8 @@ import json
 import pandas as pd
 import unittest
 
+TEST_DIR = "test/seed_host_match_func"
+
 def _build_dict_edges_node(ntwk_):
 	## A helper function that returns a dictionary with number of edges as keys
 	## and nodes as values
@@ -19,11 +21,11 @@ def _build_dict_edges_node(ntwk_):
 def _sort_node_by_edge(ntwk_, dict_edges_node):
 	## A helper function that returns a list of nodes reversely sorted by their 
 	## degrees and a list of corresponding degrees
-	nodes_sorted = ntwk_.number_of_nodes*[None]
+	nodes_sorted = ntwk_.number_of_nodes()*[None]
 	degree_sorted = len(nodes_sorted)*[None]
 	degrees = sorted(dict_edges_node.keys(), reverse = True)
 	idx_acc = 0
-	for d in degree_sorted:
+	for d in degrees:
 		len_nodes = len(dict_edges_node[d])
 		nodes_sorted[idx_acc: idx_acc + len_nodes] = dict_edges_node[d]
 		degree_sorted[idx_acc: idx_acc + len_nodes] = [d]*len_nodes
@@ -32,7 +34,8 @@ def _sort_node_by_edge(ntwk_, dict_edges_node):
 
 def _save_dict_to_csv(dict_matching, file_path):
 	## A helper function that saves the matching dictionary as a specified file
-	df = pd.DataFrame(list(dict_matching.items()), columns = ['seed', 'host_id'])
+	## with columns ['host_id', 'seed']
+	df = pd.DataFrame(list(dict_matching.items()), columns = ['host_id', 'seed'])
 	df.to_csv(file_path)
  
 def _check_user_matchingfile_info_json(file):
@@ -45,9 +48,8 @@ def _check_user_matchingfile_info_csv(file):
 
 def check_user_matchingfile(file_path):
 	## A function to check whether the user-input host-seed matching file is valid
-	## If the file is not a json or csv, will throw an exception
-	## If the matching contains conflicting information or lacks information, will
-	## throw aother exception
+	## Raise exceptions when given file path is invalid / when contents of file
+	## does not satisfy the seed-host matching format.
 	if file_path.lower().endswith('.json'):
 		try:
 			with open(file_path, 'r') as file:
@@ -98,7 +100,7 @@ def match_quantile(nodes_sorted, quantile, unavail=[]):
 	## A function to match one seed by quantile to the host
 	### Input: nodes_sorted: host sorted by degree in reverse order
 	###        unavail: a list of unavailable host id (already matched)
-	###        quantile: the desired rank of the host
+	###        quantile: the desired quantile for host selection
 	assert len(nodes_sorted) != len(unavail), "All hosts already taken"
 	assert quantile in [[0, 25], [25, 50], [50, 75], [75, 100]], "Incorrect quantile input"
 	assert len(nodes_sorted) >= 4, "Network size < 4; too small to use quantile"
@@ -119,12 +121,12 @@ def match_all_hosts(ntwk_, match_method, seed_size, ranking=[], quantile=[]):
 	### Input: ntwk_: A networkX object read by read_network()
 	###		   match_method: Method of matching
 	###        seed_size: How many seeds should be matched (e.g. 5)
-	###        rank: A list of integers that shows ranking of contact degree for each seed (having length = seed_size, e.g. [1, 250, 300, 400, 700])
-	###        quantile: A list of lists that shows quantiles of contact degree for each seed (having length = seed_size, e.g. [[0, 25], [0, 25], [0, 25], [0, 25], [0, 25]])
+	###        rank: A list of integers or None that shows ranking of contact degree for each seed (having length = seed_size, e.g. [1, 250, 300, 400, , None, 700])
+	###        quantile: A list of lists that shows quantiles of contact degree for each seed (having length = seed_size, e.g. [[0, 25], [0, 25], None, [0, 25], [0, 25], [0, 25]])
 	### Output: A dictionary of the matching (key: the host id, value: the seed id, e.g. {232:0, 256:1, 790:2, 4:3, 760:4})
 
 	dict_edges_node = _build_dict_edges_node(ntwk_)
-	nodes_sorted, degree_sorted = _sort_node_by_edge(ntwk_, dict_edges_node)
+	nodes_sorted, _ = _sort_node_by_edge(ntwk_, dict_edges_node)
 	unavail_id = []
 
 	dict_method_seeds = {}
@@ -160,39 +162,93 @@ def write_match(match_dict, wk_dir):
 	# with open(os.path.join(wk_dir, "seed_host_match.txt"), "w") as txt:
 	# 	for i in sorted_match:
 	# 		txt.write(",".join([str(i), str(sorted_match[i])]) + "\n")
-	_save_dict_to_csv(os.path.join(wk_dir, "seed_host_match.csv"))
-
-	import unittest
+	_save_dict_to_csv(sorted_match, os.path.join(wk_dir, "seed_host_match.csv"))
 
 class HostSeedMatch(unittest.TestCase):
 
-    def test_check_user_matchingfile(self):
-      pass
-    
-    def read_network(self):
-      pass
-    
-    def match_random(self):
-      pass
+	def test_check_user_matchingfile(self):
+		## TO DO: Test the helper functions _check_user_matchingfile_info_json
+		## 		and _check_user_matchingfile_info_csv
+		pass
 
-    def match_quantile(self):
-      pass
+	def test_read_network(self):
+		pass
 
-    def match_ranking(self):
-      pass
+	def test_match_random(self):
+		pass
 
-    def match_all_hosts(self):
-      pass
+	def test_match_quantile(self):
+		pass
 
-    def write_match(self):
-      pass
+	def test_match_ranking(self):
+		pass
+
+	def test_match_all_hosts(self):
+		pass
+
+	def test_write_match(self):
+		pass
+
+	def test_build_dict_edges_node(self):
+		# 0 edge
+		G = nx.Graph()
+		self.assertEqual(_build_dict_edges_node(G), {})
+		# 1 edge
+		G.add_edge(0, 1)
+		self.assertEqual(_build_dict_edges_node(G), {1: [0, 1]})
+		# 2 edges
+		G.add_edges_from([(1, 3)])
+		G.add_node(2)
+		self.assertEqual(_build_dict_edges_node(G), {0: [2], 1: [0, 3], 2:[1]})
+
+	def test_sort_node_by_edge(self):
+		# 0 edge
+		G = nx.Graph()
+		dict_edges_node_0 = _build_dict_edges_node(G)
+		self.assertEqual(_sort_node_by_edge(G, dict_edges_node_0), ([], []))
+		# 1 edge
+		G.add_edge(0, 1)
+		dict_edges_node_1 = _build_dict_edges_node(G)
+		self.assertEqual(_sort_node_by_edge(G, dict_edges_node_1), ([0, 1], [1, 1]))
+		# 2 edges
+		G.add_edges_from([(1, 3)])
+		G.add_node(2)
+		dict_edges_node_2 = _build_dict_edges_node(G)
+		self.assertEqual(_sort_node_by_edge(G, dict_edges_node_2), ([1, 0, 3, 2], [2, 1, 1, 0]))
+
+	def test_save_dict_to_csv(self):
+		dict_matching_empty = {}
+		file_path_empty = os.path.join(TEST_DIR, "empty_dict_to_csv.csv")
+		_save_dict_to_csv(dict_matching_empty, file_path_empty)
+		df_empty = pd.read_csv(file_path_empty)
+		self.assertEqual(df_empty.columns.tolist(), ['host_id', 'seed'])
+
+		dict_matching_one = {0: 0}
+		file_path_one = os.path.join(TEST_DIR, "one_dict_to_csv.csv")
+		_save_dict_to_csv(dict_matching_one, file_path_one)
+		df_one = pd.read_csv(file_path_one)
+		self.assertEqual(df_one['host_id'][0], 0)
+		self.assertEqual(df_one['host_id'][0], 0)
+
+		dict_matching_two = {0: 1, 1: 0}
+		file_path_two = os.path.join(TEST_DIR, "two_dict_to_csv.csv")
+		_save_dict_to_csv(dict_matching_two, file_path_two)
+		df_two = pd.read_csv(file_path_two)
+		self.assertEqual(df_two['host_id'][0], 0)
+		self.assertEqual(df_two['seed'][1], 0)
+	
+	def test_check_user_matchingfile_info_json(file):
+		pass
+
+	def test_check_user_matchingfile_info_csb(file):
+		pass
 
 if __name__ == '__main__':
     unittest.main()
 
-################ Testing #######################
-ntwk = read_network("/Users/px54/Documents/TB_software/V2_code/test/contact_network.adjlist")
-############ To test other methods, change "random" here to "ranking" or "quantile", and specify the parameters for them
-mtch = match_all_hosts(ntwk, "random", 5)
-########### Change the directories to your own directory for testing
-write_match(mtch, "/Users/px54/Documents/TB_software/V2_code/test")
+# ################ Testing #######################
+# ntwk = read_network("/Users/px54/Documents/TB_software/V2_code/test/contact_network.adjlist")
+# ############ To test other methods, change "random" here to "ranking" or "quantile", and specify the parameters for them
+# mtch = match_all_hosts(ntwk, "random", 5)
+# ########### Change the directories to your own directory for testing
+# write_match(mtch, "/Users/px54/Documents/TB_software/V2_code/test")
