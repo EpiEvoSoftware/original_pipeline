@@ -70,3 +70,22 @@ def list_csv(directory,suffix=None):
     Precondition: suffix is a string
     """
     raise NotImplementedError("todo implement")
+
+def edit_params(dir):
+    # Step 1: Read the file into a dictionary
+    params = {}
+
+    with open('params.config', 'r') as file:
+        for line in file:
+            key, value = line.strip().split(':', 1)
+            params[key] = value.strip()
+
+    # Step 2: Edit or update the dictionary
+    params['host_size'] = '2000'  # Example: updating host_size
+    params['Infection_rate'] = '0.04'  # Example: updating Infection_rate
+    params['new_param'] = 'new_value'  # Example: adding a new parameter
+
+    # Step 3: Write the updated dictionary back to the file
+    with open('params.config', 'w') as file:
+        for key, value in params.items():
+            file.write(f"{key}:{value}\n")

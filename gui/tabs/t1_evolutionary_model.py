@@ -8,7 +8,7 @@ class EvoModel:
         self.tab_parent = tab_parent
 
         self.control_frame = ttk.Frame(self.parent, width=300)
-        self.control_frame.pack(fill='both', expand=True)  # Pack the frame
+        self.control_frame.pack(fill='both', expand=True)  # pack the frame
 
         self.name_label = ttk.Label(self.control_frame, text="Number of Generations")
         self.name_label.pack()

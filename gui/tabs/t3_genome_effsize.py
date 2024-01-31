@@ -7,7 +7,7 @@ class GenomeEffSize:
         self.tab_parent = tab_parent
 
         self.control_frame = ttk.Frame(self.parent, width=300)
-        self.control_frame.pack(fill='both', expand=True)  # Pack the frame
+        self.control_frame.pack(fill='both', expand=True) 
 
         diagnostic_label = ttk.Label(self.control_frame, text="Reference Genome")
         diagnostic_label.pack()
@@ -47,9 +47,9 @@ class GenomeEffSize:
         next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
         next_button.pack()
 
-    def choose_file(self):  # Added self parameter
+    def choose_file(self):  # 
         filename = filedialog.askopenfilename(title="Select a file")
-        print("Selected file:", filename)  # You can replace this with your own logic
+        print("Selected file:", filename)  # replace
 
     def go_to_next_tab(self):
         current_tab_index = self.tab_parent.index(self.tab_parent.select())

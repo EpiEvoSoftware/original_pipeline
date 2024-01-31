@@ -62,7 +62,7 @@ class Seeds:
 
     def choose_file(self):  # Added self parameter
         filename = filedialog.askopenfilename(title="Select a file")
-        print("Selected file:", filename)  # You can replace this with your own logic
+        print("Selected file:", filename)  # replace
 
     def go_to_next_tab(self):
         current_tab_index = self.tab_parent.index(self.tab_parent.select())
