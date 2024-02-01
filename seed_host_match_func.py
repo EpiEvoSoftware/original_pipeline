@@ -8,7 +8,6 @@ def check_user_matchingfile():
 
 def read_network(network_path):
 	if os.path.exists(network_path):
-		## Check format
 		return(nx.read_adjlist(network_path))
 	else:
 		print("The provided network path doesn't exist.")
@@ -66,7 +65,6 @@ def match_all_hosts(ntwk_, match_method, seed_size, ranking=[], quantile=[]):
 			matched_host = match_random(match_ranking, quantile[i], unavail=unavail_id)
 			match_dict[matched_host] = i
 			unavail_id.append(matched_host)
-	print(match_dict)
 	return(match_dict)
 
 
