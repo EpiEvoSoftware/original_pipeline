@@ -5,6 +5,7 @@ import json
 import pandas as pd
 import unittest
 
+script_path = os.path.dirname(__file__)
 TEST_DIR = "test/seed_host_match_func"
 
 def _build_dict_edges_node(ntwk_):
@@ -36,7 +37,7 @@ def _save_dict_to_csv(dict_matching, file_path):
 	## A helper function that saves the matching dictionary as a specified file
 	## with columns ['host_id', 'seed']
 	df = pd.DataFrame(list(dict_matching.items()), columns = ['host_id', 'seed'])
-	df.to_csv(file_path)
+	df.to_csv(file_path, index = False)
  
 def _check_user_matchingfile_info_json(file):
 	## To do: to check the contents of json
@@ -69,7 +70,7 @@ def check_user_matchingfile(file_path):
 def read_network(network_path):
 	if os.path.exists(network_path):
 		## Check format
-		return(nx.read_adjlist(network_path))
+		return(nx.read_adjlist(network_path, nodetype=int))
 	else:
 		raise ("The provided networkX path doesn't exist")
 
@@ -151,6 +152,7 @@ def match_all_hosts(ntwk_, match_method, seed_size, ranking=[], quantile=[]):
 		match_dict[matched_host] = seed
 	return match_dict
 
+# TO DO: Read Config and match
 
 def write_match(match_dict, wk_dir):
 	## A function to write the matching to a csv file in the working directory
@@ -171,8 +173,29 @@ class HostSeedMatch(unittest.TestCase):
 		## 		and _check_user_matchingfile_info_csv
 		pass
 
-	def test_read_network(self):
+	def test_check_user_matchingfile_info_json(file):
+		## TO DO: check json file
 		pass
+
+	def test_check_user_matchingfile_info_csv(file):
+		## TO DO: check csv file
+		pass
+
+	def test_read_network(self):
+		file_path_network_r = os.path.join(script_path, TEST_DIR, "test_read_network.adjlist")
+		file_path_network_error = os.path.join(script_path, TEST_DIR, "test_read_network_error.adjlist")
+		G = nx.path_graph(4)
+		F = nx.path_graph(4)
+		nx.write_adjlist(G, file_path_network_r)
+
+		nw = read_network(file_path_network_r)
+		print(nw.adj)
+		print(G.adj)
+		self.assertEqual(nx.utils.misc.graphs_equal(G, nw), True)
+
+
+
+		
 
 	def test_match_random(self):
 		pass
@@ -218,30 +241,24 @@ class HostSeedMatch(unittest.TestCase):
 
 	def test_save_dict_to_csv(self):
 		dict_matching_empty = {}
-		file_path_empty = os.path.join(TEST_DIR, "empty_dict_to_csv.csv")
+		file_path_empty = os.path.join(script_path, TEST_DIR, "empty_dict_to_csv.csv")
 		_save_dict_to_csv(dict_matching_empty, file_path_empty)
 		df_empty = pd.read_csv(file_path_empty)
 		self.assertEqual(df_empty.columns.tolist(), ['host_id', 'seed'])
 
 		dict_matching_one = {0: 0}
-		file_path_one = os.path.join(TEST_DIR, "one_dict_to_csv.csv")
+		file_path_one = os.path.join(script_path, TEST_DIR, "one_dict_to_csv.csv")
 		_save_dict_to_csv(dict_matching_one, file_path_one)
 		df_one = pd.read_csv(file_path_one)
 		self.assertEqual(df_one['host_id'][0], 0)
 		self.assertEqual(df_one['host_id'][0], 0)
 
 		dict_matching_two = {0: 1, 1: 0}
-		file_path_two = os.path.join(TEST_DIR, "two_dict_to_csv.csv")
+		file_path_two = os.path.join(script_path, TEST_DIR, "two_dict_to_csv.csv")
 		_save_dict_to_csv(dict_matching_two, file_path_two)
 		df_two = pd.read_csv(file_path_two)
 		self.assertEqual(df_two['host_id'][0], 0)
 		self.assertEqual(df_two['seed'][1], 0)
-	
-	def test_check_user_matchingfile_info_json(file):
-		pass
-
-	def test_check_user_matchingfile_info_csb(file):
-		pass
 
 if __name__ == '__main__':
     unittest.main()
