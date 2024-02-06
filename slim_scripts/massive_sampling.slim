@@ -15,7 +15,7 @@ s11 early() {
 		{
 			sampled_pathogen = sample(hosts[ind].individuals, 1);
 			line1 = paste(community.tick, ind);
-			writeFile(paste0(cwdir, runid, "/sample.txt"), line1, append=T, compress=T);
+			writeFile(paste0(cwdir, runid, "/sample.csv"), line1, append=T, compress=T);
 			sampled_inds_genomes = c(sampled_inds_genomes, sampled_pathogen);
 		}
 		sim.treeSeqRememberIndividuals(sampled_inds_genomes);
@@ -27,7 +27,7 @@ s11 early() {
 		for (ind in recovered_inds)
 		{
 			line1 = paste(community.tick, ind);
-			writeFile(paste0(cwdir, runid, "/massive_recovery.txt"), line1, append=T, compress=T);
+			writeFile(paste0(cwdir, runid, "/massive_recovery.csv"), line1, append=T, compress=T);
 		} 
 		sim.killIndividuals(sim.subpopulations[recovered_inds].individuals);
 	}

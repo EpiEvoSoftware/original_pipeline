@@ -1,38 +1,44 @@
 {
   "BasicRunConfiguration": {
     "cwdir": "/Users/px54/Documents/TB_software/V2_code/test",
-    "n_replicates": 4
+    "n_replicates": 3
   },
   "EvolutionModel": {
     "n_generation": 360,
     "mut_rate": 4.4e-9,
     "trans_type": "additive",
-    "dr_type": "bialleleic",
+    "dr_type": "additive",
     "within_host_reproduction": false,
     "within_host_reproduction_rate": 0.01,
     "cap_withinhost": 5
   },
   "SeedsConfiguration": {
     "seed_size": 5,
-    "seeds_vcf": {
-      "method": "SLiM_burnin_WF",
-      "user_input": {
-        "path_seeds_vcf": "PATH",
-        "path_seeds_phylogeny": "PATH",
-        "scaling_factor": 12
-      },
-      "SLiM_burnin_WF": {
-        "burn_in_Ne": 4000,
-        "burn_in_generations": 5000,
-        "burn_in_mutrate": 5.3e-8,
-        "scaling_factor": 12
-      },
-      "SLiM_burnin_epi": {
-        "burn_in_start_size": 1,
-        "burn_in_generations": 5000,
-        "burn_in_mutrate": 5.3e-8,
-        "scaling_factor": 12
-      }
+    "method": "SLiM_burnin_WF",
+    "user_input": {
+      "path_seeds_vcf": "PATH",
+      "path_seeds_phylogeny": "PATH",
+      "scaling_factor": 12
+    },
+    "SLiM_burnin_WF": {
+      "burn_in_Ne": 4000,
+      "burn_in_generations": 5000,
+      "burn_in_mutrate": 5.3e-8,
+      "scaling_factor": 12
+    },
+    "SLiM_burnin_epi": {
+      "burn_in_start_size": 1,
+      "burn_in_generations": 1000,
+      "burn_in_mutrate": 5.3e-8,
+      "scaling_factor": 12,
+      "seeded_host_id": [100],
+      "S_IE_rate": 0.01,
+      "E_I_rate": 0.01,
+      "E_R_rate": 0,
+      "latency_prob": 1,
+      "I_R_rate": 0.01,
+      "I_E_rate": 0,
+      "R_S_rate": 0.05
     }
   },
   "GenomeElement": {
@@ -57,7 +63,7 @@
   "NetworkModelParameters": {
     "use_network_model": true,
     "method": "randomly_generate",
-    "host_size": 10000,
+    "host_size": 1000,
     "user_input": {
       "path_network": "PATH"
     },
@@ -82,9 +88,7 @@
     },
     "randomly_generate": {
       "method": "random",
-      "random": null,
-      "ranking": [1, 250, 300, 400, 700],
-      "quantile": [[0, 25], [0, 25], [0, 25], [0, 25], [0, 25]]
+      "path_csv": ""
     }
   },
   "EpidemiologyModel": {
@@ -97,33 +101,32 @@
       "transmissibility": [1, 1],
       "cap_transmissibility": [1, 0.9],
       "drug_resistance": [0, 1],
-      "cap_drugresist": [0, 0.8]
+      "cap_drugresist": [0, 1.5]
     },
     "transiton_rate": {
-      "S_IE_rate": [0.1, 0.1],
-      "I_R_rate": [0.1, 0.1],
-      "R_S_rate": [0.1, 0.1],
+      "S_IE_rate": [0.01, 0.01],
+      "I_R_rate": [0.01, 0.1],
+      "R_S_rate": [0.07, 0.07],
       "latency_prob": [1, 1],
-      "E_I_rate": [0.1, 0.1],
-      "I_E_rate": [0.1, 0.1],
+      "E_I_rate": [0.01, 0.01],
+      "I_E_rate": [0.01, 0.01],
       "E_R_rate": [0, 0],
-      "sample_rate": [0.1, 0.2],
+      "sample_rate": [0.005, 0.005],
       "recovery_prob_after_sampling": [1, 1]
     },
     "massive_sampling": {
-      "event_num": 2,
+      "event_num": 0,
       "generation": [150, 300],
       "sampling_prob": [0.1, 0.1],
       "recovery_prob_after_sampling": [1, 1]
     },
-    "super_infection": false
+    "super_infection": true
   },
   "Postprocessing_options": {
     "do_postprocess": true,
     "tree_plotting": {
       "branch_color_trait": 1,
-      "heatmap": [3,4],
-      "seeds_phylogeny": true
+      "heatmap": [3,4]
     }
   }
 }

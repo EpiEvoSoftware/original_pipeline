@@ -13,10 +13,11 @@
 		{
 			
 			sim.addSubpop(i - 1, 1, haploid=T); // Infected hosts
-			sim.subpopulations[i - 1].tag = i-1;
-			sim.subpopulations[i - 1].individuals.tag = seeds_structure.subset(seed_count, 1); // id of seed
+			current_subpop = sim.subpopulations[i - 1];
 			labels = c(labels, 2);
-			sim.subpopulations[i - 1].genomes.readFromVCF(paste0(seedsvcfpath, "seed.", seeds_structure.subset(seed_count, 1), ".vcf"));
+			current_subpop.genomes.readFromVCF(paste0(seedsvcfpath, "seed.", seeds_structure.subset(seed_count, 1), ".vcf"));
+			current_subpop.individuals.tag = seeds_structure.subset(seed_count, 1); // id of seed
+			sim.treeSeqRememberIndividuals(current_subpop.individuals);
 
 			if (seed_count < seed_size - 1)
 			{
@@ -26,10 +27,11 @@
 		else
 		{
 			sim.addSubpop(i - 1, 0, haploid=T); // Susceptible
-			sim.subpopulations[i - 1].tag = i - 1;
+			current_subpop = sim.subpopulations[i - 1];
 			labels = c(labels, 0);
 		}
-		sim.subpopulations[i - 1].setValue("Contacts", c());
+		current_subpop.tag = i - 1;
+		current_subpop.setValue("Contacts", c());
 	}
 
 	// change default mutation type and selection coefficient	

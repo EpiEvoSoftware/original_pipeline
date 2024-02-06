@@ -13,7 +13,7 @@ s7 early(){
 		{
 			sampled_pathogen = sample(hosts[ind].individuals, 1);
 			line1 = paste(community.tick, ind, sampled_pathogen.tag);
-			writeFile(paste0(cwdir, runid, "/sample.txt"), line1, append=T, compress=T);
+			writeFile(paste0(cwdir, runid, "/sample.csv"), line1, append=T, compress=T);
 			sampled_inds_genomes = c(sampled_inds_genomes, sampled_pathogen);
 		}
 		sim.treeSeqRememberIndividuals(sampled_inds_genomes);
@@ -34,13 +34,16 @@ s7 early(){
 				if (runif(1) > treatment_failed_rate)
 				{
 					line1 = paste(community.tick, ind + 1);
-					writeFile(paste0(cwdir, runid, "/recovery.txt"), line1, append=T, compress=T);
+					writeFile(paste0(cwdir, runid, "/recovery.csv"), line1, append=T, compress=T);
 					actually_recovered = c(actually_recovered, pathogen);
 				}
 			}
 		}
-		sim.killIndividuals(actually_recovered);
-		Host_states[recover_from_i[which(hosts[recover_from_i].individualCount==0)]] = 3;
+		if (length(actually_recovered) > 0)
+		{
+			sim.killIndividuals(actually_recovered);
+			Host_states[recover_from_i[which(hosts[recover_from_i].individualCount==0)]] = 3;
+		}
 	}
 }
 

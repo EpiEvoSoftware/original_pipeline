@@ -61,9 +61,10 @@ def generate_eff_vals(gff_, causal, es_low, es_high, wk_dir, n_gen, mut_rate, no
 		for line in gff:
 			if line.startswith("\n"):
 				continue
+			elif line.startswith("#"):
+				continue
 			else:
 				g_len = g_len + 1
-
 	genes = sample(range(int(g_len)), int(causal))
 
 	dict_causal_genes = {}
@@ -77,13 +78,16 @@ def generate_eff_vals(gff_, causal, es_low, es_high, wk_dir, n_gen, mut_rate, no
 	with open(gff_, "r") as gff:
 		index = 0
 		for line in gff:
-			if index in genes:
-				ll = line.rstrip("\n")
-				l = ll.split("\t")
-				info = l[8].split(";")
-				causal_length.append(int(l[4])-int(l[3])+1)
-				dict_causal_genes[info[2].split("=")[1]] = [int(l[3]), int(l[4]), np.random.uniform(float(es_low), float(es_high), 1)[0]]
-			index = index + 1
+			if line.startswith("#") or line.startswith("\n") :
+				continue
+			else:
+				if index in genes:
+					ll = line.rstrip("\n")
+					l = ll.split("\t")
+					info = l[8].split(";")
+					causal_length.append(int(l[4])-int(l[3])+1)
+					dict_causal_genes[info[0].split("=")[1]] = [int(l[3]), int(l[4]), np.random.uniform(float(es_low), float(es_high), 1)[0]]
+				index = index + 1
 		if norm_or_not:
 			dict_causal_genes = normalization_by_mutscounts(wk_dir, dict_causal_genes, n_gen, mut_rate)
 	seeds_trait_vals = seeds_trait_calc(wk_dir, dict_causal_genes)
@@ -129,7 +133,11 @@ def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir,
 		traits_dict.append(curret_tdict)
 		seeds_trait_vals.append(seed_vals)
 
-	write_seeds_trait(wk_dir, seeds_trait_vals)
+	write_seeds_trait(wk_dir, seeds_trait_vals, trait_n)
+	write_eff_size_csv(trait_n, traits_dict, wk_dir)
+
+
+def write_eff_size_csv(trait_n, traits_dict, wk_dir):
 	all_dict = {}
 	start_pos_dict = {}
 
@@ -158,31 +166,33 @@ def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir,
 	sorted_all_dict = {start_pos_dict[i]: all_dict[start_pos_dict[i]] for i in sorted_dict}
 
 	with open(os.path.join(wk_dir, "causal_gene_info.csv"), "w") as csv:
-		header_csv = "gene_name,start,end,eff_size_transmissibility,"
-		for i in range(trait_n[0]-1):
+		header_csv = "gene_name,start,end,"
+		for i in range(trait_n[0]):
 			header_csv = header_csv + "eff_size_transmissibility" + str(i + 1) + ","
-		for i in range(trait_n[1]-1):
+		for i in range(trait_n[1]):
 			header_csv = header_csv + "eff_size_dr" + str(i + 1) + ","
 		csv.write(header_csv[:-1] + "\n")
 		for i in sorted_all_dict:
 			csv.write(i + "," + ",".join([str(j) for j in sorted_all_dict[i]]) + "\n")
 
 
-def write_seeds_trait(wk_dir, seeds_trait_vals):
+def write_seeds_trait(wk_dir, seeds_trait_vals, traits_num):
 	## A function to write trait values(trait value: sum of all mutation's effect sizes) of all seeds into a csv file
 	### Input: wk_dir: Working directory
 	###		   seeds_trait_vals: A list (length=number of traits) where each element is a list (length=number or seeds), storing the trait value of each seeds
 	### Output: no return values
 	with open(os.path.join(wk_dir, "seeds_trait_values.csv"), "w") as csv_file:
-		header_csv = "seed_id,transmissibility,"
-		for i in range(len(seeds_trait_vals)-1):
+		header_csv = "seed_id,"
+		for i in range(traits_num[0]):
+			header_csv = header_csv + "transmissibility_" + str(i + 1) + ","
+		for i in range(traits_num[1]):
 			header_csv = header_csv + "drugresist_" + str(i + 1) + ","
 		csv_file.write(header_csv[:-1] + "\n")
 		for i in range(len(seeds_trait_vals[0])):
 			csv_file.write(str(i) + "," + ",".join([str(seeds_trait_vals[j][i]) for j in range(len(seeds_trait_vals))]) + "\n")
 
 
-def read_effvals(wk_dir, effsize_path, trait_n):
+def read_effvals(wk_dir, effsize_path, traits_num):
 	## A function to read a user-specified csv file of effect size, return the seeds' trait values accordingly
 	### Input: wk_dir: Working directory
 	###        effsize_path: Full path to the effect size file (.csv)
@@ -193,30 +203,30 @@ def read_effvals(wk_dir, effsize_path, trait_n):
 		### Check if the file format is right
 		### If effsize_path for mat correct: do
 		csv_df = pd.read_csv(effsize_path)
-		traits_num = len(csv_df.columns) - 3
-		if sum(traits_num) < 1:
-			print("Format error, need to have at least 1 trait (transmissibility).")
-		elif sum(traits_num) != traits_num:
+		traits_num_provided = len(csv_df.columns) - 3
+		if sum(traits_num) != traits_num_provided:
 			print("Format error, need to have at sum of traits number being the column of the effect size file provided.")
-		elif length(traits_num) > 2:
-			print("Wrong trait number format, need to have at most two traits number (for transmissibility and/or drug resistance).")
 		else:
 			gene_names = csv_df["gene_name"].tolist()
 			start_pos = csv_df["start"].tolist()
 			end_pos = csv_df["end"].tolist()
 			traits = []
+			traits_dict = []
 			if traits_num[0] > 0:
-				for i in range(traits_num[0] - 1):
-					traits.append(csv_df["eff_size_transmissibility" + str(i + 1)].tolist())
+				for i in range(traits_num[0]):
+					traits.append(csv_df.iloc[:, 3 + i].tolist())
 			if traits_num[1] > 0:
-				for i in range(traits_num - 1):
-					traits.append(csv_df["eff_size_dr" + str(i + 1)].tolist())
+				for i in range(traits_num[1]):
+					traits.append(csv_df.iloc[:, 3 + i + traits_num[0]].tolist())
 			seeds_trait_vals = []
-			for i in range(traits_num):
+			#print(traits)
+			for i in range(sum(traits_num)):
 				dict_c_g = {}
 				for j in range(len(gene_names)):
 					dict_c_g[gene_names[j]] = [start_pos[j], end_pos[j], traits[i][j]]
 				seeds_trait_vals.append(seeds_trait_calc(wk_dir, dict_c_g))
+				traits_dict.append(dict_c_g)
+			write_eff_size_csv(traits_num, traits_dict, wk_dir)
 			return(seeds_trait_vals)
 
 
@@ -234,47 +244,55 @@ def effsize_generation_byconfig(all_config):
 		run_effsize_generation(method="user_input", wk_dir=wk_dir, effsize_path=genetic_config["effect_size"]["user_input"]["path_effsize_table"])
 	elif effsize_method=="randomly_generate":
 		eff_params_config = genetic_config["randomly_generate"]
-		run_effsize_generation(method="randomly_generate", wk_dir=wk_dir, trait_n=eff_params_config["traits_num"], causal_sizes=eff_params_config["genes_num"], es_lows=eff_params_config["effsize_min"], es_highs=eff_params_config["effsize_max"], gff_in=eff_params_config["gff"], n_gen=all_config["EvolutionModel"]["n_generation"], mut_rate=all_config["EvolutionModel"]["mut_rate"], norm_or_not=eff_params_config["normalize"])
+		run_effsize_generation(method="randomly_generate", wk_dir=wk_dir, trait_n=genetic_config["traits_num"], causal_sizes=eff_params_config["genes_num"], es_lows=eff_params_config["effsize_min"], es_highs=eff_params_config["effsize_max"], gff_in=eff_params_config["gff"], n_gen=all_config["EvolutionModel"]["n_generation"], mut_rate=all_config["EvolutionModel"]["mut_rate"], norm_or_not=eff_params_config["normalize"])
 	else:
 		print("Incorrect effect size method.")
 
 
-def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[0], causal_sizes=[], es_lows=[], es_highs=[], norm_or_not=False, n_gen=0, mut_rate=0):
+def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[0,0], causal_sizes=[], es_lows=[], es_highs=[], norm_or_not=False, n_gen=0, mut_rate=0):
 	## A function to run the effect size generation and do error control.
 	run_check = True
 	if method=="user_input":
 		if effsize_path=="":
-			print("Need to specify a path to the effect size csv file in user_input mode.")
+			print("Need to specify a path to the effect size csv file (-effsize_path) in user_input mode.")
 			run_check = False
-		if sum(trait_n)<1:
-			print("Please provide a number of trait or a list of number of traits that sums to the number of traits in the effect size file.")
+		elif len(trait_n)!=2:
+			print("Wrong trait number format, need to have exactly two traits number (for transmissibility and drug resistance).")
+			run_check = False
+		elif sum(trait_n)<1:
+			print("Please provide a list of number of trait (-trait_n) that sum up to at least 1.")
+			run_check = False
 	elif method=="randomly_generate":
 		if sum(trait_n)<1:
-			print("Please provide a number of trait being at least 1.")
+			print("Please provide a list of number of trait (-trait_n) that sum up to at least 1.")
 			run_check = False
-		if len(es_lows)!=sum(trait_n):
-			print("The given length of the lower bounds doesn't equal to the number of traits")
-			run_check = False
-		if len(es_highs)!=sum(trait_n):
-			print("The given length of the higher bounds doesn't equal to the number of traits")
-			run_check = False
-		if norm_or_not:
-			if n_gen==0:
-				print("Need to specify a number of generation that is bigger than 0 in normalization mode")
+		else:
+			if len(causal_sizes)!=sum(trait_n):
+				print("The given length of the number of causal genetic elements (-causal_size_each) doesn't equal to the number of traits (Each trait has one number of causal genetic element)")
 				run_check = False
-			if mut_rate==0:
-				print("Need to specify a mutation rate that is bigger than 0 in normalization mode")
+			if len(es_lows)!=sum(trait_n):
+				print("The given length of the lower bounds (-es_low) doesn't equal to the number of traits")
 				run_check = False
-		if gff_in=="":
-			print("Need to specify a path to the gff file in random generation mode.")
-			run_check = False
+			if len(es_highs)!=sum(trait_n):
+				print("The given length of the higher (-es_high) bounds doesn't equal to the number of traits")
+				run_check = False
+			if norm_or_not:
+				if n_gen==0:
+					print("Need to specify a number of generation (-sim_generation) that is bigger than 0 in normalization mode")
+					run_check = False
+				if mut_rate==0:
+					print("Need to specify a mutation rate (-mut_rate) that is bigger than 0 in normalization mode")
+					run_check = False
+			if gff_in=="":
+				print("Need to specify a path to the gff file (-gff) in random generation mode.")
+				run_check = False
 	else:
 		run_check = False
-		print("Please provide a permitted method.")
+		print("Please provide a permitted method (-method): user_input/randomly_generate.")
 
 	if run_check:
 		if method=="user_input":
-			write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path, trait_n))
+			write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path, trait_n), trait_n)
 		elif method=="randomly_generate":
 			generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, norm_or_not)
 	else:

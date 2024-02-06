@@ -1,0 +1,34 @@
+##fileformat=VCFv4.2
+##source=SLiM
+##INFO=<ID=MID,Number=.,Type=Integer,Description="Mutation ID in SLiM">
+##INFO=<ID=S,Number=.,Type=Float,Description="Selection Coefficient">
+##INFO=<ID=DOM,Number=.,Type=Float,Description="Dominance">
+##INFO=<ID=PO,Number=.,Type=Integer,Description="Population of Origin">
+##INFO=<ID=TO,Number=.,Type=Integer,Description="Tick of Origin">
+##INFO=<ID=MT,Number=.,Type=Integer,Description="Mutation Type">
+##INFO=<ID=AC,Number=.,Type=Integer,Description="Allele Count">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+##INFO=<ID=AA,Number=1,Type=String,Description="Ancestral Allele">
+##INFO=<ID=NONNUC,Number=0,Type=Flag,Description="Non-nucleotide-based">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	0
+1	1306	2	A	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	1563	5	T	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1
+1	2023	7	A	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	3714	12	A	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	7234	29	G	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	8780	33	G	A	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	11996	42	T	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1
+1	14565	45	G	A	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	15398	50	T	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1
+1	15493	51	C	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=C	GT	1
+1	16756	55	C	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=C	GT	1
+1	16900	56	G	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	21089	67	C	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=C	GT	1
+1	21303	69	C	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=C	GT	1
+1	21374	71	G	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	21380	72	C	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=C	GT	1
+1	22483	75	G	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	22628	76	A	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	22954	78	G	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	25996	82	T	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1

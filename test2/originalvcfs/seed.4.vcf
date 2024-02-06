@@ -1,0 +1,32 @@
+##fileformat=VCFv4.2
+##source=SLiM
+##INFO=<ID=MID,Number=.,Type=Integer,Description="Mutation ID in SLiM">
+##INFO=<ID=S,Number=.,Type=Float,Description="Selection Coefficient">
+##INFO=<ID=DOM,Number=.,Type=Float,Description="Dominance">
+##INFO=<ID=PO,Number=.,Type=Integer,Description="Population of Origin">
+##INFO=<ID=TO,Number=.,Type=Integer,Description="Tick of Origin">
+##INFO=<ID=MT,Number=.,Type=Integer,Description="Mutation Type">
+##INFO=<ID=AC,Number=.,Type=Integer,Description="Allele Count">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+##INFO=<ID=AA,Number=1,Type=String,Description="Ancestral Allele">
+##INFO=<ID=NONNUC,Number=0,Type=Flag,Description="Non-nucleotide-based">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	0
+1	1631	6	A	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	4651	15	G	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	5377	18	G	A	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	5585	21	T	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1
+1	5987	23	C	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=C	GT	1
+1	7234	29	G	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	9051	35	A	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	9126	36	T	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1
+1	14641	46	T	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1
+1	16009	52	A	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	16756	55	C	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=C	GT	1
+1	16900	56	G	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	21374	71	G	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	22224	74	G	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	22628	76	A	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	22718	77	A	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	22954	78	G	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	25031	80	A	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1

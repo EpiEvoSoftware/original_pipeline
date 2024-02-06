@@ -29,7 +29,7 @@ s13 reproduction()
 			{
 				subpops[i].addRecombinant(infector_pathogen.genome1, NULL, NULL, NULL, NULL, NULL).tag = infector_pathogen.tag;
 				line = paste(community.tick, infector_subpop.tag, i);
-				writeFile(paste0(cwdir, runid, "/infection_raw.txt"), line, append=T, compress=T);
+				writeFile(paste0(cwdir, runid, "/infection_raw.csv"), line, append=T, compress=T);
 			}
 		}
 	}

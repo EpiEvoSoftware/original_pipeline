@@ -2,13 +2,14 @@ import os
 import shutil
 import inspect
 import subprocess
-from multiprocessing import Pool
+#from multiprocessing import Pool
 
 import tskit
 import pyslim
 import pandas as pd
 import numpy as np
 import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
 
 from base_func import *
 
@@ -113,7 +114,8 @@ def create_slimconfig(all_config):
 			out_config.write("causal_gene_path:" + os.path.join(slim_pars["cwdir"], "causal_gene_info.csv") + "\n")
 		else:
 			out_config.write("causal_gene_path:" + "\n")
-		out_config.write("seed_host_matching_path:" + os.path.join(slim_pars["cwdir"], "seed_host_match.csv") + "\n")
+		slim_pars["seed_host_matching_path"] = os.path.join(slim_pars["cwdir"], "seed_host_match.csv")
+		out_config.write("seed_host_matching_path:" + slim_pars["seed_host_matching_path"] + "\n")
 
 		if slim_pars["use_network_model"]:
 			slim_pars["host_size"] = all_config["NetworkModelParameters"]["host_size"]
@@ -169,7 +171,7 @@ def create_slimscript(slim_pars):
 	### The script should take in SLiM config file and the current output directory (related to n_replicates) as parameters
 	### No return value
 	
-	code_path = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), "slim_scripts/")
+	code_path = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), "slim_scripts")
 	mainslim_path = os.path.join(slim_pars["cwdir"], "simulation.slim")
 
 	if os.path.exists(mainslim_path):
@@ -281,7 +283,9 @@ def run_per_slim_simulation(slim_config_path, wk_dir, runid):
 		os.makedirs(output_path)
 
 	script_path = os.path.join(wk_dir, "simulation.slim")
-	subprocess.run(["slim", "-d", f"config_path=\"{slim_config_path}\"", "-d", f"runid={runid}", script_path])
+	slim_stdout_path = os.path.join(output_path, "slim.stdout")
+	with open(slim_stdout_path, 'w') as fd:
+		subprocess.run(["slim", "-d", f"config_path=\"{slim_config_path}\"", "-d", f"runid={runid}", script_path], stdout=fd)
 	return(0)
 
 
@@ -315,8 +319,12 @@ def run_all_slim_simulation(slim_config_path="", slim_pars={}, dataprocess_pars=
 		for runid in range(1,slim_pars["n_replicates"] + 1):
 			run_per_slim_simulation(slim_config_path, slim_pars["cwdir"], runid)
 			if len(dataprocess_pars) > 0:
-				run_per_data_processing(slim_pars["cwdir"], slim_pars["use_genetic_model"], runid, dataprocess_pars["n_trait"], dataprocess_pars["tree_plotting"]["branch_color_trait"])
-
+				each_wkdir = os.path.join(slim_pars["cwdir"], str(runid))
+				run_per_data_processing(slim_pars["cwdir"], slim_pars["use_genetic_model"], runid, dataprocess_pars["n_trait"], slim_pars["seed_host_matching_path"], dataprocess_pars["tree_plotting"]["branch_color_trait"])
+				plot_per_transmission_tree(each_wkdir, slim_pars["seed_size"], slim_config_path, dataprocess_pars["n_trait"], os.path.join(slim_pars["cwdir"], "seeds_phylogeny.nwk"))
+				plot_strain_distribution_trajectory(each_wkdir, slim_pars["seed_size"], slim_pars["n_generation"])
+				plot_SEIR_trajectory(each_wkdir, slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"])
+		plot_all_SEIR_trajectory(slim_pars["cwdir"], slim_pars["n_replicates"], slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"])
 	return(0)
 
 
@@ -345,17 +353,25 @@ def find_label(tseq_smp, sim_gen, sample_size):
 	return(real_name)
 
 
-def nwk_output(tseq_smp, real_name, each_wk_dir_):
+def nwk_output(tseq_smp, real_name, each_wk_dir_, seed_host_match_path):
 	##### Don't name with roots, but name with seed id?
 	roots_all = tseq_smp.first().roots
 	output_path = os.path.join(each_wk_dir_, "transmission_tree")
+	table_ind = tseq_smp.tables.individuals
+	match_dict = {}
+	with open(seed_host_match_path, "r") as in_csv:
+		for line in in_csv:
+			ll = line.rstrip("\n")
+			l = ll.split(",")
+			match_dict[int(l[0])] = int(l[1])
 	if not os.path.exists(output_path):
 		os.makedirs(output_path)
 	else:
 		shutil.rmtree(output_path)           # Removes all the subdirectories!
 		os.makedirs(output_path)
 	for root in roots_all:
-		with open(os.path.join(output_path, str(root) + ".nwk"), "w") as nwk:
+		root_subpop = table_ind[root].metadata["subpopulation"]
+		with open(os.path.join(output_path, str(match_dict[root_subpop]) + ".nwk"), "w") as nwk:
 			nwk.write(tseq_smp.first().as_newick(root = root, node_labels = real_name))
 
 
@@ -462,7 +478,7 @@ def output_tseq_vcf(wk_dir_, real_label, sampled_ts):
 	nu_ts.write_vcf(f, individual_names=real_label.values())
 
 
-def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, color_trait=1):
+def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_path, color_trait=1):
     ## wk_dir: working directory (all)
     ## gen_model: whether to calculate trait values
     ## color_trait: which trait to color the tree
@@ -470,7 +486,7 @@ def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, color_trait=1):
     each_wk_dir = os.path.join(wk_dir_, str(runid))
     full_ts, sampled_ts, sample_size, sim_gen = read_tseq(each_wk_dir)
     real_label = find_label(sampled_ts, sim_gen, sample_size)
-    nwk_output(sampled_ts, real_label, each_wk_dir)
+    nwk_output(sampled_ts, real_label, each_wk_dir, seed_host_match_path)
     if color_trait==0:
     	gen_model== False
     if gen_model==True:
@@ -480,6 +496,81 @@ def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, color_trait=1):
         write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
     output_tseq_vcf(each_wk_dir, real_label, sampled_ts)
 
+
+
+############################## PLOTTING ##################################
+
+def plot_per_transmission_tree(each_wk_dir_, seed_size, slim_config_path, n_traits, seed_phylo_path):
+	rscript_path = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), "plot_tree.r")
+	subprocess.run(["Rscript", rscript_path, each_wk_dir_, str(seed_size), slim_config_path, str(n_traits[0]), str(n_traits[1]), seed_phylo_path])
+	return(0)
+
+
+def plot_strain_distribution_trajectory(each_wk_dir_, seed_size, n_generation):
+	eff_size = pd.read_csv(os.path.join(each_wk_dir_, "strain_trajectory.csv.gz"), header=None, names=range(seed_size), compression = "gzip")
+	eff_size = pd.concat([pd.DataFrame({i: [1] for i in range(seed_size)}), eff_size]).reset_index(drop=True)
+
+	eff_size_normalized = eff_size.div(eff_size.sum(axis=1), axis=0)
+
+	ax = eff_size_normalized.plot(kind='area', stacked=True, figsize=(10, 6), cmap='viridis')
+
+	plt.xlabel('Generations')
+	plt.ylabel('Proportion of strain')
+	plt.title('Change of the Proportion of Different strains Through Time')
+	plt.ylim(0, 1)
+	plt.xlim(0, n_generation)
+	ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+	plt.tight_layout()
+	plt.savefig(os.path.join(each_wk_dir_, "strain_trajectory.png"))
+
+
+def plot_SEIR_trajectory(each_wk_dir_, seed_size, host_size, n_generation):
+	seir = pd.read_csv(os.path.join(each_wk_dir_, "SEIR_trajectory.csv.gz"), header=None, names=["S", "E", "I", "R"])
+	seir = pd.concat([pd.DataFrame({"S": [host_size - seed_size], "E": [0], "I": [seed_size], "R": [0]}), seir]).reset_index(drop=True)
+
+	seir.plot(kind='line', figsize=(10, 6), cmap='viridis')
+
+	plt.xlabel('Generations')
+	plt.ylabel('number of hosts')
+	plt.title('SEIR Trajectory')
+	plt.ylim(0, host_size)
+	plt.xlim(0, n_generation)
+
+	plt.tight_layout()
+
+	plt.savefig(os.path.join(each_wk_dir_, "SEIR_trajectory.png"))
+
+
+
+def plot_all_SEIR_trajectory(wk_dir_, rep_num, seed_size, host_size, n_generation):
+
+	each_wk_dir_ = os.path.join(wk_dir_, "1")
+	seir = pd.read_csv(os.path.join(each_wk_dir_, "SEIR_trajectory.csv.gz"), header=None, names=["S", "E", "I", "R"])
+	seir = pd.concat([pd.DataFrame({"S": [host_size - seed_size], "E": [0], "I": [seed_size], "R": [0]}), seir]).reset_index(drop=True)
+	ax = seir.plot(kind='line', figsize=(10, 6), cmap='viridis', alpha=0.4)
+	seir_sum = seir
+
+	for runid in range(2, rep_num + 1):
+		each_wk_dir_ = os.path.join(wk_dir_, str(runid))
+		seir = pd.read_csv(os.path.join(each_wk_dir_, "SEIR_trajectory.csv.gz"), header=None, names=["S", "E", "I", "R"])
+		seir = pd.concat([pd.DataFrame({"S": [host_size - seed_size], "E": [0], "I": [seed_size], "R": [0]}), seir]).reset_index(drop=True)
+		ax = seir.plot(ax = ax, kind='line', cmap='viridis', legend=None, alpha=0.4)
+		seir_sum = seir_sum.add(seir, fill_value=0)
+
+	seir_avg = seir_sum.div(rep_num)
+	ax = seir_avg.plot(ax = ax, kind='line', cmap='viridis', legend=None, linewidth=3)
+
+	plt.xlabel('Generations')
+	plt.ylabel('number of hosts')
+	plt.title('SEIR Trajectory')
+	plt.ylim(0, host_size)
+	plt.xlim(0, n_generation)
+
+
+	plt.tight_layout()
+
+	plt.savefig(os.path.join(wk_dir_, "all_SEIR_trajectory.png")) 
 
 
 

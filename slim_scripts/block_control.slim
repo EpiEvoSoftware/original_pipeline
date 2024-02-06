@@ -78,6 +78,7 @@
 		}
 		not_dr_gens = c(not_dr_gens, start_gen:end_gen);
 	}
+
 	if (length(not_dr_gens) > 0)
 	{
 		community.rescheduleScriptBlock(s3, ticks = not_dr_gens);
@@ -92,7 +93,6 @@
 	if (n_epoch > 1)
 	{
 		community.rescheduleScriptBlock(s12, ticks = epoch_changing_generation);
-		print(epoch_changing_generation);
 	}
 
 	// s11, massive sampling event, only executed at certain generations

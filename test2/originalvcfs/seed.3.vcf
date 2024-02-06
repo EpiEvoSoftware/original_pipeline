@@ -1,0 +1,29 @@
+##fileformat=VCFv4.2
+##source=SLiM
+##INFO=<ID=MID,Number=.,Type=Integer,Description="Mutation ID in SLiM">
+##INFO=<ID=S,Number=.,Type=Float,Description="Selection Coefficient">
+##INFO=<ID=DOM,Number=.,Type=Float,Description="Dominance">
+##INFO=<ID=PO,Number=.,Type=Integer,Description="Population of Origin">
+##INFO=<ID=TO,Number=.,Type=Integer,Description="Tick of Origin">
+##INFO=<ID=MT,Number=.,Type=Integer,Description="Mutation Type">
+##INFO=<ID=AC,Number=.,Type=Integer,Description="Allele Count">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+##INFO=<ID=AA,Number=1,Type=String,Description="Ancestral Allele">
+##INFO=<ID=NONNUC,Number=0,Type=Flag,Description="Non-nucleotide-based">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	0
+1	1379	4	C	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=C	GT	1
+1	2384	8	A	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	4941	17	T	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1
+1	5712	22	T	A	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1
+1	6883	26	G	A	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	7963	30	C	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=C	GT	1
+1	8162	31	T	C	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1
+1	9760	38	G	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
+1	13071	44	C	A	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=C	GT	1
+1	14666	47	T	A	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1
+1	17321	58	A	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	20592	65	A	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	22974	79	A	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
+1	26793	85	T	A	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=T	GT	1
+1	28547	89	G	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=G	GT	1
