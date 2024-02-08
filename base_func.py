@@ -1,6 +1,7 @@
 import json
 import os
 import inspect
+import argparse
 
 def read_params(path_config):
     default_config = open(os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), "base_params.json"), "r")

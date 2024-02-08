@@ -1,7 +1,8 @@
 	range_genes = c();
 	defineGlobal("effsize_pos", readCSV(causal_gene_path, colNames = T));
 	n_causal_genes = effsize_pos.nrow;
-	trait_names = effsize_pos.colNames[3:n_causal_genes];
+	ncol_idx = effsize_pos.ncol - 1;
+	trait_names = effsize_pos.colNames[3:ncol_idx];
 	n_trans_traits = sum(strcontains(trait_names, "transmissibility"));
 	n_dr_traits = sum(strcontains(trait_names, "dr"));
 	initializeGenomicElement(0, 0, effsize_pos.subset(0,1) - 1);

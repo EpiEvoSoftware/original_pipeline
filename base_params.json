@@ -87,9 +87,7 @@
     },
     "randomly_generate": {
       "method": "",
-      "random": null,
-      "ranking": [],
-      "percentile": []
+      "path_csv": ""
     }
   },
   "EpidemiologyModel": {

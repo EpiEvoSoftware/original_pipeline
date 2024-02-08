@@ -80,7 +80,7 @@ initialize() {
 	{
 		defineGlobal("cwdir", paste0(cwdir, "/"));
 	}
-	
+
 
 
 	defineConstant("L", initializeAncestralNucleotides(ref_path));
@@ -94,7 +94,8 @@ initialize() {
 		range_genes = c();
 	defineGlobal("effsize_pos", readCSV(causal_gene_path, colNames = T));
 	n_causal_genes = effsize_pos.nrow;
-	trait_names = effsize_pos.colNames[3:n_causal_genes];
+	ncol_idx = effsize_pos.ncol - 1;
+	trait_names = effsize_pos.colNames[3:ncol_idx];
 	n_trans_traits = sum(strcontains(trait_names, "transmissibility"));
 	n_dr_traits = sum(strcontains(trait_names, "dr"));
 	initializeGenomicElement(0, 0, effsize_pos.subset(0,1) - 1);
@@ -203,33 +204,52 @@ mutation(m1) {
 	// s7, treatment block, will activate only at the generations specified by treatment_gens as substitution of s3
 	not_dr_gens = c();
 	not_dr_epochs = which(drugresistance_effsize==0);
-	for (epoch_indx in not_dr_epochs)
-	{
-		if (epoch_indx == 0)
-		{
-			start_gen = 2;
-			end_gen = epoch_changing_generation[epoch_indx] - 1;
-		}
-		else if (epoch_indx == n_epoch - 1)
-		{
-			start_gen = epoch_changing_generation[epoch_indx - 1];
-			end_gen = n_generation;
-		}
-		else
-		{
-			start_gen = epoch_changing_generation[epoch_indx - 1];
-			end_gen = epoch_changing_generation[epoch_indx] - 1;
-		}
-		not_dr_gens = c(not_dr_gens, start_gen:end_gen);
-	}
 
-	if (length(not_dr_gens) > 0)
+	if (n_epoch==1)
+	{
+		if (isNULL(not_dr_epochs)==F)
+		{
+			not_dr_gens = c(not_dr_gens, 2:n_generation);
+		}
+	}
+	else
+	{
+		for (epoch_indx in not_dr_epochs)
+		{
+			if (epoch_indx == 0)
+			{
+				start_gen = 2;
+				end_gen = epoch_changing_generation[epoch_indx] - 1;
+			}
+			else if (epoch_indx == n_epoch - 1)
+			{
+				start_gen = epoch_changing_generation[epoch_indx - 1];
+				end_gen = n_generation;
+			}
+			else
+			{
+				start_gen = epoch_changing_generation[epoch_indx - 1];
+				end_gen = epoch_changing_generation[epoch_indx] - 1;
+			}
+			not_dr_gens = c(not_dr_gens, start_gen:end_gen);
+		}
+	}
+	
+	if (any(not_dr_epochs > 1))
 	{
 		community.rescheduleScriptBlock(s3, ticks = not_dr_gens);
 	}
-	if (length(not_dr_epochs) < n_epoch)
+
+	if (length(not_dr_gens) < n_generation - 1)
 	{
-		community.rescheduleScriptBlock(s7, ticks = setDifference(all_gens_vector, not_dr_gens));
+		if (isNULL(not_dr_gens))
+		{
+			community.rescheduleScriptBlock(s7, ticks = 2:n_generation);
+		}
+		else
+		{
+			community.rescheduleScriptBlock(s7, ticks = setDifference(all_gens_vector, not_dr_gens));
+		}
 	}
 
 
@@ -258,7 +278,14 @@ mutation(m1) {
 			if (epoch_indx == 0)
 			{
 				start_gen = 2;
-				end_gen = epoch_changing_generation[epoch_indx] - 1;
+				if (n_epoch > 1)
+				{
+					end_gen = epoch_changing_generation[epoch_indx] - 1;
+				}
+				else
+				{
+					end_gen = n_generation;
+				}
 			}
 			else if (epoch_indx == n_epoch - 1)
 			{
@@ -307,6 +334,7 @@ mutation(m1) {
 			labels = c(labels, 2);
 			current_subpop.genomes.readFromVCF(paste0(seedsvcfpath, "seed.", seeds_structure.subset(seed_count, 1), ".vcf"));
 			current_subpop.individuals.tag = seeds_structure.subset(seed_count, 1); // id of seed
+			print(paste0(i, ",", current_subpop.individuals.tag));
 			sim.treeSeqRememberIndividuals(current_subpop.individuals);
 
 			if (seed_count < seed_size - 1)
@@ -383,6 +411,7 @@ s12 first()
 {
 	if (community.tick!=1)
 	{
+		print(community.tick);
 		defineGlobal("current_epoch", current_epoch + 1);
 	}
 }
@@ -506,6 +535,11 @@ s7 early(){
 					line1 = paste(community.tick, ind + 1);
 					writeFile(paste0(cwdir, runid, "/recovery.csv"), line1, append=T, compress=T);
 					actually_recovered = c(actually_recovered, pathogen);
+				}
+				else
+				{
+					print(pathogen.tag);
+					print(treatment_failed_rate);
 				}
 			}
 		}

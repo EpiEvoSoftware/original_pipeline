@@ -137,7 +137,7 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
             elif model=="BA":
                 write_network(ba_generate(pop_size, m), wk_dir)
     else:
-        raise ("Terminated because of incorrect input")
+        print("Terminated because of incorrect input")
 
 
 

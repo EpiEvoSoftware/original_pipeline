@@ -1,15 +1,15 @@
 // Initial random seed:
-2137195374011
+2575763311848
 
 // RunInitializeCallbacks():
-initializeSLiMModelType(modelType = 'nonWF');
+initializeSLiMModelType(modelType = 'WF');
 initializeSLiMOptions(nucleotideBased = T);
-initializeTreeSeq();
 initializeAncestralNucleotides("ATTAAAGGTTTATACCTTCC...");
 initializeRecombinationRate(0);
 initializeMutationTypeNuc(0, 1, "f", 0);
 initializeGenomicElementType(0, m0, 1);
 initializeGenomicElement(g0, 0, 29890);
+initializeTreeSeq();
 
 // Starting run at tick <start>:
 1 

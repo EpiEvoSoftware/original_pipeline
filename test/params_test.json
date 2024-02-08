@@ -1,10 +1,10 @@
 {
   "BasicRunConfiguration": {
     "cwdir": "/Users/px54/Documents/TB_software/V2_code/test",
-    "n_replicates": 3
+    "n_replicates": 10
   },
   "EvolutionModel": {
-    "n_generation": 360,
+    "n_generation": 500,
     "mut_rate": 4.4e-9,
     "trans_type": "additive",
     "dr_type": "additive",
@@ -52,7 +52,6 @@
       },
       "randomly_generate": {
         "gff": "/Users/px54/Documents/TB_transmissibility/slim_scripts/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
-        "traits_num": [1, 2],
         "genes_num": [10, 5, 5],
         "effsize_min": [1, 1, 1],
         "effsize_max": [5, 5, 5],
@@ -111,8 +110,8 @@
       "E_I_rate": [0.01, 0.01],
       "I_E_rate": [0.01, 0.01],
       "E_R_rate": [0, 0],
-      "sample_rate": [0.005, 0.005],
-      "recovery_prob_after_sampling": [1, 1]
+      "sample_rate": [0.006, 0.006],
+      "recovery_prob_after_sampling": [0, 0]
     },
     "massive_sampling": {
       "event_num": 0,

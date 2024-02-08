@@ -44,12 +44,13 @@ def check_seed_phylo_input(path_seeds_phylogeny, wk_dir):
 		print("Path to the provided seeds' phylogeny doesn't exist")
 
 
-def split_seedvcf(seed_vcf_path, wk_dir, seeds_size):
+def split_seedvcf(seed_vcf_path, wk_dir, seeds_size, method):
 	## A function that creates a directory (originalvcfs) in wk_dir, and splits the seeds' vcf into one vcf per seed
 	## storing them in originalvcfs directory by the order of the seeds' vcf.
 	## Input: seed_vcf_path: Full path to the seeds' vcf
 	##        wk_dir: working directory
 	##        seeds_size: how many seeds is needed
+	##        method: user or slim
 	## Output: No return value
 
 	vcf_header = "##fileformat=VCFv4.2\n##source=SLiM\n##INFO=<ID=MID,Number=.,Type=Integer,Description=\"Mutation ID in SLiM\">\n##INFO=<ID=S,Number=.,Type=Float,Description=\"Selection Coefficient\">\n##INFO=<ID=DOM,Number=.,Type=Float,Description=\"Dominance\">\n##INFO=<ID=PO,Number=.,Type=Integer,Description=\"Population of Origin\">\n##INFO=<ID=TO,Number=.,Type=Integer,Description=\"Tick of Origin\">\n##INFO=<ID=MT,Number=.,Type=Integer,Description=\"Mutation Type\">\n##INFO=<ID=AC,Number=.,Type=Integer,Description=\"Allele Count\">\n##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total Depth\">\n##INFO=<ID=AA,Number=1,Type=String,Description=\"Ancestral Allele\">\n##INFO=<ID=NONNUC,Number=0,Type=Flag,Description=\"Non-nucleotide-based\">\n##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n"
@@ -59,9 +60,11 @@ def split_seedvcf(seed_vcf_path, wk_dir, seeds_size):
 		shutil.rmtree(seeds_dir, ignore_errors=True)
 	ref_allele = ["0|0", "0/0", "0", "."]
 	vcf_info_col = 9
+	pos_col = 1
 	alt_col = 4
 	ref_col = 3
 	vcf_info_col_plus1 = vcf_info_col + 1
+	pos_col_plus1 = pos_col + 1
 	os.mkdir(seeds_dir)
 	all_separate_vcfs = []
 	for i in range(seeds_size):
@@ -83,6 +86,8 @@ def split_seedvcf(seed_vcf_path, wk_dir, seeds_size):
 		else:
 			ll = line.rstrip("\n")
 			l = ll.split("\t")
+			if method=="slim":
+				l[pos_col] = str(int(l[pos_col]) + 1)
 			for i in range(seeds_size):
 				if (l[vcf_info_col+i] not in ref_allele):
 					ref = l[ref_col]
@@ -101,12 +106,12 @@ def split_seedvcf(seed_vcf_path, wk_dir, seeds_size):
 						else:
 							alt = [l[alt_col]]
 						with open(all_separate_vcfs[i], "a") as newvcf:
-							newvcf.write("\t".join(l[:alt_col]) + "\t" + alt[int(geno[0])-1] + "\t1000\tPASS\tS=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=" + ref + "\tGT\t1\n")
+							newvcf.write("\t".join(l[:pos_col]) + "\t" + l[pos_col] + "\t" + "\t".join(l[pos_col_plus1:alt_col]) + "\t" + alt[int(geno[0])-1] + "\t1000\tPASS\tS=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=" + ref + "\tGT\t1\n")
 
 
 def seed_userinput(seed_vcf_path, seed_size, wk_dir, path_seeds_phylogeny):
 	if check_seedsvcf_input(seed_vcf_path, seed_size):
-		split_seedvcf(seed_vcf_path, wk_dir, seed_size)
+		split_seedvcf(seed_vcf_path, wk_dir, seed_size, "user")
 	if path_seeds_phylogeny!="":
 		check_seed_phylo_input(path_seeds_phylogeny, wk_dir)
 
@@ -117,7 +122,7 @@ def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen):
 	with open(slim_stdout_path, 'w') as fd:
 		subprocess.run(["slim", "-d", f"Ne={Ne}", "-d", f"ref_path=\"{ref_path}\"", "-d", f"wk_dir=\"{wk_dir}\"", "-d", f"mu={mu}", "-d", f"n_gen={n_gen}", slim_script], stdout=fd)
 	seeds_treeseq(wk_dir, seed_size)
-	split_seedvcf(os.path.join(wk_dir, "seeds.vcf"), wk_dir, seed_size)
+	split_seedvcf(os.path.join(wk_dir, "seeds.vcf"), wk_dir, seed_size, "slim")
 
 def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, S_IE_rate, E_I_rate=0, E_R_rate=0, latency_prob=0, I_R_rate=0, I_E_rate=0, R_S_rate=0):
 	## A function to run the burn-in using the epidemiological model.
@@ -130,7 +135,7 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
 		subprocess.run(["slim", "-d", f"cwdir=\"{wk_dir}\"", "-d", f"ref_path=\"{ref_path}\"", "-d", f"contact_network_path=\"{os.path.join(wk_dir, "contact_network.adjlist")}\"", "-d", f"host_size={host_size}", "-d", f"mut_rate={mu}", "-d", f"n_generation={n_gen}", "-d", f"seeded_host_id=c({",".join([str(i) for i in seeded_host_id])})", "-d", f"S_IE_rate={S_IE_rate}", "-d", f"E_I_rate={E_I_rate}", "-d", f"E_R_rate={E_R_rate}", "-d", f"latency_prob={latency_prob}", "-d", f"I_R_rate={I_R_rate}", "-d", f"I_E_rate={I_E_rate}", "-d", f"R_S_rate={R_S_rate}", slim_script], stdout=fd)
 
 	seeds_treeseq(wk_dir, seed_size)
-	split_seedvcf(os.path.join(wk_dir, "seeds.vcf"), wk_dir, seed_size)
+	split_seedvcf(os.path.join(wk_dir, "seeds.vcf"), wk_dir, seed_size, "slim")
 
 
 
