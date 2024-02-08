@@ -27,7 +27,7 @@ def main():
 	percentile = args.percentile
 
 
-	run_seed_host_match(method=method, wkdir=wkdir, seed_size=seed_size, host_size=seed_size, path_matching=path_matching, match_scheme=match_scheme, ranking=ranking, percentile=percentile)
+	run_seed_host_match(method=method, wkdir=wkdir, seed_size=seed_size, host_size=host_size, path_matching=path_matching, match_scheme=match_scheme, ranking=ranking, percentile=percentile)
 
 
 if __name__ == "__main__":

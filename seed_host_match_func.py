@@ -138,10 +138,10 @@ def match_all_hosts(ntwk_: nx.Graph, match_method: dict[int, str], param: list[U
 	# 	matched_host = match_percentile(nodes_sorted, percentile[seed], unavail_id)
 	# 	unavail_id.append(matched_host)
 	# 	match_dict[matched_host] = seed
-	for seed in dict_method_seeds['random']:
-		matched_host = match_random(nodes_sorted, unavail_id)
-		unavail_id.append(matched_host)
-		match_dict[matched_host] = seed
+	#for seed in dict_method_seeds['random']:
+	#	matched_host = match_random(nodes_sorted, unavail_id)
+	#	unavail_id.append(matched_host)
+	#	match_dict[matched_host] = seed
 	return match_dict
 
 # TO DO: Read Config and match
@@ -344,11 +344,11 @@ def run_seed_host_match(method, wkdir, seed_size, host_size, path_matching="", m
 				print("UNFINISHED")  ##################################################### UNFINISHED ###############################################
 		elif method=="randomly_generate":
 			if match_scheme=="random":
-				match_all_hosts(ntwk_=read_network(ntwk_path), match_method = {i:match_scheme for i in range(seed_size)})
+				write_match(match_all_hosts(ntwk_=read_network(ntwk_path), match_method = {i:match_scheme for i in range(seed_size)}), wkdir)
 			elif match_scheme=="ranking":
-				match_all_hosts(read_network(ntwk_path), match_method = {i:match_scheme for i in range(seed_size)}, param=ranking_regen)
+				write_match(match_all_hosts(read_network(ntwk_path), match_method = {i:match_scheme for i in range(seed_size)}, param=ranking_regen), wkdir)
 			elif match_scheme=="percentile":
-				match_all_hosts(ntwk_=read_network(ntwk_path), match_method = {i:match_scheme for i in range(seed_size)}, param=percentile_regen)
+				write_match(match_all_hosts(ntwk_=read_network(ntwk_path), match_method = {i:match_scheme for i in range(seed_size)}, param=percentile_regen), wkdir)
 	else:
 		print("Terminated because of incorrect input")
 #
