@@ -18,18 +18,15 @@
     "user_input": {
       "path_seeds_vcf": "",
       "path_seeds_phylogeny": "",
-      "scaling_factor": 1
     },
     "SLiM_burnin_WF": {
       "burn_in_Ne": 0,
       "burn_in_generations": 0,
-      "burn_in_mutrate": 0,
-      "scaling_factor": 1
+      "burn_in_mutrate": 0
     },
     "SLiM_burnin_epi": {
       "burn_in_generations": 0,
       "burn_in_mutrate": 0,
-      "scaling_factor": 1,
       "seeded_host_id": [],
       "S_IE_rate": 0,
       "E_I_rate": 0,
@@ -87,7 +84,8 @@
     },
     "randomly_generate": {
       "method": "",
-      "path_csv": ""
+      "ranking": "",
+      "percentile": ""
     }
   },
   "EpidemiologyModel": {
