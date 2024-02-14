@@ -1,0 +1,809 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+<meta http-equiv='Content-Style-Type' content='text/css'>
+<title>Profile Report</title>
+<meta name='Generator' content='SLiM'>
+<style type='text/css'>
+    body {font-family: Optima,sans-serif; font-size: 14;}
+    h2 {margin-bottom: 0px;}
+    h3 {margin-bottom: 0px;}
+    p {margin-top: 5px;}
+    tt {font-family: Menlo,monospace; font-size: 13;}
+</style>
+</head>
+
+<body>
+<h2>Profile Report</h2>
+<p>Model: main_generated.slim</p>
+
+<p>Run start: Thu Dec  7 16:09:39 2023<BR>
+Run end: Thu Dec  7 16:09:40 2023</p>
+
+<p>Elapsed wall clock time: 1.65 s<BR>
+Elapsed wall clock time inside SLiM core (corrected): 1.48 s<BR>
+Elapsed CPU time inside SLiM core (uncorrected): 1.62 s<BR>
+Elapsed ticks: 361 (including initialize)</p>
+
+<p>Profile block external overhead: 0.27 ticks (1.138e-08 s)<BR>
+Profile block internal lag: 0.23 ticks (9.703e-09 s)</p>
+
+<p>Average tick SLiM memory use: 47.53 MB<BR>
+Final tick SLiM memory use: 92.58 MB</p>
+
+<h3>Cycle stage breakdown</h3>
+<p><tt>0.00&nbsp;s&nbsp;(&nbsp;0.09%)</tt> : initialize() callback execution<BR>
+<tt>0.00&nbsp;s&nbsp;(&nbsp;0.01%)</tt> : stage 0 - first() event execution<BR>
+<tt>0.68&nbsp;s&nbsp;(45.74%)</tt> : stage 1 - offspring generation<BR>
+<tt>0.28&nbsp;s&nbsp;(18.68%)</tt> : stage 2 - early() event execution<BR>
+<tt>0.01&nbsp;s&nbsp;(&nbsp;0.76%)</tt> : stage 3 - fitness calculation<BR>
+<tt>0.01&nbsp;s&nbsp;(&nbsp;0.54%)</tt> : stage 4 - viability/survival selection<BR>
+<tt>0.13&nbsp;s&nbsp;(&nbsp;8.50%)</tt> : stage 5 - bookkeeping (fixed mutation removal, etc.)<BR>
+<tt>0.05&nbsp;s&nbsp;(&nbsp;3.58%)</tt> : stage 6 - late() event execution<BR>
+<tt>0.22&nbsp;s&nbsp;(15.14%)</tt> : stage 7 - tree sequence auto-simplification</p>
+
+<h3>Callback type breakdown</h3>
+<p><tt>0.00&nbsp;s&nbsp;(&nbsp;0.08%)</tt> : initialize() callbacks<BR>
+<tt>0.00&nbsp;s&nbsp;(&nbsp;0.01%)</tt> : first() events<BR>
+<tt>0.67&nbsp;s&nbsp;(45.07%)</tt> : reproduction() events<BR>
+<tt>0.00&nbsp;s&nbsp;(&nbsp;0.00%)</tt> : recombination() callbacks<BR>
+<tt>0.05&nbsp;s&nbsp;(&nbsp;3.45%)</tt> : mutation() callbacks<BR>
+<tt>0.00&nbsp;s&nbsp;(&nbsp;0.00%)</tt> : modifyChild() callbacks<BR>
+<tt>0.28&nbsp;s&nbsp;(18.65%)</tt> : early() events<BR>
+<tt>0.00&nbsp;s&nbsp;(&nbsp;0.00%)</tt> : mutationEffect() callbacks<BR>
+<tt>0.00&nbsp;s&nbsp;(&nbsp;0.00%)</tt> : fitnessEffect() callbacks<BR>
+<tt>0.00&nbsp;s&nbsp;(&nbsp;0.00%)</tt> : survival() callbacks<BR>
+<tt>0.05&nbsp;s&nbsp;(&nbsp;3.42%)</tt> : late() events<BR>
+<tt>0.00&nbsp;s&nbsp;(&nbsp;0.00%)</tt> : interaction() callbacks</p>
+
+<h3>Script block profiles (as a fraction of corrected wall clock time)</h3>
+<p style='margin-bottom: 5px;'><tt>0.00 s (0.08%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>initialize() {<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>initializeSLiMModelType("nonWF")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>initializeSLiMOptions(nucleotideBased=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>initializeTreeSeq()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;// Read in the config file and make global variables of different parameters<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>source("read_config.slim")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;// Initiate the genomic elements and mutation types<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>source("genomic_element_init.slim")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.05 s (3.36%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>mutation(m1) {<BR>
+&nbsp;&nbsp;&nbsp;// Set mutational effects for new m2 mutation <BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,250);'>which_gene =asInteger((findInterval(mut.position, trait_locs) + 1) / 2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,235);'>mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;// trait_range = ncol(effsize_pos) - 1;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>for (t_num in 1:dr_epochs)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,216);'>mut.setValue(paste0("e", t_num), effsize_pos.subset(which_gene - 1, t_num + 3))</span><span style='background-color:rgb(255,255,255);'>; <BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>return T</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.01 s (0.41%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>1 early() {<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>seeds_structure = readCSV(paste0(cwdir, "/seed_host_match.csv"), colNames=F)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;// Add N($sample_size) subpopulations (representing N humans in the population) with 0 or 1 elements (Susceptible or Infected)<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>labels = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>seed_count = 0</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>for (i in 1:host_size)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>if (i == seeds_structure.subset(seed_count, 0))</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sim.addSubpop(i, 1, haploid=T)</span><span style='background-color:rgb(255,255,255);'>; // Infected hosts<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sim.subpopulations[i - 1].tag = i-1</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sim.subpopulations[i - 1].individuals.tag = seeds_structure.subset(seed_count, 1)</span><span style='background-color:rgb(255,255,255);'>; // Infected State<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>labels = c(labels, 2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sim.subpopulations[i - 1].genomes.readFromVCF(paste0(cwdir, "/originalvcfs/seed.", seeds_structure.subset(seed_count, 1), ".vcf"))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// writeFile(paste0(cwdir, "/seeds.name"), paste0(seed_count, ",", "p", i-1), append=T);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>if (seed_count &lt; seed_size - 1)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>seed_count = seed_count + 1</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>sim.addSubpop(i, 0, haploid=T)</span><span style='background-color:rgb(255,255,255);'>; // Susceptible<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,251);'>sim.subpopulations[i - 1].tag = i - 1</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>labels = c(labels, 0)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;// change default mutation type and selection coefficient<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>print(effsize_pos)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>allmuts = sim.subpopulations.individuals.genome1.mutations</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>for (mut in allmuts)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>if (any(mut.position == range_genes))</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>mut.setMutationType(1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>which_gene = asInteger((findInterval(mut.position, trait_locs) + 1) / 2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//trait_range = ncol(effsize_pos) - 1;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>for (t_num in 1:dr_epochs)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>mut.setValue(paste0("e", t_num), effsize_pos.subset(which_gene - 1, t_num + 3))</span><span style='background-color:rgb(255,255,255);'>; <BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//mut.setValue("e1", effsize_pos.subset(which_gene - 1, 4)); <BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//defineGlobal("trait_range", trait_range);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>defineGlobal("Host_states", labels)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.01 s (0.60%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>1 early() {<BR>
+&nbsp;&nbsp;&nbsp;// Read into the contact network file<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>lines_contact = readFile(paste0(cwdir, "/contact_network.adjlist.modified"))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>for (l in lines_contact)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>ll = strsplit(l, " ")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>ll = asInteger(strsplit(l, " "))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>host = ll[0]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>contact_size = length(ll) - 1</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>if (contact_size &gt; 0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,246);'>sim.subpopulations[host].setValue("Contacts", ll[1:contact_size])</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sim.subpopulations[host].setValue("Contacts", c());<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.40 s (27.35%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s0 reproduction() {<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,244);'>subpops_inds = sim.subpopulations.individuals</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>subpops = subpops_inds.subpopulation</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>num_inds = length(subpops_inds)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;for (pathogen in 1:num_inds)<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,199);'>this_pathogen = subpops_inds[pathogen - 1]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,216,0);'>subpops[pathogen - 1].addRecombinant(this_pathogen.genome1, NULL, NULL, NULL, NULL, NULL).tag = this_pathogen.tag</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>self.active = 0</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.29 s (19.78%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s1 reproduction()<BR>
+{<BR>
+&nbsp;&nbsp;&nbsp;// Transmission<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>infectors = which(Host_states==2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>subpops = sim.subpopulations</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>infector_subpops = subpops[infectors]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;for (infector_subpop in infector_subpops)<BR>
+&nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,236);'>contact_ids = infector_subpop.getValue("Contacts")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (length(contact_ids)&gt;0)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,244);'>infector_pathogen = sample(infector_subpop.individuals, 1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,202);'>muts = infector_pathogen.genome1.mutationsOfType(1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,154);'>transmissibility = 1 + additive_trait(muts, "e0", cap_transmissibility)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,224);'>trans_event = rbinom(length(contact_ids), 1, Infection_rate * transmissibility)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,240);'>contacts_states = Host_states[contact_ids]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (super_infection==T) { </span><span style='background-color:rgb(255,255,182);'>infectee_id = contact_ids[which((trans_event==1)&amp;(subpops[contact_ids].individualCount &lt; cap_withinhost))]</span><span style='background-color:rgb(255,255,255);'>; }<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else { infectee_id = contact_ids[which((trans_event==1)&amp;(contacts_states==0))]; }<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (i in infectee_id)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,236);'>subpops[i].addRecombinant(infector_pathogen.genome1, NULL, NULL, NULL, NULL, NULL).tag = infector_pathogen.tag</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,249);'>line = paste(community.tick, infector_subpop.tag, i)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,210);'>writeFile(paste0(cwdir, "/infection_raw.txt"), line, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>self.active=F</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.04 s (2.71%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s6 early()<BR>
+{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,236);'>inds = sim.subpopulations.individuals</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,222);'>sim.killIndividuals(inds[inds.age &gt; 0])</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.00 s (0.28%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s8 early()<BR>
+{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>hosts = sim.subpopulations</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>recovered_genomes = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>recovered_hosts = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>popsizeminus1 = host_size-1</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;// Deal with exposed individuals<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>e_inds = which(Host_states==1)</span><span style='background-color:rgb(255,255,255);'>; // deal with 1&amp;2 first<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>draw_uniform = runif(length(e_inds))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>state_transition = findInterval(draw_uniform, c(0, activate_rate, activate_rate + ER_rate))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>Host_states[e_inds[which(state_transition==0)]]=2</span><span style='background-color:rgb(255,255,255);'>; // state_transition=0 means going from latent to active state (1&gt;2)<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>recover_from_e = e_inds[which(state_transition==1)]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>if (length(recover_from_e)&gt;0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Host_states[recover_from_e]=3;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (ind in recover_from_e)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line1 = paste(community.tick, ind + 1);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T, compress=T);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sim.killIndividuals(hosts[recover_from_e].individuals);<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.01 s (0.50%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s3 early(){<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>print(community.tick)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>hosts = sim.subpopulations</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>i_inds = which(Host_states==2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>draw_uniform = runif(length(i_inds))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>state_transition = findInterval(draw_uniform, c(0, sample_rate*sample_alive_prob, sample_rate, Recovery_rate + sample_rate, Recovery_rate + sample_rate + IE_rate))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>recover_from_i = i_inds[which((state_transition==1)|(state_transition==2))]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sampled_inds = i_inds[which(state_transition&lt;=1)]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>if (length(sampled_inds)&gt;0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sampled_inds_genomes = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (ind in sampled_inds)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sampled_pathogen = sample(hosts[ind].individuals, 1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>line1 = paste(community.tick, ind, sampled_pathogen.tag, "I")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>writeFile(paste0(cwdir, "/sample.txt"), line1, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sampled_inds_genomes = c(sampled_inds_genomes, sampled_pathogen)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sim.treeSeqRememberIndividuals(sampled_inds_genomes)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//sampled_inds_genomes.genomes.outputVCF(filePath=paste0(cwdir, "/sample_vcfs/", community.tick, ".sampled.vcf"));<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>if (length(recover_from_i)&gt;0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>Host_states[recover_from_i]=3</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (ind in recover_from_i)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>line1 = paste(community.tick, ind + 1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>sim.killIndividuals(hosts[recover_from_i].individuals)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.20 s (13.58%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s7 early(){<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>i_inds = which(Host_states==2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>hosts = sim.subpopulations</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>draw_uniform = runif(length(i_inds))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>state_transition = findInterval(draw_uniform, c(0, sample_rate*sample_alive_prob, sample_rate, treatment_recovery_rate + sample_rate, treatment_recovery_rate + sample_rate + IE_rate))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>recover_from_i = i_inds[which((state_transition==1)|(state_transition==2))]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sampled_inds = i_inds[which(state_transition&lt;=1)]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>if (length(sampled_inds)&gt;0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sampled_inds_genomes = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (ind in sampled_inds)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sampled_pathogen = sample(hosts[ind].individuals, 1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>line1 = paste(community.tick, ind, sampled_pathogen.tag, "I")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>writeFile(paste0(cwdir, "/sample.txt"), line1, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sampled_inds_genomes = c(sampled_inds_genomes, sampled_pathogen)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sim.treeSeqRememberIndividuals(sampled_inds_genomes)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>actually_recovered = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>if (length(recover_from_i)&gt;0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (ind in recover_from_i)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>pathogens = hosts[ind].individuals</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (pathogen in pathogens)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,230);'>muts = pathogen.genome1.mutationsOfType(1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,254,0);'>treatment_failed_rate = bialleleic_trait(muts, dr_set, trait_locs, cap_dr_current, effsize_pos)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//the bigger the effect size for drug resistance mutation is, the more probable that the treatment fails<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>if (runif(1) &gt; treatment_failed_rate)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// print(recovery_success_rate);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>line1 = paste(community.tick, ind + 1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,238);'>writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,250);'>actually_recovered = c(actually_recovered, pathogen)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>sim.killIndividuals(actually_recovered)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>Host_states[recover_from_i[which(hosts[recover_from_i].individualCount==0)]] = 3</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.01 s (0.48%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s10 early(){<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,249);'>s_inds = which((Host_states==0)&amp;(sim.subpopulations.individualCount&gt;0))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>draw_uniform = runif(length(s_inds))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>state_transition = findInterval(draw_uniform, c(0, latent_prob))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>Host_states[s_inds[which(state_transition==0)]]=1</span><span style='background-color:rgb(255,255,255);'>; //state_transition=0 means going to latent state while =1 means going to active state<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>Host_states[s_inds[which(state_transition &gt; 0)]]=2</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.00 s (0.21%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s9 early(){<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>r_inds = which(Host_states==3)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>draw_uniform = runif(length(r_inds))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>state_transition = findInterval(draw_uniform, c(0, RS_rate))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>Host_states[r_inds[which(state_transition==0)]]=0</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.02 s (1.23%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s4 late()<BR>
+{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>writeFile(paste0(cwdir, "/SIR_trajectory.txt"), paste0(sum(Host_states == 0), ", ", sum(Host_states == 1), ", ", sum(Host_states == 2), ", ", sum(Host_states == 3)), append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,236);'>all_pathogens = sim.subpopulations.individuals.tag</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>line = sum(all_pathogens == 0)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>for (seed in 2:seed_size)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>line = paste0(line, ", ", sum(all_pathogens == seed - 1))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>writeFile(paste0(cwdir, "/strain_trajectory.txt"), line, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.03 s (2.18%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s5 late() <BR>
+{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>inds = sim.subpopulations.individuals</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sim.killIndividuals(inds)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,213);'>sim.treeSeqOutput(paste0(cwdir,  "/test_ourmethod.trees"))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;sim.simulationFinished();<BR>
+}</span></tt></p>
+
+<p><i>(blocks using < 0.01 s and < 0.01% of total wall clock time are not shown)</i></p>
+
+<h3>Script block profiles (as a fraction of within-block wall clock time)</h3>
+<p style='margin-bottom: 5px;'><tt>0.00 s (0.08%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>initialize() {<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,241);'>initializeSLiMModelType("nonWF")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,245);'>initializeSLiMOptions(nucleotideBased=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,250);'>initializeTreeSeq()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;// Read in the config file and make global variables of different parameters<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,194,0);'>source("read_config.slim")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;// Initiate the genomic elements and mutation types<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,94,0);'>source("genomic_element_init.slim")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.05 s (3.36%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>mutation(m1) {<BR>
+&nbsp;&nbsp;&nbsp;// Set mutational effects for new m2 mutation <BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,120);'>which_gene =asInteger((findInterval(mut.position, trait_locs) + 1) / 2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,195,0);'>mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;// trait_range = ncol(effsize_pos) - 1;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,245);'>for (t_num in 1:dr_epochs)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,111,0);'>mut.setValue(paste0("e", t_num), effsize_pos.subset(which_gene - 1, t_num + 3))</span><span style='background-color:rgb(255,255,255);'>; <BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,251);'>return T</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.01 s (0.41%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>1 early() {<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,235);'>seeds_structure = readCSV(paste0(cwdir, "/seed_host_match.csv"), colNames=F)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;// Add N($sample_size) subpopulations (representing N humans in the population) with 0 or 1 elements (Susceptible or Infected)<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>labels = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>seed_count = 0</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,241);'>for (i in 1:host_size)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,250,0);'>if (i == seeds_structure.subset(seed_count, 0))</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,251);'>sim.addSubpop(i, 1, haploid=T)</span><span style='background-color:rgb(255,255,255);'>; // Infected hosts<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>sim.subpopulations[i - 1].tag = i-1</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>sim.subpopulations[i - 1].individuals.tag = seeds_structure.subset(seed_count, 1)</span><span style='background-color:rgb(255,255,255);'>; // Infected State<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>labels = c(labels, 2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,155);'>sim.subpopulations[i - 1].genomes.readFromVCF(paste0(cwdir, "/originalvcfs/seed.", seeds_structure.subset(seed_count, 1), ".vcf"))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// writeFile(paste0(cwdir, "/seeds.name"), paste0(seed_count, ",", "p", i-1), append=T);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>if (seed_count &lt; seed_size - 1)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>seed_count = seed_count + 1</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,236,0);'>sim.addSubpop(i, 0, haploid=T)</span><span style='background-color:rgb(255,255,255);'>; // Susceptible<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,124,0);'>sim.subpopulations[i - 1].tag = i - 1</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,172);'>labels = c(labels, 0)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;// change default mutation type and selection coefficient<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,246);'>print(effsize_pos)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,241);'>allmuts = sim.subpopulations.individuals.genome1.mutations</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>for (mut in allmuts)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,220);'>if (any(mut.position == range_genes))</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>mut.setMutationType(1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>which_gene = asInteger((findInterval(mut.position, trait_locs) + 1) / 2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//trait_range = ncol(effsize_pos) - 1;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>for (t_num in 1:dr_epochs)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,250);'>mut.setValue(paste0("e", t_num), effsize_pos.subset(which_gene - 1, t_num + 3))</span><span style='background-color:rgb(255,255,255);'>; <BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//mut.setValue("e1", effsize_pos.subset(which_gene - 1, 4)); <BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//defineGlobal("trait_range", trait_range);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>defineGlobal("Host_states", labels)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.01 s (0.60%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>1 early() {<BR>
+&nbsp;&nbsp;&nbsp;// Read into the contact network file<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,194);'>lines_contact = readFile(paste0(cwdir, "/contact_network.adjlist.modified"))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>for (l in lines_contact)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,139);'>ll = strsplit(l, " ")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,254,0);'>ll = asInteger(strsplit(l, " "))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,244);'>host = ll[0]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,238);'>contact_size = length(ll) - 1</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>if (contact_size &gt; 0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,60,0);'>sim.subpopulations[host].setValue("Contacts", ll[1:contact_size])</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sim.subpopulations[host].setValue("Contacts", c());<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.40 s (27.35%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s0 reproduction() {<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,215);'>subpops_inds = sim.subpopulations.individuals</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,246);'>subpops = subpops_inds.subpopulation</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>num_inds = length(subpops_inds)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;for (pathogen in 1:num_inds)<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,253,0);'>this_pathogen = subpops_inds[pathogen - 1]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,38,0);'>subpops[pathogen - 1].addRecombinant(this_pathogen.genome1, NULL, NULL, NULL, NULL, NULL).tag = this_pathogen.tag</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>self.active = 0</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.29 s (19.78%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s1 reproduction()<BR>
+{<BR>
+&nbsp;&nbsp;&nbsp;// Transmission<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,247);'>infectors = which(Host_states==2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,243);'>subpops = sim.subpopulations</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>infector_subpops = subpops[infectors]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;for (infector_subpop in infector_subpops)<BR>
+&nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,160);'>contact_ids = infector_subpop.getValue("Contacts")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (length(contact_ids)&gt;0)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,197);'>infector_pathogen = sample(infector_subpop.individuals, 1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,244,0);'>muts = infector_pathogen.genome1.mutationsOfType(1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,207,0);'>transmissibility = 1 + additive_trait(muts, "e0", cap_transmissibility)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,96);'>trans_event = rbinom(length(contact_ids), 1, Infection_rate * transmissibility)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,178);'>contacts_states = Host_states[contact_ids]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (super_infection==T) { </span><span style='background-color:rgb(255,228,0);'>infectee_id = contact_ids[which((trans_event==1)&amp;(subpops[contact_ids].individualCount &lt; cap_withinhost))]</span><span style='background-color:rgb(255,255,255);'>; }<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else { infectee_id = contact_ids[which((trans_event==1)&amp;(contacts_states==0))]; }<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (i in infectee_id)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,161);'>subpops[i].addRecombinant(infector_pathogen.genome1, NULL, NULL, NULL, NULL, NULL).tag = infector_pathogen.tag</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,224);'>line = paste(community.tick, infector_subpop.tag, i)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,250,0);'>writeFile(paste0(cwdir, "/infection_raw.txt"), line, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>self.active=F</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.04 s (2.71%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s6 early()<BR>
+{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,180,0);'>inds = sim.subpopulations.individuals</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,103,0);'>sim.killIndividuals(inds[inds.age &gt; 0])</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.00 s (0.28%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s8 early()<BR>
+{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,159,0);'>hosts = sim.subpopulations</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,247);'>recovered_genomes = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,246);'>recovered_hosts = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,239);'>popsizeminus1 = host_size-1</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;// Deal with exposed individuals<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,240,0);'>e_inds = which(Host_states==1)</span><span style='background-color:rgb(255,255,255);'>; // deal with 1&amp;2 first<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,199);'>draw_uniform = runif(length(e_inds))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,173);'>state_transition = findInterval(draw_uniform, c(0, activate_rate, activate_rate + ER_rate))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,201,0);'>Host_states[e_inds[which(state_transition==0)]]=2</span><span style='background-color:rgb(255,255,255);'>; // state_transition=0 means going from latent to active state (1&gt;2)<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,211);'>recover_from_e = e_inds[which(state_transition==1)]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,242);'>if (length(recover_from_e)&gt;0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Host_states[recover_from_e]=3;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (ind in recover_from_e)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line1 = paste(community.tick, ind + 1);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T, compress=T);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sim.killIndividuals(hosts[recover_from_e].individuals);<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.01 s (0.50%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s3 early(){<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,252,0);'>print(community.tick)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,237,0);'>hosts = sim.subpopulations</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,89);'>i_inds = which(Host_states==2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,192);'>draw_uniform = runif(length(i_inds))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,205);'>state_transition = findInterval(draw_uniform, c(0, sample_rate*sample_alive_prob, sample_rate, Recovery_rate + sample_rate, Recovery_rate + sample_rate + IE_rate))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,154);'>recover_from_i = i_inds[which((state_transition==1)|(state_transition==2))]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,199);'>sampled_inds = i_inds[which(state_transition&lt;=1)]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>if (length(sampled_inds)&gt;0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>sampled_inds_genomes = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (ind in sampled_inds)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,240);'>sampled_pathogen = sample(hosts[ind].individuals, 1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,236);'>line1 = paste(community.tick, ind, sampled_pathogen.tag, "I")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,222);'>writeFile(paste0(cwdir, "/sample.txt"), line1, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,244);'>sampled_inds_genomes = c(sampled_inds_genomes, sampled_pathogen)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,232);'>sim.treeSeqRememberIndividuals(sampled_inds_genomes)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//sampled_inds_genomes.genomes.outputVCF(filePath=paste0(cwdir, "/sample_vcfs/", community.tick, ".sampled.vcf"));<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>if (length(recover_from_i)&gt;0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,96);'>Host_states[recover_from_i]=3</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (ind in recover_from_i)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,178);'>line1 = paste(community.tick, ind + 1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,252,0);'>writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,225,0);'>sim.killIndividuals(hosts[recover_from_i].individuals)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.20 s (13.58%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s7 early(){<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,251);'>i_inds = which(Host_states==2)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,248);'>hosts = sim.subpopulations</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>draw_uniform = runif(length(i_inds))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>state_transition = findInterval(draw_uniform, c(0, sample_rate*sample_alive_prob, sample_rate, treatment_recovery_rate + sample_rate, treatment_recovery_rate + sample_rate + IE_rate))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,249);'>recover_from_i = i_inds[which((state_transition==1)|(state_transition==2))]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>sampled_inds = i_inds[which(state_transition&lt;=1)]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>if (length(sampled_inds)&gt;0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>sampled_inds_genomes = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (ind in sampled_inds)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>sampled_pathogen = sample(hosts[ind].individuals, 1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>line1 = paste(community.tick, ind, sampled_pathogen.tag, "I")</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>writeFile(paste0(cwdir, "/sample.txt"), line1, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>sampled_inds_genomes = c(sampled_inds_genomes, sampled_pathogen)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>sim.treeSeqRememberIndividuals(sampled_inds_genomes)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>actually_recovered = c()</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>if (length(recover_from_i)&gt;0)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (ind in recover_from_i)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,241);'>pathogens = hosts[ind].individuals</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (pathogen in pathogens)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,68);'>muts = pathogen.genome1.mutationsOfType(1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,66,0);'>treatment_failed_rate = bialleleic_trait(muts, dr_set, trait_locs, cap_dr_current, effsize_pos)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//the bigger the effect size for drug resistance mutation is, the more probable that the treatment fails<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,244);'>if (runif(1) &gt; treatment_failed_rate)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// print(recovery_success_rate);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,230);'>line1 = paste(community.tick, ind + 1)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,130);'>writeFile(paste0(cwdir, "/recovery.txt"), line1, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,221);'>actually_recovered = c(actually_recovered, pathogen)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,240);'>sim.killIndividuals(actually_recovered)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,249);'>Host_states[recover_from_i[which(hosts[recover_from_i].individualCount==0)]] = 3</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.01 s (0.48%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s10 early(){<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,94,0);'>s_inds = which((Host_states==0)&amp;(sim.subpopulations.individualCount&gt;0))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,238);'>draw_uniform = runif(length(s_inds))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,228);'>state_transition = findInterval(draw_uniform, c(0, latent_prob))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,237,0);'>Host_states[s_inds[which(state_transition==0)]]=1</span><span style='background-color:rgb(255,255,255);'>; //state_transition=0 means going to latent state while =1 means going to active state<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,242,0);'>Host_states[s_inds[which(state_transition &gt; 0)]]=2</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.00 s (0.21%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s9 early(){<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,177,0);'>r_inds = which(Host_states==3)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,233,0);'>draw_uniform = runif(length(r_inds))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,123);'>state_transition = findInterval(draw_uniform, c(0, RS_rate))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,176,0);'>Host_states[r_inds[which(state_transition==0)]]=0</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.02 s (1.23%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s4 late()<BR>
+{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,139);'>writeFile(paste0(cwdir, "/SIR_trajectory.txt"), paste0(sum(Host_states == 0), ", ", sum(Host_states == 1), ", ", sum(Host_states == 2), ", ", sum(Host_states == 3)), append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,59,0);'>all_pathogens = sim.subpopulations.individuals.tag</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,200);'>line = sum(all_pathogens == 0)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,253);'>for (seed in 2:seed_size)</span><span style='background-color:rgb(255,255,255);'><BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,252,0);'>line = paste0(line, ", ", sum(all_pathogens == seed - 1))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,239);'>writeFile(paste0(cwdir, "/strain_trajectory.txt"), line, append=T, compress=T)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.03 s (2.18%):</tt></p>
+<p style='margin-top: 5px;'><tt><span style='background-color:rgb(255,255,255);'>s5 late() <BR>
+{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>inds = sim.subpopulations.individuals</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>sim.killIndividuals(inds)</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,1,0);'>sim.treeSeqOutput(paste0(cwdir,  "/test_ourmethod.trees"))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;sim.simulationFinished();<BR>
+}</span></tt></p>
+
+<p><i>(blocks using < 0.01 s and < 0.01% of total wall clock time are not shown)</i></p>
+
+<h3>User-defined functions (as a fraction of corrected wall clock time)</h3>
+<p style='margin-bottom: 5px;'><tt>0.06 s (3.78%):</tt></p>
+<p style='margin-top: 5px;'><tt>(numeric)additive_trait(object&lt;Mutation&gt; muts, string trait_type, float cap)<BR><span style='background-color:rgb(255,255,255);'>{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,184);'>trait_value = size(muts) ? sum(muts.getValue(trait_type)) else 0.0</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;if (trait_value &lt; cap)<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>return(trait_value</span><span style='background-color:rgb(255,255,255);'>);<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;else<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>return(cap</span><span style='background-color:rgb(255,255,255);'>);<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.14 s (9.48%):</tt></p>
+<p style='margin-top: 5px;'><tt>(numeric)bialleleic_trait(object&lt;Mutation&gt; muts, string trait_type, numeric trait_locations, float cap, object&lt;DataFrame&gt; effsize_df)<BR><span style='background-color:rgb(255,255,255);'>{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,176);'>which_gene = unique(sapply(muts.position, "asInteger((findInterval(applyValue, trait_locations) + 1) / 2);"))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,246);'>which_trait = strsplit(trait_type, sep="e")[1]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,162);'>trait_value = size(which_gene) ? sum( effsize_pos.subset(which_gene - 1, current_epoch + 3)) else 0.0</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;if (trait_value &lt; cap)<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,254);'>return(trait_value</span><span style='background-color:rgb(255,255,255);'>);<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;else<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,255);'>return(cap</span><span style='background-color:rgb(255,255,255);'>);<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<h3>User-defined functions (as a fraction of within-block wall clock time)</h3>
+<p style='margin-bottom: 5px;'><tt>0.06 s (3.78%):</tt></p>
+<p style='margin-top: 5px;'><tt>(numeric)additive_trait(object&lt;Mutation&gt; muts, string trait_type, float cap)<BR><span style='background-color:rgb(255,255,255);'>{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,6,0);'>trait_value = size(muts) ? sum(muts.getValue(trait_type)) else 0.0</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;if (trait_value &lt; cap)<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,218);'>return(trait_value</span><span style='background-color:rgb(255,255,255);'>);<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;else<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>return(cap</span><span style='background-color:rgb(255,255,255);'>);<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<p style='margin-bottom: 5px;'><tt>0.14 s (9.48%):</tt></p>
+<p style='margin-top: 5px;'><tt>(numeric)bialleleic_trait(object&lt;Mutation&gt; muts, string trait_type, numeric trait_locations, float cap, object&lt;DataFrame&gt; effsize_df)<BR><span style='background-color:rgb(255,255,255);'>{<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,161,0);'>which_gene = unique(sapply(muts.position, "asInteger((findInterval(applyValue, trait_locations) + 1) / 2);"))</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,163);'>which_trait = strsplit(trait_type, sep="e")[1]</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,138,0);'>trait_value = size(which_gene) ? sum( effsize_pos.subset(which_gene - 1, current_epoch + 3)) else 0.0</span><span style='background-color:rgb(255,255,255);'>;<BR>
+&nbsp;&nbsp;&nbsp;if (trait_value &lt; cap)<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,250);'>return(trait_value</span><span style='background-color:rgb(255,255,255);'>);<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;else<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='background-color:rgb(255,255,252);'>return(cap</span><span style='background-color:rgb(255,255,255);'>);<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+}</span></tt></p>
+
+<h3>MutationRun usage</h3>
+<p><tt>&nbsp;83.33%</tt> of ticks : 1 mutation runs per genome<BR>
+<tt>&nbsp;16.67%</tt> of ticks : 2 mutation runs per genome</p>
+<p><tt>100.00%</tt> of ticks : regime 1 (no mutationEffect() callbacks)<BR>
+<tt>&nbsp;&nbsp;0.00%</tt> of ticks : regime 2 (constant neutral mutationEffect() callbacks only)<BR>
+<tt>&nbsp;&nbsp;0.00%</tt> of ticks : regime 3 (unpredictable mutationEffect() callbacks present)</p>
+<p><tt>110202927</tt> mutations referenced, summed across all ticks<BR>
+<tt>0</tt> mutations considered potentially nonneutral<BR>
+<tt>100.00%</tt> of mutations excluded from fitness calculations<BR>
+<tt>87662</tt> maximum simultaneous mutations</p>
+<p><tt>1410501</tt> mutation runs referenced, summed across all ticks<BR>
+<tt>1317898</tt> unique mutation runs maintained among those<BR>
+<tt>&nbsp;&nbsp;0.00%</tt> of mutation run nonneutral caches rebuilt per tick<BR>
+<tt>&nbsp;&nbsp;6.57%</tt> of mutation runs shared among genomes</p>
+
+<h3>SLiM memory usage (average / final tick) </h3>
+<p><tt><span style='background-color:rgb(255,255,255);'>0.98 KB</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0.98 KB</span></tt> : Chromosome objects (1.00 / 1)<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,255);'>472 bytes</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>472 bytes</span></tt> : mutation rate maps<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,255);'>32 bytes</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>32 bytes</span></tt> : recombination rate maps<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,255);'>7.30 KB</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>7.30 KB</span></tt> : ancestral nucleotides</p>
+
+<p><tt><span style='background-color:rgb(255,255,255);'>1.88 KB</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>1.88 KB</span></tt> : Community object</p>
+
+<p><tt><span style='background-color:rgb(255,255,235);'>508.26 KB</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> : Genome objects (6505.75 / 0)<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,255);'>10.22 KB</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> : external MutationRun* buffers<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,188);'>1.65 MB</span></tt> / <tt><span style='background-color:rgb(255,255,178);'>3.75 MB</span></tt> : unused pool space<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,254);'>14.19 KB</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>17.84 KB</span></tt> : unused pool buffers</p>
+
+<p><tt><span style='background-color:rgb(255,255,255);'>0.52 KB</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0.52 KB</span></tt> : GenomicElement objects (11.00 / 11)</p>
+
+<p><tt><span style='background-color:rgb(255,255,255);'>352 bytes</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>352 bytes</span></tt> : GenomicElementType objects (2.00 / 2)</p>
+
+<p><tt><span style='background-color:rgb(255,255,232);'>0.57 MB</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>368 bytes</span></tt> : Individual objects (3254.87 / 2)<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,178);'>1.90 MB</span></tt> / <tt><span style='background-color:rgb(255,255,166);'>4.31 MB</span></tt> : unused pool space</p>
+
+<p><tt><span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> : InteractionType objects (0.00 / 0)</p>
+
+<p><tt><span style='background-color:rgb(255,255,75);'>4.48 MB</span></tt> / <tt><span style='background-color:rgb(255,255,127);'>6.17 MB</span></tt> : Mutation objects (53432.64 / 73570)<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,242);'>342.69 KB</span></tt> / <tt><span style='background-color:rgb(255,255,245);'>512.00 KB</span></tt> : refcount buffer<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,139);'>2.88 MB</span></tt> / <tt><span style='background-color:rgb(255,255,155);'>4.83 MB</span></tt> : unused pool space</p>
+
+<p><tt><span style='background-color:rgb(255,255,247);'>202.81 KB</span></tt> / <tt><span style='background-color:rgb(255,255,251);'>197.37 KB</span></tt> : MutationRun objects (3708.54 / 3609)<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,196);'>1.45 MB</span></tt> / <tt><span style='background-color:rgb(255,255,178);'>3.72 MB</span></tt> : external MutationIndex buffers<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> : nonneutral mutation caches<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,244);'>278.71 KB</span></tt> / <tt><span style='background-color:rgb(255,255,245);'>0.51 MB</span></tt> : unused pool space<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> : unused pool buffers</p>
+
+<p><tt><span style='background-color:rgb(255,255,255);'>0.59 KB</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0.59 KB</span></tt> : MutationType objects (2.00 / 2)</p>
+
+<p><tt><span style='background-color:rgb(255,255,255);'>2.21 KB</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>2.21 KB</span></tt> : Species objects (1.00 / 1)<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,104,0);'>30.03 MB</span></tt> / <tt><span style='background-color:rgb(255,85,0);'>64.67 MB</span></tt> : tree-sequence tables</p>
+
+<p><tt><span style='background-color:rgb(255,255,225);'>0.75 MB</span></tt> / <tt><span style='background-color:rgb(255,255,240);'>0.75 MB</span></tt> : Subpopulation objects (997.23 / 1000)<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> : fitness caches<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> : parent tables<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> : spatial maps</p>
+
+<p><tt><span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> / <tt><span style='background-color:rgb(255,255,255);'>0 bytes</span></tt> : Substitution objects (0.00 / 0)</p>
+
+<p>Eidos:<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,215);'>0.98 MB</span></tt> / <tt><span style='background-color:rgb(255,255,235);'>0.98 MB</span></tt> : EidosASTNode pool<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,253);'>63.60 KB</span></tt> / <tt><span style='background-color:rgb(255,255,254);'>64.00 KB</span></tt> : EidosSymbolTable pool<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,203);'>1.28 MB</span></tt> / <tt><span style='background-color:rgb(255,255,215);'>1.94 MB</span></tt> : EidosValue pool<BR>
+<tt>&nbsp;&nbsp;&nbsp;<span style='background-color:rgb(255,255,249);'>141.39 KB</span></tt> / <tt><span style='background-color:rgb(255,255,251);'>174.00 KB</span></tt> : File buffers</p>
+</body>
+</html>

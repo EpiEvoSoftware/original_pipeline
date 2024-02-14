@@ -8,25 +8,17 @@ initialize() {
 	
 	// Initiate the genomic elements and mutation types
 	source("genomic_element_init.slim");
-	
-	// Define a default param epoch:0 to log which epoch is the simulation currently in (only useful when multiple_epochs:T)
-	defineGlobal("epoch", 0);
+
 }
 
 
 mutation(m2) {
-
-	// draw mutational effects for the new m2 mutation 
-	// effects = rmvnorm(1, QTL_mu, QTL_sigma); 
+	// Set mutational effects for new m2 mutation 
 	which_gene =asInteger((findInterval(muts.position, trait_locs) + 1) / 2);
 	mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3)); 
 	mut.setValue("e1", effsize_pos.subset(which_gene - 1, 4)); 
-
-	// remember all drawn effects, for our final output 
-	//old_effects = sim.getValue("all_effects"); 
-	//sim.setValue("all_effects", rbind(old_effects, effects));
-
-return T;
+	
+	return T;
 
 }
 
@@ -102,19 +94,10 @@ return T;
 			mut.setValue("e1", effsize_pos.subset(which_gene - 1, 4)); 	
 		}
 	}
-	//pos_mutated = setIntersection(allmuts.position, range_genes);
-	//muts = allmuts[which(any(allmuts.position == pos_mutated))];
-	//print(muts.position);
-	//muts.setMutationType(1);
-	//muts = sim.subpopulations.individuals.genome1.mutationsOfType(1);
-	//which_gene = asInteger((findInterval(muts.position, trait_locs) + 1) / 2);
-	//print(which_gene);
-	//
-	//
+
 	
 
 	defineGlobal("Host_states", labels);
-	//sim.outputFull("initial.output");
 }
 
 // Contact network read-in module
@@ -128,21 +111,6 @@ return T;
 		ll = asInteger(strsplit(l, " "));
 		host = ll[0];
 		contact_size = length(ll) - 1;
-		//if (length(ll) > 1)
-		//{
-		//	end_index = length(ll) - 1;
-		//	for (cont in ll[1:end_index])
-		//	{
-		//		if (cont=="")  // Make sure input is correct and get rid of this
-		//		{
-		//			contacts = c(contacts);
-		//		}
-		//		else
-		//		{
-		//			contacts = c(contacts, asInteger(cont));
-		//		}
-		//	}
-		//}
 		if (contact_size > 0)
 		{
 			sim.subpopulations[host].setValue("Contacts", ll[1:contact_size]);
@@ -166,6 +134,7 @@ s0 reproduction() {
 s1 reproduction()
 {
 	// Transmission
+	print("Please");
 	infectors = which(Host_states==2);
 	
 	for (infector in infectors)
@@ -175,10 +144,6 @@ s1 reproduction()
 		if (length(contact_ids)>0)
 		{
 			infector_pathogen = sample(infector_subpop.individuals, 1);
-			//muts_info = rep(0, length(range_genes));
-			//contains_or_not = match(infector_pathogen.genome1.mutations.position, range_genes);
-			//muts_info[contains_or_not[which(contains_or_not >= 0)]] = 1;
-			//transmissibility = sum(traits_transmissibility * muts_info);
 			muts = infector_pathogen.genome1.mutationsOfType(1);
 			transmissibility = size(muts) ? sum(muts.getValue("e0")) else 0.0;
 
@@ -278,9 +243,10 @@ s6 early()
 		{
 			pathogen = sample(sim.subpopulations[ind].individuals, 1);
 			muts = pathogen.genome1.mutationsOfType(1);
-			traits_recoveryrate = size(muts) ? sum(muts.getValue("e1")) else 0.0;
-			recovery_success_rate = 1.5 - traits_recoveryrate; // 1.5 could be changed, the bigger the effect size for drug resistance mutation is, the smaller the recovery success
-			if (runif(1) < recovery_success_rate)
+			treatment_failed_rate = size(muts) ? sum(muts.getValue("e1")) else 0.0;
+			//print(treatment_failed_rate);
+			//the bigger the effect size for drug resistance mutation is, the more probable that the treatment fails
+			if (runif(1) > treatment_failed_rate)
 			{
 				// print(recovery_success_rate);
 				line1 = paste(community.tick, ind);

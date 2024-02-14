@@ -1,0 +1,53 @@
+1 early() {
+	seeds_structure = readCSV(paste0(cwdir, "/seed_host_match.csv"), colNames=F);
+
+	// Add N($sample_size) subpopulations (representing N humans in the population) with 0 or 1 elements (Susceptible or Infected)
+	labels = c();
+	seed_count = 0;
+	for (i in 1:host_size)
+	{
+		if (i == seeds_structure.subset(seed_count, 0) + 1)
+		{
+			
+			sim.addSubpop(i, 1, haploid=T); // Infected hosts
+			sim.subpopulations[i - 1].tag = i-1;
+			sim.subpopulations[i - 1].individuals.tag = seeds_structure.subset(seed_count, 1); // Infected State
+			labels = c(labels, 2);
+			sim.subpopulations[i - 1].genomes.readFromVCF(paste0(cwdir, "/originalvcfs/seed.", seeds_structure.subset(seed_count, 1), ".vcf"));
+			// writeFile(paste0(cwdir, "/seeds.name"), paste0(seed_count, ",", "p", i-1), append=T);
+			if (seed_count < seed_size - 1)
+			{
+				seed_count = seed_count + 1;
+			}
+		}
+		else
+		{
+			sim.addSubpop(i, 0, haploid=T); // Susceptible
+			sim.subpopulations[i - 1].tag = i - 1;
+			labels = c(labels, 0);
+		}
+	}
+	// change default mutation type and selection coefficient
+	
+	//print(effsize_pos);
+	
+	allmuts = sim.subpopulations.individuals.genome1.mutations;
+	for (mut in allmuts)
+	{
+		if (any(mut.position == range_genes))
+		{
+			mut.setMutationType(1);
+			which_gene = asInteger((findInterval(mut.position, trait_locs) + 1) / 2);
+			mut.setValue("e0", effsize_pos.subset(which_gene - 1, 3));
+			//trait_range = ncol(effsize_pos) - 1;
+			for (t_num in 1:dr_epochs)
+			{
+				mut.setValue(paste0("e", t_num), effsize_pos.subset(which_gene - 1, t_num + 3)); 
+			}
+			//mut.setValue("e1", effsize_pos.subset(which_gene - 1, 4)); 
+			//defineGlobal("trait_range", trait_range);
+		}
+	}
+
+	defineGlobal("Host_states", labels);
+}

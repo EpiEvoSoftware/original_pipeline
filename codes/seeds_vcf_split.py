@@ -2,23 +2,23 @@ import argparse
 
 
 ## Split the vcfs to make them separate vcf files for each seed to facilitate SLiM to read
-def split_vcf(wkdir):
+def modify_vcf(wkdir, seed_size):
     with open(wkdir + "seeds.vcf", "r") as vcf:
         for line in vcf:
             if line.startswith("##"):
-                for i in range(10):
+                for i in range(seed_size):
                     with open(wkdir + "seed." + str(i) + ".vcf", "a") as newvcf:
                         newvcf.write(line)
             elif line.startswith("#"):
                 ll = line.rstrip("\n")
                 l = ll.split("\t")
-                for i in range(10):
+                for i in range(seed_size):
                     with open(wkdir + "seed." + str(i) + ".vcf", "a") as newvcf:
                         newvcf.write("\t".join(l[:10]) + "\n")
             else:
                 ll = line.rstrip("\n")
                 l = ll.split("\t")
-                for i in range(10):
+                for i in range(seed_size):
                     if (l[9+i]=="0|0"):
                         continue
                     else:
@@ -38,10 +38,12 @@ def split_vcf(wkdir):
 def main():
     parser = argparse.ArgumentParser(description='Split and modify the vcfs.')
     parser.add_argument('-wk_dir', action='store',dest='wk_dir', required=True)
+    parser.add_argument('-seed_size', action='store',dest='seed_size', type=int, required=True)
 
     args = parser.parse_args()
     wk_dir_ = args.wk_dir
-    split_vcf(wk_dir_)
+    seed_size_ = args.seed_size
+    modify_vcf(wk_dir_, seed_size_)
 
 if __name__ == "__main__":
     main()

@@ -1,15 +1,30 @@
 initialize() {
 	initializeSLiMModelType("WF");
 	initializeSLiMOptions(nucleotideBased=T); // Nucleotide-based model
-	source("read_config.slim");	
+	//source("read_config.slim");
+	defineGlobal("configs", readFile("params.config"));
+	int_pars = c("burn_in_Ne", "seed_size")
+	str_pars = c("cwdir", "ref_path")
+	float_pars = c("burn_in_mutrate")
+	for(l in configs)
+	{
+		ll = strsplit(l, ":");
+		if (any(ll[0]==int_pars))
+		{
+			defineGlobal(ll[0], asInteger(ll[1]));
+		}
+		else if (any(ll[0]==str_pars))
+		{
+			defineGlobal(ll[0], ll[1]);
+		}
+		else if (any(ll[0]==float_pars))
+		{
+			defineGlobal(ll[0], asFloat(ll[1]));	
+		}
+	}
 	
 	defineConstant("L", initializeAncestralNucleotides(ref_path)); // Read in a reference genome
 	initializeRecombinationRate(0);
-
-	// Global variables
-	//defineGlobal("pop_size", 4000); // Size of the host population
-	
-	
 
 	initializeMutationTypeNuc(0, 1, "f", 0.0); // Neutral mutations
 	initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(burn_in_mutrate)); // yearly

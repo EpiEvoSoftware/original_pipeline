@@ -98,7 +98,6 @@ def main():
     parser.add_argument('-method', action='store',dest='method', required=True)
     parser.add_argument('-p_ER', action='store',dest='p_ER', required=False, type=float)
     parser.add_argument('-rp_size','--rp_size', nargs='+', help='Size of random partition graph groups', required=False, type=int)
-    #parser.add_argument('-p_within', action='store',dest='p_within', required=False, type=float)
     parser.add_argument('-p_within','--p_within', nargs='+', help='probability of edges for different groups (descending order), take 2 elements rn', required=False, type=float)
     parser.add_argument('-p_between', action='store',dest='p_between', required=False, type=float)
     parser.add_argument('-m', action='store',dest='m', required=False, type=int)
@@ -114,13 +113,13 @@ def main():
     m = args.m
     
     if mtd == "ER":
-        write_network(ER_generate(pop_size, wk_dir, p_ER), wk_dir, pop_size)
+        write_network(ER_generate(pop_size, p_ER), wk_dir, pop_size)
 
     elif mtd == "rd_part":
-        write_network(rp_generate(rp_size, wk_dir, p_within, p_between), wk_dir, pop_size)
+        write_network(rp_generate(rp_size, p_within, p_between), wk_dir, pop_size)
 
     elif mtd=="ba":
-         write_network(ba_generate(wk_dir, pop_size, m), wk_dir, pop_size)
+         write_network(ba_generate(pop_size, m), wk_dir, pop_size)
 
     else:
         print("Illegal method provided!")

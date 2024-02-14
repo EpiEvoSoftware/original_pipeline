@@ -17,8 +17,8 @@ def time_fasta(_wkdir, start_y, start_m, fa_):
             else:
                 sample_time["p" + l[1]] = "-".join([str(yr_add), str(mon_add), "01"])
             
-    with open(_wkdir + fa, "r") as fa_in:
-        with open(_wkdir + fa[:-5] + "timed.fasta", "w") as fa_out:
+    with open(_wkdir + fa_, "r") as fa_in:
+        with open(_wkdir + fa_[:-5] + "timed.fasta", "w") as fa_out:
             for line in fa_in:
                 if line.startswith(">"):
                     ll = line.rstrip("\n")
