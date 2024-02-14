@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
 class EpiModel:
-    def __init__(self, parent, tab_parent, config_file):
+    def __init__(self, parent, tab_parent, config_path):
         self.parent = parent
         self.tab_parent = tab_parent
 

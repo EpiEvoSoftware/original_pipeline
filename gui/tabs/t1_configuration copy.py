@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 # from __main__ import load_config_as_dict
 
-class EvoModel:
-    def __init__(self, parent, tab_parent, config_file):
+class Configuration:
+    def __init__(self, parent, tab_parent, config_path):
         self.parent = parent
         self.tab_parent = tab_parent
 

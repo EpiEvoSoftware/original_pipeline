@@ -19,22 +19,22 @@ class NetworkGraphApp:
     A class providing a visualization app.
     """
 
-    def __init__(self, parent, tab_parent, config_file):
+    def __init__(self, parent, tab_parent, config_path):
         """
         Initializes the visualization app.
 
         Parameter k: The initial number of clusters
         Precondition: k is an int
 
-        Parameter config_file: The configuration file, as a python dictionary
-        Precondition: config_file is a valid dictionary
+        Parameter config_path: The configuration file, as a python dictionary
+        Precondition: config_path is a valid dictionary
         """
         self.parent = parent
         self.tab_parent = tab_parent
 
         if isinstance(parent, tk.Tk):
             self.parent.title("Network Graph Visualization")
-        self.pop_size = int(config_file["host_size"])
+        # self.pop_size = int(config_path["host_size"])
 
         # window_width = 800
         # window_height = 600

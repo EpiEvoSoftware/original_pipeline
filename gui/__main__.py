@@ -7,13 +7,22 @@ import argparse
 import os.path
 import tkinter as tk
 from tkinter import ttk
+import json
 
-from tabs.t1_evolutionary_model import EvoModel
+from tabs.t1_configuration import Configuration
 from tabs.t2_seeds import Seeds
 from tabs.t3_genome_effsize import GenomeEffSize
 from tabs.t4_network_seedhost import NetworkGraphApp
 from tabs.t5_epi_model import EpiModel
 
+
+def load_config(config_path):
+    """
+    loads configuration file into python from a path
+    """
+    with open(config_path, 'r') as file:
+        return json.load(file)
+    
 def load_config_as_dict(config_file):
     """
     Loads the configuration from a file into a dictionary.
@@ -47,13 +56,13 @@ def parse_args():
     parser = argparse.ArgumentParser(
         prog='cluster', description='Application to view GUI')
     parser.add_argument('--config_path', type=str,
-                        help='path to the configuration file', default="codes/params.config")
+                        help='path to the configuration JSON file', default="base_params.json")
     parser.add_argument('-v', '--view', action='store_true',
                         help='visualize network graph')
     return parser.parse_args()
 
 
-def launch_gui(config_file):
+def launch_gui(config_path):
     """
     Launches the gui application
     """
@@ -66,12 +75,12 @@ def launch_gui(config_file):
     tab3 = ttk.Frame(tab_parent)
     tab4 = ttk.Frame(tab_parent)
     tab5 = ttk.Frame(tab_parent)
-    network_app = EvoModel(tab1, tab_parent, config_file)
-    network_app = Seeds(tab2, tab_parent, config_file)
-    network_app = GenomeEffSize(tab3, tab_parent, config_file)
-    network_app = NetworkGraphApp(tab4, tab_parent, config_file)
-    network_app = EpiModel(tab5, tab_parent, config_file)
-    tab_parent.add(tab1, text="Evolutionary Model")
+    network_app = Configuration(tab1, tab_parent, config_path)
+    network_app = Seeds(tab2, tab_parent, config_path)
+    network_app = GenomeEffSize(tab3, tab_parent, config_path)
+    network_app = NetworkGraphApp(tab4, tab_parent, config_path)
+    network_app = EpiModel(tab5, tab_parent, config_path)
+    tab_parent.add(tab1, text="Configuration")
     tab_parent.add(tab2, text="Seeds")
     tab_parent.add(tab3, text="Genome Effect Size")
     tab_parent.add(tab4, text="Network Graph")
@@ -87,9 +96,8 @@ def execute():
     Executes the application, according to the command line arguments specified.
     """
     args = parse_args()
-    config = load_config_as_dict(args.config_path)
-    if config:
-        launch_gui(config)
+    if args.config_path:
+        launch_gui(args.config_path)
     else:
         print("A valid configuration file is required to run the application.")
 
