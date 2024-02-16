@@ -49,15 +49,15 @@ class HostSeedMatch(unittest.TestCase):
 
 	def test_match_percentile(self):
 		nodes_0 = [0]
-		host_0 = match_percentile(nodes_0, [], (0, 100))
+		host_0 = match_percentile(nodes_0, [], [0, 100])
 		self.assertEqual(host_0, 0)
 
 		nodes_1 = [0, 1]
-		host_1 = match_percentile(nodes_1, [], (50, 100))
+		host_1 = match_percentile(nodes_1, [], [50, 100])
 		self.assertEqual(host_1, 1)
 
 		nodes_2 = [0, 1, 2]
-		host_2 = match_percentile(nodes_2, [], (30, 70))
+		host_2 = match_percentile(nodes_2, [], [30, 70])
 		self.assertEqual(host_2, 1)
 
 	def test_match_ranking(self):
@@ -81,9 +81,9 @@ class HostSeedMatch(unittest.TestCase):
 		# param_0 = {0: 1, 1: 2, 2:3, 3:4}
 		match_0 = match_all_hosts(G, match_method_0, param_0, 5)
 		self.assertEqual(match_0[0], 0)
-		self.assertEqual(match_0[6], 1)
-		self.assertEqual(match_0[11], 2)
-		self.assertEqual(match_0[15], 3)
+		self.assertEqual(match_0[1], 6)
+		self.assertEqual(match_0[2], 11)
+		self.assertEqual(match_0[3], 15)
 
 	def test_build_dict_edges_node(self):
 		# 0 edge
@@ -117,21 +117,20 @@ class HostSeedMatch(unittest.TestCase):
 		file_path_empty = os.path.join(PIPELINE_PATH, TEST_DIR, "empty_dict_to_csv.csv")
 		_save_dict_to_csv(dict_matching_empty, file_path_empty)
 		df_empty = pd.read_csv(file_path_empty)
-		self.assertEqual(df_empty.columns.tolist(), ['host_id', 'seed'])
+		self.assertEqual(df_empty.columns.tolist(), ['seed', 'host_id'])
 
 		dict_matching_one = {0: 0}
 		file_path_one = os.path.join(PIPELINE_PATH, TEST_DIR, "one_dict_to_csv.csv")
 		_save_dict_to_csv(dict_matching_one, file_path_one)
 		df_one = pd.read_csv(file_path_one)
 		self.assertEqual(df_one['host_id'][0], 0)
-		self.assertEqual(df_one['host_id'][0], 0)
 
 		dict_matching_two = {0: 1, 1: 0}
 		file_path_two = os.path.join(PIPELINE_PATH, TEST_DIR, "two_dict_to_csv.csv")
 		_save_dict_to_csv(dict_matching_two, file_path_two)
 		df_two = pd.read_csv(file_path_two)
-		self.assertEqual(df_two['host_id'][0], 0)
-		self.assertEqual(df_two['seed'][1], 0)
+		self.assertEqual(df_two['host_id'][0], 1)
+		self.assertEqual(df_two['seed'][1], 1)
 
 if __name__ == '__main__':
     unittest.main()
