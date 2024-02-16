@@ -183,10 +183,13 @@ def match_all_hosts(ntwk_: nx.Graph, match_method: dict[int, str], param: dict[i
 
 def read_config_and_match(file_path: str, ntwk_: nx.Graph, num_seed: int):
 	## A function to read from config file and do matching
-	config = read_params(file_path)["SeedHostMatching"]["randomly_generated"]
-	match_method = config["randomly_generated"]["match_scheme"]
-	match_method_param = config["randomly_generated"]["match_scheme_param"]
-	match_all_hosts(ntwk_, {seed: match_method[seed] for seed in range(num_seed)}, {seed: match_method_param[seed] for seed in range(num_seed)})
+	config_all = read_params(file_path)
+	config = config_all["SeedHostMatching"]["randomly_generated"]
+	match_method = config["match_scheme"]
+	match_method_param = config["match_scheme_param"]
+	path_matching = config_all["SeedHostMatching"]["user_input"]["path_matching"]
+	method = "user_input" if path_matching != "" else "randomly_generated"
+	run_seed_host_match(method=method, wkdir=config_all["BasicRunConfiguration"]["cwdir"], num_seed=num_seed, path_matching=path_matching, match_scheme=match_method, match_scheme_param=match_method_param)
 
 def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme="", match_scheme_param = ""):
 	## A function that supports the execution of seed_host_match in command line and saves the matching file in the specified diretcory
