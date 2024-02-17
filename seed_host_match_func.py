@@ -18,19 +18,21 @@ TEST_DIR = "test/seed_host_match_func"
 HUNDRED = 100
 ZERO = 0
 
-def _build_dict_edges_node(ntwk_: nx.Graph) -> dict[int, list[int]]:
+def _build_dict_edges_node(ntwk_):
 	## A helper function that returns a dictionary with degrees as keys
 	## and a list of nodes of corresponding degrees as values
-	### Output: dict_edges_node: A dictionary with int as keys and int list as values
+	## ntwk_: nx.Graph
+	### Output: dict_edges_node: A dictionary with int as keys and int list as values dict[int, list[int]]
 	dict_edges_node = defaultdict(list)
 	[dict_edges_node[n_edges].append(node) for node, n_edges in ntwk_.degree]
 	return dict_edges_node
 
-def _sort_node_by_edge(dict_edges_node: dict[int, list[int]]) -> Tuple[list[int], list[int]]:
+def _sort_node_by_edge(dict_edges_node):
 	## A helper function that returns a list of nodes reversely sorted by their 
 	## degrees and a list of their corresponding degrees
-	### Output: nodes_sorted: A list of int
-	### 		degree_sorted: A list of int
+	## dict_edges_node: dict[int, list[int]]
+	### Output: nodes_sorted: A list of int list[int]
+	### 		degree_sorted: A list of int list[int]
 	nodes_sorted = []
 	degree_sorted = []
 	for degree in sorted(dict_edges_node.keys(), reverse = True):
@@ -40,26 +42,32 @@ def _sort_node_by_edge(dict_edges_node: dict[int, list[int]]) -> Tuple[list[int]
 	# degree_sorted is not used anywhere in the pipeline; we can delete it if we decide this is unnecessary
 	return nodes_sorted, degree_sorted
 
-def _save_dict_to_csv(dict_matching: dict[int, int], file_path: str):
+def _save_dict_to_csv(dict_matching, file_path):
 	## A helper function that saves the matching dictionary as a specified file
 	## with columns ['seed', 'host_id']
+	## dict_matching: dict[int, int]
+	## file_path: str
 	### Output: file_path: A string
 
 	# changed the order of columns, it used to be ['host_id', 'seed']
 	df = pd.DataFrame(list(dict_matching.items()), columns = ['seed', 'host_id'])
 	df.to_csv(file_path, index = False)
  
-def _read_user_matchingfile_info_json(file: str):
+def _read_user_matchingfile_info_json(file):
+	## file: str
 	## TO DO: to check the contents of json
 	return file
 
-def _read_user_matchingfile_info_csv(file: str):
+def _read_user_matchingfile_info_csv(file):
+	## file: str
 	## TO DO: to check the contents of csv
 	return file
 
-def _percentile_to_index(percentile: list[int, int], node_per_percent: Union[float, int]) -> Tuple[int, int]:
+def _percentile_to_index(percentile, node_per_percent):
 	## A helper function that converts the percentile range to index range for the matching method ## 'percentile'
-	### Output: A tuple of ints representing the range of indices to choose from
+	## percentile: list[int, int]
+	## node_per_percent: Union[float, int]
+	### Output: A tuple of ints representing the range of indices to choose from Tuple[int, int]
 	if len(percentile) != 2:
 		raise CustomizedError(f"The percentile range {percentile} is not a list of two element.")
 	l_per, h_per = percentile
@@ -74,10 +82,11 @@ def _percentile_to_index(percentile: list[int, int], node_per_percent: Union[flo
 	high_idx = math.floor(node_per_percent * h_per)
 	return low_idx, high_idx
 
-def read_user_matchingfile(file_path: str):
+def read_user_matchingfile(file_path):
 	## A function to check whether the user-input host-seed matching file is valid
 	## Raise exceptions when given file path is invalid / when contents of file
 	## does not satisfy the seed-host matching format.
+	## file_path: str
 	### Output: A dictionary of matching where seeds are the keys and host_id are the values
 	file_path = Path(file_path)
 
@@ -101,23 +110,30 @@ def read_user_matchingfile(file_path: str):
 			raise ValueError(f"Invalid CSV format in {file_path}")
 	raise ValueError("Host-seed matching file is not CSV or JSON.")
 
-def read_network(network_path: str) -> nx.Graph:
+def read_network(network_path):
 	## A function that read networks from a given path
-	### Output: A networkX object
+	## network_path: str
+	### Output: nx.Graph
 	network_path = Path(network_path)
 	if not network_path.exists():
 		raise FileNotFoundError(f"The provided networkX path '{network_path}' doesn't exist. Please run network_generation first before running this script and make sure the given working directory is correct.")
 	return nx.read_adjlist(network_path, nodetype=int)
 
-def match_random(nodes_sorted: list[int], taken_hosts: list[int], param = None) -> int:
+def match_random(nodes_sorted, taken_hosts, param = None):
 	### A function to return one random available host to match one seed
+	## nodes_sorted: list[int]
+	## taken_hosts: list[int]
+	## param: None
 	### Output: host: An int
 	available_host = list(set(nodes_sorted).difference(set(taken_hosts)))
 	host = sample(available_host, 1)[0]
 	return host
 
-def match_ranking(nodes_sorted: list[int], taken_hosts: list[int], rank: int) -> int:
+def match_ranking(nodes_sorted: list[int], taken_hosts, rank):
 	## A function to match one seed by rank (=degree of connectivity) to the host
+	## nodes_sorted: list[int]
+	## taken_hosts: list[int]
+	## rank: int
 	### Output: host: An int
 	ntwk_size = len(nodes_sorted)
 	if rank > ntwk_size:
@@ -127,8 +143,11 @@ def match_ranking(nodes_sorted: list[int], taken_hosts: list[int], rank: int) ->
 		raise CustomizedError(f"Host of specified rank {rank} is already taken.")
 	return host
 
-def match_percentile(nodes_sorted: list[int], taken_hosts: list[int], percentile: list[int, int]) -> int:
+def match_percentile(nodes_sorted, taken_hosts, percentile):
 	## A function to match one seed by percentile to the host
+	## nodes_sorted:  list[int]
+	## taken_hosts: list[int]
+	## percentile: list[int, int]
 	### Output: host: An int
 	node_per_percent = len(nodes_sorted) / 100
 	low_idx, high_idx = _percentile_to_index(percentile, node_per_percent)
@@ -140,16 +159,22 @@ def match_percentile(nodes_sorted: list[int], taken_hosts: list[int], percentile
 			raise CustomizedError(f"There is no host left to match in the percentile {percentile}.")
 		host = sample(available_host, 1)[0]
 		return host
-	raise CustomizedError(f"There is no host left to match in the range {percentile}%")
+	raise CustomizedError(f"There is no host left to match in the range {percentile}%.")
 	
-def write_match(match_dict: dict[int, int], wk_dir: str):
+def write_match(match_dict, wk_dir):
 	## A function to write the matching to a csv file in the working directory
+	## match_dict: dict[int, int]
+	## wk_dir: str
 	sorted_match = dict(sorted(match_dict.items()))
 	_save_dict_to_csv(sorted_match, os.path.join(wk_dir, "seed_host_match.csv"))
 
-def match_all_hosts(ntwk_: nx.Graph, match_method: dict[int, str], param: dict[int, Union[int, list[int, int], None]], num_seed: int) -> dict[int, int]:
+def match_all_hosts(ntwk_, match_method, param, num_seed):
 	## A function to match each seed to one host given the matching method.
-	### Output: A dictionary of the matching (key: the seed, value: the host id, e.g. {0: 232, 1:256, 2:790, 3:4, 4:760})
+	## ntwk_: nx.Graph
+	##  match_method: dict[int, str]
+	## param: dict[int, Union[int, list[int, int], None]]
+	## num_seed: int
+	### Output: A dictionary of the matching (key: the seed, value: the host id, e.g. {0: 232, 1:256, 2:790, 3:4, 4:760}) dict[int, int]
 	ntwk_size = ntwk_.number_of_nodes()
 	if num_seed != len(param.keys()): 
 		raise CustomizedError(f"Please provide a matching parameter for each seed. (Length of matching parameter {len(param.keys())} doesn't match number of seed {num_seed})")
@@ -181,8 +206,10 @@ def match_all_hosts(ntwk_: nx.Graph, match_method: dict[int, str], param: dict[i
 			taken_hosts_id.append(matched_host)
 	return match_dict
 
-def read_config_and_match(file_path: str, ntwk_: nx.Graph, num_seed: int):
+def read_config_and_match(file_path, num_seed):
 	## A function to read from config file and do matching
+	## file_path: str
+	## num_seed: int
 	config_all = read_params(file_path)
 	config = config_all["SeedHostMatching"]["randomly_generated"]
 	match_method = config["match_scheme"]
