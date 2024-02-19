@@ -1,5 +1,5 @@
 import unittest
-from seed_host_match_func import read_network, match_random, match_ranking, match_percentile, match_all_hosts, write_match, _build_dict_edges_node, _sort_node_by_edge, _save_dict_to_csv
+from seed_host_match_func import read_network, match_random, match_ranking, match_percentile, match_all_hosts, _build_dict_edges_node, _sort_node_by_edge, _save_dict_to_csv
 import os
 import networkx as nx
 import pandas as pd

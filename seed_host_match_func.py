@@ -165,7 +165,7 @@ def write_match(match_dict, wk_dir):
 	## A function to write the matching to a csv file in the working directory
 	## match_dict: dict[int, int]
 	## wk_dir: str
-	sorted_match = dict(sorted(match_dict.items()))
+	sorted_match = dict(sorted(match_dict.items(), key=lambda x:x[1]))
 	_save_dict_to_csv(sorted_match, os.path.join(wk_dir, "seed_host_match.csv"))
 
 def match_all_hosts(ntwk_, match_method, param, num_seed):
@@ -237,7 +237,7 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 			else: 
 				read_user_matchingfile(path_matching)
 		elif method=="randomly_generate":
-			if match_scheme == "random":
+			if match_scheme == "" and match_scheme_param == "":
 				match_scheme = {seed_id: "random" for seed_id in range(num_seed)}
 				match_scheme_param = {seed_id: None for seed_id in range(num_seed)}
 			else:
