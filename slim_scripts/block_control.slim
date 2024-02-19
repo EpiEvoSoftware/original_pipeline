@@ -1,5 +1,6 @@
 1 first() {
-	//// Define blocks to run
+	//// Turn on warnings
+	suppressWarnings(F);
 
 	// self reproduction (for mutation accumulation) run every generation
 	community.rescheduleScriptBlock(s0, ticks = 2:n_generation);

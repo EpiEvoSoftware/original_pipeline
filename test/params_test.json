@@ -104,13 +104,13 @@
     },
     "transiton_rate": {
       "S_IE_rate": [0.01, 0.01],
-      "I_R_rate": [0.01, 0.1],
+      "I_R_rate": [0.01, 0.3],
       "R_S_rate": [0.07, 0.07],
       "latency_prob": [1, 1],
       "E_I_rate": [0.01, 0.01],
       "I_E_rate": [0.01, 0.01],
       "E_R_rate": [0, 0],
-      "sample_rate": [0.006, 0.006],
+      "sample_rate": [0.006, 0.01],
       "recovery_prob_after_sampling": [0, 0]
     },
     "massive_sampling": {

@@ -1,10 +1,15 @@
+suppressPackageStartupMessages(library("ape"))
+suppressPackageStartupMessages(library("phylobase"))
+suppressPackageStartupMessages(library("ggtree"))
+suppressPackageStartupMessages(library("data.table"))
+
 library("ape")
 library("phylobase")
 library("ggtree")
 library("ggplot2")
-library("gridExtra")
-library("grid")
 require("data.table")
+
+options(warn=-1)
 
 
 assign_id <- function(meta_df, g1, id_value, new_layer) {
@@ -106,6 +111,7 @@ n_gen = as.integer(slim_config[slim_config$V1=="n_generation",]$V2)
 meta_df$name = as.character(meta_df$name)
 
 whole_phylo_output = FALSE
+
 if (file.exists(seed_tree))
 {
 	seed_phylo = read.tree(seed_tree)
@@ -167,24 +173,24 @@ for (seed_id in 1:seed_size)
       g2 = phylo4d(g1)
       nodeData(g2) <- rNodeData
       tipData(g2) <- rTipData
+
       p2 <- ggtree(g2, aes(color=I(color)), ladderize = TRUE)
+
 
       if (n_dr>0)
       {
         p3 <- gheatmap(p2, df_heatmap, offset=5, width=0.1) + 
-            theme(plot.margin = margin(0,0,0.5,1, "cm")) +
-            scale_fill_gradient(low="white", high="orange")
+            theme(plot.margin = margin(0,0,0.5,1, "cm"))
+        p3$scales$scales <- list()
+        p3 <- p3 + scale_fill_gradient(low="white", high="orange")
       }
       else
       {
         p3 <- p2
       }
-      
-      p3 <- gheatmap(p2, df_heatmap, offset=5, width=0.1) + 
-        theme(plot.margin = margin(0,0,0.5,1, "cm")) +
-        scale_fill_gradient(low="white", high="orange") 
+
     
-      ggsave(file.path(wk_dir, "transmission_tree", paste0("tree.", seed_id - 1, ".pdf")), plot = p3, width = 5, height = 10, dpi = 300)
+      suppressWarnings(ggsave(file.path(wk_dir, "transmission_tree", paste0("tree.", seed_id - 1, ".pdf")), plot = p3, width = 5, height = 10, dpi = 300))
       
       if (whole_phylo_output) 
       {
@@ -201,13 +207,16 @@ for (seed_id in 1:seed_size)
   else
   {
     print("No samples for this seed's progeny.")
-    if (length(seed_phylo$tip.label)==1)
-    {
-      whole_phylo_output = FALSE
-    }
     if (whole_phylo_output) 
     {
-      seed_phylo <- drop.tip(seed_phylo, as.character(seed_id - 1))
+      if (length(seed_phylo$tip.label)==1)
+      {
+        whole_phylo_output = FALSE
+      }
+      else
+      {
+        seed_phylo <- drop.tip(seed_phylo, as.character(seed_id - 1))
+      }
     }
   }
 }
@@ -262,15 +271,16 @@ if (whole_phylo_output)
   if (n_dr>0)
   {
     p3 <- gheatmap(p2, df_heatmap, offset=5, width=0.1) + 
-        theme(plot.margin = margin(0,0,0.5,1, "cm")) +
-        scale_fill_gradient(low="white", high="orange")
+        theme(plot.margin = margin(0,0,0.5,1, "cm")) 
+    p3$scales$scales <- list()
+    p3 <- p3 + scale_fill_gradient(low="white", high="orange")
   }
   else
   {
     p3 <- p2
   }
 
-	ggsave(file.path(wk_dir, "whole_transmission_tree.pdf"), plot = p3, width = 5, height = 10, dpi = 300)
+	suppressWarnings(ggsave(file.path(wk_dir, "whole_transmission_tree.pdf"), plot = p3, width = 5, height = 10, dpi = 300))
 }
 
 

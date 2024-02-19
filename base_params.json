@@ -14,10 +14,11 @@
   },
   "SeedsConfiguration": {
     "seed_size": 1,
+    "use_reference": false,
     "method": "",
     "user_input": {
       "path_seeds_vcf": "",
-      "path_seeds_phylogeny": "",
+      "path_seeds_phylogeny": ""
     },
     "SLiM_burnin_WF": {
       "burn_in_Ne": 0,

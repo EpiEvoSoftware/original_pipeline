@@ -13,7 +13,8 @@
     "cap_withinhost": 1
   },
   "SeedsConfiguration": {
-    "seed_size": 1
+    "seed_size": 1,
+    "use_reference": false,
   },
   "GenomeElement": {
     "use_genetic_model": true,

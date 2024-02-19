@@ -17,7 +17,6 @@
 			labels = c(labels, 2);
 			current_subpop.genomes.readFromVCF(paste0(seedsvcfpath, "seed.", seeds_structure.subset(seed_count, 1), ".vcf"));
 			current_subpop.individuals.tag = seeds_structure.subset(seed_count, 1); // id of seed
-			print(paste0(i, ",", current_subpop.individuals.tag));
 			sim.treeSeqRememberIndividuals(current_subpop.individuals);
 
 			if (seed_count < seed_size - 1)

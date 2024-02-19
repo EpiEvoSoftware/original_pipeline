@@ -1,7 +1,7 @@
 {
     "BasicRunConfiguration": {
         "cwdir": "/Users/px54/Documents/TB_software/V2_code/test",
-        "n_replicates": 5
+        "n_replicates": 1
     },
     "EvolutionModel": {
         "n_generation": 360,
@@ -17,8 +17,7 @@
         "method": "SLiM_burnin_WF",
         "user_input": {
             "path_seeds_vcf": "PATH",
-            "path_seeds_phylogeny": "PATH",
-            "scaling_factor": 12
+            "path_seeds_phylogeny": "PATH"
         },
         "SLiM_burnin_WF": {
             "burn_in_Ne": 4000,

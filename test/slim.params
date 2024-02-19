@@ -18,13 +18,13 @@ cap_transmissibility:1,0.9
 drugresistance_effsize:0,1
 cap_drugresist:0,1.5
 S_IE_rate:0.01,0.01
-I_R_rate:0.01,0.1
+I_R_rate:0.01,0.3
 R_S_rate:0.07,0.07
 latency_prob:1,1
 E_I_rate:0.01,0.01
 I_E_rate:0.01,0.01
 E_R_rate:0,0
-sample_rate:0.006,0.006
+sample_rate:0.006,0.01
 recovery_prob_after_sampling:0,0
 n_massive_sample:0
 super_infection:
