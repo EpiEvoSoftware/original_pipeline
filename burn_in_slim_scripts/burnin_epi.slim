@@ -7,7 +7,7 @@ initialize() {
 	initializeRecombinationRate(0);
 
 	initializeMutationTypeNuc(0, 1, "f", 0.0); // Neutral mutations
-	initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mut_rate));
+	initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mut_rate / 3));
 
 	initializeGenomicElement(0, 0, L - 1);
 }

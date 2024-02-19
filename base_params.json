@@ -84,9 +84,8 @@
       "path_matching": ""
     },
     "randomly_generate": {
-      "method": "",
-      "ranking": "",
-      "percentile": ""
+      "match_scheme": "",
+      "match_scheme_param": "",
     }
   },
   "EpidemiologyModel": {

@@ -5,7 +5,7 @@ initialize() {
 	initializeRecombinationRate(0);
 
 	initializeMutationTypeNuc(0, 1, "f", 0.0); // Neutral mutations
-	initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mu)); // yearly
+	initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mu / 3)); // yearly
 	initializeGenomicElement(0, 0, L - 1);
 
 	initializeTreeSeq();
