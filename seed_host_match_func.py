@@ -176,10 +176,6 @@ def match_all_hosts(ntwk_, match_method, param, num_seed):
 	## num_seed: int
 	### Output: A dictionary of the matching (key: the seed, value: the host id, e.g. {0: 232, 1:256, 2:790, 3:4, 4:760}) dict[int, int]
 	ntwk_size = ntwk_.number_of_nodes()
-	if num_seed != len(param.keys()): 
-		raise CustomizedError(f"Please provide a matching parameter for each seed. (Length of matching parameter {len(param.keys())} doesn't match number of seed {num_seed})")
-	if num_seed != len(match_method.keys()): 
-		raise CustomizedError(f"Please provide a matching method for each seed. (Length of matching method {len(match_method.keys())} doesn't match number of seed {num_seed})")
 	if num_seed > ntwk_size:
 		raise CustomizedError(f"It is not allowed to match {num_seed} seeds to {ntwk_size} hosts. Please reduce the number of seeds or increase the host population size.")
 	
@@ -190,10 +186,15 @@ def match_all_hosts(ntwk_, match_method, param, num_seed):
 
     # Gather the nodes by their matching method
 	dict_method_seeds = {'ranking': [], 'percentile': [], 'random': []}
-	for _ , (seed_id, method) in enumerate(match_method.items()):
-		if method not in ['ranking', 'percentile', 'random']:
+	# for _ , (seed_id, method) in enumerate(match_method.items()):
+	# 	if method not in ['ranking', 'percentile', 'random']:
+	# 		raise CustomizedError(f"Please provide a valid matching method in ('ranking', 'percentile', 'random') instead of {method} for seed {seed_id}")
+	# 	dict_method_seeds[method].append(seed_id)
+	for seed_id in range(num_seed):
+		idx_method = match_method.get(seed_id)
+		if idx_method not in [None, 'ranking', 'percentile', 'random']:
 			raise CustomizedError(f"Please provide a valid matching method in ('ranking', 'percentile', 'random') instead of {method} for seed {seed_id}")
-		dict_method_seeds[method].append(seed_id)	
+		dict_method_seeds[idx_method].append(seed_id) if idx_method != None else dict_method_seeds["random"].append(seed_id)
 	
 	# Define the matching function by the method param and process methods in the specified order
 	match_functions = {'ranking': match_ranking, 'percentile': match_percentile,'random': match_random}
@@ -201,7 +202,7 @@ def match_all_hosts(ntwk_, match_method, param, num_seed):
 	for method in ['ranking', 'percentile', 'random']:
 		match_function = match_functions[method]
 		for seed_id in dict_method_seeds[method]:
-			matched_host = match_function(nodes_sorted, taken_hosts_id, param[seed_id])
+			matched_host = match_function(nodes_sorted, taken_hosts_id, param.get(seed_id))
 			match_dict[seed_id] = matched_host
 			taken_hosts_id.append(matched_host)
 	return match_dict

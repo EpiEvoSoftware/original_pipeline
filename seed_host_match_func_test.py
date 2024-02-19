@@ -76,7 +76,7 @@ class HostSeedMatch(unittest.TestCase):
 	def test_match_all_hosts(self):
 		G = nx.Graph()
 		G.add_edges_from([(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (6, 7), (6, 8), (6, 9), (6, 10), (11, 12), (11, 13), (11, 14), (15, 16), (15, 17), (18, 19)])
-		match_method_0 = {0: 'ranking', 1: 'ranking', 2: 'ranking', 3: 'ranking', 4: 'random'}
+		match_method_0 = {0: 'ranking', 1: 'ranking', 2: 'ranking', 3: 'ranking'}
 		param_0 = {0: 1, 1: 2, 2:3, 3:4, 4: None}
 		# param_0 = {0: 1, 1: 2, 2:3, 3:4}
 		match_0 = match_all_hosts(G, match_method_0, param_0, 5)
