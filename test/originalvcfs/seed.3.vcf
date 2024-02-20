@@ -10,7 +10,8 @@
 ##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
 ##INFO=<ID=AA,Number=1,Type=String,Description="Ancestral Allele">
 ##INFO=<ID=NONNUC,Number=0,Type=Flag,Description="Non-nucleotide-based">
-##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	i0
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	i0
 1	399	.	A	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
 1	501	.	C	T	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=C	GT	1
 1	2066	.	A	G	1000	PASS	S=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=A	GT	1
