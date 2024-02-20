@@ -1,41 +1,50 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "/Users/px54/Documents/TB_software/Haslemere_dt/redist"
+    "cwdir": "/Users/px54/Documents/TB_software/V2_code/test",
+    "n_replicates": 10
   },
   "EvolutionModel": {
-    "n_generation": 360,
+    "n_generation": 500,
     "mut_rate": 4.4e-9,
     "trans_type": "additive",
-    "dr_type": "bialleleic",
-    "within_host_evolution": false,
+    "dr_type": "additive",
+    "within_host_reproduction": false,
+    "within_host_reproduction_rate": 0.01,
     "cap_withinhost": 5
   },
   "SeedsConfiguration": {
     "seed_size": 5,
-    "seeds_vcf": {
-      "method": "SLiM_burnin_WF",
-      "user_input": {
-        "path_seeds_vcf": "PATH",
-        "path_seeds_phylogeny": "PATH",
-        "scaling_factor": 12
-      },
-      "SLiM_burnin_WF": {
-        "burn_in_Ne": 4000,
-        "burn_in_generations": 5000,
-        "burn_in_mutrate": 5.3e-8,
-        "scaling_factor": 12
-      },
-      "SLiM_burnin_epi": {
-        "burn_in_start_size": 1,
-        "burn_in_generations": 5000,
-        "burn_in_mutrate": 5.3e-8,
-        "scaling_factor": 12
-      }
+    "method": "SLiM_burnin_WF",
+    "user_input": {
+      "path_seeds_vcf": "PATH",
+      "path_seeds_phylogeny": "PATH",
+      "scaling_factor": 12
+    },
+    "SLiM_burnin_WF": {
+      "burn_in_Ne": 4000,
+      "burn_in_generations": 5000,
+      "burn_in_mutrate": 5.3e-8,
+      "scaling_factor": 12
+    },
+    "SLiM_burnin_epi": {
+      "burn_in_start_size": 1,
+      "burn_in_generations": 1000,
+      "burn_in_mutrate": 5.3e-8,
+      "scaling_factor": 12,
+      "seeded_host_id": [100],
+      "S_IE_rate": 0.01,
+      "E_I_rate": 0.01,
+      "E_R_rate": 0,
+      "latency_prob": 1,
+      "I_R_rate": 0.01,
+      "I_E_rate": 0,
+      "R_S_rate": 0.05
     }
   },
   "GenomeElement": {
     "use_genetic_model": true,
     "ref_path": "/Users/px54/Documents/TB_software/covid_test/EPI_ISL_402124.fasta",
+    "traits_num": [1, 2],
     "effect_size": {
       "method": "user_input",
       "user_input": {
@@ -43,7 +52,6 @@
       },
       "randomly_generate": {
         "gff": "/Users/px54/Documents/TB_transmissibility/slim_scripts/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
-        "traits_num": [1, 2],
         "genes_num": [10, 5, 5],
         "effsize_min": [1, 1, 1],
         "effsize_max": [5, 5, 5],
@@ -52,9 +60,9 @@
     }
   },
   "NetworkModelParameters": {
-    "use_network_model": false,
+    "use_network_model": true,
     "method": "randomly_generate",
-    "host_size": 10000,
+    "host_size": 1000,
     "user_input": {
       "path_network": "PATH"
     },
@@ -79,36 +87,45 @@
     },
     "randomly_generate": {
       "method": "random",
-      "random": null,
-      "ranking": [1, 250, 300, 400, 700],
-      "quantile": [[0, 25], [0, 25], [0, 25], [0, 25], [0, 25]]
+      "path_csv": ""
     }
   },
   "EpidemiologyModel": {
     "model": "SEIR",
     "epoch_changing": {
-      "epoch_num": 2,
-      "changing_generation": [200],
-      "transmission": [1, 1],
-      "treatment": [0, 2]
+      "n_epoch": 2,
+      "epoch_changing_generation": [200]
+    },
+    "genetic_architecture": {
+      "transmissibility": [1, 1],
+      "cap_transmissibility": [1, 0.9],
+      "drug_resistance": [0, 1],
+      "cap_drugresist": [0, 1.5]
     },
     "transiton_rate": {
-      "S_IE_rate": [0.1, 0.1],
-      "I_R_rate": [0.1, 0.1],
-      "R_I_rate": [0.1, 0.1],
+      "S_IE_rate": [0.01, 0.01],
+      "I_R_rate": [0.01, 0.3],
+      "R_S_rate": [0.07, 0.07],
       "latency_prob": [1, 1],
-      "E_I_rate": [0.1, 0.1],
-      "I_E_rate": [0.1, 0.1],
+      "E_I_rate": [0.01, 0.01],
+      "I_E_rate": [0.01, 0.01],
       "E_R_rate": [0, 0],
-      "sample_rate": [0.1, 0.2],
-      "recovery_prob_after_sampling": [1, 1]
+      "sample_rate": [0.006, 0.01],
+      "recovery_prob_after_sampling": [0, 0]
     },
     "massive_sampling": {
-      "event_num": 2,
+      "event_num": 0,
       "generation": [150, 300],
       "sampling_prob": [0.1, 0.1],
       "recovery_prob_after_sampling": [1, 1]
     },
-    "super_infection": false
+    "super_infection": true
+  },
+  "Postprocessing_options": {
+    "do_postprocess": true,
+    "tree_plotting": {
+      "branch_color_trait": 1,
+      "heatmap": [3,4]
+    }
   }
 }
