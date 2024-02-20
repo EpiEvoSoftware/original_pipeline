@@ -1,0 +1,56 @@
+1 first() {
+	//// Define blocks to run
+	// self reproduction (for mutation accumulation) run every generation
+	community.rescheduleScriptBlock(s0, ticks = 2:n_generation);
+	// s1, transmission block, run every generation
+	community.rescheduleScriptBlock(s1, ticks = 2:n_generation);
+	// s2, within-host evolution block, will be disabled if within_host_evolution is false
+	if (within_host_evolution==T)
+	{
+		community.rescheduleScriptBlock(s2, ticks = 2:n_generation);
+	}
+	// s3, process the infected hosts, recover or sample or go back to exposed
+	community.rescheduleScriptBlock(s3, ticks = 2:n_generation);
+	// s4, logging this generation's compartment information. Run for all generations
+	community.rescheduleScriptBlock(s4, ticks = 2:n_generation);
+	// s5, end of simulation block
+	community.rescheduleScriptBlock(s5, ticks = n_generation);
+	// s6, kill all old pathogens, run at all generations as a complement of the mutation process
+	community.rescheduleScriptBlock(s6, ticks = 2:n_generation);
+	// s7, treatment block, will activate only at the generations specified by treatment_gens as substitution of s3
+	if (treatment==T) 
+	{
+		treatment_start = asInteger(treatment_gens[0]);
+		treatment_end = asInteger(treatment_gens[1]);
+		treatment_start_1 = treatment_start - 1;
+		treatment_end_1 = treatment_end + 1;
+		community.rescheduleScriptBlock(s7, ticks = treatment_start:treatment_end);
+		ori_gen = c(2:treatment_start_1, treatment_end_1:n_generation);
+		community.rescheduleScriptBlock(s3, ticks = ori_gen);
+		// s12 epoch changing for drug resistance
+		if (multiple_epochs==T)
+		{
+			community.rescheduleScriptBlock(s12, ticks = asInteger(epoch_changing));
+		}
+		defineGlobal("cap_dr_current", asFloat(cap_dr[0]));
+		defineGlobal("dr_set", "e1");
+		defineGlobal("current_epoch", 1);
+	}
+	// s8, process the exposed hosts
+	if (model=="SEIR")
+	{
+		community.rescheduleScriptBlock(s8, ticks = 2:n_generation);
+	}
+	// s9, process recovered individuals
+	if (RS_rate > 0)
+	{
+		community.rescheduleScriptBlock(s9, ticks = 2:n_generation);
+	}
+	// s10, process this generation's new infections.
+	community.rescheduleScriptBlock(s10, ticks = 2:n_generation);
+	// s11, massive sampling event, only active at certain generations
+	if (massive_sampling==T)
+	{
+		community.rescheduleScriptBlock(s11, ticks = asInteger(massive_samp_gens));
+	}
+}
