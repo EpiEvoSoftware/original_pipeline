@@ -1,9 +1,0 @@
-	defineConstant("L", initializeAncestralNucleotides(ref_path));
-	initializeRecombinationRate(0);
-
-	initializeMutationTypeNuc(0, 1, "f", 0.0); // Neutral mutations
-	initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mut_rate / 3));
-	initializeMutationTypeNuc(1, 1, "f", 0.0);  // Mutations contributing to traits
-	initializeGenomicElementType(1, 1, 1.0, mmJukesCantor(mut_rate / 3));
-
-	

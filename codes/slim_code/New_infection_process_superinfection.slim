@@ -1,8 +1,0 @@
-s10 early(){
-	s_inds = which((Host_states==0)&(sim.subpopulations.individualCount>0));
-
-	draw_uniform = runif(length(s_inds));
-	state_transition = findInterval(draw_uniform, c(0, latent_prob));
-	Host_states[s_inds[which(state_transition==0)]]=1; //state_transition=0 means going to latent state while =1 means going to active state
-	Host_states[s_inds[which(state_transition > 0)]]=2;
-}

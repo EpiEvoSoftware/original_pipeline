@@ -1,7 +1,0 @@
-s5 late() 
-{
-	inds = sim.subpopulations.individuals;
-	sim.killIndividuals(inds);
-	sim.treeSeqOutput(paste0(cwdir, runid, "/sampled_genomes.trees"));
-	sim.simulationFinished();
-}
