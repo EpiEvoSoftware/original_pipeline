@@ -1,4 +1,6 @@
 initialize() {
+
+	suppressWarnings(T);
 	initializeSLiMModelType("WF");
 	initializeSLiMOptions(nucleotideBased=T);
 	defineConstant("L", initializeAncestralNucleotides(ref_path)); // Read in a reference genome

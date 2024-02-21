@@ -42,9 +42,12 @@ def nwk_output(tseq_smp, real_name, each_wk_dir_, seed_host_match_path):
 	match_dict = {}
 	with open(seed_host_match_path, "r") as in_csv:
 		for line in in_csv:
-			ll = line.rstrip("\n")
-			l = ll.split(",")
-			match_dict[int(l[0])] = int(l[1])
+			if line.startswith("seed"):
+				continue
+			else:
+				ll = line.rstrip("\n")
+				l = ll.split(",")
+				match_dict[int(l[1])] = int(l[0])
 	if not os.path.exists(output_path):
 		os.makedirs(output_path)
 	else:
@@ -122,9 +125,12 @@ def color_by_seed(tseq_smp, trvs_order, seed_host_match_path):
 	
 	with open(seed_host_match_path, "r") as in_csv:
 		for line in in_csv:
-			ll = line.rstrip("\n")
-			l = ll.split(",")
-			match_dict[int(l[0])] = int(l[1])
+			if line.startswith("seed"):
+				continue
+			else:
+				ll = line.rstrip("\n")
+				l = ll.split(",")
+				match_dict[int(l[1])] = int(l[0])
 	cmap = cm.get_cmap('viridis')
 	values = np.linspace(0, 1, len(match_dict))
 	colors = cmap(values)

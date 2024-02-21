@@ -267,6 +267,9 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[
 			print("Please provide a list of number of trait (-trait_n) that sum up to at least 1.")
 			run_check = False
 		else:
+			if len(trait_n)!=2:
+				print("Wrong trait number format, need to have exactly two traits number (for transmissibility and drug resistance).")
+				run_check = False
 			if len(causal_sizes)!=sum(trait_n):
 				print("The given length of the number of causal genetic elements (-causal_size_each) doesn't equal to the number of traits (Each trait has one number of causal genetic element)")
 				run_check = False

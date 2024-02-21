@@ -13,6 +13,16 @@ def read_params(path_config):
 
     return(default_param_dict)
 
+def read_params_simonly(path_config):
+    default_config = open(os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), "slim_only_template.json"), "r")
+    default_param_dict = json.loads(default_config.read())
+    config = open(path_config, "r")
+    usr_param_dict = json.loads(config.read())
+
+    default_param_dict.update(usr_param_dict)
+
+    return(default_param_dict)
+
 
 def str2bool(v):
     if isinstance(v, bool):

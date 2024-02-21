@@ -120,6 +120,7 @@ if (file.exists(seed_tree))
 
 for (seed_id in 1:seed_size)
 {
+  print(paste0("Plotting seed ", seed_id, "'s transmission tree..."))
   trans_tree_file = file.path(wk_dir, "transmission_tree", paste0(seed_id - 1, ".nwk"))
   tree_str <- paste(readLines(trans_tree_file), collapse="\n")
   if (startsWith(tree_str, "("))
@@ -152,23 +153,27 @@ for (seed_id in 1:seed_size)
       rTipData <- data.frame(color = color_value_df[1:nTips(g1),]$color)
       
       
-      for (i in 1:n_dr)
+      if (n_dr>0)
       {
-        color_value_df = assign_dr(meta_df, color_value_df, i, n_trans)
-        dr_df = data.frame(dr = color_value_df[start_id:nodes_num, ncol(color_value_df)])
-        colnames(dr_df) = paste0("dr", i)
-        rNodeData <- cbind(rNodeData, dr_df)
-        rTipData <- cbind(rTipData, color_value_df[1:nTips(g1), ncol(color_value_df)])
-        if (ncol(color_value_df)>4)
+        for (i in 1:n_dr)
         {
-          df_heatmap <- color_value_df[1:nTips(g1), 4:ncol(color_value_df)]
+          color_value_df = assign_dr(meta_df, color_value_df, i, n_trans)
+          dr_df = data.frame(dr = color_value_df[start_id:nodes_num, ncol(color_value_df)])
+          colnames(dr_df) = paste0("dr", i)
+          rNodeData <- cbind(rNodeData, dr_df)
+          rTipData <- cbind(rTipData, color_value_df[1:nTips(g1), ncol(color_value_df)])
+          if (ncol(color_value_df)>4)
+          {
+            df_heatmap <- color_value_df[1:nTips(g1), 4:ncol(color_value_df)]
+          }
+          else
+          {
+            df_heatmap <- data.frame(dr1=color_value_df[1:nTips(g1), 4])
+          }
+          rownames(df_heatmap) <- color_value_df[1:nTips(g1),]$label_nm
         }
-        else
-        {
-          df_heatmap <- data.frame(dr1=color_value_df[1:nTips(g1), 4])
-        }
-        rownames(df_heatmap) <- color_value_df[1:nTips(g1),]$label_nm
       }
+      
       
       g2 = phylo4d(g1)
       nodeData(g2) <- rNodeData

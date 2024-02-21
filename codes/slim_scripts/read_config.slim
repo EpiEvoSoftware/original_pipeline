@@ -31,6 +31,8 @@
 		}
 		else if (any(ll[0]==list_float_pars))
 		{
+			print(ll[0]);
+			print(asFloat(strsplit(ll[1], sep=",")));
 			defineGlobal(ll[0], asFloat(strsplit(ll[1], sep=",")));	
 		}
 		else if (any(ll[0]==bin_pars))
@@ -45,6 +47,8 @@
 	{
 		defineGlobal("cwdir", paste0(cwdir, "/"));
 	}
+
+
 
 
 

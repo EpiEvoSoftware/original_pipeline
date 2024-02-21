@@ -123,6 +123,7 @@ def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen):
 		subprocess.run(["slim", "-d", f"Ne={Ne}", "-d", f"ref_path=\"{ref_path}\"", "-d", f"wk_dir=\"{wk_dir}\"", "-d", f"mu={mu}", "-d", f"n_gen={n_gen}", slim_script], stdout=fd)
 	seeds_treeseq(wk_dir, seed_size)
 	split_seedvcf(os.path.join(wk_dir, "seeds.vcf"), wk_dir, seed_size, "slim")
+	os.remove(os.path.join(wk_dir, "seeds.vcf"))
 
 def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, S_IE_rate, E_I_rate=0, E_R_rate=0, latency_prob=0, I_R_rate=0, I_E_rate=0, R_S_rate=0):
 	## A function to run the burn-in using the epidemiological model.

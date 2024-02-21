@@ -85,7 +85,7 @@
     },
     "randomly_generate": {
       "match_scheme": "",
-      "match_scheme_param": "",
+      "match_scheme_param": ""
     }
   },
   "EpidemiologyModel": {

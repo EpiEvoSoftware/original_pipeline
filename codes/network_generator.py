@@ -4,7 +4,7 @@ import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate a contact network for the population size specified and conver it to a .csv file')
+    parser = argparse.ArgumentParser(description='Generate a contact network for the population size specified and store it in the working directory as an adjacency list.')
     parser.add_argument('-popsize', action='store',dest='popsize', required=True, type=int)
     parser.add_argument('-wkdir', action='store',dest='wkdir', required=True, type=str)
     parser.add_argument('-method', action='store',dest='method', required=True, type=str)

@@ -33,7 +33,7 @@ s7 early(){
 				//the bigger the effect size for drug resistance mutation is, the more probable that the treatment fails
 				if (runif(1) > treatment_failed_rate)
 				{
-					line1 = paste(community.tick, ind + 1);
+					line1 = paste(community.tick, ind);
 					writeFile(paste0(cwdir, runid, "/recovery.csv"), line1, append=T, compress=T);
 					actually_recovered = c(actually_recovered, pathogen);
 				}

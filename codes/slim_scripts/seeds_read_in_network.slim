@@ -1,22 +1,23 @@
 1 early() {
-	seeds_structure = readCSV(seed_host_matching_path, colNames=F);
+	seeds_structure = readCSV(seed_host_matching_path, colNames=T);
 
 	// Add N($sample_size) subpopulations (representing N humans in the population) with 0 or 1 elements (Susceptible or Infected)
 	labels = c();
 	seed_count = 0;
+
 	seedsvcfpath = paste0(cwdir, "originalvcfs/");
 
 
 	for (i in 1:host_size)
 	{
-		if (i == seeds_structure.subset(seed_count, 0) + 1)
+		if (i == seeds_structure.subset(seed_count, 1) + 1)
 		{
 			
 			sim.addSubpop(i - 1, 1, haploid=T); // Infected hosts
 			current_subpop = sim.subpopulations[i - 1];
 			labels = c(labels, 2);
-			current_subpop.genomes.readFromVCF(paste0(seedsvcfpath, "seed.", seeds_structure.subset(seed_count, 1), ".vcf"));
-			current_subpop.individuals.tag = seeds_structure.subset(seed_count, 1); // id of seed
+			current_subpop.genomes.readFromVCF(paste0(seedsvcfpath, "seed.", seeds_structure.subset(seed_count, 0), ".vcf"));
+			current_subpop.individuals.tag = seeds_structure.subset(seed_count, 0); // id of seed
 			sim.treeSeqRememberIndividuals(current_subpop.individuals);
 
 			if (seed_count < seed_size - 1)
@@ -34,26 +35,40 @@
 		current_subpop.setValue("Contacts", c());
 	}
 
+
 	// change default mutation type and selection coefficient	
 	allmuts = sim.subpopulations.individuals.genome1.mutations;
-	for (mut in allmuts)
-	{
-		if (any(mut.position == range_genes))
+	if (n_trans_traits > 0) {
+		for (mut in allmuts)
 		{
-			mut.setMutationType(1);
-			which_gene = asInteger((findInterval(mut.position, trait_locs) + 1) / 2);
-
-			for (t_num in 1:n_trans_traits)
+			if (any(mut.position == range_genes))
 			{
-				mut.setValue(paste0("trans_", t_num), effsize_pos.subset(which_gene - 1, t_num + 2)); 
-			}
+				mut.setMutationType(1);
+				which_gene = asInteger((findInterval(mut.position, trait_locs) + 1) / 2);
 
-			for (t_num in 1:n_dr_traits)
-			{
-				mut.setValue(paste0("dr_", t_num), effsize_pos.subset(which_gene - 1, t_num + 2 + n_trans_traits)); 
+				for (t_num in 1:n_trans_traits)
+				{
+					mut.setValue(paste0("trans_", t_num), effsize_pos.subset(which_gene - 1, t_num + 2)); 
+				}
 			}
 		}
 	}
+	if (n_dr_traits > 0) {
+		for (mut in allmuts)
+		{
+			if (any(mut.position == range_genes))
+			{
+				mut.setMutationType(1);
+				which_gene = asInteger((findInterval(mut.position, trait_locs) + 1) / 2);
+
+				for (t_num in 1:n_dr_traits)
+				{
+					mut.setValue(paste0("dr_", t_num), effsize_pos.subset(which_gene - 1, t_num + 2 + n_trans_traits)); 
+				}
+			}
+		}
+	}
+	
 
 	defineGlobal("Host_states", labels);
 }
