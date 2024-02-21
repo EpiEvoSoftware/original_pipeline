@@ -231,7 +231,7 @@ def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_
 ############################## PLOTTING ##################################
 
 def plot_per_transmission_tree(each_wk_dir_, seed_size, slim_config_path, n_traits, seed_phylo_path):
-	rscript_path = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), "plot_tree.R")
+	rscript_path = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), "plot_tree.r")
 	subprocess.run(["Rscript", rscript_path, each_wk_dir_, str(seed_size), slim_config_path, str(n_traits[0]), str(n_traits[1]), seed_phylo_path])
 	return(0)
 
