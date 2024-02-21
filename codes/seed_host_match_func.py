@@ -221,9 +221,7 @@ def read_config_and_match(file_path, num_seed):
 
 def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme="", match_scheme_param = ""):
 	## A function that supports the execution of seed_host_match in command line and saves the matching file in the specified diretcory
-	
-	# Process the match_scheme and parameters if the scheme is 'random' for all seeds
-	
+		
 	# Read network
 	ntwk_path = os.path.join(wkdir, "contact_network.adjlist")
 	

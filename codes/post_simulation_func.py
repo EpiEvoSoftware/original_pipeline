@@ -215,13 +215,13 @@ def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_
     real_label = find_label(sampled_ts, sim_gen, sample_size)
     nwk_output(sampled_ts, real_label, each_wk_dir, seed_host_match_path)
     if color_trait==0:
-    	gen_model== False
+        gen_model== False
     if gen_model==True:
         traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, n_trait)
         if color_trait>0:
-        	trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
+            trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
         else:
-        	trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
+            trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
         mtdata = metadta_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
         write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
     output_tseq_vcf(each_wk_dir, real_label, sampled_ts)
@@ -231,7 +231,7 @@ def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_
 ############################## PLOTTING ##################################
 
 def plot_per_transmission_tree(each_wk_dir_, seed_size, slim_config_path, n_traits, seed_phylo_path):
-	rscript_path = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), "plot_tree.r")
+	rscript_path = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), "plot_tree.R")
 	subprocess.run(["Rscript", rscript_path, each_wk_dir_, str(seed_size), slim_config_path, str(n_traits[0]), str(n_traits[1]), seed_phylo_path])
 	return(0)
 
