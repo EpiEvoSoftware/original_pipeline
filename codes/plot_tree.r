@@ -120,7 +120,7 @@ if (file.exists(seed_tree))
 
 for (seed_id in 1:seed_size)
 {
-  print(paste0("Plotting seed ", seed_id, "'s transmission tree..."))
+  print(paste0("Plotting seed ", seed_id - 1, "'s transmission tree..."))
   trans_tree_file = file.path(wk_dir, "transmission_tree", paste0(seed_id - 1, ".nwk"))
   tree_str <- paste(readLines(trans_tree_file), collapse="\n")
   if (startsWith(tree_str, "("))
