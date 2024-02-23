@@ -17,25 +17,24 @@ def ER_generate(pop_size, p_ER):
     ## pop_size: int
     ## p_ER: float/int
     er_graph = nx.erdos_renyi_graph(pop_size, p_ER)
-    return(er_graph)
+    return er_graph
 
 
 def rp_generate(rp_size, p_within, p_between):
     ## Returns a random partition graph with 2 groups, each group having a probability of within-group edge, and there is a between-group edge probability
-    ## rp_size: int
+    ## rp_size: list[int], length of the list is 2
     ## p_within: list[float], length of the list is 2
-    ## p_between: float
-    rp_graph = nx.random_partition_graph(rp_size, p_within[1], p_between)
-    if p_within[0] != p_within[1]:
+    rp_graph = nx.random_partition_graph(rp_size, max(p_within), p_between)
+    if p_within[0]!=p_within[1]:
         higher_density_group = list(rp_graph.graph['partition'][0])
         for i in higher_density_group:
             for j in range(i):
                 if j in list(rp_graph.adj[i]):
                     continue
                 else:
-                    if np.random.uniform(0, 1, 1)[0] <= (p_within[0] - p_within[1]) / (1 - p_within[1]):
+                    if np.random.uniform(0, 1, 1)[0] <= abs(p_within[0] - p_within[1]) / (1 - p_within[1]):
                         rp_graph.add_edge(i ,j)
-    return(rp_graph)
+    return rp_graph
 
 
 def _random_subset(seq,m):
