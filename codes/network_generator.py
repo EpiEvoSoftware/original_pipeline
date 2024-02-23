@@ -26,7 +26,7 @@ def rp_generate(rp_size, p_within, p_between):
     ## p_within: list[float], length of the list is 2
     ## p_between: float
     rp_graph = nx.random_partition_graph(rp_size, p_within[1], p_between)
-    if p_within[0]==p_within[1]:
+    if p_within[0] != p_within[1]:
         higher_density_group = list(rp_graph.graph['partition'][0])
         for i in higher_density_group:
             for j in range(i):

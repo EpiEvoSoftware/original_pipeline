@@ -13,16 +13,16 @@ def ER_generate(pop_size, p_ER):
 
 
 def rp_generate(rp_size, p_within, p_between):
-    rp_graph = nx.random_partition_graph(rp_size, p_within[1], p_between)
-    # When two partitions have the 'same' connectivities within themselves ?
-    if p_within[0]==p_within[1]:
+    ## Generate a random partition graph with 2 groups, each group having a probability of within-group edge, and there is a between-group edge probability
+    rp_graph = nx.random_partition_graph(rp_size, max(p_within), p_between)
+    if p_within[0]!=p_within[1]:
         higher_density_group = list(rp_graph.graph['partition'][0])
         for i in higher_density_group:
             for j in range(i):
                 if j in list(rp_graph.adj[i]):
                     continue
                 else:
-                    if np.random.uniform(0, 1, 1)[0] <= (p_within[0] - p_within[1]) / (1 - p_within[1]):
+                    if np.random.uniform(0, 1, 1)[0] <= abs(p_within[0] - p_within[1]) / (1 - p_within[1]):
                         rp_graph.add_edge(i ,j)
     return rp_graph
 
@@ -111,9 +111,6 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
                 run_check = False
             elif p_between==0:
                 print("WARNING: You didn't specify a between partition connection probability (-p_between) or have set it to 0. This will lead to two isolating partitions, which isn't usually desired. Please make sure this is what you want.")
-            elif len(p_between)!=len(rp_size) - 1:
-                print("The parameter p between each partition needs to be 1 number (-p_between)")
-                run_check = False
         elif model=="BA":
             if m==0:
                 print("Need to specify a m>0 (-m) in Barabasi-Albert graph.")
