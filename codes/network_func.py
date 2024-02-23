@@ -7,15 +7,14 @@ import random
 def write_network(ntwk_, wk_dir):
     nx.write_adjlist(ntwk_, os.path.join(wk_dir, "contact_network.adjlist"))
 
-
 def ER_generate(pop_size, p_ER):
     er_graph = nx.erdos_renyi_graph(pop_size, p_ER)
-    return(er_graph)
+    return er_graph
 
 
 def rp_generate(rp_size, p_within, p_between):
-    ## Generate a random partition graph with 2 groups, each group having a probability of within-group edge, and there is a between-group edge probability
     rp_graph = nx.random_partition_graph(rp_size, p_within[1], p_between)
+    # When two partitions have the 'same' connectivities within themselves ?
     if p_within[0]==p_within[1]:
         higher_density_group = list(rp_graph.graph['partition'][0])
         for i in higher_density_group:
@@ -25,7 +24,7 @@ def rp_generate(rp_size, p_within, p_between):
                 else:
                     if np.random.uniform(0, 1, 1)[0] <= (p_within[0] - p_within[1]) / (1 - p_within[1]):
                         rp_graph.add_edge(i ,j)
-    return(rp_graph)
+    return rp_graph
 
 
 def _random_subset(seq,m):
@@ -138,6 +137,8 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
                 write_network(ba_generate(pop_size, m), wk_dir)
     else:
         print("Terminated because of incorrect input")
+
+
 
 
 
