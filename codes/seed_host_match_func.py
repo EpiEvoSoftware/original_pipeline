@@ -134,7 +134,7 @@ def match_ranking(nodes_sorted: list[int], taken_hosts, rank):
 	## nodes_sorted: list[int]
 	## taken_hosts: list[int]
 	## rank: int
-	### Output: host: An int
+	### Output: host: int
 	ntwk_size = len(nodes_sorted)
 	if rank > ntwk_size:
 		raise CustomizedError(f"Your provided ranking {rank} exceed host size {ntwk_size}.")
