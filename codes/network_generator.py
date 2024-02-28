@@ -1,17 +1,6 @@
-import networkx as nx
-import os
-import argparse
-import random
+import networkx as nx, os, argparse
 from base_func import *
 from error_handling import CustomizedError
-
-def _random_subset(seq,m):
-    ## Returns a set of m objects that are sampled from the given sequence
-    targets = set()
-    while len(targets) < m:
-        x = random.choice(seq)
-        targets.add(x)
-    return targets
 
 
 def write_network(ntwk_, wk_dir):
@@ -33,7 +22,8 @@ def ER_generate(pop_size, p_ER):
         p_ER (str): The probability of existing edges between two nodes.
         pop_size (int): Population size.
     """
-    if not 0 < p_ER <= 1: raise CustomizedError("You need to specify a p>0 (-p_ER) in Erdos-Renyi graph.")
+    if not 0 < p_ER <= 1: 
+        raise CustomizedError("You need to specify a p>0 (-p_ER) in Erdos-Renyi graph.")
     er_graph = nx.erdos_renyi_graph(pop_size, p_ER)
     return er_graph
 
@@ -49,15 +39,23 @@ def rp_generate(pop_size, rp_size, p_within, p_between):
     """
     block_size = len(rp_size)
     prob_size = len(p_within)
+
+    # Check for validity of inputs
     if sum(rp_size) != pop_size:
-        raise CustomizedError(f"Size of the partitions (-rp_size {rp_size}) has to add up to the whole population size (-popsize {pop_size}). ")
-    if prob_size != block_size: raise CustomizedError(f"The number of partitions ({block_size}) does not match the number of given within partition connection probabilities ({prob_size}).")
+        raise CustomizedError(f"Size of the partitions (-rp_size {rp_size}) has 
+                              to add up to the whole population size (-popsize {pop_size}). ")
+    if prob_size != block_size: 
+        raise CustomizedError(f"The number of partitions ({block_size}) does 
+                              not match the number of given within partition connection probabilities ({prob_size}).")
     if p_between == 0: 
         print("WARNING: You didn't specify a between partition connection probability (-p_between) or have set it to 0. This will lead to two completely isolated partitions.")
-    # p is the contact probability matrix where p_ij represents the prob between block i and block j
+    
+    # Construct contact probability matrix
     p = [[p_between for _ in range(block_size)] for _ in range(block_size)]
     for k in range(block_size):
         p[k][k] = p_within[k]
+
+    # Generate random partition graph
     rp_graph = nx.stochastic_block_model(rp_size, p)
     return rp_graph
 
@@ -73,9 +71,9 @@ def ba_generate(pop_size, m):
     ba_graph = nx.barabasi_albert_graph(pop_size, m)
     return ba_graph
 
-def check_input_network(wk_dir, path_network, pop_size):
+def copy_input_network(wk_dir, path_network, pop_size):
     """
-    Check the format of the input network and store it in the working directory.
+    Checks the format of the input network and copy it in the working directory.
     
     Parameters:
         wk_dir (str): Working directory.
@@ -89,14 +87,15 @@ def check_input_network(wk_dir, path_network, pop_size):
 
     ntwk = nx.read_adjlist(path_network)
     if len(ntwk) != pop_size:
-        raise CustomizedError(f"The provided network doesn't have the same number of nodes ({len(ntwk)}) as the host population size ({pop_size}) specified.")
+        raise CustomizedError(f"The provided network doesn't have the same number of nodes 
+                              ({len(ntwk)}) as the host population size ({pop_size}) specified.")
 
     write_network(ntwk, wk_dir)
 
 
 def run_network_generation(pop_size, wk_dir, method, model="", path_network="", p_ER=0, rp_size=[], p_within=[], p_between=0, m=0):
     """
-    Generate the contact network given parameters.
+    Generates the contact network given parameters.
     
     Parameters:
         wk_dir (str): Working directory.
@@ -112,7 +111,7 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
     """
     try: 
         if method == "user_input":
-            check_input_network(wk_dir, path_network, pop_size)
+            copy_input_network(wk_dir, path_network, pop_size)
     
         elif method=="randomly_generate":
             if not model in ["ER", "BP", "BA"]: 
@@ -125,6 +124,9 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
                 write_network(ba_generate(pop_size, m), wk_dir)
         else:
             CustomizedError("Please provide a permitted method (user_input/randomly_generate).")
+        print("******************************************************************** \n" +
+              "                   CONTACT NETWORK GENERATED                         \n" +
+              "******************************************************************** \n")
     except Exception as e:
         raise CustomizedError(f"Contact network generation - A violation of input parameters occured {e}.")
 
@@ -148,12 +150,14 @@ def network_generation_byconfig(all_config):
     # BA params
     ba_m=ntwk_config["randomly_generate"]["BA"]["ba_m"]
 
-    run_network_generation(pop_size = pop_size, wk_dir = wk_dir, method = ntwk_method, path_network = path_network, model = model, p_ER = p_ER, p_within = p_within, p_between = p_between, rp_size = rp_size, ba_m = ba_m)
+    run_network_generation(pop_size = pop_size, wk_dir = wk_dir, method = ntwk_method, 
+                           path_network = path_network, model = model, p_ER = p_ER, 
+                           p_within = p_within, p_between = p_between, 
+                           rp_size = rp_size, ba_m = ba_m)
 
-
-###################################
 def main():
-    parser = argparse.ArgumentParser(description='Generate a contact network for the population size specified and store it in the working directory as an adjacency list.')
+    parser = argparse.ArgumentParser(description='Generate a contact network for the population \
+                                     size specified and store it in the working directory as an adjacency list.')
     parser.add_argument('-popsize', action='store',dest='popsize', required=True, type=int)
     parser.add_argument('-wkdir', action='store',dest='wkdir', required=True, type=str)
     parser.add_argument('-method', action='store',dest='method', required=True, type=str)
@@ -161,7 +165,8 @@ def main():
     parser.add_argument('-path_network', action='store',dest='path_network', required=False, type=str, default="")
     parser.add_argument('-p_ER', action='store',dest='p_ER', required=False, type=float, default=0)
     parser.add_argument('-rp_size','--rp_size', nargs='+', help='Size of random partition graph groups', required=False, type=int, default=[])
-    parser.add_argument('-p_within','--p_within', nargs='+', help='probability of edges for different groups (descending order), take 2 elements rn', required=False, type=float, default=[])
+    parser.add_argument('-p_within','--p_within', nargs='+', help='probability of edges for different groups \
+                        (descending order), take 2 elements rn', required=False, type=float, default=[])
     parser.add_argument('-p_between', action='store',dest='p_between', required=False, type=float, default=0)
     parser.add_argument('-m', action='store',dest='m', required=False, type=int, default=0)
     
@@ -179,7 +184,6 @@ def main():
     
     run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method=method, model=model, path_network=path_network, p_ER=p_ER, rp_size=rp_size, p_within=p_within, p_between=p_between, m=m)
 
-    
 
 if __name__ == "__main__":
 	main()

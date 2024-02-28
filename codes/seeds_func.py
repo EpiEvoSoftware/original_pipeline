@@ -1,119 +1,208 @@
-import os
-import subprocess
-import shutil
-import inspect
-import tskit
-import random
-import pyslim
+import os, subprocess, shutil, inspect, tskit, random, pyslim
+from error_handling import CustomizedError
+import ete3 as Tree
+
+NUM_VCF_FORMAT_COLUMNS = 9
+POS_COL = 1
+ALT_COL = 4
+REF_COL = 3
+VCF_STR_HA = "\t1000\tPASS\tS=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA="
+VCF_STR_HB = "\tGT\t1\n"
+
+PHYLO_PREFIX = "seeds_phylogeny_uncoalesced"
+NEWICK_SUFFIX = ".nwk"
+NEWICK_NAME = "seeds.nwk"
+VCF_NAME = "seeds.vcf"
+
+VCF_HEAD = """\
+	##fileformat=VCFv4.2\n##source=SLiM
+	##INFO=<ID=MID,Number=.,Type=Integer,Description=\"Mutation ID in SLiM\">
+	##INFO=<ID=S,Number=.,Type=Float,Description=\"Selection Coefficient\">
+	##INFO=<ID=DOM,Number=.,Type=Float,Description=\"Dominance\">
+	##INFO=<ID=PO,Number=.,Type=Integer,Description=\"Population of Origin\">
+	##INFO=<ID=TO,Number=.,Type=Integer,Description=\"Tick of Origin\">
+	##INFO=<ID=MT,Number=.,Type=Integer,Description=\"Mutation Type\">
+	##INFO=<ID=AC,Number=.,Type=Integer,Description=\"Allele Count\">
+	##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total Depth\">
+	##INFO=<ID=AA,Number=1,Type=String,Description=\"Ancestral Allele\">
+	##INFO=<ID=NONNUC,Number=0,Type=Flag,Description=\"Non-nucleotide-based\">
+	##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
+	"""
+
+def _create_seeds_directory(wk_dir):
+	"""
+	Returns new directory storing the seed vcf files
+
+	Parameters:
+		wk_dir (str): Working directory
+	"""
+	seeds_dir = os.path.join(wk_dir, "originalvcfs/")
+	# Remove if the directory already exists
+	if os.path.exists(seeds_dir):
+		shutil.rmtree(seeds_dir, ignore_errors=True)
+	os.mkdir(seeds_dir)
+	return seeds_dir
+
+def _copy_vcf_headers(all_separate_vcfs):
+	"""
+	Writes header information into each VCF.
+
+	Parameters:
+		all_separate_vcfs (list[str]): File paths of VCF files.
+	"""
+	for vcf in all_separate_vcfs:
+		with open(vcf, "a") as a_vcf:
+			a_vcf.write(VCF_HEAD)
+
+def _write_column_names(all_separate_vcfs, header_line, vcf_info_col_plus1):
+	"""
+	Writes the column names into each VCF.
+
+	Parameters: 
+		all_separate_vcfs (list[str]): File paths of VCF files.
+		header_line (str): The column line of the shared seed VCF.
+		vcf_info_col_plus1 (int): The index of info column for the second seed.
+	"""
+	col_names = header_line.rstrip("\n").split("\t")
+	for newvcf in all_separate_vcfs:
+		with open(newvcf, "a") as vcf_file:
+			# Only include the column name for the first seed, 
+			# because in each vcf file we will only have one seed
+			vcf_file.write("\t".join(col_names[:vcf_info_col_plus1]) + "\n")
+
+def _process_data_lines(seed_vcf_path, all_separate_vcfs, method):
+	"""
+	Writes non-header lines into individual VCF files.
+
+	Parameters:
+		seed_vcf_path (str): File path of the input seed VCF file.
+		all_separate_vcfs (list[str]): File path of the seeds' VCF files.
+		method (str): the burn-in method (e.g., slim).
+	"""
+	# Define the reference allele
+	ref_allele = ["0|0", "0/0", "0", "."]
+	with open(seed_vcf_path, "r") as all_vcf:
+		for line in all_vcf:
+			if line.startswith("#"):
+				_write_column_names(all_separate_vcfs, line, NUM_VCF_FORMAT_COLUMNS + 1)
+			elif not line.startswith("##"):
+				# Encounter a row of information
+				fields = line.rstrip("\n").split("\t")
+				if method == "slim":
+					# SLiM use index 1 instead of 0
+					fields[POS_COL] = str(int(fields[POS_COL]) + 1)
+				for i, newvcf in enumerate(all_separate_vcfs):
+					idx = NUM_VCF_FORMAT_COLUMNS + i
+					if fields[idx] not in ref_allele:
+						ref = fields[REF_COL]
+						# Get the base of this seed
+						geno = fields[idx].split("|") if "|" in fields[idx] else fields[idx].split("/")
+						geno = list(set([x for x in geno if x != "0"]))
+						if len(geno) <= 1:
+							# Write to the vcf file
+							alt = fields[ALT_COL].split(",") if len(fields[ALT_COL]) > 1 else [fields[ALT_COL]]
+							with open(newvcf, "a") as vcf_file:
+								vcf_file.write("\t".join(fields[:ALT_COL]) + 
+											alt[int(geno[0])-1] + VCF_STR_HA + ref + VCF_STR_HB)
+						else:
+							raise CustomizedError("The genotype is a heterozygote, \
+												which is not permitted for a haploid pathogen genome.")
+						
+def _generate_sample_indices(ts, seed_size):
+    """
+    Generate sample indices for simplification.
+
+    Parameters:
+        ts (tskit.TreeSequence): The treesequence.
+        seed_size (int): The number of seeds.
+
+    Returns:
+        list: List of sample indices.
+    """
+    if ts.tables.individuals.num_rows < seed_size:
+        raise ValueError("Not enough genomes to choose seeds from. Please rerun the seed generation or adjust parameters.")
+    sampled_inds = random.sample(range(ts.tables.individuals.num_rows), seed_size)
+    return [2 * i for i in sampled_inds]
 
 
-#################### SEEDS GENRATION ################
 def check_seedsvcf_input(vcf_path, seeds_size):
-	## A function to check the format of the user-input seeds' vcf file
-	## First check whether the file exists
-	## Then check whether the file has the same number of columns as seeds_size specified
-	## Lastly check the format of the vcf file (all the entries being 0 or 1)
-	## Return error message for each problem
-	## Return True or False
-	### Input: vcf_path: Full path to the seeds' vcf file (one file)
-	###		   seeds_size: how many seeds is needed
-	### Output: Boolean value (True/False)
-	if os.path.exists(vcf_path):
-		all_vcf = open(vcf_path, "r")
+	"""
+	Checks the format of the user-input seeds' VCF file.
+	
+	Parameters:
+		vcf_path (str): Full path to the seeds' VCF file.
+		seeds_size (int): Number of seeds needed.
+	"""
+	# Check if the file exists
+	if not os.path.exists(vcf_path):
+		raise FileNotFoundError(f"Path to the provided VCF ({vcf_path}) doesn't exist.")
+	
+	# Check if the number of columns align with the number of seeds
+	with open(vcf_path, "r") as all_vcf:
 		for line in all_vcf:
 			if line.startswith("##"):
 				continue
 			else:
-				ll = line.rstrip("\n")
-				l = ll.split("\t")
-				if len(l) == 9 + seeds_size:
-					return(True)
-				else:
-					print("The vcf provided doesn't have the correct number of individuals in it. Terminated.")
-					return(False)
-	else:
-		print("Path to the provided vcf doesn't exist. Terminated.")
-		return(False)
+				line_stp = line.rstrip("\n").split("\t")
+				if len(line_stp) != NUM_VCF_FORMAT_COLUMNS + seeds_size:
+					raise CustomizedError(f"The vcf provided doesn't 
+						   have the correct number of individuals ({seeds_size}) in it.")
+	
+	return True
 
 
-def check_seed_phylo_input(path_seeds_phylogeny, wk_dir):
-	if os.file.exists(path_seeds_phylogeny):
-		shutil.copyfile(path_seeds_phylogeny, os.path.join(wk_dir, "seeds.nwk"))
-		## Should also check whether the newick format is correct, and the tip names are correct
-	else:
-		print("Path to the provided seeds' phylogeny doesn't exist")
+def copy_seed_phylo_input(path_seeds_phylogeny, wk_dir):
+	"""
+	Checks and copies the seeds' phylogenies into working directory.
+
+	Parameters:
+		path_seeds_phylogeny (str): Full path to the seeds' phylogeny VCF.
+		wk_dir (str): Working directory.
+	"""
+	if not os.path.exists(path_seeds_phylogeny):
+		raise CustomizedError(f"Path to the provided seeds' 
+						phylogeny ({path_seeds_phylogeny}) doesn't exist.")
+	## Should also check whether the newick format is correct, and the tip names are correct
+	phylo = Tree(path_seeds_phylogeny, "newick")
+	tips = sorted([leaf.name for leaf in phylo])
+	if tips != list(range(len(tips))):
+		raise CustomizedError("Seed phylogeny tip labels must be consecutive integers \
+						starting from 0.")
+	shutil.copyfile(path_seeds_phylogeny, os.path.join(wk_dir, "seeds.nwk"))
 
 
 def split_seedvcf(seed_vcf_path, wk_dir, seeds_size, method):
-	## A function that creates a directory (originalvcfs) in wk_dir, and splits the seeds' vcf into one vcf per seed
-	## storing them in originalvcfs directory by the order of the seeds' vcf.
-	## Input: seed_vcf_path: Full path to the seeds' vcf
-	##        wk_dir: working directory
-	##        seeds_size: how many seeds is needed
-	##        method: user or slim
-	## Output: No return value
+	"""
+	Splits the one shared seed vcf into individual seed's VCF.
 
-	vcf_header = "##fileformat=VCFv4.2\n##source=SLiM\n##INFO=<ID=MID,Number=.,Type=Integer,Description=\"Mutation ID in SLiM\">\n##INFO=<ID=S,Number=.,Type=Float,Description=\"Selection Coefficient\">\n##INFO=<ID=DOM,Number=.,Type=Float,Description=\"Dominance\">\n##INFO=<ID=PO,Number=.,Type=Integer,Description=\"Population of Origin\">\n##INFO=<ID=TO,Number=.,Type=Integer,Description=\"Tick of Origin\">\n##INFO=<ID=MT,Number=.,Type=Integer,Description=\"Mutation Type\">\n##INFO=<ID=AC,Number=.,Type=Integer,Description=\"Allele Count\">\n##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total Depth\">\n##INFO=<ID=AA,Number=1,Type=String,Description=\"Ancestral Allele\">\n##INFO=<ID=NONNUC,Number=0,Type=Flag,Description=\"Non-nucleotide-based\">\n##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n"
-	seeds_dir = os.path.join(wk_dir, "originalvcfs/")
-	# If the directory exists, delete and regenerate it
-	if os.path.exists(seeds_dir):
-		shutil.rmtree(seeds_dir, ignore_errors=True)
-	ref_allele = ["0|0", "0/0", "0", "."]
-	vcf_info_col = 9
-	pos_col = 1
-	alt_col = 4
-	ref_col = 3
-	vcf_info_col_plus1 = vcf_info_col + 1
-	pos_col_plus1 = pos_col + 1
-	os.mkdir(seeds_dir)
-	all_separate_vcfs = []
-	for i in range(seeds_size):
-		current_vcf = os.path.join(seeds_dir, f"seed.{i}.vcf")
-		all_separate_vcfs.append(current_vcf)
-		separate_vcf = open(os.path.join(current_vcf), "a")
-		separate_vcf.write(vcf_header)
-		separate_vcf.close()
-	all_vcf = open(seed_vcf_path, "r")
-	for line in all_vcf:
-		if line.startswith("##"):
-			continue
-		elif line.startswith("#"):
-			ll = line.rstrip("\n")
-			l = ll.split("\t")
-			for i in range(seeds_size):
-				with open(all_separate_vcfs[i], "a") as newvcf:
-					newvcf.write("\t".join(l[:vcf_info_col_plus1]) + "\n")
-		else:
-			ll = line.rstrip("\n")
-			l = ll.split("\t")
-			if method=="slim":
-				l[pos_col] = str(int(l[pos_col]) + 1)
-			for i in range(seeds_size):
-				if (l[vcf_info_col+i] not in ref_allele):
-					ref = l[ref_col]
-					if "|" in l[vcf_info_col+i]:
-						geno_ = l[vcf_info_col+i].split("|")
-					elif "/" in l[vcf_info_col+i]:
-						geno_ = l[vcf_info_col+i].split("/")
-					else:
-						geno_ = [l[vcf_info_col+i]]
-					geno = list(set([x for x in geno_ if x != "0"]))
-					if len(geno) > 1:
-						print("The genotype is a heterozygot, which is not permitted for a haploid pathogen genome")
-					else:
-						if len(l[alt_col]) > 1:
-							alt = l[alt_col].split(",")
-						else:
-							alt = [l[alt_col]]
-						with open(all_separate_vcfs[i], "a") as newvcf:
-							newvcf.write("\t".join(l[:pos_col]) + "\t" + l[pos_col] + "\t" + "\t".join(l[pos_col_plus1:alt_col]) + "\t" + alt[int(geno[0])-1] + "\t1000\tPASS\tS=0;DOM=1;TO=1;MT=0;AC=1;DP=1000;AA=" + ref + "\tGT\t1\n")
+	Parameters:
+		seed_vcf_path (str): Full path to the shared seed VCF
+		wk_dir (str): Working directory to write the new VCFs into
+		seeds_size (int): Number of seeds
+		method (str): the burn-in method (e.g., slim)
+	"""
+	seeds_dir = _create_seeds_directory(wk_dir)
+	all_separate_vcfs = [os.path.join(seeds_dir, f"seed.{i}.vcf") for i in range(seeds_size)]
+	_copy_vcf_headers(all_separate_vcfs)
+	_process_data_lines(seed_vcf_path, all_separate_vcfs, method)
 
 
 def seed_userinput(seed_vcf_path, seed_size, wk_dir, path_seeds_phylogeny):
+	"""
+	Check and/or copy user input seeds' information
+
+	Parameters:
+		seed_vcf_path (str): Full path to the shared seed VCF
+		seed_size (int): Number of seeds
+		wk_dir: Working directory
+		path_seeds_phylogeny (str): Full path to the seeds' phylogeny if opt to use
+	"""
+	# Check shared seed vcf
 	if check_seedsvcf_input(seed_vcf_path, seed_size):
 		split_seedvcf(seed_vcf_path, wk_dir, seed_size, "user")
-	if path_seeds_phylogeny!="":
-		check_seed_phylo_input(path_seeds_phylogeny, wk_dir)
+	# Copy shared seed phylogeny newick file into working directory
+	if path_seeds_phylogeny != "":
+		copy_seed_phylo_input(path_seeds_phylogeny, wk_dir)
 
 
 def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen):
@@ -158,8 +247,8 @@ def seeds_treeseq(wk_dir, seed_size):
 	## Called when seed is generated by SLiM burn in.
 	## Input: wk_dir: working directory
 	## Output: No return value
-	rscript_path = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), "seed_phylogeny_id_convert.r")
 
+	# Load the tree sequence
 	ts = tskit.load(os.path.join(wk_dir, "seeds.trees"))
 
 	if ts.tables.individuals.num_rows < seed_size:
