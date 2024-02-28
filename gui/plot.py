@@ -15,7 +15,7 @@ import networkx as nx
 import numpy as np
 from tools import *
 import json
-import random
+import csv
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -151,21 +151,19 @@ class NetworkGraphApp:
         self.table_frame.pack(side=tk.BOTTOM, fill=tk.X,
                               padx=10, pady=10, expand=False)
 
-        columns = ("seed_id", "transmissibility", "drugresist_1",
-                   "drugresist_2", "match_method", "method_parameter", "host_id")
+        columns = ("seed_id", "transmissibility", "drugresist_1", "drugresist_2", "match_method", "method_parameter", "method_parameter_2", "host_id")
         self.table = ttk.Treeview(
             self.table_frame, columns=columns, show='headings')
+        
         for col in columns:
-            self.table.heading(col, text=col)
-            self.table.column(col, width=150, anchor=tk.CENTER)
+            self.table.heading(col, text=col.replace('_', ' ').title())
+            if col in ["seed_id", "transmissibility", "drugresist_1", "drugresist_2"]:
+                self.table.column(col, width=100, anchor=tk.CENTER)  
+            else:
+                self.table.column(col, width=150, anchor=tk.CENTER)  
         self.table.pack(side=tk.LEFT, fill=tk.X)
 
-        transmissibility = [0.25, 0.05, 0.15, 0.2, 0.25]
-        drugresist_1 = [0.0, 0.0, 0.0, 0.7, 0.0]
-        drugresist_2 = [0.0, 0.0, 0.0, 0.0, 0.0]
-        for i in range(5):  # Adjusted range to match number of example rows
-            self.table.insert("", "end", values=(
-                i+1, transmissibility[i], drugresist_1[i], drugresist_2[i], "", ""))
+        self.populate_table_from_csv('test/seeds_trait_values.csv') 
 
         self.table.bind("<Double-1>", self.on_double_click)
         
@@ -173,6 +171,13 @@ class NetworkGraphApp:
         self.degree_button = ttk.Button(
             self.table_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')
         self.degree_button.pack()
+    
+    def populate_table_from_csv(self, csv_path):
+        with open(csv_path, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                self.table.insert("", "end", values=(
+                    row['seed_id'], row['transmissibility'], row['drugresist_1'], row['drugresist_2'], "", ""))
 
     def plot_degree_distribution(self):
         graph_type = self.graph_type.get()
@@ -337,10 +342,26 @@ class NetworkGraphApp:
         item = self.table.identify('item', event.x, event.y)
         column = self.table.identify_column(event.x)
         match_method = self.table.item(item, 'values')[4]
-        if column == "#6" and match_method != "" and match_method != "Random":  # column number for "method_parameter"
+        if column in ("#6", "#7") and match_method == "Percentile":  # Columns for "method_parameter" and "method_parameter_2"
+            self.edit_percentage_parameter(item, column)
+        elif column == "#6" and match_method != "" and match_method != "Random":  # column number for "method_parameter"
             self.edit_method_parameter(item, column)
         elif column == "#5":  # Column for "match_method"
             self.choose_match_method(item, column)
+    
+    def edit_percentage_parameter(self, item, column):
+        entry = tk.Entry(self.table)
+        entry.insert(0, self.table.item(item, 'values')[int(column[1]) - 1])  # Pre-fill with current value
+
+        x, y, width, height = self.table.bbox(item, column)
+        entry.place(x=x, y=y, width=width, height=height)
+
+        def save_percentage(event):
+            self.table.set(item, column=column, value=entry.get())
+            entry.destroy()
+
+        entry.bind("<Return>", save_percentage)
+        entry.focus()
 
     def choose_match_method(self, item, column):
         combobox = ttk.Combobox(
@@ -358,6 +379,7 @@ class NetworkGraphApp:
         new_method = combobox.get()
         self.table.set(item, column="match_method", value=new_method)
         self.table.set(item, column="method_parameter", value="")
+        self.table.set(item, column="method_parameter_2", value="")
         combobox.destroy()
 
     def update_cell(self, item, col_name, combobox):
@@ -451,14 +473,16 @@ class NetworkGraphApp:
             match_method = row[4]
 
             method_parameter = row[5]
+            
+            
 
             match_methods[seed_id] = match_method
 
             if match_method == "Ranking":
                 match_params[seed_id] = int(method_parameter)
             elif match_method == "Percentile":
-                percentages = list(
-                    map(int, method_parameter.strip("%").split("-")))
+                method_parameter_2 = row[6]
+                percentages = [int(method_parameter), int(method_parameter_2)]
                 match_params[seed_id] = percentages
             else:  # For "Random", no specific parameter is needed
                 match_params[seed_id] = None
