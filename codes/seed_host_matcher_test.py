@@ -1,27 +1,27 @@
 import unittest
-from seed_host_match_func import read_network, match_random, match_ranking, match_percentile, match_all_hosts, _build_dict_edges_node, _sort_node_by_edge, _save_dict_to_csv
+from seed_host_matcher import read_network, match_random, match_ranking, match_percentile, match_all_hosts, _build_dict_edges_node, _sort_node_by_edge, _save_dict_to_csv
 import os
 import networkx as nx
 import pandas as pd
 # The path for the working pipeline
 PIPELINE_PATH = os.path.dirname(__file__)
 # The relative path for the testing folder
-TEST_DIR = "test/seed_host_match_func"
+TEST_DIR = "../test"
 
 
 class HostSeedMatch(unittest.TestCase):
 
 	def test_read_user_matchingfile(self):
-		## TO DO: Test the helper functions _check_user_matchingfile_info_json
+		## TODO: Test the helper functions _check_user_matchingfile_info_json
 		## 		and _check_user_matchingfile_info_csv
 		pass
 
 	def test_read_user_matchingfile_info_json(file):
-		## TO DO: check json file
+		## TODO: check json file
 		pass
 
 	def test_read_user_matchingfile_info_csv(file):
-		## TO DO: check csv file
+		## TODO: check csv file
 		pass
 
 	def test_read_network(self):
