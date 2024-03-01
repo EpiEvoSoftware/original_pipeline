@@ -57,7 +57,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         prog='cluster', description='Application to view GUI')
     parser.add_argument('--config_path', type=str,
-                        help='path to the configuration JSON file', default="base_params.json")
+                        help='path to the configuration JSON file', default="codes/base_params.json")
     parser.add_argument('-v', '--view', action='store_true',
                         help='visualize network graph')
     return parser.parse_args()

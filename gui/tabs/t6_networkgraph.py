@@ -1,7 +1,7 @@
 import sys
 import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.join(os.path.dirname(current_dir), '../')
+parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
@@ -165,7 +165,7 @@ class NetworkGraphApp:
                 self.table.column(col, width=150, anchor=tk.CENTER)  
         self.table.pack(side=tk.LEFT, fill=tk.X)
 
-        self.populate_table_from_csv('test/seeds_trait_values.csv') 
+        self.populate_table_from_csv('test/test_drugresist/seeds_trait_values.csv') 
 
         self.table.bind("<Double-1>", self.on_double_click)
         
