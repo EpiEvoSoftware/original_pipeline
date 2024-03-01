@@ -6,7 +6,6 @@ s8 early()
 	e_inds = which(Host_states==1);
 
 	draw_uniform = runif(length(e_inds));
-	print(E_I_rate[current_epoch]);
 	state_transition = findInterval(draw_uniform, c(0, E_I_rate[current_epoch], E_I_rate[current_epoch] + E_R_rate[current_epoch]));
 	Host_states[e_inds[which(state_transition==0)]] = 2; // state_transition=0 means going from latent to active state (1>2)
 	recover_from_e = e_inds[which(state_transition==1)];

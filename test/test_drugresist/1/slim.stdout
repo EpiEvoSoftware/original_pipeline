@@ -1,0 +1,46 @@
+// Initial random seed:
+2096441993511
+
+// RunInitializeCallbacks():
+initializeSLiMModelType(modelType = 'nonWF');
+initializeSLiMOptions(nucleotideBased = T);
+initializeTreeSeq();
+"S_IE_rate"
+0.04 0.04 0.04
+"I_R_rate"
+0.03 0.06 0.05
+"R_S_rate"
+0.05 0.1 0.1
+"latency_prob"
+1.0 1.0 1.0
+"E_I_rate"
+0.3 0.3 0.3
+"I_E_rate"
+0.0 0.0 0.0
+"E_R_rate"
+0.0 0.0 0.0
+"sample_rate"
+0.0001 0.0001 0.0001
+"recovery_prob_after_sampling"
+0.0 0.0 0.0
+"cap_transmissibility"
+10.0 10.0 10.0
+"cap_drugresist"
+0.0 10.0 10.0
+initializeAncestralNucleotides("ATTAAAGGTTTATACCTTCC...");
+initializeRecombinationRate(0);
+initializeMutationTypeNuc(0, 1, "f", 0);
+initializeGenomicElementType(0, m0, 1);
+initializeMutationTypeNuc(1, 1, "f", 0);
+initializeGenomicElementType(1, m1, 1);
+initializeGenomicElement(g0, 0, 449);
+initializeGenomicElement(g1, 450, 499);
+initializeGenomicElement(g0, 500, 649);
+initializeGenomicElement(g1, 650, 999);
+initializeGenomicElement(g0, 1000, 4299);
+initializeGenomicElement(g1, 4300, 4499);
+initializeGenomicElement(g0, 4500, 29890);
+
+// Starting run at tick <start>:
+1 
+

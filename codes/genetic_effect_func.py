@@ -20,20 +20,24 @@ def seeds_trait_calc(wk_dir, dict_c_g):
 	c = 0
 	calc_sum = []
 	seeds_vcf_dict = os.path.join(wk_dir, "originalvcfs/")
-	seeds = os.listdir(seeds_vcf_dict)
-	for seed in seeds:
-		calc_sum.append(0)
-		with open(os.path.join(seeds_vcf_dict, seed), "r") as seed_vcf:
-			for line in seed_vcf:
-				if line.startswith("#"):
-					continue
-				else:
-					ll = line.rstrip("\n")
-					l = ll.split("\t")
-					for gene in dict_c_g:
-						if int(l[1]) >= dict_c_g[gene][0] and int(l[1]) <= dict_c_g[gene][1]:
-							calc_sum[c] = calc_sum[c] + dict_c_g[gene][2]
-			c = c + 1
+	if os.path.exists(seeds_vcf_dict):
+		seeds = os.listdir(seeds_vcf_dict)
+		for seed in seeds:
+			calc_sum.append(0)
+			with open(os.path.join(seeds_vcf_dict, seed), "r") as seed_vcf:
+				for line in seed_vcf:
+					if line.startswith("#"):
+						continue
+					else:
+						ll = line.rstrip("\n")
+						l = ll.split("\t")
+						for gene in dict_c_g:
+							if int(l[1]) >= dict_c_g[gene][0] and int(l[1]) <= dict_c_g[gene][1]:
+								calc_sum[c] = calc_sum[c] + dict_c_g[gene][2]
+				c = c + 1
+	else:
+		print("WARNING: seed_generator.py hasn't been run. If you want use seed sequence different than reference genome, please run seed_generator first.")
+	
 	return(calc_sum)
 
 

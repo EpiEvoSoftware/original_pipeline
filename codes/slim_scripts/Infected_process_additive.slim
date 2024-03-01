@@ -37,11 +37,6 @@ s7 early(){
 					writeFile(paste0(cwdir, runid, "/recovery.csv"), line1, append=T, compress=T);
 					actually_recovered = c(actually_recovered, pathogen);
 				}
-				else
-				{
-					print(pathogen.tag);
-					print(treatment_failed_rate);
-				}
 			}
 		}
 		if (length(actually_recovered) > 0)

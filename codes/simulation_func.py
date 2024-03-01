@@ -120,7 +120,8 @@ def create_slimconfig(all_config):
 			raise Exception("Please specify \"true\" or \"false\" for using reference genome for seeds (\"use_reference\").")
 		else:
 			out_config.write("use_genetic_model:" + writebinary(slim_pars["use_reference"]) + "\n")
-		if slim_pars["use_reference"]:
+
+		if slim_pars["use_reference"]==False:
 			if os.path.exists(os.path.join(slim_pars["cwdir"], "originalvcfs"))==False:
 				raise Exception("Reference genome isn't used for seed sequences, but SeedGenerator hasn't been run. Please run SeedGenerator before running this program or specify use_reference=true.")
 		if os.path.exists(os.path.join(slim_pars["cwdir"], "seed_host_match.csv"))==False:
@@ -315,26 +316,6 @@ def create_slimconfig(all_config):
 
 
 
-def check_prerequisites(wk_dir, use_genetic_model=True, use_network_model=True):
-	### A function that takes in the parameters and check whether the required prerequisites files are already in the working directory
-	pres_met = True
-	if os.path.exists(os.path.join(wk_dir, "originalvcfs"))==False:
-		print("No seed file is provided in the working directory, please run seed_generator module before running the simulation.")
-		pres_met = False
-	if use_network_model:
-		if os.path.exists(os.path.join(wk_dir, "contact_network.adjlist"))==False:
-			print("No network file is provided in the working directory under network model, please run network_generator module before running the simulation or use a no-network model.")
-			pres_met = False
-		if os.path.exists(os.path.join(wk_dir, "seed_host_match.csv"))==False:
-			print("No seed-host matching file file is provided in the working directory under network model, please run seed_host_matcher module before running the simulation.")
-			pres_met = False
-	if use_genetic_model:
-		if os.path.exists(os.path.join(wk_dir, "causal_gene_info.csv"))==False:
-			print("No causal gene effect size file is provided in the working directory under network model, please run genetic_effect_generator module before running the simulation or use a no-genetic-effect model.")
-			pres_met = False
-	return(pres_met)
-
-
 
 def create_slimscript(slim_pars):
 	### A function that create a SLiM script in the working directory according to the config
@@ -484,9 +465,6 @@ def run_all_slim_simulation(slim_config_path="", slim_pars={}, dataprocess_pars=
 
 	run_check = True
 
-	if check_prerequisites(slim_pars["cwdir"], use_genetic_model=slim_pars["use_genetic_model"], use_network_model=slim_pars["use_network_model"])==False:
-		print("Prerequisites for your specified slim configuration isn't met, please see the error message and run the pre-simulation steps as suggested.")
-		run_check = False
 
 
 	if run_check:
