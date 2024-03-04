@@ -57,21 +57,27 @@
         }
     },
     "NetworkModelParameters": {
-        "use_network_model": true,
+        "use_network_model": false,
         "method": "",
         "host_size": 4,
         "user_input": {
             "path_network": "/System/Developer"
         },
         "randomly_generate": {
-            "network_model": "ER",
+            "network_model": "BA",
             "ER": {
-                "p_ER": 0
+                "p_ER": 200001.0
             },
             "RP": {
-                "rp_size": [],
-                "p_within": [],
-                "p_between": 0
+                "rp_size": [
+                    5,
+                    6
+                ],
+                "p_within": [
+                    7,
+                    8
+                ],
+                "p_between": 9
             },
             "BA": {
                 "ba_m": 0
