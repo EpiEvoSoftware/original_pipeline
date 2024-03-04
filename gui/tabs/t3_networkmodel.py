@@ -3,7 +3,13 @@ from tkinter import ttk, messagebox, filedialog
 import json
 import os
 
+
 class NetworkModel:
+    def __init__(self, parent, tab_parent, config_path):
+        sidebar = NetworkModelConfigurations(parent, tab_parent, config_path)
+
+
+class NetworkModelConfigurations:
     def __init__(self, parent, tab_parent, config_path):
 
         self.network_model_to_string = {
