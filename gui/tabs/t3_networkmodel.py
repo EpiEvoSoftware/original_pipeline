@@ -6,7 +6,7 @@ import os
 
 class NetworkModel:
     def __init__(self, parent, tab_parent, config_path):
-        sidebar = NetworkModelConfigurations(parent, tab_parent, config_path)
+        self.sidebar = NetworkModelConfigurations(parent, tab_parent, config_path)
 
 
 class NetworkModelConfigurations:
