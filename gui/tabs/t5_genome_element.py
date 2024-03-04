@@ -5,6 +5,7 @@ import os
 
 class GenomeElement:
     def __init__(self, parent, tab_parent, config_path):
+        
 
         self.network_model_to_string = {
             "Erdős–Rényi": "ER",
