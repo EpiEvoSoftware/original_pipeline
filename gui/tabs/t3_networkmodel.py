@@ -3,13 +3,25 @@ from tkinter import ttk, messagebox, filedialog
 import json
 import os
 
-class GenomeEffSize:
+class NetworkModel:
     def __init__(self, parent, tab_parent, config_path):
 
         self.network_dict = {
             "Erdős–Rényi": "ER",
             "Barabási-Albert": "BA",
             "Random Partition": "RP"
+        }
+
+        self.string_to_bool_mapping = {
+            "yes": True,
+            "no": False,
+            "Yes": True,
+            "No": False
+        }
+
+        self.bool_to_string_mapping = {
+            True: "Yes",
+            False: "No"
         }
 
         self.config_path = config_path
@@ -31,74 +43,53 @@ class GenomeEffSize:
         self.control_frame = ttk.Frame(self.parent, width=300)
         self.control_frame.pack(fill='both', expand=True) 
 
-        # break
-        # self.surname_label = ttk.Label(self.control_frame, text="Model")
-        # self.surname_label.pack()
-        # self.model_combobox = ttk.Combobox(self.control_frame, values=["Yes", "No"], foreground="White")
-        # self.model_combobox.pack()
 
-        self.string_to_bool_mapping = {
-            "yes": True,
-            "no": False,
-            "Yes": True,
-            "No": False
-        }
-
-        self.bool_to_string_mapping = {
-            True: "Yes",
-            False: "No"
-        }
+        # Modified part for scrolling
+            # Testings
+        self.canvas = tk.Canvas(self.control_frame)
+        self.scrollbar = ttk.Scrollbar(self.control_frame, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
         
+        self.scrollable_frame = ttk.Frame(self.canvas)
+        self.canvas_frame = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        
+        def configure_scroll_region(event):
+            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        
+        def configure_canvas_width(event):
+            self.canvas.itemconfig(self.canvas_frame, width=event.width)
+        
+        self.scrollable_frame.bind("<Configure>", configure_scroll_region)
+        self.canvas.bind("<Configure>", configure_canvas_width)
+        
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.scrollbar.pack(side=tk.RIGHT, fill="y")
+            # Testing End
+        # 
 
-        # self.use_network_model_response = tk.StringVar(value = self.bool_to_string_mapping[self.use_network_model])
-        # ttk.Label(self.control_frame, text="use_network_model",
-        #           style='Large.TLabel').pack()
-        # self.use_network_model_response_dropdown = ttk.Combobox(
-        #     self.control_frame,
-        #     textvariable=self.use_network_model_response,
-        #     values=["Yes", "No"],
-        #     style='Large.TButton'
-        # )
-        # self.use_network_model_response_dropdown.pack()
-        # self.use_network_model_response_dropdown.bind(
-        #     "<<ComboboxSelected>>", self.on_use_network_model_response_combobox_change)
-
-        # self.use_network_model_response_dropdown_parameter_entries = {}
-        # self.use_network_model_response_dropdown_parameter_labels = []
-
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
         # break v break breakvbreakbreakbreakbreak
     
-        self.use_network_model_label = ttk.Label(self.control_frame, text="use_network_model:")
+        self.use_network_model_label = ttk.Label(self.scrollable_frame, text="use_network_model:")
         self.use_network_model_label.pack()
         self.use_network_model_var = tk.StringVar(value=self.bool_to_string_mapping[self.use_network_model])
-        self.use_network_model_combobox = ttk.Combobox(self.control_frame, textvariable=self.use_network_model_var, values=["Yes", "No"], state="readonly")
+        self.use_network_model_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.use_network_model_var, values=["Yes", "No"], state="readonly")
         self.use_network_model_combobox.pack()
-        update_use_network_model_button = tk.Button(self.control_frame, text="Update use_network_model", command=self.update_use_network_model)
+        update_use_network_model_button = tk.Button(self.scrollable_frame, text="Update use_network_model", command=self.update_use_network_model)
         update_use_network_model_button.pack()
 
         if self.use_network_model == True:
-            self.method_label = ttk.Label(self.control_frame, text="method:")
+            return
+            self.method_label = ttk.Label(self.scrollable_frame, text="method:")
             self.method_label.pack()
             self.method_var = tk.StringVar()
-            self.method_combobox = ttk.Combobox(self.control_frame, textvariable=self.method_var, values=["randomly generate", "user_input"], state="readonly")
+            self.method_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.method_var, values=["randomly generate", "user_input"], state="readonly")
             self.method_combobox.pack()
-            self.update_method_button = tk.Button(self.control_frame, text="Update method", command=self.update_method)
+            self.update_method_button = tk.Button(self.scrollable_frame, text="Update method", command=self.update_method)
             self.update_method_button.pack()
 
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
-
         if self.use_network_model == "Yes":
-            self.asdf = ttk.Label(self.control_frame, text="use_network_model:")
+            return
+            self.asdf = ttk.Label(self.scrollable_frame, text="use_network_model:")
 
 
         # break v break breakvbreakbreakbreakbreak
@@ -204,9 +195,9 @@ class GenomeEffSize:
         choice = self.use_network_model_response_dropdown.get()
         if choice == "Yes":
             self.method_string = tk.StringVar(value = "")
-            self.method_combobox_label = ttk.Label(self.control_frame, text=f"method:", style='Large.TLabel').pack()
+            self.method_combobox_label = ttk.Label(self.scrollable_frame, text=f"method:", style='Large.TLabel').pack()
             self.method_combobox = ttk.Combobox(
-                self.control_frame,
+                self.scrollable_frame,
                 textvariable=self.method_string,
                 values=["user_input", "randomly generate"],
                 style='Large.TButton'
@@ -221,7 +212,7 @@ class GenomeEffSize:
         chosen_path = filedialog.askdirectory(title="Select a Directory")
         if chosen_path:  
             self.network_path = chosen_path
-            self.network_path_label = ttk.Label(self.control_frame, text="Current Network Path: " + self.network_path)
+            self.network_path_label = ttk.Label(self.scrollable_frame, text="Current Network Path: " + self.network_path)
             self.network_path_label.pack()
             self.network_path_label.config(text=f"Path Network: {self.network_path}") 
             config = self.load_config_as_dict()
@@ -236,19 +227,19 @@ class GenomeEffSize:
 
         choice = self.use_network_model_response_dropdown.get()
         if choice == "user_input":
-            network_path_label = ttk.Label(self.control_frame, text="Choose Network Path")
+            network_path_label = ttk.Label(self.scrollable_frame, text="Choose Network Path")
             network_path_label.pack()
-            choose_network_path_button = tk.Button(self.control_frame, text="Choose Path", command=self.choose_network_path)
+            choose_network_path_button = tk.Button(self.scrollable_frame, text="Choose Path", command=self.choose_network_path)
             choose_network_path_button.pack()
-            self.network_path_label = ttk.Label(self.control_frame, text="Current Network Path: " + self.network_path)
+            self.network_path_label = ttk.Label(self.scrollable_frame, text="Current Network Path: " + self.network_path)
             self.network_path_label.pack()
             # render run network generate
             
         elif choice == "randomly generate":
             self.network_model_string = tk.StringVar()
-            ttk.Label(self.control_frame, text="Select Network Model Type:", style='Large.TLabel').pack()
+            ttk.Label(self.scrollable_frame, text="Select Network Model Type:", style='Large.TLabel').pack()
             network_model_combobox = ttk.Combobox(
-                self.control_frame,
+                self.scrollable_frame,
                 textvariable=self.network_model_string,
                 values=["Erdős–Rényi", "Barabási-Albert",
                         "Random Partition"],
@@ -262,7 +253,7 @@ class GenomeEffSize:
             self.network_model_combobox_parameter_labels = []
 
             self.degree_button = ttk.Button(
-            self.control_frame, text="Run Network Generation", command=self.run_network_generation, style='Large.TButton')
+            self.scrollable_frame, text="Run Network Generation", command=self.run_network_generation, style='Large.TButton')
             self.degree_button.pack()
 
 
@@ -295,11 +286,11 @@ class GenomeEffSize:
 
         # create new parameters
         for param, dtype in params:
-            label = ttk.Label(self.control_frame,
+            label = ttk.Label(self.scrollable_frame,
                               text=f"{param} ({dtype}):", style='Large.TLabel')
             label.pack()
             self.network_model_combobox_parameter_labels.append(label)
-            entry = tk.Entry(self.control_frame)
+            entry = tk.Entry(self.scrollable_frame)
             entry.pack()
             self.network_model_combobox_parameter_entries[param] = entry
 
@@ -318,12 +309,12 @@ class GenomeEffSize:
             if new_use_network_model == "Yes":
                 if not hasattr(self, 'method_label'):  # create the label if it doesn't exist
                     # break
-                    self.method_label = ttk.Label(self.control_frame, text="method:")
+                    self.method_label = ttk.Label(self.scrollable_frame, text="method:")
                     self.method_label.pack()
                     self.method_var = tk.StringVar()
-                    self.method_combobox = ttk.Combobox(self.control_frame, textvariable=self.method_var, values=["randomly generate", "user_input"], state="readonly")
+                    self.method_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.method_var, values=["randomly generate", "user_input"], state="readonly")
                     self.method_combobox.pack()
-                    self.update_method_button = tk.Button(self.control_frame, text="Update method", command=self.update_method)
+                    self.update_method_button = tk.Button(self.scrollable_frame, text="Update method", command=self.update_method)
                     self.update_method_button.pack()
                     # break
                 else:
@@ -351,18 +342,18 @@ class GenomeEffSize:
             if new_method == "user_input":
                 if not hasattr(self, 'path_network_label'):  # create the label if it doesn't exist
                     # break
-                    # self.path_network_label = ttk.Label(self.control_frame, text="path_network:")
+                    # self.path_network_label = ttk.Label(self.scrollable_frame, text="path_network:")
                     # self.path_network_label.pack()
                     # self.path_network_var = tk.StringVar(value = self.path_network)
-                    # self.path_network_combobox = ttk.Combobox(self.control_frame, textvariable=self.path_network_var, values=["randomly generate", "user_input"], state="readonly")
+                    # self.path_network_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.path_network_var, values=["randomly generate", "user_input"], state="readonly")
                     # self.path_network_combobox.pack()
-                    # self.update_path_network_button = tk.Button(self.control_frame, text="Update path_network", command=self.update_path_network)
+                    # self.update_path_network_button = tk.Button(self.scrollable_frame, text="Update path_network", command=self.update_path_network)
                     # self.update_path_network_button.pack()
-                    path_network_label = ttk.Label(self.control_frame, text="Choose path_network")
+                    path_network_label = ttk.Label(self.scrollable_frame, text="Choose path_network")
                     path_network_label.pack()
-                    self.choose_path_network_button = tk.Button(self.control_frame, text="path_network:", command=self.choose_network_path)
+                    self.choose_path_network_button = tk.Button(self.scrollable_frame, text="path_network:", command=self.choose_network_path)
                     self.choose_path_network_button.pack()
-                    self.path_network_label = ttk.Label(self.control_frame, text="Current path_network: " + self.path_network)
+                    self.path_network_label = ttk.Label(self.scrollable_frame, text="Current path_network: " + self.path_network)
                     self.path_network_label.pack()
                     # break
                 else:

@@ -4,7 +4,7 @@ This module is where we put the helpers that are used by multiple other modules.
 import traceback
 import os, sys
 import tkinter as tk
-
+import json
 
 class CreateToolTip(object):
     """
@@ -144,3 +144,17 @@ def edit_params(dir):
     with open('params.config', 'w') as file:
         for key, value in params.items():
             file.write(f"{key}:{value}\n")
+
+
+def go_to_next_tab(tab_parent):
+    current_tab_index = tab_parent.index(tab_parent.select())
+    next_tab_index = (current_tab_index + 1) % tab_parent.index("end")
+    tab_parent.select(next_tab_index)
+
+def load_config_as_dict(config_path):
+    with open(config_path, 'r') as file:
+        return json.load(file)
+
+def save_config(config_path, config):
+    with open(config_path, 'w') as file:
+        json.dump(config, file, indent=4)

@@ -11,7 +11,7 @@ import json
 
 from tabs.t1_configuration import Configuration
 from tabs.t2_seeds import Seeds
-from tabs.t3_genome_effsize import GenomeEffSize
+from tabs.t3_networkmodel import NetworkModel
 from tabs.t4_seeds_configuration import SeedsConfiguration
 from tabs.t5_genome_element import GenomeElement
 from tabs.t6_networkgraph import NetworkGraphApp
@@ -79,13 +79,13 @@ def launch_gui(config_path):
     tab6 = ttk.Frame(tab_parent)
     network_app = Configuration(tab1, tab_parent, config_path)
     network_app = Seeds(tab2, tab_parent, config_path)
-    network_app = GenomeEffSize(tab3, tab_parent, config_path)
+    network_app = NetworkModel(tab3, tab_parent, config_path)
     network_app = SeedsConfiguration(tab4, tab_parent, config_path)
     network_app = GenomeElement(tab5, tab_parent, config_path)
     network_app = NetworkGraphApp(tab6, tab_parent, config_path)
     tab_parent.add(tab1, text="Configuration")
     tab_parent.add(tab2, text="Seeds")
-    tab_parent.add(tab3, text="Genome Effect Size")
+    tab_parent.add(tab3, text="Network Model Parameters")
     tab_parent.add(tab4, text="Seeds Configuration")
     tab_parent.add(tab5, text="Genome Element")
     tab_parent.add(tab6, text="Network Graph")
