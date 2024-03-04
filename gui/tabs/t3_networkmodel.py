@@ -6,11 +6,19 @@ import os
 class NetworkModel:
     def __init__(self, parent, tab_parent, config_path):
 
-        self.network_dict = {
+        self.network_model_to_string = {
             "Erdős–Rényi": "ER",
             "Barabási-Albert": "BA",
             "Random Partition": "RP"
         }
+
+        self.string_to_network_mode = {
+            "ER": "Erdős–Rényi",
+            "BA": "Barabási-Albert",
+            "RP": "Random Partition"
+        }
+        
+        self.graph_values = ["Erdős–Rényi", "Barabási-Albert", "Random Partition"]
 
         self.string_to_bool_mapping = {
             "yes": True,
@@ -67,15 +75,26 @@ class NetworkModel:
             # Testing End
         # 
 
-        # break v break breakvbreakbreakbreakbreak
+
+        # host_size_label = self.load_config_as_dict()['NetworkModelParameters']['host_size']
+        self.host_size_label = ttk.Label(self.scrollable_frame, text="host_size:")
+        self.host_size_label.pack()
+        self.host_size_entry = ttk.Entry(self.scrollable_frame, foreground="black")
+        self.host_size_entry.insert(0, self.host_size)  
+        self.host_size_entry.pack()
+        update_host_size_button = tk.Button(self.scrollable_frame, text="Update host_size", command=self.update_host_size)
+        update_host_size_button.pack()
+        # 
+
     
+        # self.use_network_model = self.load_config_as_dict()['NetworkModelParameters']['use_network_model']
         self.use_network_model_label = ttk.Label(self.scrollable_frame, text="use_network_model:")
         self.use_network_model_label.pack()
         self.use_network_model_var = tk.StringVar(value=self.bool_to_string_mapping[self.use_network_model])
         self.use_network_model_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.use_network_model_var, values=["Yes", "No"], state="readonly")
         self.use_network_model_combobox.pack()
-        update_use_network_model_button = tk.Button(self.scrollable_frame, text="Update use_network_model", command=self.update_use_network_model)
-        update_use_network_model_button.pack()
+        self.update_use_network_model_button = tk.Button(self.scrollable_frame, text="Update use_network_model", command=self.update_use_network_model)
+        self.update_use_network_model_button.pack()
 
         if self.use_network_model == True:
             return
@@ -90,12 +109,7 @@ class NetworkModel:
         if self.use_network_model == "Yes":
             return
             self.asdf = ttk.Label(self.scrollable_frame, text="use_network_model:")
-
-
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
-        # break v break breakvbreakbreakbreakbreak
+        # 
 
 
 
@@ -106,7 +120,7 @@ class NetworkModel:
         try:
             new_host_size = int(self.host_size_entry.get())  
             config = self.load_config_as_dict() 
-            config['EvolutionModel']['host_size'] = new_host_size 
+            config['NetworkModelParameters']['host_size'] = new_host_size 
             self.save_config(config)  
             messagebox.showinfo("Update Successful", "host_size changed.")  
         except ValueError:
@@ -141,8 +155,6 @@ class NetworkModel:
             messagebox.showinfo("Update Successful", "within_host_reproduction_rate changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for within_host_reproduction_rate.") 
-
-
 
 
     # def update_within_host_reproduction(self):
@@ -181,32 +193,32 @@ class NetworkModel:
 
 # break
 
-    def on_use_network_model_response_combobox_change(self, event=None):
-        """
-        Clear previously displayed widgets
-        Check the combobox value and render appropriate UI elements
-        """
-        # for widget in self.dynamic_widgets:
-        #     widget.destroy()
-        # self.dynamic_widgets.clear()
-        # self.method_combobox.pack_forget()
-        # self.method_combobox_label.pack_forget()
+    # def on_use_network_model_response_combobox_change(self, event=None):
+    #     """
+    #     Clear previously displayed widgets
+    #     Check the combobox value and render appropriate UI elements
+    #     """
+    #     # for widget in self.dynamic_widgets:
+    #     #     widget.destroy()
+    #     # self.dynamic_widgets.clear()
+    #     # self.method_combobox.pack_forget()
+    #     # self.method_combobox_label.pack_forget()
 
-        choice = self.use_network_model_response_dropdown.get()
-        if choice == "Yes":
-            self.method_string = tk.StringVar(value = "")
-            self.method_combobox_label = ttk.Label(self.scrollable_frame, text=f"method:", style='Large.TLabel').pack()
-            self.method_combobox = ttk.Combobox(
-                self.scrollable_frame,
-                textvariable=self.method_string,
-                values=["user_input", "randomly generate"],
-                style='Large.TButton'
-            )
-            self.method_combobox.pack()
-            self.method_combobox.bind("<<ComboboxSelected>>", self.on_method_combobox_change)
-        elif choice == "No":
-            self.method_combobox.pack_forget() #TODO: fix nontype object has no attribute pack forget
-            self.method_combobox_label.pack_forget()
+    #     choice = self.use_network_model_response_dropdown.get()
+    #     if choice == "Yes":
+    #         self.method_string = tk.StringVar(value = "")
+    #         self.method_combobox_label = ttk.Label(self.scrollable_frame, text=f"method:", style='Large.TLabel').pack()
+    #         self.method_combobox = ttk.Combobox(
+    #             self.scrollable_frame,
+    #             textvariable=self.method_string,
+    #             values=["user_input", "randomly generate"],
+    #             style='Large.TButton'
+    #         )
+    #         self.method_combobox.pack()
+    #         self.method_combobox.bind("<<ComboboxSelected>>", self.on_method_combobox_change)
+    #     elif choice == "No":
+    #         self.method_combobox.pack_forget() #TODO: fix nontype object has no attribute pack forget
+    #         self.method_combobox_label.pack_forget()
 
     def choose_network_path(self):  
         chosen_path = filedialog.askdirectory(title="Select a Directory")
@@ -220,82 +232,82 @@ class NetworkModel:
             self.save_config(config)
     
     
-    def on_method_combobox_change(self, event=None):
-        for widget in self.dynamic_widgets:
-            widget.destroy()
-        self.dynamic_widgets.clear()
+    # def on_method_combobox_change(self, event=None):
+    #     for widget in self.dynamic_widgets:
+    #         widget.destroy()
+    #     self.dynamic_widgets.clear()
 
-        choice = self.use_network_model_response_dropdown.get()
-        if choice == "user_input":
-            network_path_label = ttk.Label(self.scrollable_frame, text="Choose Network Path")
-            network_path_label.pack()
-            choose_network_path_button = tk.Button(self.scrollable_frame, text="Choose Path", command=self.choose_network_path)
-            choose_network_path_button.pack()
-            self.network_path_label = ttk.Label(self.scrollable_frame, text="Current Network Path: " + self.network_path)
-            self.network_path_label.pack()
-            # render run network generate
+    #     choice = self.use_network_model_response_dropdown.get()
+    #     if choice == "user_input":
+    #         network_path_label = ttk.Label(self.scrollable_frame, text="Choose Network Path")
+    #         network_path_label.pack()
+    #         choose_network_path_button = tk.Button(self.scrollable_frame, text="Choose Path", command=self.choose_network_path)
+    #         choose_network_path_button.pack()
+    #         self.network_path_label = ttk.Label(self.scrollable_frame, text="Current Network Path: " + self.network_path)
+    #         self.network_path_label.pack()
+    #         # render run network generate
             
-        elif choice == "randomly generate":
-            self.network_model_string = tk.StringVar()
-            ttk.Label(self.scrollable_frame, text="Select Network Model Type:", style='Large.TLabel').pack()
-            network_model_combobox = ttk.Combobox(
-                self.scrollable_frame,
-                textvariable=self.network_model_string,
-                values=["Erdős–Rényi", "Barabási-Albert",
-                        "Random Partition"],
-                style='Large.TButton'
-            )
+    #     elif choice == "randomly generate":
+    #         self.network_model_string = tk.StringVar()
+    #         ttk.Label(self.scrollable_frame, text="Select Network Model Type:", style='Large.TLabel').pack()
+    #         network_model_combobox = ttk.Combobox(
+    #             self.scrollable_frame,
+    #             textvariable=self.network_model_string,
+    #             values=["Erdős–Rényi", "Barabási-Albert",
+    #                     "Random Partition"],
+    #             style='Large.TButton'
+    #         )
 
-            network_model_combobox.pack()
-            network_model_combobox.bind("<<ComboboxSelected>>", self.update_parameters)
+    #         network_model_combobox.pack()
+    #         network_model_combobox.bind("<<ComboboxSelected>>", self.update_parameters)
 
-            self.network_model_combobox_parameter_entries = {}
-            self.network_model_combobox_parameter_labels = []
+    #         self.network_model_combobox_parameter_entries = {}
+    #         self.network_model_combobox_parameter_labels = []
 
-            self.degree_button = ttk.Button(
-            self.scrollable_frame, text="Run Network Generation", command=self.run_network_generation, style='Large.TButton')
-            self.degree_button.pack()
-
-
-    def run_network_generation(self):
-        return
+    #         self.degree_button = ttk.Button(
+    #         self.scrollable_frame, text="Run Network Generation", command=self.run_network_generation, style='Large.TButton')
+    #         self.degree_button.pack()
 
 
-    def update_parameters(self, event=None):
-        # clear existing parameters
-        for label in self.network_model_combobox_parameter_labels:
-            label.destroy()
-        for entry in self.network_model_combobox_parameter_entries.values():
-            entry.destroy()
+    # def run_network_generation(self):
+    #     return
 
-        self.network_model_combobox_parameter_labels.clear()
-        self.network_model_combobox_parameter_entries.clear()
 
-        network_model = self.network_model_string.get()
-        selected_graph_type = self.network_dict[network_model]
-        params = []
+    # def update_parameters(self, event=None):
+    #     # clear existing parameters
+    #     for label in self.network_model_combobox_parameter_labels:
+    #         label.destroy()
+    #     for entry in self.network_model_combobox_parameter_entries.values():
+    #         entry.destroy()
 
-        if selected_graph_type == "ER":
-            params = [("p_er", "float")]
-        elif selected_graph_type == "RP":
-            params = [("rp_size", "int, int"), ("p_within", "float, float"), ("p_between", "float")]
-        elif selected_graph_type == "BA":
-            params = [("m", "int")]
-        else:
-            messagebox.showwarning('Error', 'Unsupported Network Type')
+    #     self.network_model_combobox_parameter_labels.clear()
+    #     self.network_model_combobox_parameter_entries.clear()
 
-        # create new parameters
-        for param, dtype in params:
-            label = ttk.Label(self.scrollable_frame,
-                              text=f"{param} ({dtype}):", style='Large.TLabel')
-            label.pack()
-            self.network_model_combobox_parameter_labels.append(label)
-            entry = tk.Entry(self.scrollable_frame)
-            entry.pack()
-            self.network_model_combobox_parameter_entries[param] = entry
+    #     network_model = self.network_model_string.get()
+    #     selected_network_model = self.network_dict[network_model]
+    #     params = []
 
-        self.degree_button.pack_forget()
-        self.degree_button.pack()
+    #     if selected_network_model == "ER":
+    #         params = [("p_er", "float")]
+    #     elif selected_network_model == "RP":
+    #         params = [("rp_size", "int, int"), ("p_within", "float, float"), ("p_between", "float")]
+    #     elif selected_network_model == "BA":
+    #         params = [("m", "int")]
+    #     else:
+    #         messagebox.showwarning('Error', 'Unsupported Network Type')
+
+    #     # create new parameters
+    #     for param, dtype in params:
+    #         label = ttk.Label(self.scrollable_frame,
+    #                           text=f"{param} ({dtype}):", style='Large.TLabel')
+    #         label.pack()
+    #         self.network_model_combobox_parameter_labels.append(label)
+    #         entry = tk.Entry(self.scrollable_frame)
+    #         entry.pack()
+    #         self.network_model_combobox_parameter_entries[param] = entry
+
+    #     self.degree_button.pack_forget()
+    #     self.degree_button.pack()
 
 
     def update_use_network_model(self):
@@ -312,7 +324,7 @@ class NetworkModel:
                     self.method_label = ttk.Label(self.scrollable_frame, text="method:")
                     self.method_label.pack()
                     self.method_var = tk.StringVar()
-                    self.method_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.method_var, values=["randomly generate", "user_input"], state="readonly")
+                    self.method_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.method_var, values=["user_input", "randomly generate"], state="readonly")
                     self.method_combobox.pack()
                     self.update_method_button = tk.Button(self.scrollable_frame, text="Update method", command=self.update_method)
                     self.update_method_button.pack()
@@ -326,6 +338,7 @@ class NetworkModel:
             else:
                 if hasattr(self, 'method_label'):
                     self.method_label.pack_forget()
+                    self.method_var.pack_forget()
                     self.method_combobox.pack_forget()
                     self.update_method_button.pack_forget()
             # break
@@ -340,49 +353,128 @@ class NetworkModel:
             messagebox.showinfo("Update Successful", "method changed to " + new_method)
             # add conditional logic for path network and network_model
             if new_method == "user_input":
-                if not hasattr(self, 'path_network_label'):  # create the label if it doesn't exist
-                    # break
-                    # self.path_network_label = ttk.Label(self.scrollable_frame, text="path_network:")
-                    # self.path_network_label.pack()
-                    # self.path_network_var = tk.StringVar(value = self.path_network)
-                    # self.path_network_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.path_network_var, values=["randomly generate", "user_input"], state="readonly")
-                    # self.path_network_combobox.pack()
-                    # self.update_path_network_button = tk.Button(self.scrollable_frame, text="Update path_network", command=self.update_path_network)
-                    # self.update_path_network_button.pack()
-                    path_network_label = ttk.Label(self.scrollable_frame, text="Choose path_network")
-                    path_network_label.pack()
+                self.hide_elements_update_methods()
+                if not hasattr(self, 'path_network_label'):  
+                    # create the label if it doesn't exist
+                    self.path_network_label = ttk.Label(self.scrollable_frame, text="Choose path_network")
+                    self.path_network_label.pack()
                     self.choose_path_network_button = tk.Button(self.scrollable_frame, text="path_network:", command=self.choose_network_path)
                     self.choose_path_network_button.pack()
-                    self.path_network_label = ttk.Label(self.scrollable_frame, text="Current path_network: " + self.path_network)
-                    self.path_network_label.pack()
-                    # break
+                    self.chosen_path_network_label = ttk.Label(self.scrollable_frame, text="Current path_network: " + self.path_network)
+                    self.chosen_path_network_label.pack()
+
                 else:
                     # break, show the label if it was previously created
                     self.path_network_label.pack()
                     self.choose_path_network_button.pack()
-                    self.path_network_label.pack()
-                    # break
+                    self.chosen_path_network_label.pack()
+
             elif new_method == "randomly generate":
-                if hasattr(self, 'path_network_label'):
-                    self.path_network_label.pack_forget()
-                    self.choose_path_network_button.pack_forget()
-                    self.path_network_label.pack_forget()
+                self.hide_elements_update_methods()
+                # itshere
+                if not hasattr(self, 'network_model_label'): 
+                # self.network_model = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']["network_model"]
+                    self.network_model_label = ttk.Label(self.scrollable_frame, text="network_model:")
+                    self.network_model_label.pack()
+                    self.network_model_var = tk.StringVar(value = self.string_to_network_mode[self.network_model])
+                    self.network_model_combobox = ttk.Combobox(
+                        self.scrollable_frame,
+                        textvariable=self.network_model_var,
+                        values=self.graph_values,
+                        state="readonly"
+                    )
+                    self.network_model_combobox.pack()
+                    self.update_method_button = tk.Button(self.scrollable_frame, text="Update network_model", command=self.update_use_network_model)
+                    self.update_method_button.pack()
+                else:
+                    self.network_model_label.pack()
+                    self.network_model_combobox.pack()
+                    self.update_method_button.pack()
+
         else:
             messagebox.showerror("Update Error", "Please enter 'user_input' or 'randomly generate' for method.")
 
+    def update_network_model(self):
+        new_network_model = self.network_model_var.get().strip().lower()  # Normalize input
+        if new_network_model in ["user_input", "randomly generate"]: #TODO: change to dropdown
+            messagebox.showinfo("Update Successful", "network_model changed to " + new_network_model)
+            # add conditional logic for path network and network_model
+            if new_network_model == "user_input":
+                if not hasattr(self, 'path_network_label'):  
+                    # create the label if it doesn't exist
+                    self.hide_elements_update_network_models()
+                    self.path_network_label = ttk.Label(self.scrollable_frame, text="Choose path_network")
+                    self.path_network_label.pack()
+                    self.choose_path_network_button = tk.Button(self.scrollable_frame, text="path_network:", command=self.choose_network_path)
+                    self.choose_path_network_button.pack()
+                    self.chosen_path_network_label = ttk.Label(self.scrollable_frame, text="Current path_network: " + self.path_network)
+                    self.chosen_path_network_label.pack()
+
+                else:
+                    # break, show the label if it was previously created
+                    self.hide_elements_update_network_models()
+                    self.path_network_label.pack()
+                    self.choose_path_network_button.pack()
+                    self.path_network_label.pack()
+                    self.chosen_path_network_label.pack()
+
+            elif new_network_model == "randomly generate":
+                self.hide_elements_update_network_models()
+              
+                self.network_model_label = ttk.Label(self.scrollable_frame, text="network_model:")
+                self.network_model_label.pack()
+                self.network_model_var = tk.StringVar()
+                self.network_model_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.network_model_var, values=["user_input", "randomly generate"], state="readonly")
+                self.network_model_combobox.pack()
+                self.update_network_model_button = tk.Button(self.scrollable_frame, text="Update network_model", command=self.update_network_model)
+                self.update_network_model_button.pack()
+
+
+                # self.network_model = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']["network_model"]
+                self.network_model_label = ttk.Label(self.scrollable_frame, text="network_model:").pack()
+                self.network_model_var = tk.StringVar(self.network_model)
+                self.network_model_combobox = ttk.Combobox(
+                    self.scrollable_frame,
+                    textvariable=self.network_model_var,
+                    values=self.graph_values,
+                    style='Large.TButton'
+                ).pack()
+                self.update_network_model_button = tk.Button(self.scrollable_frame, text="Update network_model", command=self.update_network_model)
+                self.update_network_model_button.pack()
+
+
+
+        else:
+            messagebox.showerror("Update Error", "Please enter 'user_input' or 'randomly generate' for method.")
+
+
     
-    def update_path_network(self):
-        new_path_network = self.path_network_var.get().strip().lower()  # Normalize input
-        if isinstance(new_path_network, str):
-        # if os.path.exists(new_path_network):
-            # Assuming you want to save the path as is, without converting to lowercase
-            config = self.load_config_as_dict()
-            config['NetworkModelParameter']['user_input']['path_network'] = new_path_network
-            self.save_config(config)
+    # def update_path_network(self):
+    #     new_path_network = self.path_network_var.get().strip().lower()  # Normalize input
+    #     if isinstance(new_path_network, str):
+    #     # if os.path.exists(new_path_network):
+    #         # Assuming you want to save the path as is, without converting to lowercase
+    #         config = self.load_config_as_dict()
+    #         config['NetworkModelParameter']['user_input']['path_network'] = new_path_network
+    #         self.save_config(config)
             
 
-            next_button = tk.Button(self.parent, text="Run Network Generate")
-            next_button.pack()
-            messagebox.showinfo("Update Successful", "path_network changed to \"" + new_path_network + "\"")
-        else:
-            messagebox.showerror("Update Error", "The provided path does not exist. Please enter a valid path for path_network.")
+    #         next_button = tk.Button(self.parent, text="Run Network Generate")
+    #         next_button.pack()
+    #         messagebox.showinfo("Update Successful", "path_network changed to \"" + new_path_network + "\"")
+    #     else:
+    #         messagebox.showerror("Update Error", "The provided path does not exist. Please enter a valid path for path_network.")
+
+
+    def hide_elements_update_methods(self):
+        if hasattr(self, 'path_network_label'):
+        # if new_method == "user_input":
+            self.path_network_label.pack_forget()
+            self.choose_path_network_button.pack_forget()
+            self.path_network_label.pack_forget()
+            self.chosen_path_network_label.pack_forget()
+        if hasattr(self, 'network_model_combobox'):
+        # if new_method == "randomly generate":
+            self.network_model_combobox.pack_forget()
+            self.update_method_button.pack_forget()
+            self.network_model_label.pack_forget()
