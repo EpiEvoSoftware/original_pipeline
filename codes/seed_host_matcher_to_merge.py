@@ -250,24 +250,6 @@ def match_all_hosts(ntwk_, match_method, param, num_seed):
 			taken_hosts_id.append(matched_host)
 	return match_dict
 
-def read_config_and_match(file_path, num_seed):
-	"""
-	Write matching file given the configuration file.
-
-	Parameters:
-		file_path (str): Full path to the configuration file.
-		num_seed (int): Number of seeds.
-	"""
-	config_all = read_params(file_path)
-	config = config_all["SeedHostMatching"]["randomly_generated"]
-	match_method = config["match_scheme"]
-	match_method_param = config["match_scheme_param"]
-	path_matching = config_all["SeedHostMatching"]["user_input"]["path_matching"]
-	method = "user_input" if path_matching != "" else "randomly_generated"
-	run_seed_host_match(method=method, wkdir=config_all["BasicRunConfiguration"]["cwdir"], 
-					 num_seed=num_seed, path_matching=path_matching, 
-	match_scheme=match_method, match_scheme_param=match_method_param)
-
 def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme="", match_scheme_param = ""):
 	"""
 	Executes seed host matching process in command line and write the matching file 
@@ -320,8 +302,30 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 		else:
 			raise CustomizedError(f"Please provide a permitted method (-method): \
 						 user_input/randomly_generate instead of your current input {method}.")
-	except (CustomizedError, FileNotFoundError, ValueError) as e:
+		print("\n")
+		print("******************************************************************** \n" +
+              "                         SEEDS HOSTS MACTHED                         \n" +
+              "******************************************************************** \n")
+	except Exception as e:
 		print(f"Seed and host match - A violation of input parameters occured: {e}")
+
+def read_config_and_match(file_path, num_seed):
+	"""
+	Write matching file given the configuration file.
+
+	Parameters:
+		file_path (str): Full path to the configuration file.
+		num_seed (int): Number of seeds.
+	"""
+	config_all = read_params(file_path)
+	config = config_all["SeedHostMatching"]["randomly_generated"]
+	match_method = config["match_scheme"]
+	match_method_param = config["match_scheme_param"]
+	path_matching = config_all["SeedHostMatching"]["user_input"]["path_matching"]
+	method = "user_input" if path_matching != "" else "randomly_generated"
+	run_seed_host_match(method=method, wkdir=config_all["BasicRunConfiguration"]["cwdir"], 
+					 num_seed=num_seed, path_matching=path_matching, 
+	match_scheme=match_method, match_scheme_param=match_method_param)
 
 def main():
 	parser = argparse.ArgumentParser(description='Match seeds and hosts.')

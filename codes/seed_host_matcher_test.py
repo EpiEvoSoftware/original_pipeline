@@ -1,5 +1,5 @@
 import unittest
-from seed_host_matcher import read_network, match_random, match_ranking, match_percentile, match_all_hosts, _build_dict_edges_node, _sort_node_by_edge, _save_dict_to_csv
+from original_pipeline.codes.seed_host_matcher_to_merge import read_network, match_random, match_ranking, match_percentile, match_all_hosts, _build_dict_edges_node, _sort_node_by_edge, _save_dict_to_csv
 import os
 import networkx as nx
 import pandas as pd
@@ -75,7 +75,8 @@ class HostSeedMatch(unittest.TestCase):
 
 	def test_match_all_hosts(self):
 		G = nx.Graph()
-		G.add_edges_from([(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (6, 7), (6, 8), (6, 9), (6, 10), (11, 12), (11, 13), (11, 14), (15, 16), (15, 17), (18, 19)])
+		G.add_edges_from([(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (6, 7), (6, 8), (6, 9), 
+					(6, 10), (11, 12), (11, 13), (11, 14), (15, 16), (15, 17), (18, 19)])
 		match_method_0 = {0: 'ranking', 1: 'ranking', 2: 'ranking', 3: 'ranking'}
 		param_0 = {0: 1, 1: 2, 2:3, 3:4, 4: None}
 		# param_0 = {0: 1, 1: 2, 2:3, 3:4}
