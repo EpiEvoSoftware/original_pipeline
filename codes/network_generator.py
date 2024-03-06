@@ -43,11 +43,11 @@ def rp_generate(pop_size, rp_size, p_within, p_between):
 
     # Check for validity of inputs
     if sum(rp_size) != pop_size:
-        raise CustomizedError(f"Size of the partitions (-rp_size {rp_size}) has 
+        raise CustomizedError(f"Size of the partitions (-rp_size {rp_size}) has \
                               to add up to the whole population size (-popsize {pop_size}). ")
     if prob_size != block_size: 
-        raise CustomizedError(f"The number of partitions ({block_size}) does
-                              not match the number of given within partition connection
+        raise CustomizedError(f"The number of partitions ({block_size}) does \
+                              not match the number of given within partition connection \
                               probabilities ({prob_size}).")
     if p_between == 0: 
         print("WARNING: You didn't specify a between partition connection probability (-p_between) \
@@ -90,7 +90,7 @@ def copy_input_network(wk_dir, path_network, pop_size):
 
     ntwk = nx.read_adjlist(path_network)
     if len(ntwk) != pop_size:
-        raise CustomizedError(f"The provided network doesn't have the same number of nodes 
+        raise CustomizedError(f"The provided network doesn't have the same number of nodes \
                               ({len(ntwk)}) as the host population size ({pop_size}) specified.")
 
     write_network(ntwk, wk_dir)
