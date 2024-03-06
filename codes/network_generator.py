@@ -29,7 +29,8 @@ def ER_generate(pop_size, p_ER):
 
 def rp_generate(pop_size, rp_size, p_within, p_between):
     """
-    Returns a random partition graph with n groups, each group having a probability of within-group edge, and there is a global between-group edge probability.
+    Returns a random partition graph with n groups, each group having a probability of \
+        within-group edge, and there is a global between-group edge probability.
     
     Parameters:
         rp_size (list[int]): The sizes of partitions.
@@ -45,10 +46,12 @@ def rp_generate(pop_size, rp_size, p_within, p_between):
         raise CustomizedError(f"Size of the partitions (-rp_size {rp_size}) has 
                               to add up to the whole population size (-popsize {pop_size}). ")
     if prob_size != block_size: 
-        raise CustomizedError(f"The number of partitions ({block_size}) does 
-                              not match the number of given within partition connection probabilities ({prob_size}).")
+        raise CustomizedError(f"The number of partitions ({block_size}) does
+                              not match the number of given within partition connection
+                              probabilities ({prob_size}).")
     if p_between == 0: 
-        print("WARNING: You didn't specify a between partition connection probability (-p_between) or have set it to 0. This will lead to two completely isolated partitions.")
+        print("WARNING: You didn't specify a between partition connection probability (-p_between) \
+              or have set it to 0. This will lead to two completely isolated partitions.")
     
     # Construct contact probability matrix
     p = [[p_between for _ in range(block_size)] for _ in range(block_size)]
@@ -115,7 +118,8 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
     
         elif method=="randomly_generate":
             if not model in ["ER", "BP", "BA"]: 
-                raise CustomizedError("You need to specify a random graph model (-model) in random generate mode. (Supported model: ER/RP/BA)")
+                raise CustomizedError("You need to specify a random graph model (-model) in random \
+                                      generate mode. (Supported model: ER/RP/BA)")
             if model == "ER": 
                 write_network(ER_generate(pop_size, p_ER), wk_dir)
             elif model == "RP": 
@@ -164,7 +168,8 @@ def main():
     parser.add_argument('-model', action='store',dest='model', required=False, type=str, default="")
     parser.add_argument('-path_network', action='store',dest='path_network', required=False, type=str, default="")
     parser.add_argument('-p_ER', action='store',dest='p_ER', required=False, type=float, default=0)
-    parser.add_argument('-rp_size','--rp_size', nargs='+', help='Size of random partition graph groups', required=False, type=int, default=[])
+    parser.add_argument('-rp_size','--rp_size', nargs='+', help='Size of random partition graph groups', 
+                        required=False, type=int, default=[])
     parser.add_argument('-p_within','--p_within', nargs='+', help='probability of edges for different groups \
                         (descending order), take 2 elements rn', required=False, type=float, default=[])
     parser.add_argument('-p_between', action='store',dest='p_between', required=False, type=float, default=0)
@@ -182,7 +187,8 @@ def main():
     p_between = args.p_between
     m = args.m
     
-    run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method=method, model=model, path_network=path_network, p_ER=p_ER, rp_size=rp_size, p_within=p_within, p_between=p_between, m=m)
+    run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method=method, model=model, path_network=path_network, 
+                           p_ER=p_ER, rp_size=rp_size, p_within=p_within, p_between=p_between, m=m)
 
 
 if __name__ == "__main__":
