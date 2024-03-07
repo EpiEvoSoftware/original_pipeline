@@ -3,9 +3,14 @@ from tkinter import ttk, messagebox, filedialog
 import json
 import os
 
-class GenomeElement:
+
+class NetworkModel:
     def __init__(self, parent, tab_parent, config_path):
-        
+        self.sidebar = NetworkModelConfigurations(parent, tab_parent, config_path)
+
+
+class NetworkModelConfigurations:
+    def __init__(self, parent, tab_parent, config_path):
 
         self.network_model_to_string = {
             "Erdős–Rényi": "ER",
@@ -35,29 +40,8 @@ class GenomeElement:
 
         self.config_path = config_path
 
-    # User Configurations
-        # bool
-        self.use_genetic_model = self.load_config_as_dict()['GenomeElement']['use_genetic_model']
-        # list
-        self.traits_num = self.load_config_as_dict()['GenomeElement']['traits_num']
-
-        # str
-        self.path_effsize_table = self.load_config_as_dict()['GenomeElement']['user_input']["path_effsize_table"]
-
-        # str
-        self.gff = self.load_config_as_dict()['GenomeElement']['randomly_generate']["gff"]
-        # list
-        self.genes_num = self.load_config_as_dict()['GenomeElement']['randomly_generate']['ER']['genes_num']
-        # list
-        self.effsize_min = self.load_config_as_dict()['GenomeElement']['randomly_generate']['RP']['effsize_min']
-        # list
-        self.effsize_max = self.load_config_as_dict()['GenomeElement']['randomly_generate']['RP']['effsize_max']
-        # bool
-        self.normalize = self.load_config_as_dict()['GenomeElement']['randomly_generate']['RP']['normalize']
-    # 
-
-    # User Configurations for network model
-        self.use_genetic_model = self.load_config_as_dict()['NetworkModelParameters']['use_genetic_model']
+        # User Configurations
+        self.use_network_model = self.load_config_as_dict()['NetworkModelParameters']['use_network_model']
         self.host_size = self.load_config_as_dict()['NetworkModelParameters']['host_size']
 
         self.path_network = self.load_config_as_dict()['NetworkModelParameters']['user_input']["path_network"]
@@ -66,12 +50,12 @@ class GenomeElement:
 
         self.p_ER = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['ER']['p_ER']
 
-        self.genes_num = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['genes_num']
+        self.rp_size = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['rp_size']
         self.p_within = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['p_within']
         self.p_between = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['p_between']
 
         self.ba_m = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['BA']['ba_m']
-    # 
+        # 
 
         self.parent = parent
         self.tab_parent = tab_parent
@@ -116,14 +100,14 @@ class GenomeElement:
         # 
 
     
-        # self.use_genetic_model = self.load_config_as_dict()['NetworkModelParameters']['use_genetic_model']
-        self.use_genetic_model_label = ttk.Label(self.scrollable_frame, text="use_genetic_model:")
-        self.use_genetic_model_label.pack()
-        self.use_genetic_model_var = tk.StringVar(value=self.bool_to_string_mapping[self.use_genetic_model])
-        self.use_genetic_model_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.use_genetic_model_var, values=["Yes", "No"], state="readonly")
-        self.use_genetic_model_combobox.pack()
-        self.update_use_genetic_model_button = tk.Button(self.scrollable_frame, text="Update use_genetic_model", command=self.update_use_genetic_model)
-        self.update_use_genetic_model_button.pack()
+        # self.use_network_model = self.load_config_as_dict()['NetworkModelParameters']['use_network_model']
+        self.use_network_model_label = ttk.Label(self.scrollable_frame, text="use_network_model:")
+        self.use_network_model_label.pack()
+        self.use_network_model_var = tk.StringVar(value=self.bool_to_string_mapping[self.use_network_model])
+        self.use_network_model_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.use_network_model_var, values=["Yes", "No"], state="readonly")
+        self.use_network_model_combobox.pack()
+        self.update_use_network_model_button = tk.Button(self.scrollable_frame, text="Update use_network_model", command=self.update_use_network_model)
+        self.update_use_network_model_button.pack()
 
         next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
         next_button.pack()
@@ -192,16 +176,16 @@ class GenomeElement:
             config['NetworkModelParameters']['user_input']["path_network"] = self.network_path
             self.save_config(config)
 
-    def update_use_genetic_model(self):
+    def update_use_network_model(self):
         self.hide_elements_update_methods()
-        new_use_genetic_model = self.use_genetic_model_var.get()
-        if new_use_genetic_model in ["Yes", "No"]: 
+        new_use_network_model = self.use_network_model_var.get()
+        if new_use_network_model in ["Yes", "No"]: 
             config = self.load_config_as_dict()
-            config['NetworkModelParameters']['use_genetic_model'] = self.string_to_bool_mapping[new_use_genetic_model]
+            config['NetworkModelParameters']['use_network_model'] = self.string_to_bool_mapping[new_use_network_model]
             self.save_config(config)
 
             # break
-            if new_use_genetic_model == "Yes":
+            if new_use_network_model == "Yes":
                 if not hasattr(self, 'method_label'):  # create the label if it doesn't exist
                     # break
                     self.method_label = ttk.Label(self.scrollable_frame, text="method:")
@@ -218,7 +202,7 @@ class GenomeElement:
                     self.method_combobox.pack()
                     self.update_method_button.pack()
                     # break
-            elif new_use_genetic_model == "No":
+            elif new_use_network_model == "No":
                 self.hide_elements_update_methods()
                 if hasattr(self, 'method_label'): 
                     self.method_label.pack_forget()
@@ -226,9 +210,9 @@ class GenomeElement:
                     self.update_method_button.pack_forget()
 
             # break
-            messagebox.showinfo("Update Successful", "use_genetic_model changed.")
+            messagebox.showinfo("Update Successful", "use_network_model changed.")
         else:
-            messagebox.showerror("Update Error", "Please enter 'Yes' or 'No' for use_genetic_model.")
+            messagebox.showerror("Update Error", "Please enter 'Yes' or 'No' for use_network_model.")
 
 
     def update_method(self):
@@ -317,7 +301,7 @@ class GenomeElement:
                     self.update_ER_button.pack()
 
             elif new_network_model == "RP":
-                # self.genes_num = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['genes_num']
+                # self.rp_size = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['rp_size']
                     # int int
                 # self.p_within = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['p_within']
                     # float float
@@ -327,21 +311,21 @@ class GenomeElement:
                 if not hasattr(self, "RP"):
                     def update_all_RP():
                         """
-                        Updates the self.genes_num value in the params file
+                        Updates the self.rp_size value in the params file
                         """
                         try:
-                            genes_num_value = int(self.genes_num_entry.get())
-                            genes_num_value_2 = int(self.genes_num_entry_2.get())
+                            rp_size_value = int(self.rp_size_entry.get())
+                            rp_size_value_2 = int(self.rp_size_entry_2.get())
                             p_within_value = int(self.p_within_entry.get())
                             p_within_value_2 = int(self.p_within_entry_2.get())
                             p_between_value = int(self.p_between_entry.get())
 
                             config = self.load_config_as_dict()
-                            config['NetworkModelParameters']['randomly_generate']['RP']['genes_num'] = [genes_num_value, genes_num_value_2]
+                            config['NetworkModelParameters']['randomly_generate']['RP']['rp_size'] = [rp_size_value, rp_size_value_2]
                             config['NetworkModelParameters']['randomly_generate']['RP']['p_within'] = [p_within_value, p_within_value_2]
                             config['NetworkModelParameters']['randomly_generate']['RP']['p_between'] = p_between_value
                             self.save_config(config)   
-                            message = "RP Parameters changed.\n\n" + "genes_num: " + str([genes_num_value, genes_num_value_2]) + "\n"
+                            message = "RP Parameters changed.\n\n" + "rp_size: " + str([rp_size_value, rp_size_value_2]) + "\n"
                             message2 = "p_within: " + str([p_within_value, p_within_value_2]) + "\n"
                             message3 = "p_between_value: " + str(p_between_value)
                             messagebox.showinfo("Update Successful", message + message2 + message3)
@@ -349,14 +333,14 @@ class GenomeElement:
                             messagebox.showerror("Update Error", "Invalid Input.") 
                       
                     
-                    self.genes_num_label = ttk.Label(self.scrollable_frame, text="genes_num:")
-                    self.genes_num_label.pack()
-                    self.genes_num_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.genes_num_entry.insert(0, self.genes_num[0])  
-                    self.genes_num_entry_2 = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.genes_num_entry_2.insert(0, self.genes_num[1])
-                    self.genes_num_entry.pack()
-                    self.genes_num_entry_2.pack()
+                    self.rp_size_label = ttk.Label(self.scrollable_frame, text="rp_size:")
+                    self.rp_size_label.pack()
+                    self.rp_size_entry = ttk.Entry(self.scrollable_frame, foreground="black")
+                    self.rp_size_entry.insert(0, self.rp_size[0])  
+                    self.rp_size_entry_2 = ttk.Entry(self.scrollable_frame, foreground="black")
+                    self.rp_size_entry_2.insert(0, self.rp_size[1])
+                    self.rp_size_entry.pack()
+                    self.rp_size_entry_2.pack()
 
                     self.p_within_label = ttk.Label(self.scrollable_frame, text="p_within:")
                     self.p_within_label.pack()
@@ -373,13 +357,13 @@ class GenomeElement:
                     self.p_between_entry.insert(0, self.p_between)  
                     self.p_between_entry.pack()
 
-                    # self.update_ER_button = tk.Button(self.scrollable_frame, text="Update genes_num", command=self.update_ER)
+                    # self.update_ER_button = tk.Button(self.scrollable_frame, text="Update rp_size", command=self.update_ER)
                     self.update_ER_button = tk.Button(self.scrollable_frame, text="Update All RP parameters", command=update_all_RP)
                     self.update_ER_button.pack()
 
                 else:
-                    self.genes_num_label.pack()
-                    self.genes_num_entry.pack()
+                    self.rp_size_label.pack()
+                    self.rp_size_entry.pack()
                     self.p_within_label
                     self.p_within_entry.pack()
                     self.p_within_entry_2.pack()
@@ -418,26 +402,26 @@ class GenomeElement:
             # else:
             #     self.hide_elements_network_values()
 
-            self.render_run_eff_size_generation()
+            self.render_run_network_generation()
             messagebox.showinfo("Update Successful", "network_model changed to " + new_network_model_unconverted + ".")
 
         else:
             messagebox.showerror("Update Error", "Invalid Entry for network_model.")
 
     
-    def render_run_eff_size_generation(self):
-        def run_eff_size_generate():
+    def render_run_network_generation(self):
+        def run_network_generate():
             messagebox.showerror("Update Error", "helloo world")
-        if not hasattr(self, 'run_eff_size_generate_button'):
-            self.run_eff_size_generate_button = tk.Button(self.scrollable_frame, text="run_eff_size_generation", command=run_eff_size_generate)
-            self.run_eff_size_generate_button.pack()
+        if not hasattr(self, 'run_network_generate_button'):
+            self.run_network_generate_button = tk.Button(self.scrollable_frame, text="run_network_generation", command=run_network_generate)
+            self.run_network_generate_button.pack()
         else:
-            self.run_eff_size_generate_button.pack()
+            self.run_network_generate_button.pack()
 
     def hide_elements_update_methods(self):
         self.hide_elements_network_values()
-        if hasattr(self, 'run_eff_size_generate_button'):
-            self.run_eff_size_generate_button.pack_forget()
+        if hasattr(self, 'run_network_generate_button'):
+            self.run_network_generate_button.pack_forget()
         if hasattr(self, 'path_network_label'):
         # if new_method == "user_input":
             self.path_network_label.pack_forget()
@@ -451,18 +435,18 @@ class GenomeElement:
             self.network_model_label.pack_forget()
 
     def hide_elements_network_values(self):
-        if hasattr(self, 'run_eff_size_generate_button'):
-            self.run_eff_size_generate_button.pack_forget()
+        if hasattr(self, 'run_network_generate_button'):
+            self.run_network_generate_button.pack_forget()
         if hasattr(self, 'p_ER_label'):
         # if new_network_model == "ER":
             self.p_ER_label.pack_forget()
             self.p_ER_entry.pack_forget()
             self.update_ER_button.pack_forget()
-        if hasattr(self, 'genes_num_label'):
+        if hasattr(self, 'rp_size_label'):
         # if new_network_model == "RP":
-            self.genes_num_label.pack_forget()
-            self.genes_num_entry.pack_forget()
-            self.genes_num_entry_2.pack_forget()
+            self.rp_size_label.pack_forget()
+            self.rp_size_entry.pack_forget()
+            self.rp_size_entry_2.pack_forget()
             self.p_within_label.pack_forget()
             self.p_within_entry.pack_forget()
             self.p_within_entry_2.pack_forget()
