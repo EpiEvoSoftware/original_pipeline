@@ -13,9 +13,9 @@
         "cap_withinhost": 1
     },
     "SeedsConfiguration": {
-        "seed_size": 1,
+        "seed_size": 3,
         "use_reference": false,
-        "method": "",
+        "method": "user_input",
         "user_input": {
             "path_seeds_vcf": "",
             "path_seeds_phylogeny": ""
@@ -57,21 +57,21 @@
         }
     },
     "NetworkModelParameters": {
-        "use_network_model": false,
+        "use_network_model": true,
         "method": "",
-        "host_size": 4,
+        "host_size": 3,
         "user_input": {
-            "path_network": "/System/Developer"
+            "path_network": "/System/DriverKit/Runtime"
         },
         "randomly_generate": {
-            "network_model": "BA",
+            "network_model": "RP",
             "ER": {
                 "p_ER": 200001.0
             },
             "RP": {
                 "rp_size": [
                     5,
-                    6
+                    56
                 ],
                 "p_within": [
                     7,
