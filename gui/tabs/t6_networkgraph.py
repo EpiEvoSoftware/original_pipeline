@@ -183,8 +183,8 @@ class NetworkGraphApp:
 
     def plot_degree_distribution(self):
         graph_type = self.graph_type.get()
-        wk_dir = "/Users/vivianzhao/Desktop/TB_software_new/original_pipeline/test/" 
-        wk_dir = "/Users/andrewhahn/T7/original_pipeline/test/"
+        wk_dir = "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test" 
+    
         if graph_type == "Erdős–Rényi":
             p = float(self.parameter_entries["p"].get())
             run_network_generation(pop_size=1000, wk_dir=wk_dir, method="randomly_generate", model="ER", p_ER=p)
@@ -410,7 +410,7 @@ class NetworkGraphApp:
         return [""]
 
     def match_hosts(self):
-        ntwk_path = "/Users/vivianzhao/Desktop/TB_software_new/original_pipeline/test/contact_network.adjlist"
+        ntwk_path = "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test/test_drugresist/contact_network.adjlist"
         ntwk = read_network(ntwk_path)
 
         match_methods, match_params = self.collect_matching_criteria()

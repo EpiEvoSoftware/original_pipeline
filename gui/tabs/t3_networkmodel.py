@@ -1,7 +1,18 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import json
+import sys
 import os
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+from seed_host_match_func import *
+from network_func import *
+
 
 
 class NetworkModel:
@@ -108,6 +119,7 @@ class NetworkModelConfigurations:
         self.use_network_model_combobox.pack()
         self.update_use_network_model_button = tk.Button(self.scrollable_frame, text="Update use_network_model", command=self.update_use_network_model)
         self.update_use_network_model_button.pack()
+        
 
         next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
         next_button.pack()
@@ -411,12 +423,48 @@ class NetworkModelConfigurations:
     
     def render_run_network_generation(self):
         def run_network_generate():
-            messagebox.showerror("Update Error", "helloo world")
+            pop_size = int(self.host_size_entry.get())
+            model = self.network_model_var.get()
+            if model == "Erdős–Rényi":
+                p_ER = float(self.p_ER_entry.get())  # Assuming p_ER_entry is an input field in your GUI
+                network = ER_generate(pop_size, p_ER)
+            elif model == "Barabási-Albert":
+                m = int(self.ba_m_entry.get())  # Assuming ba_m_entry is an input field in your GUI
+                network = ba_generate(pop_size, m)
+            elif model == "Random Partition":
+                # Assuming rp_size_entry, p_within_entry, p_between_entry are input fields in your GUI
+                rp_size = [int(part) for part in self.rp_size_entry.get().split(',')]  # User inputs comma-separated sizes
+                p_within = [float(p) for p in self.p_within_entry.get().split(',')]  # User inputs comma-separated probabilities
+                p_between = float(self.p_between_entry.get())
+                network = rp_generate(rp_size, p_within, p_between)
+            else:
+                print("Unsupported model.")
+                return
+            degrees = [network.degree(n) for n in network.nodes()]
+            plot_degree_distribution(degrees)
+                                     
+        
         if not hasattr(self, 'run_network_generate_button'):
             self.run_network_generate_button = tk.Button(self.scrollable_frame, text="run_network_generation", command=run_network_generate)
             self.run_network_generate_button.pack()
         else:
             self.run_network_generate_button.pack()
+            
+        if not hasattr(self, 'graph_frame'):  
+            self.graph_frame = ttk.Frame(self.scrollable_frame)
+            self.graph_frame.pack(fill='both', expand=True)
+            
+        def plot_degree_distribution(degrees):
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+            ax.set_title("Degree Distribution")
+            ax.set_xlabel("Degree")
+            ax.set_ylabel("Number of Nodes")
+
+            canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
 
     def hide_elements_update_methods(self):
         self.hide_elements_network_values()
