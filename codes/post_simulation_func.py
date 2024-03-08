@@ -79,32 +79,26 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
 		mut = tseq_smp.mutation(j)
 		pos_values.append(tseq_smp.site(mut.site).position + 1)
 		node_ids.append(mut.node)
-	intvs = np.searchsorted(search_intvls, pos_values)
-	which_m2 = np.where(intvs % 2 == 1)[0]
+		intvs = np.searchsorted(search_intvls, pos_values)
+		which_m2 = np.where(intvs % 2 == 1)[0]
+	colnames_df = eff_size.columns
+	for j in range(num_trait):
+		node_pluses.append({i:0 for i in range(node_size)})
+		for i in which_m2:
+			node_pluses[j][node_ids[i]] += eff_size[colnames_df[j + 3]][intvs[i] // 2]
 	real_traits_vals = []
-	if len(which_m2)==0:
-		for i in range(num_trait):
-			trait_val_now = {j:0 for j in range(node_size)}
-			real_traits_vals.append(trait_val_now)
-		print("WARNING: There's no mutation mutations related to trait in samples from this replication.")
-	else:
-		colnames_df = eff_size.columns
-		for j in range(num_trait):
-			node_pluses.append({i:0 for i in range(node_size)})
-			for i in which_m2:
-				node_pluses[j][node_ids[i]] += eff_size[colnames_df[j + 3]][intvs[i] // 2]
-		for i in range(num_trait):
-			node_plus = node_pluses[i]
-			muts_nodes = {}
-			for key, value in node_plus.items():
-				if value > 0:
-					muts_nodes[key] = value
-			trait_val_now = {j:0 for j in range(node_size)}
-			trait_val_now[-1]=0
-			for u in trvs_order:
-				trait_val_now[u] = trait_val_now[tree_first.parent(u)] + node_plus[u]
-			trait_val_now.pop(-1)
-			real_traits_vals.append(trait_val_now)
+	for i in range(num_trait):
+		node_plus = node_pluses[i]
+		muts_nodes = {}
+		for key, value in node_plus.items():
+			if value > 0:
+				muts_nodes[key] = value
+		trait_val_now = {j:0 for j in range(node_size)}
+		trait_val_now[-1]=0
+		for u in trvs_order:
+			trait_val_now[u] = trait_val_now[tree_first.parent(u)] + node_plus[u]
+		trait_val_now.pop(-1)
+		real_traits_vals.append(trait_val_now)
 	return(real_traits_vals, trvs_order)
 
 def floats_to_colors_via_matplotlib(float_values):
@@ -116,12 +110,9 @@ def floats_to_colors_via_matplotlib(float_values):
 
 def color_by_trait_normalized(trait_val_now, trvs_order):
 	all_traits = np.array(list(trait_val_now.values()))
-	if np.max(all_traits)-np.min(all_traits)>0:
-		normalized_traits = (all_traits-np.min(all_traits))/(np.max(all_traits)-np.min(all_traits))
-		color_map_nodes = floats_to_colors_via_matplotlib(normalized_traits)
-		color_map_dict = {i:color_map_nodes[i] for i in range(len(trvs_order))}
-	else:color_map_dict = {i:"#000000" for i in range(len(trvs_order))}
-
+	normalized_traits = (all_traits-np.min(all_traits))/(np.max(all_traits)-np.min(all_traits))
+	color_map_nodes = floats_to_colors_via_matplotlib(normalized_traits)
+	color_map_dict = {i:color_map_nodes[i] for i in range(len(trvs_order))}
 	return(color_map_dict)
 
 def color_by_seed(tseq_smp, trvs_order, seed_host_match_path):

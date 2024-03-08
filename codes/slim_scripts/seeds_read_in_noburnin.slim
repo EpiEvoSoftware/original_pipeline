@@ -1,17 +1,19 @@
 1 early() {
-	seeds_structure = readCSV(seed_host_matching_path, colNames=T);
+	seeds_structure = readCSV(seed_host_matching_path, colNames=F);
+
 	// Add N($sample_size) subpopulations (representing N humans in the population) with 0 or 1 elements (Susceptible or Infected)
 	labels = c();
 	seed_count = 0;
 
 	for (i in 1:host_size)
 	{
-		if (i == seeds_structure.subset(seed_count, 1) + 1)
+		if (i == seeds_structure.subset(seed_count, 0) + 1)
 		{
+			
 			sim.addSubpop(i - 1, 1, haploid=T); // Infected hosts
 			current_subpop = sim.subpopulations[i - 1];
 			labels = c(labels, 2);
-			current_subpop.individuals.tag = seeds_structure.subset(seed_count, 0); // id of seed
+			current_subpop.individuals.tag = seeds_structure.subset(seed_count, 1); // id of seed
 			sim.treeSeqRememberIndividuals(current_subpop.individuals);
 
 			if (seed_count < seed_size - 1)

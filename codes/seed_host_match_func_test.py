@@ -1,27 +1,27 @@
 import unittest
-from original_pipeline.codes.seed_host_matcher_to_merge import read_network, match_random, match_ranking, match_percentile, match_all_hosts, _build_dict_edges_node, _sort_node_by_edge, _save_dict_to_csv
+from seed_host_match_func import read_network, match_random, match_ranking, match_percentile, match_all_hosts, _build_dict_edges_node, _sort_node_by_edge, _save_dict_to_csv
 import os
 import networkx as nx
 import pandas as pd
 # The path for the working pipeline
 PIPELINE_PATH = os.path.dirname(__file__)
 # The relative path for the testing folder
-TEST_DIR = "../test"
+TEST_DIR = "test/seed_host_match_func"
 
 
 class HostSeedMatch(unittest.TestCase):
 
 	def test_read_user_matchingfile(self):
-		## TODO: Test the helper functions _check_user_matchingfile_info_json
+		## TO DO: Test the helper functions _check_user_matchingfile_info_json
 		## 		and _check_user_matchingfile_info_csv
 		pass
 
 	def test_read_user_matchingfile_info_json(file):
-		## TODO: check json file
+		## TO DO: check json file
 		pass
 
 	def test_read_user_matchingfile_info_csv(file):
-		## TODO: check csv file
+		## TO DO: check csv file
 		pass
 
 	def test_read_network(self):
@@ -75,8 +75,7 @@ class HostSeedMatch(unittest.TestCase):
 
 	def test_match_all_hosts(self):
 		G = nx.Graph()
-		G.add_edges_from([(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (6, 7), (6, 8), (6, 9), 
-					(6, 10), (11, 12), (11, 13), (11, 14), (15, 16), (15, 17), (18, 19)])
+		G.add_edges_from([(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (6, 7), (6, 8), (6, 9), (6, 10), (11, 12), (11, 13), (11, 14), (15, 16), (15, 17), (18, 19)])
 		match_method_0 = {0: 'ranking', 1: 'ranking', 2: 'ranking', 3: 'ranking'}
 		param_0 = {0: 1, 1: 2, 2:3, 3:4, 4: None}
 		# param_0 = {0: 1, 1: 2, 2:3, 3:4}
