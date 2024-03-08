@@ -1,10 +1,10 @@
 from base_func import *
 import os
 import statistics
-import subprocess
 from random import sample
 import numpy as np
 import pandas as pd
+import argparse
 
 
 def seeds_trait_calc(wk_dir, dict_c_g):

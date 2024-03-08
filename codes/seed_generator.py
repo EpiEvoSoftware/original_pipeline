@@ -16,19 +16,19 @@ NEWICK_NAME = "seeds.nwk"
 VCF_NAME = "seeds.vcf"
 
 VCF_HEAD = """\
-	##fileformat=VCFv4.2\n##source=SLiM
-	##INFO=<ID=MID,Number=.,Type=Integer,Description=\"Mutation ID in SLiM\">
-	##INFO=<ID=S,Number=.,Type=Float,Description=\"Selection Coefficient\">
-	##INFO=<ID=DOM,Number=.,Type=Float,Description=\"Dominance\">
-	##INFO=<ID=PO,Number=.,Type=Integer,Description=\"Population of Origin\">
-	##INFO=<ID=TO,Number=.,Type=Integer,Description=\"Tick of Origin\">
-	##INFO=<ID=MT,Number=.,Type=Integer,Description=\"Mutation Type\">
-	##INFO=<ID=AC,Number=.,Type=Integer,Description=\"Allele Count\">
-	##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total Depth\">
-	##INFO=<ID=AA,Number=1,Type=String,Description=\"Ancestral Allele\">
-	##INFO=<ID=NONNUC,Number=0,Type=Flag,Description=\"Non-nucleotide-based\">
-	##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
-	"""
+##fileformat=VCFv4.2\n##source=SLiM
+##INFO=<ID=MID,Number=.,Type=Integer,Description=\"Mutation ID in SLiM\">
+##INFO=<ID=S,Number=.,Type=Float,Description=\"Selection Coefficient\">
+##INFO=<ID=DOM,Number=.,Type=Float,Description=\"Dominance\">
+##INFO=<ID=PO,Number=.,Type=Integer,Description=\"Population of Origin\">
+##INFO=<ID=TO,Number=.,Type=Integer,Description=\"Tick of Origin\">
+##INFO=<ID=MT,Number=.,Type=Integer,Description=\"Mutation Type\">
+##INFO=<ID=AC,Number=.,Type=Integer,Description=\"Allele Count\">
+##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total Depth\">
+##INFO=<ID=AA,Number=1,Type=String,Description=\"Ancestral Allele\">
+##INFO=<ID=NONNUC,Number=0,Type=Flag,Description=\"Non-nucleotide-based\">
+##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
+"""
 
 NODES_PER_IND = 2
 PHYLO_DIR = "seeds_phylogeny_uncoalesced"
@@ -96,7 +96,7 @@ def _process_data_lines(seed_vcf_path, all_separate_vcfs, method):
 	ref_allele = ["0|0", "0/0", "0", "."]
 	with open(seed_vcf_path, "r") as all_vcf:
 		for line in all_vcf:
-			if line.startswith("#"):
+			if line.startswith("#CHROM"):
 				_write_column_names(all_separate_vcfs, line, NUM_VCF_FORMAT_COLUMNS + 1)
 			elif not line.startswith("##"):
 				# Encounter a row of information
@@ -115,7 +115,7 @@ def _process_data_lines(seed_vcf_path, all_separate_vcfs, method):
 							# Write to the vcf file
 							alt = fields[ALT_COL].split(",") if len(fields[ALT_COL]) > 1 else [fields[ALT_COL]]
 							with open(newvcf, "a") as vcf_file:
-								vcf_file.write("\t".join(fields[:ALT_COL]) + 
+								vcf_file.write("\t".join(fields[:ALT_COL]) + "\t" +
 											alt[int(geno[0])-1] + VCF_STR_HA + ref + VCF_STR_HB)
 						else:
 							raise CustomizedError("The genotype is a heterozygote, \
