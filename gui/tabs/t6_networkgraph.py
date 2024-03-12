@@ -5,8 +5,10 @@ parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
-from seed_host_match_func import *
-from network_func import *
+# from seed_host_match_func import *
+# from network_func import *
+from seed_host_match_func_v0 import *
+from network_generator import *
 
 
 import tkinter as tk

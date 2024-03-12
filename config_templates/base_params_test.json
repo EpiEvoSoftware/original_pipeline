@@ -1,6 +1,6 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "/Users/vivianzhao/Desktop/TB_software/wkdir",
+        "cwdir": "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test",
         "n_replicates": 1
     },
     "EvolutionModel": {
@@ -13,9 +13,9 @@
         "cap_withinhost": 1
     },
     "SeedsConfiguration": {
-        "seed_size": 1,
+        "seed_size": 3,
         "use_reference": false,
-        "method": "",
+        "method": "user_input",
         "user_input": {
             "path_seeds_vcf": "",
             "path_seeds_phylogeny": ""
@@ -59,19 +59,19 @@
     "NetworkModelParameters": {
         "use_network_model": true,
         "method": "",
-        "host_size": 100,
+        "host_size": 1000,
         "user_input": {
-            "path_network": "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test"
+            "path_network": "/System/DriverKit/Runtime"
         },
         "randomly_generate": {
-            "network_model": "BA",
+            "network_model": "ER",
             "ER": {
                 "p_ER": 0.3
             },
             "RP": {
                 "rp_size": [
                     5,
-                    6
+                    56
                 ],
                 "p_within": [
                     7,
