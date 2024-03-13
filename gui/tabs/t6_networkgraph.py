@@ -9,6 +9,9 @@ if parent_dir not in sys.path:
 # from network_func import *
 from seed_host_match_func_v0 import *
 from network_generator import *
+from base_func import read_params
+
+
 
 
 import tkinter as tk
@@ -101,10 +104,12 @@ class NetworkGraphApp:
         self.fig, self.ax = plt.subplots(figsize=(5, 3))
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
+        self.plot_degree_distribution()
 
-        self.degree_button = ttk.Button(
-            self.control_frame, text="Plot Degree Distribution", command=self.plot_degree_distribution, style='Large.TButton')
-        self.degree_button.pack()
+        # self.degree_button = ttk.Button(
+        #     self.control_frame, text="Plot Degree Distribution", command=self.plot_degree_distribution, style='Large.TButton')
+        # self.degree_button.pack()
         # TODO: ask user for partition numbers, max 10
 
         # # -----------------------------------------
@@ -184,48 +189,50 @@ class NetworkGraphApp:
                     row['seed_id'], row['transmissibility'], row['drugresist_1'], row['drugresist_2'], "", ""))
 
     def plot_degree_distribution(self):
-        graph_type = self.graph_type.get()
-        wk_dir = "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test" 
+        config = self.load_config_as_dict() 
+        wk_dir = config["BasicRunConfiguration"]["cwdir"]
+        network_file_path = os.path.join(wk_dir, "contact_network.adjlist")
+        
+        try:
+            G = nx.read_adjlist(network_file_path)
+        except FileNotFoundError:
+            messagebox.showerror("Error", f"Network file not found at {network_file_path}")
+            return
+
     
-        if graph_type == "Erdős–Rényi":
-            p = float(self.parameter_entries["p"].get())
-            run_network_generation(pop_size=1000, wk_dir=wk_dir, method="randomly_generate", model="ER", p_ER=p)
-        elif graph_type == "Random Partition":
-            p_in = float(self.parameter_entries["p_in"].get())
-            p_out = float(self.parameter_entries["p_out"].get())
-            rp_size = [500, 500]  # Example partition sizes
-            p_within = [p_in, p_in]
-            run_network_generation(pop_size=1000, wk_dir=wk_dir, method="randomly_generate", model="RP", rp_size=rp_size, p_within=p_within, p_between=p_out)
-        elif graph_type == "Barabási-Albert":
-            m = int(self.parameter_entries["m"].get())
-            run_network_generation(pop_size=1000, wk_dir=wk_dir, method="randomly_generate", model="BA", m=m)
+        # if graph_type == "Erdős–Rényi":
+        #     p = float(self.parameter_entries["p"].get())
+        #     run_network_generation(pop_size=1000, wk_dir=wk_dir, method="randomly_generate", model="ER", p_ER=p)
+        # elif graph_type == "Random Partition":
+        #     p_in = float(self.parameter_entries["p_in"].get())
+        #     p_out = float(self.parameter_entries["p_out"].get())
+        #     rp_size = [500, 500]  # Example partition sizes
+        #     p_within = [p_in, p_in]
+        #     run_network_generation(pop_size=1000, wk_dir=wk_dir, method="randomly_generate", model="RP", rp_size=rp_size, p_within=p_within, p_between=p_out)
+        # elif graph_type == "Barabási-Albert":
+        #     m = int(self.parameter_entries["m"].get())
+        #     run_network_generation(pop_size=1000, wk_dir=wk_dir, method="randomly_generate", model="BA", m=m)
 
-        G = nx.read_adjlist(os.path.join(wk_dir, "contact_network.adjlist"))
+        # G = nx.read_adjlist(os.path.join(wk_dir, "contact_network.adjlist"))
+        # degrees = [G.degree(n) for n in G.nodes()]
+        
         degrees = [G.degree(n) for n in G.nodes()]
-
         self.ax.clear()
-        self.ax.hist(degrees, bins=range(
-            min(degrees), max(degrees) + 1, 1), edgecolor='black')
+        self.ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
         self.ax.set_title("Degree Distribution")
         self.ax.set_xlabel("Degree")
         self.ax.set_ylabel("Number of Nodes")
-
-        x_min = self.ax.get_xlim()[0]
-        current_range = self.ax.get_xlim()[1] - x_min
-
-        quartile = 3
-        # # partitions = [current_range//4, current_range//2, current_range*3//4]
-        # partitions = []
-        # n = len(degrees)
-        # for partition in range(quartile):
-        #     partitions.append(degrees[n//partition])
-
-        partitions = [current_range/4 + x_min, current_range /
-                      2 + x_min, current_range*3/4 + x_min]
-        for partition in partitions:
-            self.ax.axvline(x=partition, color='k', linestyle='--')
-
         self.canvas.draw()
+
+        # self.ax.clear()
+        # self.ax.hist(degrees, bins=range(
+        #     min(degrees), max(degrees) + 1, 1), edgecolor='black')
+        # self.ax.set_title("Degree Distribution")
+        # self.ax.set_xlabel("Degree")
+        # self.ax.set_ylabel("Number of Nodes")
+
+        
+
         # TODO: change names from t1, t2 to more descriptive name
 
         return
@@ -412,12 +419,15 @@ class NetworkGraphApp:
         return [""]
 
     def match_hosts(self):
-        ntwk_path = "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test/test_drugresist/contact_network.adjlist"
+        wk_dir = self.load_config_as_dict()["BasicRunConfiguration"]["cwdir"]
+        ntwk_path = os.path.join(wk_dir, "contact_network.adjlist")
         ntwk = read_network(ntwk_path)
+        
+        num_seed = len(self.table.get_children())
 
         match_methods, match_params = self.collect_matching_criteria()
 
-        match_dict = match_all_hosts(ntwk, match_methods, match_params, 5)
+        match_dict = match_all_hosts(ntwk, match_methods, match_params, num_seed)
 
 
         for child in self.table.get_children():
