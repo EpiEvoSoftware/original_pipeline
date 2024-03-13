@@ -1,17 +1,37 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import json
+import sys
 import os
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+from seed_host_match_func import *
+from network_generator import *
+from base_func import read_params
+
+# from seed_generator import *
+
 
 
 class NetworkModel:
     def __init__(self, parent, tab_parent, config_path):
-        self.sidebar = NetworkModelConfigurations(parent, tab_parent, config_path)
-
+        self.top_frame = ttk.Frame(parent)
+        self.bottom_frame = ttk.Frame(parent)
+        
+        self.top_frame.pack(side="top", fill="both", expand=True)
+        self.bottom_frame.pack(side="bottom", fill="both", expand=True)
+        
+        self.graph = NetworkModelGraph(self.bottom_frame)
+        self.sidebar = NetworkModelConfigurations(self.top_frame, tab_parent, config_path, self.graph) 
 
 class NetworkModelConfigurations:
-    def __init__(self, parent, tab_parent, config_path):
-
+    def __init__(self, parent, tab_parent, config_path, graph):
+        self.graph = graph
         self.network_model_to_string = {
             "Erdős–Rényi": "ER",
             "Barabási-Albert": "BA",
@@ -108,6 +128,7 @@ class NetworkModelConfigurations:
         self.use_network_model_combobox.pack()
         self.update_use_network_model_button = tk.Button(self.scrollable_frame, text="Update use_network_model", command=self.update_use_network_model)
         self.update_use_network_model_button.pack()
+        
 
         next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
         next_button.pack()
@@ -410,13 +431,57 @@ class NetworkModelConfigurations:
 
     
     def render_run_network_generation(self):
+        config = self.load_config_as_dict() 
+        wk_dir = config["BasicRunConfiguration"]["cwdir"]
         def run_network_generate():
-            messagebox.showerror("Update Error", "helloo world")
+            pop_size = int(self.host_size_entry.get())
+            graph_type = self.network_model_var.get()
+            if graph_type == "Erdős–Rényi":
+                p_ER = float(self.p_ER_entry.get())  # Assuming p_ER_entry is an input field in your GUI
+                run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="ER", p_ER=p_ER)
+            elif graph_type == "Barabási-Albert":
+                m = int(self.ba_m_entry.get())  # Assuming ba_m_entry is an input field in your GUI
+                run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="BA", m=m)
+            elif graph_type == "Random Partition":
+                # Assuming rp_size_entry, p_within_entry, p_between_entry are input fields in your GUI
+                rp_size = [int(part) for part in self.rp_size_entry.get().split(',')]  # User inputs comma-separated sizes
+                p_within = [float(p) for p in self.p_within_entry.get().split(',')]  # User inputs comma-separated probabilities
+                p_between = float(self.p_between_entry.get())
+                run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="RP", rp_size=rp_size, p_within=p_within, p_between=p_between)
+            else:
+                print("Unsupported model.")
+                return
+            G = nx.read_adjlist(os.path.join(wk_dir, "contact_network.adjlist"))
+            degrees = [G.degree(n) for n in G.nodes()]
+            self.graph.plot_degree_distribution(degrees)
+            
         if not hasattr(self, 'run_network_generate_button'):
             self.run_network_generate_button = tk.Button(self.scrollable_frame, text="run_network_generation", command=run_network_generate)
             self.run_network_generate_button.pack()
         else:
             self.run_network_generate_button.pack()
+
+                                     
+        
+            
+        # if not hasattr(self, 'graph_frame'):  
+        #     self.graph_frame = ttk.Frame(self.scrollable_frame)
+        #     self.graph_frame.pack(fill='both', expand=True, after=self.scrollable_frame)
+            
+            
+        # def plot_degree_distribution(degrees):
+                
+        #     fig, ax = plt.subplots(figsize=(6, 4))
+        #     ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+        #     ax.set_title("Degree Distribution")
+        #     ax.set_xlabel("Degree")
+        #     ax.set_ylabel("Number of Nodes")
+
+        #     canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
+        #     canvas.draw()
+        #     canvas_widget = canvas.get_tk_widget()
+        #     canvas_widget.pack(fill=tk.BOTH, expand=True)
+        
 
     def hide_elements_update_methods(self):
         self.hide_elements_network_values()
@@ -458,3 +523,29 @@ class NetworkModelConfigurations:
             self.ba_m_label.pack_forget()
             self.ba_m_entry.pack_forget()
             self.update_ER_button.pack_forget()
+
+class NetworkModelGraph:
+    def __init__(self, parent):
+        self.parent = parent
+        self.create_graph_frame()
+
+    def create_graph_frame(self):
+        self.graph_frame = ttk.Frame(self.parent)
+        self.graph_frame.pack(fill='both', expand=True)
+
+    def plot_degree_distribution(self, degrees):
+        # Clear the current graph contents
+        for widget in self.graph_frame.winfo_children():
+            widget.destroy()
+
+        # Now create a new graph in the existing frame
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+        ax.set_title("Degree Distribution")
+        ax.set_xlabel("Degree")
+        ax.set_ylabel("Number of Nodes")
+
+        canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
+        canvas.draw()
+        canvas_widget = canvas.get_tk_widget()
+        canvas_widget.pack(fill=tk.BOTH, expand=True)

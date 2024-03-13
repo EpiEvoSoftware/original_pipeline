@@ -1,6 +1,6 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "",
+        "cwdir": "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test",
         "n_replicates": 1
     },
     "EvolutionModel": {
@@ -59,14 +59,14 @@
     "NetworkModelParameters": {
         "use_network_model": true,
         "method": "",
-        "host_size": 3,
+        "host_size": 1000,
         "user_input": {
             "path_network": "/System/DriverKit/Runtime"
         },
         "randomly_generate": {
-            "network_model": "RP",
+            "network_model": "ER",
             "ER": {
-                "p_ER": 200001.0
+                "p_ER": 0.3
             },
             "RP": {
                 "rp_size": [
@@ -80,7 +80,7 @@
                 "p_between": 9
             },
             "BA": {
-                "ba_m": 0
+                "ba_m": 3
             }
         }
     },

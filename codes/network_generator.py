@@ -121,6 +121,7 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
                 raise CustomizedError("You need to specify a random graph model (-model) in random \
                                       generate mode. (Supported model: ER/RP/BA)")
             if model == "ER": 
+                print(wk_dir)
                 write_network(ER_generate(pop_size, p_ER), wk_dir)
             elif model == "RP": 
                 write_network(rp_generate(pop_size, rp_size, p_within, p_between), wk_dir)
