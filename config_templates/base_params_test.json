@@ -13,9 +13,9 @@
         "cap_withinhost": 1
     },
     "SeedsConfiguration": {
-        "seed_size": 3,
+        "seed_size": 6,
         "use_reference": false,
-        "method": "user_input",
+        "method": "SLiM_burnin_epi",
         "user_input": {
             "path_seeds_vcf": "",
             "path_seeds_phylogeny": ""
@@ -28,7 +28,10 @@
         "SLiM_burnin_epi": {
             "burn_in_generations": 0,
             "burn_in_mutrate": 0,
-            "seeded_host_id": [],
+            "seeded_host_id": [
+                1,
+                2
+            ],
             "S_IE_rate": 0,
             "E_I_rate": 0,
             "E_R_rate": 0,
@@ -41,7 +44,10 @@
     "GenomeElement": {
         "use_genetic_model": true,
         "ref_path": "",
-        "traits_num": [],
+        "traits_num": [
+            16,
+            7
+        ],
         "effect_size": {
             "method": "",
             "user_input": {
@@ -57,7 +63,7 @@
         }
     },
     "NetworkModelParameters": {
-        "use_network_model": true,
+        "use_network_model": false,
         "method": "",
         "host_size": 1000,
         "user_input": {
