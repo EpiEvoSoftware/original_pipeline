@@ -214,16 +214,127 @@ class GenomeElement:
         return
     
     def render_path_eff_size_table(self):
-        self.path_network_label = ttk.Label(self.scrollable_frame, text="Choose path_network")
+        def choose_and_update_path():
+            chosen_file = filedialog.askopenfilename(title="Select a path_effsize_table")
+            if chosen_file:  
+                # self.path_effsize_table = self.load_config_as_dict()['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
+                self.path_effsize_table = chosen_file
+                self.chosen_path_network_label.config(text=f"path_effsize_table: {self.path_effsize_table}") 
+                config = self.load_config_as_dict()
+                config['GenomeElement']['effect_size']['user_input']["path_effsize_table"] = self.path_effsize_table
+                self.save_config(config)
+
+
+        self.path_network_label = ttk.Label(self.scrollable_frame, text="Choose path_effsize_table")
         self.path_network_label.pack()
-        self.choose_path_network_button = tk.Button(self.scrollable_frame, text="path_network:")
+        self.choose_path_network_button = tk.Button(self.scrollable_frame, text="path_effsize_table:", command = choose_and_update_path)
         self.choose_path_network_button.pack()
-        self.chosen_path_network_label = ttk.Label(self.scrollable_frame, text="Current path_network: ")
+        self.chosen_path_network_label = ttk.Label(self.scrollable_frame, text="Current path_effsize_table: " + self.path_effsize_table)
         self.chosen_path_network_label.pack()
+
+        self.render_run_button()
+
+
     def render_rg_options(self):
-        self.path_network_label = ttk.Label(self.scrollable_frame, text="Choose path_network")
-        self.path_network_label.pack()
-        self.choose_path_network_button = tk.Button(self.scrollable_frame, text="path_network:")
-        self.choose_path_network_button.pack()
-        self.chosen_path_network_label = ttk.Label(self.scrollable_frame, text="Current path_network: ")
-        self.chosen_path_network_label.pack()
+        if not hasattr(self, "gff_label"): 
+            def clean_list_input(stripped_list_input, unstripped_list_input):
+                if stripped_list_input == "":
+                    parsed_new_seeded_host_id = []
+                elif stripped_list_input.isdigit():
+                    parsed_new_seeded_host_id = [int(stripped_list_input)]
+                elif "," in unstripped_list_input:
+                    parsed_new_seeded_host_id = [int(item.strip()) for item in stripped_list_input.split(',')]
+                else:
+                    raise ValueError("Invalid input format.")
+                
+                return parsed_new_seeded_host_id
+            
+            def update_all_rg_values():
+                """
+                Updates gff, genes_num, effsize min and max, and normalize in the params file
+                    self.gff = ['GenomeElement']['effect_size']['randomly_generate']["gff"]
+                    self.genes_num = ['GenomeElement']['effect_size']['randomly_generate']['genes_num']
+                    self.effsize_min = ['GenomeElement']['effect_size']['randomly_generate']['effsize_min']
+                    self.effsize_max = ['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
+                    self.normalize = ['GenomeElement']['effect_size']['randomly_generate']['normalize']
+                """
+                try:
+                    new_normalize = str(self.normalize_var.get())
+                    gff_value = str(self.gff_entry.get())
+                    unstripped_list_genes_num_value = self.genes_num_entry.get().strip()
+                    stripped_list_genes_num_value = unstripped_list_genes_num_value.strip("[]").strip()
+                    unstripped_list_effsize_min_value = self.effsize_min_entry.get().strip()
+                    stripped_list_effsize_min_value = unstripped_list_effsize_min_value.strip("[]").strip()
+                    unstripped_list_effsize_max_value = self.effsize_max_entry.get().strip()
+                    stripped_list_effsize_max_value = unstripped_list_effsize_max_value.strip("[]").strip()
+
+
+                    genes_num_value = clean_list_input(stripped_list_genes_num_value, unstripped_list_genes_num_value)
+                    effsize_min_value = clean_list_input(stripped_list_effsize_min_value, unstripped_list_effsize_min_value)
+                    effsize_max_value = clean_list_input(stripped_list_effsize_max_value, unstripped_list_effsize_max_value)
+
+                    config = self.load_config_as_dict()
+                    config['GenomeElement']['effect_size']['randomly_generate']["gff"] = gff_value
+                    config['GenomeElement']['effect_size']['randomly_generate']['genes_num'] = genes_num_value
+                    config['GenomeElement']['effect_size']['randomly_generate']['effsize_min'] = effsize_min_value
+                    config['GenomeElement']['effect_size']['randomly_generate']['effsize_max'] = effsize_max_value
+                    config['GenomeElement']['effect_size']['randomly_generate']['normalize'] = self.string_to_bool_mapping[new_normalize]
+                    self.save_config(config)   
+                    messagebox.showinfo("Update Successful")
+                except ValueError:
+                    messagebox.showerror("Update Error", "Invalid Input.") 
+                
+            
+            self.gff_label = ttk.Label(self.scrollable_frame, text="gff:")
+            self.gff_label.pack()
+            self.gff_entry = ttk.Entry(self.scrollable_frame, foreground="black")
+            self.gff_entry.insert(0, self.gff)  
+            self.gff_entry.pack()
+
+            self.genes_num_label = ttk.Label(self.scrollable_frame, text="genes_num:")
+            self.genes_num_label.pack()
+            self.genes_num_entry = ttk.Entry(self.scrollable_frame, foreground="black")
+            self.genes_num_entry.insert(0, str(self.genes_num))  
+            self.genes_num_entry.pack()
+
+            self.effsize_min_label = ttk.Label(self.scrollable_frame, text="effsize_min:")
+            self.effsize_min_label.pack()
+            self.effsize_min_entry = ttk.Entry(self.scrollable_frame, foreground="black")
+            self.effsize_min_entry.insert(0, str(self.effsize_min))  
+            self.effsize_min_entry.pack()
+
+            self.effsize_max_label = ttk.Label(self.scrollable_frame, text="effsize_max:")
+            self.effsize_max_label.pack()
+            self.effsize_max_entry = ttk.Entry(self.scrollable_frame, foreground="black")
+            self.effsize_max_entry.insert(0, str(self.effsize_max))  
+            self.effsize_max_entry.pack()
+
+            self.normalize_label = ttk.Label(self.scrollable_frame, text="normalize:")
+            self.normalize_label.pack()
+            self.normalize_var = tk.StringVar(value=self.bool_to_string_mapping[self.normalize])
+            self.normalize_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.normalize_var, values=["Yes", "No"], state="readonly")
+            self.normalize_combobox.pack() 
+
+            # self.update_ER_button = tk.Button(self.scrollable_frame, text="Update rp_size", command=self.update_ER)
+            self.update_all_rg_values_button = tk.Button(self.scrollable_frame, text="Update All Parameters", command=update_all_rg_values)
+            self.update_all_rg_values_button.pack()
+
+            self.render_run_button()
+        else:
+            self.gff_label.pack()
+            self.gff_entry.pack()
+            self.genes_num_label.pack()
+            self.genes_num_entry.pack()
+            self.effsize_min_label.pack()
+            self.effsize_min_entry.pack()
+            self.effsize_max_label.pack()
+            self.effsize_max_entry.pack()
+            self.normalize_label.pack()
+            self.normalize_combobox.pack() 
+            self.update_all_rg_values_button.pack()
+
+    def render_run_button(self):
+        def effect_size_generation():
+            return
+        self.run_effect_size_generation_button = tk.Button(self.scrollable_frame, text="run_effect_size_generation_button", command=effect_size_generation)
+        self.run_effect_size_generation_button.pack()

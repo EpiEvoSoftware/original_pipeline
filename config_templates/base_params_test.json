@@ -30,7 +30,7 @@
             "burn_in_mutrate": 0,
             "seeded_host_id": [
                 1,
-                2
+                3
             ],
             "S_IE_rate": 0,
             "E_I_rate": 0,
@@ -51,26 +51,35 @@
         "effect_size": {
             "method": "",
             "user_input": {
-                "path_effsize_table": ""
+                "path_effsize_table": "/Volumes/T7/software/Downloads/new_design.pdf"
             },
             "randomly_generate": {
-                "gff": "",
-                "genes_num": [],
-                "effsize_min": [],
-                "effsize_max": [],
-                "normalize": false
+                "gff": "412",
+                "genes_num": [
+                    1,
+                    1
+                ],
+                "effsize_min": [
+                    4,
+                    4
+                ],
+                "effsize_max": [
+                    5,
+                    5
+                ],
+                "normalize": true
             }
         }
     },
     "NetworkModelParameters": {
-        "use_network_model": false,
+        "use_network_model": true,
         "method": "",
         "host_size": 1000,
         "user_input": {
             "path_network": "/System/DriverKit/Runtime"
         },
         "randomly_generate": {
-            "network_model": "ER",
+            "network_model": "BA",
             "ER": {
                 "p_ER": 0.3
             },
