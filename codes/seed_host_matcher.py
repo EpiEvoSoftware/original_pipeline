@@ -230,7 +230,7 @@ def match_all_hosts(ntwk_, match_method, param, num_seed):
 	dict_method_seeds = {'Ranking': [], 'Percentile': [], 'Random': []}
 
 	for seed_id in range(num_seed):
-		idx_method = match_method.get(seed_id)
+		idx_method = match_method.get(str(seed_id))
 		if idx_method not in [None, 'Ranking', 'Percentile', 'Random']:
 			raise CustomizedError(f"Please provide a valid matching method in ('Ranking', \
 						 'Percentile', 'Random') instead of {method} for seed {seed_id}")
@@ -245,7 +245,7 @@ def match_all_hosts(ntwk_, match_method, param, num_seed):
 	for method in ['Ranking', 'Percentile', 'Random']:
 		match_function = match_functions[method]
 		for seed_id in dict_method_seeds[method]:
-			matched_host = match_function(nodes_sorted, taken_hosts_id, param.get(seed_id))
+			matched_host = match_function(nodes_sorted, taken_hosts_id, param.get(str(seed_id)))
 			match_dict[seed_id] = matched_host
 			taken_hosts_id.append(matched_host)
 	return match_dict
@@ -289,6 +289,9 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 						   not a valid json format.")
 				
 			if list(set(match_scheme.values())) != ["Random"]:
+				if match_scheme_param == "":
+					raise CustomizedError(f"Please specify the matching parameters (-match_scheme_param) for \
+						   'Ranking' or 'Percentile'.")
 				try:
 					match_scheme_param = json.loads(match_scheme_param)
 				except json.decoder.JSONDecodeError: 
