@@ -120,7 +120,7 @@ if (file.exists(seed_tree))
 
 for (seed_id in 1:seed_size)
 {
-  print(paste0("Plotting seed ", seed_id - 1, "'s transmission tree..."))
+  cat(paste0("Plotting seed ", seed_id - 1, "'s transmission tree..."))
   trans_tree_file = file.path(wk_dir, "transmission_tree", paste0(seed_id - 1, ".nwk"))
   tree_str <- paste(readLines(trans_tree_file), collapse="\n")
   if (startsWith(tree_str, "("))
@@ -129,7 +129,7 @@ for (seed_id in 1:seed_size)
     tree = read.tree(trans_tree_file)
     if (length(tree$tip.label)==1)
     {
-      print("Doesn't support visualizing single branch tree.")
+      cat("Doesn't support visualizing single branch tree.")
       if (whole_phylo_output) 
       {
         seed_phylo <- drop.tip(seed_phylo, as.character(seed_id - 1))
@@ -211,7 +211,7 @@ for (seed_id in 1:seed_size)
   }
   else
   {
-    print("No samples for this seed's progeny.")
+    cat("No samples for this seed's progeny.")
     if (whole_phylo_output) 
     {
       if (length(seed_phylo$tip.label)==1)

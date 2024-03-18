@@ -1,5 +1,5 @@
 import os, networkx as nx, json, pandas as pd, math, argparse
-from Random import sample
+from random import sample
 from collections import defaultdict
 from pathlib import Path
 from error_handling import CustomizedError

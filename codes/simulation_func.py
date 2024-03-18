@@ -36,7 +36,7 @@ def create_slimconfig(all_config):
 	slim_pars = {}
 	slim_pars["cwdir"] = all_config["BasicRunConfiguration"]["cwdir"]
 	if os.path.exists(slim_pars["cwdir"])== False:
-		raise Exception(f"The working directory specified {slim_pars["cwdir"]} doesn't exist.")
+		raise Exception(f"The working directory specified doesn't exist.")
 	else:
 		out_config = open(os.path.join(all_config["BasicRunConfiguration"]["cwdir"], "slim.params"), "w")
 		out_config.write("cwdir:" + slim_pars["cwdir"] + "\n")
