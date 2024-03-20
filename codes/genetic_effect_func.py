@@ -133,9 +133,11 @@ def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir,
 	traits_dict = []
 	seeds_trait_vals = []
 	for trait_id in range(sum(trait_n)):
+		print(trait_id)
 		curret_tdict, seed_vals = generate_eff_vals(gff_, causal_sizes[trait_id], es_lows[trait_id], es_highs[trait_id], wk_dir, n_gen, mut_rate, norm_or_not)
 		traits_dict.append(curret_tdict)
 		seeds_trait_vals.append(seed_vals)
+
 
 	write_seeds_trait(wk_dir, seeds_trait_vals, trait_n)
 	write_eff_size_csv(trait_n, traits_dict, wk_dir)
@@ -255,6 +257,9 @@ def effsize_generation_byconfig(all_config):
 
 def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[0,0], causal_sizes=[], es_lows=[], es_highs=[], norm_or_not=False, n_gen=0, mut_rate=0):
 	## A function to run the effect size generation and do error control.
+	print("trait_n ", trait_n)
+	print("causal_sizes ", causal_sizes)
+
 	run_check = True
 	if method=="user_input":
 		if effsize_path=="":
@@ -299,8 +304,10 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[
 
 	if run_check:
 		if method=="user_input":
+			print(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, norm_or_not)
 			write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path, trait_n), trait_n)
 		elif method=="randomly_generate":
+			print(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, norm_or_not)
 			generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, norm_or_not)
 	else:
 		print("Terminated because of incorrect input")

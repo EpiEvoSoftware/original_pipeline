@@ -10,24 +10,27 @@ parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
-from seed_host_match_func import *
 from network_generator import *
-from base_func import read_params
+from seed_host_match_func import *
+from tabs.t6_networkgraph import NetworkGraphApp
+
 
 # from seed_generator import *
 
 
 
 class NetworkModel:
-    def __init__(self, parent, tab_parent, config_path):
+    def __init__(self, parent, tab_parent, network_graph_app, config_path):
         self.top_frame = ttk.Frame(parent)
         self.bottom_frame = ttk.Frame(parent)
         
         self.top_frame.pack(side="top", fill="both", expand=True)
         self.bottom_frame.pack(side="bottom", fill="both", expand=True)
         
-        self.graph = NetworkModelGraph(self.bottom_frame)
-        self.sidebar = NetworkModelConfigurations(self.top_frame, tab_parent, config_path, self.graph) 
+        self.graph = NetworkModelGraph(self.bottom_frame, tab_parent, network_graph_app, config_path)
+        self.sidebar = NetworkModelConfigurations(self.top_frame, tab_parent, config_path, self.graph)
+
+        
 
 class NetworkModelConfigurations:
     def __init__(self, parent, tab_parent, config_path, graph):
@@ -451,9 +454,13 @@ class NetworkModelConfigurations:
             else:
                 print("Unsupported model.")
                 return
+            
+            
+
             G = nx.read_adjlist(os.path.join(wk_dir, "contact_network.adjlist"))
             degrees = [G.degree(n) for n in G.nodes()]
             self.graph.plot_degree_distribution(degrees)
+        
             
         if not hasattr(self, 'run_network_generate_button'):
             self.run_network_generate_button = tk.Button(self.scrollable_frame, text="run_network_generation", command=run_network_generate)
@@ -525,8 +532,11 @@ class NetworkModelConfigurations:
             self.update_ER_button.pack_forget()
 
 class NetworkModelGraph:
-    def __init__(self, parent):
+    def __init__(self, parent, tab_parent, network_graph_app, config_path):
         self.parent = parent
+        self.tab_parent = tab_parent
+        self.config_path = config_path
+        self.network_graph_app = network_graph_app
         self.create_graph_frame()
 
     def create_graph_frame(self):
@@ -534,11 +544,9 @@ class NetworkModelGraph:
         self.graph_frame.pack(fill='both', expand=True)
 
     def plot_degree_distribution(self, degrees):
-        # Clear the current graph contents
         for widget in self.graph_frame.winfo_children():
             widget.destroy()
 
-        # Now create a new graph in the existing frame
         fig, ax = plt.subplots(figsize=(6, 4))
         ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
         ax.set_title("Degree Distribution")
@@ -549,3 +557,6 @@ class NetworkModelGraph:
         canvas.draw()
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.pack(fill=tk.BOTH, expand=True)
+        
+
+        self.network_graph_app.plot_degree_distribution()

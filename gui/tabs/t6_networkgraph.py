@@ -53,8 +53,13 @@ class NetworkGraphApp:
         self.tab_parent = tab_parent
 
         self.config_path = config_path
+        
+        self.config = self.load_config_as_dict()
+        wk_dir = self.config["BasicRunConfiguration"]["cwdir"]
+        self.network_file_path = os.path.join(wk_dir, "contact_network.adjlist")
+        
 
-        self.pop_size = int(self.load_config_as_dict()['NetworkModelParameters']['host_size'])
+        self.pop_size = int(self.config['NetworkModelParameters']['host_size'])
 
         # window_width = 800
         # window_height = 600
@@ -83,21 +88,6 @@ class NetworkGraphApp:
         self.graph_frame = ttk.Frame(self.parent)
         self.graph_frame.pack(side=tk.TOP, fill=tk.X, expand=False)
 
-        self.graph_type = tk.StringVar()
-        ttk.Label(self.control_frame, text="Select Graph Type:",
-                  style='Large.TLabel').pack()
-        graph_type_dropdown = ttk.Combobox(
-            self.control_frame,
-            textvariable=self.graph_type,
-            values=["Erdős–Rényi", "Barabási-Albert",
-                    "Random Partition"],
-            style='Large.TButton'
-        )
-        # TODO: Look for more responsive tk classes to replace Combobox
-        graph_type_dropdown.pack()
-        graph_type_dropdown.bind(
-            "<<ComboboxSelected>>", self.update_parameters)
-
         self.parameter_entries = {}
         self.parameter_labels = []
 
@@ -106,52 +96,6 @@ class NetworkGraphApp:
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
         
         self.plot_degree_distribution()
-
-        # self.degree_button = ttk.Button(
-        #     self.control_frame, text="Plot Degree Distribution", command=self.plot_degree_distribution, style='Large.TButton')
-        # self.degree_button.pack()
-        # TODO: ask user for partition numbers, max 10
-
-        # # -----------------------------------------
-        # # Creating the table
-        # # -----------------------------------------
-        # self.table = ttk.Treeview(self.control_frame, columns=(
-        #     'id', 't1', 't2', 'host_id'), show='headings')
-
-        # # Defining and setting the width of the columns
-        # self.table.column('id', width=50)
-        # self.table.column('t1', width=50)
-        # self.table.column('t2', width=50)
-        # self.table.column('host_id', width=100)
-        # # TODO: after choosing the Percentile, match it to the specific node
-
-        # # Defining the columns
-        # self.table.heading('id', text='ID')
-        # self.table.heading('t1', text='t1')
-        # self.table.heading('t2', text='t2')
-        # self.table.heading('host_id', text='host_id')
-
-        # # # Defining the headings
-        # # self.table.heading('id', text='ID')
-        # # self.table.heading('t1', text='t1')
-        # # self.table.heading('t2', text='t2')
-        # # self.table.heading('host_id', text='host_id')
-        # # TODO: generate from text file, will have t3, t4
-        # # TODO: limit x axis when to the right, its too to the left
-
-        # # Adding rows to the table
-        # data = [
-        #     ("1", "?", "?", "1111"),
-        #     ("2", "?", "?", "1111"),
-        #     ("3", "?", "?", "1111"),
-        #     ("4", "?", "?", "1111"),
-        # ]
-
-        # for row in data:
-        #     self.table.insert('', tk.END, values=row)
-
-        # # Positioning the table in the GUI
-        # self.table.pack(side='right', fill='both', expand=True)
 
         self.create_table()
 
@@ -188,131 +132,8 @@ class NetworkGraphApp:
                 self.table.insert("", "end", values=(
                     row['seed_id'], row['transmissibility'], row['drugresist_1'], row['drugresist_2'], "", ""))
 
-    def plot_degree_distribution(self):
-        config = self.load_config_as_dict() 
-        wk_dir = config["BasicRunConfiguration"]["cwdir"]
-        network_file_path = os.path.join(wk_dir, "contact_network.adjlist")
-        
-        try:
-            G = nx.read_adjlist(network_file_path)
-        except FileNotFoundError:
-            messagebox.showerror("Error", f"Network file not found at {network_file_path}")
-            return
 
-    
-        # if graph_type == "Erdős–Rényi":
-        #     p = float(self.parameter_entries["p"].get())
-        #     run_network_generation(pop_size=1000, wk_dir=wk_dir, method="randomly_generate", model="ER", p_ER=p)
-        # elif graph_type == "Random Partition":
-        #     p_in = float(self.parameter_entries["p_in"].get())
-        #     p_out = float(self.parameter_entries["p_out"].get())
-        #     rp_size = [500, 500]  # Example partition sizes
-        #     p_within = [p_in, p_in]
-        #     run_network_generation(pop_size=1000, wk_dir=wk_dir, method="randomly_generate", model="RP", rp_size=rp_size, p_within=p_within, p_between=p_out)
-        # elif graph_type == "Barabási-Albert":
-        #     m = int(self.parameter_entries["m"].get())
-        #     run_network_generation(pop_size=1000, wk_dir=wk_dir, method="randomly_generate", model="BA", m=m)
 
-        # G = nx.read_adjlist(os.path.join(wk_dir, "contact_network.adjlist"))
-        # degrees = [G.degree(n) for n in G.nodes()]
-        
-        degrees = [G.degree(n) for n in G.nodes()]
-        self.ax.clear()
-        self.ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
-        self.ax.set_title("Degree Distribution")
-        self.ax.set_xlabel("Degree")
-        self.ax.set_ylabel("Number of Nodes")
-        self.canvas.draw()
-
-        # self.ax.clear()
-        # self.ax.hist(degrees, bins=range(
-        #     min(degrees), max(degrees) + 1, 1), edgecolor='black')
-        # self.ax.set_title("Degree Distribution")
-        # self.ax.set_xlabel("Degree")
-        # self.ax.set_ylabel("Number of Nodes")
-
-        
-
-        # TODO: change names from t1, t2 to more descriptive name
-
-        return
-
-    # def plot_degree_distribution(self):
-    #     graph_type = self.graph_type.get()
-    #     selected_graph_type = self.network_dict[graph_type]
-
-    #     if selected_graph_type == "ER":
-    #         p = float(self.parameter_entries["p"].get())
-    #         G = network_generate.ER_generate(self.pop_size, p)
-    #     elif selected_graph_type == "RP":
-    #         p_in = float(self.parameter_entries["p_in"].get())
-    #         p_out = float(self.parameter_entries["p_out"].get())
-
-    #         G = network_generate.rp_generate([500, 500], [p_in, p_in], p_out)
-    #         # TODO: replace with correct parameters in the config file
-    #     elif selected_graph_type == "BA":
-    #         m = int(self.parameter_entries["m"].get())
-    #         # TODO error handling: ValueError: invalid literal for int() with base 10: ''
-    #         G = network_generate.ba_generate(self.pop_size, m)
-    #     else:
-    #         messagebox.showwarning('Error', 'Unsupported Graph Type')
-
-    #     degrees = [G.degree(n) for n in G.nodes()]
-
-    #     # --------- by x axis
-
-    #     partitions = [25, 50, 75]
-
-    #     self.ax.clear()
-    #     self.ax.hist(degrees, bins=range(
-    #         min(degrees), max(degrees) + 1, 1), edgecolor='black')
-
-    #     # Draw vertical lines for partitions
-    #     for partition in partitions:
-    #         self.ax.axvline(x=partition, color='k', linestyle='--')
-
-    #     # Setting titles and labels
-    #     self.ax.set_title("Degree Distribution")
-    #     self.ax.set_xlabel("Degree")
-    #     self.ax.set_ylabel("Number of Nodes")
-    #     self.canvas.draw()
-
-    #     # Creating a dictionary to hold nodes for each partition
-    #     partitioned_nodes = {partition: [] for partition in partitions + [100]}
-
-    #     # Assign nodes to partitions
-    #     for node, degree in enumerate(degrees):
-    #         for partition in partitions:
-    #             if degree <= partition:
-    #                 partitioned_nodes[partition].append(node)
-    #                 break
-    #         else:
-    #             # For nodes with degree greater than the last partition value
-    #             partitioned_nodes[100].append(node)
-
-    #     return partitioned_nodes
-
-    #     # --------- by node values
-
-    #     # Calculate quartiles
-    #     Q1, median, Q3 = np.percentile(degrees, [25, 50, 75])
-
-    #     self.ax.clear()
-    #     self.ax.hist(degrees, bins=range(
-    #         min(degrees), max(degrees) + 1, 1), edgecolor='black')
-
-    #     # Draw vertical lines for quartiles
-    #     for quartile in [Q1, median, Q3]:
-    #         self.ax.axvline(x=quartile, color='k', linestyle='--')
-
-    #     # Setting titles and labels
-    #     self.ax.set_title("Degree Distribution")
-    #     self.ax.set_xlabel("Degree")
-    #     self.ax.set_ylabel("Number of Nodes")
-    #     self.canvas.draw()
-
-    #     # Returning the quartile values
-    #     return Q1, median, Q3
 
     def update_parameters(self, event=None):
         # clear existing parameters
@@ -442,6 +263,27 @@ class NetworkGraphApp:
                 self.table.item(child, values=updated_values)
 
         self.highlight_matched_hosts(ntwk, match_dict)
+    
+    def plot_degree_distribution(self):
+        
+        try:
+            G = nx.read_adjlist(self.network_file_path)
+            degrees = [G.degree(n) for n in G.nodes()]
+            self.ax.clear()
+        
+            degrees = [G.degree(n) for n in G.nodes()]
+            self.ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+            self.ax.set_title("Degree Distribution")
+            self.ax.set_xlabel("Degree")
+            self.ax.set_ylabel("Number of Nodes")
+            
+            # self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
+            self.canvas.draw()
+            # self.canvas_widget = self.canvas.get_tk_widget()
+            # self.canvas_widget.pack(fill=tk.BOTH, expand=True)
+        except FileNotFoundError:
+            messagebox.showerror("Error", f"Network file not found at {self.network_file_path}")
+            return
 
     def highlight_matched_hosts(self, ntwk, match_dict):
         

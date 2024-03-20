@@ -81,7 +81,7 @@
         "randomly_generate": {
             "network_model": "BA",
             "ER": {
-                "p_ER": 0.3
+                "p_ER": 0.5
             },
             "RP": {
                 "rp_size": [
@@ -95,7 +95,7 @@
                 "p_between": 9
             },
             "BA": {
-                "ba_m": 3
+                "ba_m": 2
             }
         }
     },

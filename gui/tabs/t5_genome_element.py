@@ -2,6 +2,14 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import json
 import os
+import sys
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+    
+from genetic_effect_func import *
+
 
 class GenomeElement:
     def __init__(self, parent, tab_parent, config_path):
@@ -332,9 +340,39 @@ class GenomeElement:
             self.normalize_label.pack()
             self.normalize_combobox.pack() 
             self.update_all_rg_values_button.pack()
+            
+    def parse_list_input(input_str):
+        if input_str.startswith('[') and input_str.endswith(']'):
+            input_str = input_str[1:-1]  
+        return [int(item.strip()) for item in input_str.split(',') if item.strip().isdigit()]
 
     def render_run_button(self):
         def effect_size_generation():
-            return
+            method = self.effect_size_method_var.get().strip().lower()
+            config = self.load_config_as_dict() 
+            wk_dir = config["BasicRunConfiguration"]["cwdir"]
+            n_gen = config["EvolutionModel"]["n_generation"]
+            mut_rate = config["EvolutionModel"]["mut_rate"]
+
+            if method == "user input":
+                method = "user_input"
+                effsize_path = self.path_effsize_table
+                trait_n = self.traits_num  
+            elif method == "randomly generate":
+                method = "randomly_generate"
+                effsize_path = ""
+                gff_in = self.gff
+                trait_n = self.traits_num
+                causal_sizes = self.genes_num
+                es_lows = self.effsize_min
+                es_highs = self.effsize_max
+                norm_or_not = self.normalize
+            else:
+                print("Invalid method specified")
+                return
+            
+            run_effsize_generation(method, wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, n_gen=n_gen, mut_rate=mut_rate)
+
+            
         self.run_effect_size_generation_button = tk.Button(self.scrollable_frame, text="run_effect_size_generation_button", command=effect_size_generation)
         self.run_effect_size_generation_button.pack()
