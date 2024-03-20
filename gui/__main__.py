@@ -79,15 +79,18 @@ def launch_gui(config_path):
     tab6 = ttk.Frame(tab_parent)
     network_app = Configuration(tab1, tab_parent, config_path)
     network_app = Seeds(tab2, tab_parent, config_path)
-    network_app = NetworkModel(tab3, tab_parent, config_path)
+    network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path)
+    network_model_app = NetworkModel(tab3, tab_parent, network_graph_app, config_path)
     network_app = SeedsConfiguration(tab4, tab_parent, config_path)
-    # network_app = GenomeElement(tab5, tab_parent, config_path)
-    network_app = NetworkGraphApp(tab6, tab_parent, config_path)
-    tab_parent.add(tab1, text="Configuration")
-    tab_parent.add(tab2, text="Seeds")
+    network_app = GenomeElement(tab5, tab_parent, config_path)
+    
+
+    
+    tab_parent.add(tab1, text="Basic Configuration")
+    tab_parent.add(tab2, text="Evolutionary Model")
     tab_parent.add(tab3, text="Network Model Parameters")
     tab_parent.add(tab4, text="Seeds Configuration")
-    # tab_parent.add(tab5, text="Genome Element")
+    tab_parent.add(tab5, text="Genome Element")
     tab_parent.add(tab6, text="Network Graph")
 
     tab_parent.pack(expand=1, fill='both')

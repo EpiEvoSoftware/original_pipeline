@@ -1,6 +1,1 @@
-seed_id,transmissibility,drugresist_1,drugresist_2
-0,0.25,0.0,0.0
-1,0.05,0.0,0.0
-2,0.15,0.0,0.0
-3,0.2,0.7,0.0
-4,0.25,0.0,0.0
+seed_id,transmissibility_1,transmissibility_2,transmissibility_3,transmissibility_4,transmissibility_5,transmissibility_6,transmissibility_7,transmissibility_8,transmissibility_9,transmissibility_10,transmissibility_11,transmissibility_12,transmissibility_13,transmissibility_14,transmissibility_15,transmissibility_16,drugresist_1,drugresist_2,drugresist_3,drugresist_4,drugresist_5,drugresist_6,drugresist_7
