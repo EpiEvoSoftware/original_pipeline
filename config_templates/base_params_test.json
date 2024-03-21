@@ -1,6 +1,6 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test",
+        "cwdir": "",
         "n_replicates": 1
     },
     "EvolutionModel": {
