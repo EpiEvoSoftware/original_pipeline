@@ -15,6 +15,8 @@ from tabs.t3_networkmodel import NetworkModel
 from tabs.t4_seeds_configuration import SeedsConfiguration
 from tabs.t5_genome_element import GenomeElement
 from tabs.t6_networkgraph import NetworkGraphApp
+from tabs.t7_epidemiology_model import EpidemiologyModel
+from tabs.t8_post_processing import PostProcessing
 
 
 def load_config(config_path):
@@ -77,12 +79,16 @@ def launch_gui(config_path):
     tab4 = ttk.Frame(tab_parent)
     tab5 = ttk.Frame(tab_parent)
     tab6 = ttk.Frame(tab_parent)
+    tab7 = ttk.Frame(tab_parent)
+    tab8 = ttk.Frame(tab_parent)
     network_app = Configuration(tab1, tab_parent, config_path)
     network_app = Seeds(tab2, tab_parent, config_path)
     network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path)
     network_model_app = NetworkModel(tab3, tab_parent, network_graph_app, config_path)
     network_app = SeedsConfiguration(tab4, tab_parent, config_path)
     network_app = GenomeElement(tab5, tab_parent, config_path)
+    network_app = EpidemiologyModel(tab7, tab_parent, config_path)
+    network_app = PostProcessing(tab8, tab_parent, config_path)
     
 
     
@@ -92,6 +98,8 @@ def launch_gui(config_path):
     tab_parent.add(tab4, text="Seeds Configuration")
     tab_parent.add(tab5, text="Genome Element")
     tab_parent.add(tab6, text="Network Graph")
+    tab_parent.add(tab7, text="Epidemiology Model")
+    tab_parent.add(tab8, text="Post Processing Options")
 
     tab_parent.pack(expand=1, fill='both')
 
