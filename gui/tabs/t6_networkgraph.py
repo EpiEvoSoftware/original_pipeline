@@ -7,7 +7,7 @@ if parent_dir not in sys.path:
 
 # from seed_host_match_func import *
 # from network_func import *
-from seed_host_match_func_v0 import *
+from seed_host_match_func import *
 from network_generator import *
 from base_func import read_params
 
