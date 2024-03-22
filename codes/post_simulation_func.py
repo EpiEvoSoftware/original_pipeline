@@ -1,17 +1,26 @@
-import os
-import tskit
-import pyslim
-import shutil
-import subprocess
-import inspect
+import os, tskit, pyslim, shutil, subprocess, inspect
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 
+NUM_META_COLS = 3
 
 def read_tseq(each_wk_dir_):
+	"""
+	Returns the tree sequence, sampled tree, sample size, 
+	and generation simulated in specified working directory.
+
+	Parameters:
+		each_wk_dir (str): Full directory to a single simulation.
+
+	Returns:
+		ts (TreeSequence): Tree sequence object of the sampled tree.
+		sampled_tree (TreeSequence): Tree sequence object of the sampled tree (hyploid).
+		sample_size (list[int]): List of the number of samples [0, 1, 2, ..., sample_size - 1]
+		n_gens (int): The number of generation used in simulation.
+	"""
 	ts = tskit.load(os.path.join(each_wk_dir_, "sampled_genomes.trees"))
 	n_gens = ts.metadata["SLiM"]["tick"]
 	sample_size = range(ts.tables.individuals.num_rows)
@@ -20,79 +29,99 @@ def read_tseq(each_wk_dir_):
 
 
 def find_label(tseq_smp, sim_gen, sample_size):
-	## Find the labels for every tip, labeled as ${tick}.${host_id}
+	"""
+	Returns the labels for tips, labeled as ${tick}.${host_id}. 
+	${tick} is the generation that pathogen got sampled.
+
+	Parameters:
+		tseq_smp (TreeSequence): The simplified tree sequence object.
+		sim_gen (int): The number of generation used in simulation.
+		sample_size (int): The sample size.
+	"""
 	all_tables = tseq_smp.tables
+	### ATTENTION FOR TESTING: WHAT DOES 0 MEAN IN all_tables.nodes.time?
 	leaf_time = sim_gen - all_tables.nodes.time[sample_size].astype(int)
-	leaf_id = all_tables.nodes.individual[sample_size]
-	leaf_label = []
-	table_ind = all_tables.individuals
 	real_name = {}
 	for l_id in sample_size:
-		subpop_now = table_ind[l_id].metadata["subpopulation"]
-		leaf_label.append(subpop_now)
+		subpop_now = all_tables.individuals[l_id].metadata["subpopulation"]
 		real_name[l_id] = str(leaf_time[l_id]) + "." + str(subpop_now)
-	return(real_name)
+	return real_name
 
 
 def nwk_output(tseq_smp, real_name, each_wk_dir_, seed_host_match_path):
-	##### Don't name with roots, but name with seed id?
+	"""
+	Writes transmission tree newick file for each simulation.
+
+	Parameters:
+		tseq_smp (TreeSequence): The simplified tree sequence object.
+		real_name (str): The true label.
+		each_wk_dir_ (str): The working directory for each simulation.
+		seed_host_match_path (str): Full path to seed host match file.
+	"""
 	roots_all = tseq_smp.first().roots
 	output_path = os.path.join(each_wk_dir_, "transmission_tree")
-	table_ind = tseq_smp.tables.individuals
-	match_dict = {}
-	with open(seed_host_match_path, "r") as in_csv:
-		for line in in_csv:
-			if line.startswith("seed"):
-				continue
-			else:
-				ll = line.rstrip("\n")
-				l = ll.split(",")
-				match_dict[int(l[1])] = int(l[0])
-	if not os.path.exists(output_path):
-		os.makedirs(output_path)
-	else:
-		shutil.rmtree(output_path)           # Removes all the subdirectories!
-		os.makedirs(output_path)
+	df_host_seed_match = pd.read_csv(seed_host_match_path)
+	match_dict = df_host_seed_match.set_index('host_id')['seed'].to_dict()
+	# Removes all the subdirectories
+	if os.path.exists(output_path):
+		shutil.rmtree(output_path) 
+	os.makedirs(output_path)
 	for root in roots_all:
-		root_subpop = table_ind[root].metadata["subpopulation"]
-		with open(os.path.join(output_path, str(match_dict[root_subpop]) + ".nwk"), "w") as nwk:
+		root_subpop = tseq_smp.tables.individuals[root].metadata["subpopulation"]
+		with open(os.path.join(output_path, f"{match_dict[root_subpop]}.nwk"), "w") as nwk:
 			nwk.write(tseq_smp.first().as_newick(root = root, node_labels = real_name) + "\n")
 
 
 def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
+	"""
+	Compute the trait values for all nodes given a TreeSequence object.
+
+	Parameters:
+		wk_dir_ (str): Full path to the working directory of a simulation.
+		tseq_smp (TreeSequence): The TreeSequence objects.
+		n_trait (list[int]): A list of number of traits for transmissibility and drug resistance.
+
+	"""
 	eff_size = pd.read_csv(os.path.join(wk_dir_, "causal_gene_info.csv"))
+	# Increment the end index so it is no longer inclusive
+	eff_size["end"] = int(eff_size["end"]) + 1
+	# Compute the total number of traits for both transmissibility and drug resistance.
 	num_trait = sum(n_trait)
-	search_intvls = []
-	for i in range(eff_size.shape[0]):
-		search_intvls.append(eff_size["start"][i])
-		search_intvls.append(eff_size["end"][i])
-	## Prepare mutation data for each node
+	search_intvls = np.ravel(eff_size[["start", "end"]])
+
+	# Prepare mutation data for each node
 	node_pluses = []
-	pos_values = []
-	node_ids = []
+	pos_values = [] # list of positions of mutations happened
+	node_ids = [] # list of list of nodes with specific mutations
 	node_size = tseq_smp.tables.nodes.num_rows
 	muts_size = tseq_smp.tables.mutations.num_rows
 	tree_first = tseq_smp.first()
 	trvs_order = list(tree_first.nodes(order="preorder"))
 
-	for j in range(muts_size):
-		mut = tseq_smp.mutation(j)
+	for mut_idx in range(muts_size):
+		mut = tseq_smp.mutation(mut_idx)
 		pos_values.append(tseq_smp.site(mut.site).position + 1)
 		node_ids.append(mut.node)
+	
+	# Get the indices of each mutation position if inserted into the search intervals
 	intvs = np.searchsorted(search_intvls, pos_values)
+
 	which_m2 = np.where(intvs % 2 == 1)[0]
 	real_traits_vals = []
-	if len(which_m2)==0:
-		for i in range(num_trait):
-			trait_val_now = {j:0 for j in range(node_size)}
+
+	if len(which_m2) == 0:
+		for _ in range(num_trait):
+			trait_val_now = { i: 0 for i in range(node_size)}
 			real_traits_vals.append(trait_val_now)
-		print("WARNING: There's no mutation mutations related to trait in samples from this replication.")
+		print("WARNING: There's no mutations related to any trait in samples from this replication.")
 	else:
 		colnames_df = eff_size.columns
-		for j in range(num_trait):
-			node_pluses.append({i:0 for i in range(node_size)})
+		for trait_idx in range(num_trait):
+			node_pluses.append({i: 0 for i in range(node_size)})
 			for i in which_m2:
-				node_pluses[j][node_ids[i]] += eff_size[colnames_df[j + 3]][intvs[i] // 2]
+				# nodes_ids[i] are the nodes with that specific mutation
+				# intvs[i] // 2 implies the gene that mutation belongs to
+				node_pluses[trait_idx][node_ids[i]] += eff_size[colnames_df[trait_idx + NUM_META_COLS]][intvs[i] // 2]
 		for i in range(num_trait):
 			node_plus = node_pluses[i]
 			muts_nodes = {}
@@ -105,6 +134,7 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
 				trait_val_now[u] = trait_val_now[tree_first.parent(u)] + node_plus[u]
 			trait_val_now.pop(-1)
 			real_traits_vals.append(trait_val_now)
+	# order of traversal
 	return(real_traits_vals, trvs_order)
 
 def floats_to_colors_via_matplotlib(float_values):
