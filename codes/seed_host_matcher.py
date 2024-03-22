@@ -287,16 +287,25 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 				except json.decoder.JSONDecodeError:
 					raise CustomizedError(f"The matching methods {match_scheme} is \
 						   not a valid json format.")
-				
-			if list(set(match_scheme.values())) != ["Random"]:
-				if match_scheme_param == "":
-					raise CustomizedError(f"Please specify the matching parameters (-match_scheme_param) for \
-						   'Ranking' or 'Percentile'.")
 				try:
 					match_scheme_param = json.loads(match_scheme_param)
-				except json.decoder.JSONDecodeError: 
-					raise CustomizedError(f"The matching parameters {match_scheme_param} is \
-						   not a valid json format.")
+				except json.decoder.JSONDecodeError:
+					if list(set(match_scheme.values())) != ["Random"]:
+						raise CustomizedError(f"The matching parameters {match_scheme_param} is \
+			# 			   not a valid json format.")
+					elif match_scheme_param == "": 
+						raise CustomizedError(f"Please specify the matching parameters (-match_scheme_param) for " \
+						   "'Ranking' or 'Percentile'.")
+					match_scheme_param = {seed_id: None for seed_id in range(num_seed)}
+			# if list(set(match_scheme.values())) != ["Random"]:
+			# 	if match_scheme_param == "":
+			# 		raise CustomizedError(f"Please specify the matching parameters (-match_scheme_param) for \
+			# 			   'Ranking' or 'Percentile'.")
+			# 	try:
+			# 		match_scheme_param = json.loads(match_scheme_param)
+			# 	except json.decoder.JSONDecodeError: 
+			# 		raise CustomizedError(f"The matching parameters {match_scheme_param} is \
+			# 			   not a valid json format.")
 
 			write_match(match_all_hosts(ntwk_=read_network(ntwk_path), match_method = match_scheme, 
 							   param = match_scheme_param, num_seed = num_seed), wkdir)

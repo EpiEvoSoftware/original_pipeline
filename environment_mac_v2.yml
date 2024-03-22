@@ -1,4 +1,4 @@
-name: trans_slim_test
+name: trans_slim_test_v2
 channels:
   - anaconda
   - bioconda
@@ -107,4 +107,4 @@ dependencies:
       - stack-data==0.6.3
       - traitlets==5.13.0
       - wcwidth==0.2.10
-prefix: /Users/px54/anaconda3/envs/trans_slim_test
+# prefix: /Users/px54/anaconda3/envs/trans_slim_test
