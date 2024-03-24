@@ -6,6 +6,9 @@ import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 
 NUM_META_COLS = 3
+POS_COL = 1
+TRANS_INDEX = 0
+DRUG_RES_INDEX = 1
 
 def read_tseq(each_wk_dir_):
 	"""
@@ -25,7 +28,7 @@ def read_tseq(each_wk_dir_):
 	n_gens = ts.metadata["SLiM"]["tick"]
 	sample_size = range(ts.tables.individuals.num_rows)
 	sampled_tree = ts.simplify(samples = [2 * i for i in sample_size])
-	return(ts, sampled_tree, sample_size, n_gens)
+	return ts, sampled_tree, sample_size, n_gens
 
 
 def find_label(tseq_smp, sim_gen, sample_size):
@@ -81,18 +84,22 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
 		tseq_smp (TreeSequence): The TreeSequence objects.
 		n_trait (list[int]): A list of number of traits for transmissibility and drug resistance.
 
+	Returns:
+		real_traits_vals (list[dict[int (node_id), float]]): Dictionary storing the trait values of every node.
+		trvs_order (list[int]): Pre-order traversal or nodes in the TreeSequence object.
 	"""
 	eff_size = pd.read_csv(os.path.join(wk_dir_, "causal_gene_info.csv"))
 	# Increment the end index so it is no longer inclusive
 	eff_size["end"] = int(eff_size["end"]) + 1
+	
 	# Compute the total number of traits for both transmissibility and drug resistance.
 	num_trait = sum(n_trait)
 	search_intvls = np.ravel(eff_size[["start", "end"]])
 
-	# Prepare mutation data for each node
-	node_pluses = []
+	# seem unncessary
 	pos_values = [] # list of positions of mutations happened
 	node_ids = [] # list of list of nodes with specific mutations
+
 	node_size = tseq_smp.tables.nodes.num_rows
 	muts_size = tseq_smp.tables.mutations.num_rows
 	tree_first = tseq_smp.first()
@@ -110,173 +117,269 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
 	real_traits_vals = []
 
 	if len(which_m2) == 0:
-		for _ in range(num_trait):
-			trait_val_now = { i: 0 for i in range(node_size)}
-			real_traits_vals.append(trait_val_now)
+		# for _ in range(num_trait):
+		trait_val_now = { i: 0 for i in range(node_size)}
 		print("WARNING: There's no mutations related to any trait in samples from this replication.")
-	else:
-		colnames_df = eff_size.columns
-		for trait_idx in range(num_trait):
-			node_pluses.append({i: 0 for i in range(node_size)})
-			for i in which_m2:
-				# nodes_ids[i] are the nodes with that specific mutation
-				# intvs[i] // 2 implies the gene that mutation belongs to
-				node_pluses[trait_idx][node_ids[i]] += eff_size[colnames_df[trait_idx + NUM_META_COLS]][intvs[i] // 2]
-		for i in range(num_trait):
-			node_plus = node_pluses[i]
-			muts_nodes = {}
-			for key, value in node_plus.items():
-				if value > 0:
-					muts_nodes[key] = value
-			trait_val_now = {j:0 for j in range(node_size)}
-			trait_val_now[-1]=0
-			for u in trvs_order:
-				trait_val_now[u] = trait_val_now[tree_first.parent(u)] + node_plus[u]
-			trait_val_now.pop(-1)
-			real_traits_vals.append(trait_val_now)
+		return [trait_val_now for _ in range(num_trait)], trvs_order
+	
+	for trait_idx in range(num_trait):
+		node_plus = np.zeros(node_size)
+		for mut in which_m2:
+			# nodes_ids[mut] are the nodes with that specific mutation
+			# intvs[mut] // 2 implies the gene that mutation belongs to
+			# record the effect size caused by the new mutations given the parent node
+			node_plus[node_ids[mut]] += eff_size.iloc[intvs[mut] // 2, trait_idx + NUM_META_COLS]
+		trait_val = {j: 0 for j in range(-1, node_size)}
+		for node_id in trvs_order:
+			trait_val[node_id] = trait_val[tree_first.parent(node_id)] + node_plus[node_id]
+		trait_val.pop(-1)
+		real_traits_vals.append(trait_val)
 	# order of traversal
-	return(real_traits_vals, trvs_order)
+	return real_traits_vals, trvs_order
 
 def floats_to_colors_via_matplotlib(float_values):
+	"""
+	Converts a list of float values to hexadecimal colors using Matplotlib's colormap.
+
+	Parameters:
+		float_values (list[float]): List of float values.
+
+	Returns:
+		hex_colors (list[str]): List of hexadecimal colors corresponding to the input float values.
+	"""
 	cmap = mcolors.LinearSegmentedColormap.from_list("", ["blue", "red"])
 	colors = [cmap(value) for value in float_values]
 	hex_colors = [mcolors.to_hex(color) for color in colors]
-	return(hex_colors)
+	return hex_colors
 
 
-def color_by_trait_normalized(trait_val_now, trvs_order):
-	all_traits = np.array(list(trait_val_now.values()))
-	if np.max(all_traits)-np.min(all_traits)>0:
-		normalized_traits = (all_traits-np.min(all_traits))/(np.max(all_traits)-np.min(all_traits))
+def color_by_trait_normalized(trait_val, trvs_order):
+	"""
+	Colorizes nodes based on normalized trait values.
+
+	Parameters:
+		trait_val (dict): Dictionary containing trait values for nodes.
+		trvs_order (list[int]): List of node IDs in the pre-order traversal.
+
+	Returns:
+		dict: Dictionary mapping node IDs to hexadecimal colors based on normalized trait values.
+	"""
+	all_traits = np.array(list(trait_val.values()))
+	if np.max(all_traits) > np.min(all_traits):
+		normalized_traits = (all_traits - np.min(all_traits)) / (np.max(all_traits) - np.min(all_traits))
 		color_map_nodes = floats_to_colors_via_matplotlib(normalized_traits)
-		color_map_dict = {i:color_map_nodes[i] for i in range(len(trvs_order))}
-	else:color_map_dict = {i:"#000000" for i in range(len(trvs_order))}
+		color_map_dict = {i: color_map_nodes[i] for i in range(len(trvs_order))}
+	else:
+		color_map_dict = {i:"#000000" for i in range(len(trvs_order))}
 
-	return(color_map_dict)
+	return color_map_dict
 
 def color_by_seed(tseq_smp, trvs_order, seed_host_match_path):
+	"""
+	Colorizes nodes based on seed-host matches.
+
+	Parameters:
+		tseq_smp (TreeSequence): The TreeSequence object.
+		trvs_order (list[int]): List of node IDs in the order of traversal.
+		seed_host_match_path (str): Path to the seed-host match file.
+
+	Returns:
+		dict: Dictionary mapping node IDs to hexadecimal colors based on seed-host matches.
+	"""
 	roots_all = tseq_smp.first().roots
 	table_ind = tseq_smp.tables.individuals
-	match_dict = {}
 	node_size = tseq_smp.tables.nodes.num_rows
-	trait_val_now = {j:0 for j in range(node_size)}
+	trait_val = {node_id: 0 for node_id in range(node_size)}
 	tree_first = tseq_smp.first()
 	
-	with open(seed_host_match_path, "r") as in_csv:
-		for line in in_csv:
-			if line.startswith("seed"):
-				continue
-			else:
-				ll = line.rstrip("\n")
-				l = ll.split(",")
-				match_dict[int(l[1])] = int(l[0])
+	# Read seed-host match file
+	match_dict = {}
+	df_host_seed_match = pd.read_csv(seed_host_match_path)
+	match_dict = df_host_seed_match.set_index('host_id')['seed'].to_dict()
+
+	# Create colormap based on the number of seed-host matches
 	cmap = cm.get_cmap('viridis')
 	values = np.linspace(0, 1, len(match_dict))
 	colors = cmap(values)
 	hex_codes = [mcolors.to_hex(color) for color in colors]
 
+	# Assign colors to roots based on seed-host matches
 	for root in roots_all:
-		seed_id = match_dict[table_ind[root].metadata["subpopulation"]]
-		trait_val_now[root] = hex_codes[seed_id]
+		seed_id = match_dict.get(table_ind[root].metadata.get("subpopulation", -1), -1)
+		if seed_id != -1:
+			trait_val[root] = hex_codes[seed_id]
+
+	# Propagate colors to non-root nodes
 	for u in trvs_order:
 		if u not in roots_all:
-			trait_val_now[u] = trait_val_now[tree_first.parent(u)]
-	return(trait_val_now)
+			trait_val[u] = trait_val[tree_first.parent(u)]
+
+	return trait_val
 
 
 def metadta_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color):
+	"""
+	Generates metadata for nodes based on various parameters.
+
+	Parameters:
+		sample_size (int): Number of sampled nodes.
+		trvs_order (list[int]): List of node IDs in the order of traversal.
+		sampled_ts (TreeSequence): The sampled TreeSequence object.
+		sim_gen (int): Number of simulation generations.
+		traits_num_values (list[dict[int, float]]): Trait values for each node.
+		trait_color (dict): Dictionary mapping node IDs to trait colors.
+
+	Returns:
+		dict: Dictionary containing metadata for each node.
+	"""
 	a_big_df = {}
 	sample_size_max = len(sample_size)
 	nodes_table = sampled_ts.tables.nodes
 	inds_table = sampled_ts.tables.individuals
 	tree_first = sampled_ts.first()
 	traits_num = len(traits_num_values)
+
 	for u in trvs_order:
 		node_id = str(u)
 		node_time = str(sim_gen - nodes_table.time[u].astype(int))
 		if u < sample_size_max:
 			subpop_id = str(inds_table[u].metadata["subpopulation"])
-			name = ".".join([node_time, subpop_id])
+			name = f"{node_time}.{subpop_id}"
 		else:
 			subpop_id = str(-1)
 			name = "."
 		parent_id = str(tree_first.parent(u))
 		color_by_trait = str(trait_color[u])
-		a_big_df[u] = [node_id, name, node_time, subpop_id, parent_id, color_by_trait]
-		for i in range(traits_num):
-			a_big_df[u].append(str(traits_num_values[i][u]))
-	return(a_big_df)
+		traits_values_str = [str(traits_num_values[trait_id][u]) for trait_id in range(traits_num)]
+		a_big_df[u] = [node_id, name, node_time, subpop_id, parent_id, color_by_trait] + traits_values_str
+
+	return a_big_df
 
 
 def write_metadata(mtdata, each_wk_dir_, n_trait, color_trait):
+	"""
+	Writes metadata to a CSV file.
+
+	Parameters:
+		mtdata (dict): Dictionary containing metadata for each node.
+		each_wk_dir_ (str): Full path to the directory where the CSV file will be written.
+		n_trait (list[int]): A list containing the number of traits for transmissibility 
+		and drug resistance.
+		color_trait (int): Index of the trait to be used for color coding.
+	"""
+
 	with open(os.path.join(each_wk_dir_, "transmission_tree_metadata.csv"), "w") as csv:
+		# Write header
 		if color_trait <= n_trait[0]:
 			color_trait_id = color_trait
 		else:
 			color_trait_id = color_trait - n_trait[0]
 		header = "node_id,name,node_time,subpop_id,parent_id,color_trait_" + str(color_trait_id)
 		for i in range(n_trait[0]):
-			header = header + "," + "transmissibility_" + str(i + 1)
+			header += f",transmissibility_{i + 1}"
 		for i in range(n_trait[1]):
-			header = header + "," + "drug_resistance_" + str(i + 1)
+			header += f",drug_resistance_{i + 1}"
 		csv.write(header + "\n")
-		for i in mtdata:
-			csv.write(",".join(mtdata[i]) + "\n")
+		# Write node data
+		for _, node_data in mtdata:
+			csv.write(",".join(mtdata[node_data]) + "\n")
 
 
 def output_tseq_vcf(wk_dir_, real_label, sampled_ts):
+	"""
+	Converts a TreeSequence object to VCF format and writes it to a file.
+
+	Parameters:
+		wk_dir_ (str): Full path to the working directory.
+		real_label (dict): Dictionary mapping individual IDs to their labels.
+		sampled_ts (TreeSequence): The sampled TreeSequence object.
+	"""
 	vcf_path = os.path.join(wk_dir_, "sampled_pathogen_sequences.vcf.tmp")
-	f = open(vcf_path, "w")
-	nu_ts = pyslim.convert_alleles(sampled_ts)
-	nu_ts.write_vcf(f, individual_names=real_label.values())
-	f.close()
-	with open(vcf_path, "r") as in_vcf:
-		with open(os.path.join(wk_dir_, "sampled_pathogen_sequences.vcf"), "w") as outvcf:
-			for line in in_vcf:
-				if line.startswith("#"):
-					outvcf.write(line)
-				else:
-					ll = line.split("\t")
-					new_line = ll[0] + "\t" + str(int(ll[1]) + 1) + "\t" + "\t".join(ll[2:])
-					outvcf.write(new_line)
+
+	# Write VCF file
+	with open(vcf_path, "w") as f:
+		nu_ts = pyslim.convert_alleles(sampled_ts)
+		nu_ts.write_vcf(f, individual_names = real_label.values())
+
+	# Modify position values and write to final VCF file
+	with open(vcf_path, "r") as in_vcf, open(os.path.join(wk_dir_, "sampled_pathogen_sequences.vcf"), "w") as out_vcf:
+		for line in in_vcf:
+			if line.startswith("#"):
+				out_vcf.write(line)
+			else:
+				fields = line.split("\t")
+				new_line = "\t".join(fields[:POS_COL], str(int(fields[POS_COL]) + 1), fields[POS_COL + 1:])
+				out_vcf.write(new_line)
+	
+	# Remove the temporary VCF file
 	os.remove(vcf_path)
 
 
-
-
 def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_path, color_trait=1):
-    ## wk_dir: working directory (all)
-    ## gen_model: whether to calculate trait values
-    ## color_trait: which trait to color the tree
-    ## runid
-    each_wk_dir = os.path.join(wk_dir_, str(runid))
-    full_ts, sampled_ts, sample_size, sim_gen = read_tseq(each_wk_dir)
-    real_label = find_label(sampled_ts, sim_gen, sample_size)
-    nwk_output(sampled_ts, real_label, each_wk_dir, seed_host_match_path)
-    if color_trait==0:
-        gen_model== False
-    if gen_model==True:
-        traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, n_trait)
-        if color_trait>0:
-            trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
-        else:
-            trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
-        mtdata = metadta_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
-        write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
-    output_tseq_vcf(each_wk_dir, real_label, sampled_ts)
+	"""
+	Performs data processing tasks for a specific run.
+
+	Parameters:
+		wk_dir_ (str): Working directory path.
+		gen_model (bool): Whether to calculate trait values.
+		runid (int): Identifier for the current run.
+		n_trait (list): List containing the number of traits for transmissibility and drug resistance.
+		seed_host_match_path (str): Path to the seed-host match file.
+		color_trait (int): Index of the trait to be used for coloring the tree (default is 1).
+	"""
+	# Set up directory for the current run
+	each_wk_dir = os.path.join(wk_dir_, str(runid))
+	# Read TreeSequence data
+	_, sampled_ts, sample_size, sim_gen = read_tseq(each_wk_dir)
+	# Find real labels
+	real_label = find_label(sampled_ts, sim_gen, sample_size)
+	# Write Newick output
+	nwk_output(sampled_ts, real_label, each_wk_dir, seed_host_match_path)
+
+	# Determine if trait calculation is needed
+	if color_trait == 0:
+		gen_model = False
+
+	if gen_model:
+		traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, n_trait)
+		trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
+		mtdata = metadta_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
+		write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
+	
+	# Output VCF file
+	output_tseq_vcf(each_wk_dir, real_label, sampled_ts)
 
 
 
-############################## PLOTTING ##################################
+############################## PLOTTING ###########################################################
 
 def plot_per_transmission_tree(each_wk_dir_, seed_size, slim_config_path, n_traits, seed_phylo_path):
-	rscript_path = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), "plot_tree.r")
-	subprocess.run(["Rscript", rscript_path, each_wk_dir_, str(seed_size), slim_config_path, str(n_traits[0]), str(n_traits[1]), seed_phylo_path])
-	return(0)
+	"""
+    Plots transmission trees per simulation run.
+
+    Parameters:
+        each_wk_dir_ (str): Full path to the working directory for each run.
+        seed_size (int): Number of seeds in the simulation.
+        slim_config_path (str): Path to the SLiM configuration file.
+        n_traits (tuple): Tuple containing the number of traits for transmissibility and drug resistance.
+        seed_phylo_path (str): Path to the seed phylogeny file.
+	"""
+	rscript_path = os.path.join(os.path.dirname(__file__), "plot_tree.r")
+	subprocess.run(["Rscript", rscript_path, each_wk_dir_, str(seed_size), slim_config_path, \
+				 str(n_traits[TRANS_INDEX]), str(n_traits[DRUG_RES_INDEX]), seed_phylo_path])
 
 
 def plot_strain_distribution_trajectory(each_wk_dir_, seed_size, n_generation):
-	eff_size = pd.read_csv(os.path.join(each_wk_dir_, "strain_trajectory.csv.gz"), header=None, names=range(seed_size), compression = "gzip")
+	"""
+    Plots strain distribution trajectory.
+
+    Parameters:
+        each_wk_dir_ (str): Full path to the working directory for each run.
+        seed_size (int): Number of seeds in the simulation.
+        n_generation (int): Number of generations.
+    """
+	eff_size = pd.read_csv(os.path.join(each_wk_dir_, "strain_trajectory.csv.gz"), header = None, \
+						names = range(seed_size), compression = "gzip")
 	eff_size = pd.concat([pd.DataFrame({i: [1] for i in range(seed_size)}), eff_size]).reset_index(drop=True)
 
 	eff_size_normalized = eff_size.div(eff_size.sum(axis=1), axis=0)
