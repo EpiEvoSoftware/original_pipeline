@@ -124,11 +124,11 @@ def create_slim_config(all_config):
 	if not slim_pars["use_reference"]:
 		if not os.path.exists(os.path.join(slim_pars["cwdir"], "originalvcfs")):
 			raise CustomizedError("Reference genome isn't used for seed sequences, but SeedGenerator hasn't been run. Please run SeedGenerator before running this program or specify use_reference=true.")
-		if not os.path.exists(os.path.join(slim_pars["cwdir"], "seed_host_match.csv")):
-			raise CustomizedError("HostSeedMatcher hasn't been run. Please run HostSeedMatcher before running this program.")
-		else:
-			slim_pars["seed_host_matching_path"] = os.path.join(slim_pars["cwdir"], "seed_host_match.csv")
-			out_config.write(f"seed_host_matching_path:{slim_pars["seed_host_matching_path"]}\n")
+	if not os.path.exists(os.path.join(slim_pars["cwdir"], "seed_host_match.csv")):
+		raise CustomizedError("HostSeedMatcher hasn't been run. Please run HostSeedMatcher before running this program.")
+	else:
+		slim_pars["seed_host_matching_path"] = os.path.join(slim_pars["cwdir"], "seed_host_match.csv")
+		out_config.write(f"seed_host_matching_path:{slim_pars["seed_host_matching_path"]}\n")
 	print("\"SeedsConfiguration\" Checked. ")
 
 	print("Checking \"GenomeElement\"...... ")
