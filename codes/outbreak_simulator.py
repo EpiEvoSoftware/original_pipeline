@@ -119,7 +119,7 @@ def create_slim_config(all_config):
 
 	slim_pars["use_reference"] = all_config["SeedsConfiguration"]["use_reference"]
 	_check_boolean(slim_pars["use_reference"], "Whether to use reference genome for seeds")
-	out_config.write(f"use_genetic_model:{_writebinary(slim_pars["use_reference"])}\n")
+	out_config.write(f"use_reference:{_writebinary(slim_pars["use_reference"])}\n")
 
 	if not slim_pars["use_reference"]:
 		if not os.path.exists(os.path.join(slim_pars["cwdir"], "originalvcfs")):
