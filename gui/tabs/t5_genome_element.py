@@ -293,7 +293,7 @@ class GenomeElement:
                     messagebox.showerror("Update Error", "Invalid Input.") 
                 
             
-            self.gff_label = ttk.Label(self.scrollable_frame, text="gff:")
+            self.gff_label = ttk.Label(self.scrollable_frame, text="gff: (TODO: Update to path)")
             self.gff_label.pack()
             self.gff_entry = ttk.Entry(self.scrollable_frame, foreground="black")
             self.gff_entry.insert(0, self.gff)  
