@@ -127,13 +127,10 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
             
             if model == "ER": 
                 ntwk = ER_generate(pop_size, p_ER)
-                # write_network(ER_generate(pop_size, p_ER), wk_dir)
             elif model == "RP":
                 ntwk = rp_generate(pop_size, rp_size, p_within, p_between)
-                # write_network(rp_generate(pop_size, rp_size, p_within, p_between), wk_dir)
             else:
                 ntwk = ba_generate(pop_size, m)
-                # write_network(ba_generate(pop_size, m), wk_dir)
         else:
             CustomizedError("Please provide a permitted method (user_input/randomly_generate).")
         # No Error occur
