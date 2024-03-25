@@ -217,7 +217,7 @@ def color_by_seed(tseq_smp, trvs_order, seed_host_match_path):
 	return trait_val
 
 
-def metadta_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color):
+def metadata_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color):
 	"""
 	Generates metadata for nodes based on various parameters.
 
@@ -281,8 +281,8 @@ def write_metadata(mtdata, each_wk_dir_, n_trait, color_trait):
 			header += f",drug_resistance_{i + 1}"
 		csv.write(header + "\n")
 		# Write node data
-		for _, node_data in mtdata:
-			csv.write(",".join(mtdata[node_data]) + "\n")
+		for _, node_data in mtdata.items():
+			csv.write(",".join(node_data) + "\n")
 
 
 def output_tseq_vcf(wk_dir_, real_label, sampled_ts):
@@ -308,7 +308,7 @@ def output_tseq_vcf(wk_dir_, real_label, sampled_ts):
 				out_vcf.write(line)
 			else:
 				fields = line.split("\t")
-				new_line = "\t".join(fields[:POS_COL], str(int(fields[POS_COL]) + 1), fields[POS_COL + 1:])
+				new_line = "\t".join(fields[:POS_COL]+ [str(int(fields[POS_COL]) + 1)] + fields[POS_COL + 1:])
 				out_vcf.write(new_line)
 	
 	# Remove the temporary VCF file
@@ -344,7 +344,7 @@ def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_
 	if gen_model:
 		traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, n_trait)
 		trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
-		mtdata = metadta_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
+		mtdata = metadata_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
 		write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
 	
 	# Output VCF file
@@ -414,7 +414,7 @@ def plot_SEIR_trajectory(each_wk_dir_, seed_size, host_size, n_generation):
         n_generation (int): Number of generations.
 	"""
 	seir = pd.read_csv(os.path.join(each_wk_dir_, "SEIR_trajectory.csv.gz"), \
-					heade = None, names = ["S", "E", "I", "R"])
+					header = None, names = ["S", "E", "I", "R"])
 	seir = pd.concat([pd.DataFrame({"S": [host_size - seed_size], "E": [0], \
 								 "I": [seed_size], "R": [0]}), seir]).reset_index(drop = True)
 
@@ -453,16 +453,19 @@ def plot_all_SEIR_trajectory(wk_dir_, seed_size, host_size, n_generation, run_su
 	init_df = pd.DataFrame({"S": [host_size - seed_size],"E": [0], "I": [seed_size], "R": [0]})
 
 	# Iterate through all the trajectories
-	for run_id in run_success:
+	for idx, run_id in enumerate(run_success):
 		each_wk_dir = os.path.join(wk_dir_, str(run_id))
-		seir = pd.read_csv(os.path.join(each_wk_dir, "SEIR_trajectory.csv.gz"), header = None, names = ["S, E, I, R"])
+		seir = pd.read_csv(os.path.join(each_wk_dir, "SEIR_trajectory.csv.gz"), header = None, names = ["S", "E", "I", "R"])
 		seir = pd.concat([init_df.copy(), seir]).reset_index(drop = True)
 		# SUSPICIOUS
-		ax = seir.plot(kind = 'line', figsize = (10, 6), cmap = 'viridis', alpha = 0.4)
+		if idx == 0:
+			ax = seir.plot(kind = 'line', figsize = (10, 6), cmap = 'viridis', alpha = 0.4)
+		else:
+			ax = seir.plot(ax = ax, kind = 'line', legend = None, cmap = 'viridis', alpha = 0.4)
 		seir_sum = seir_sum.add(seir, fill_value = 0)
 
 	seir_avg = seir_sum.div(len(run_success))
-	ax = seir_avg.plot(ax = ax, kind ='line', cmap = 'viridis', linewidth = 3)
+	ax = seir_avg.plot(ax = ax, kind ='line', cmap = 'viridis', linewidth = 3, legend = None)
 
 	plt.xlabel('Generations')
 	plt.ylabel('Number of hosts')
@@ -481,31 +484,34 @@ def plot_all_strain_trajectory(wk_dir_, seed_size, host_size, n_generation, run_
     Plot the trajectory of different strains over time.
 
     Parameters:
-    - wk_dir_ (str): The directory where the strain data is stored.
-    - seed_size (int): The number of initial strains.
-    - host_size (int): The total population size.
-    - n_generation (int): The number of generations.
-    - run_success (list): List of run IDs for successful simulations.
+    	wk_dir_ (str): The directory where the strain data is stored.
+    	seed_size (int): The number of initial strains.
+    	host_size (int): The total population size.
+    	n_generation (int): The number of generations.
+    	run_success (list): List of run IDs for successful simulations.
     """
 	if len(run_success) <= 0: return
 
 	# Initiate the "empty" frame
-	traj_sum = pd.DateFrame({str(i): [0] for i in range(seed_size)})
+	traj_sum = pd.DataFrame({str(i): [0] for i in range(seed_size)})
 	init_df = pd.DataFrame({str(i): [1] for i in range(seed_size)})
 	col_names = [str(i) for i in range(seed_size)]
 
 	# Iterate through all trajectoreis
-	for run_id in run_success:
-		each_wk_dir = os.path.join(wk_dir_, str[run_id])
+	for idx, run_id in enumerate(run_success):
+		each_wk_dir = os.path.join(wk_dir_, str(run_id))
 		strain_df = pd.read_csv(os.path.join(each_wk_dir, "strain_trajectory.csv.gz"), header = None, names = col_names)
-		strain_df = pd.concat(init_df, strain_df).reset_index(drop = True)
+		strain_df = pd.concat([init_df.copy(), strain_df]).reset_index(drop = True)
 		strain_df_normalized = strain_df.div(strain_df.sum(axis = 1), axis = 0)
 		# SUSPICIOUS
-		ax = strain_df_normalized.plot(kind = 'line', figsize = (10, 6), cmap = 'viridis', alpha = 0.4)
+		if idx == 0:
+			ax = strain_df_normalized.plot(kind = 'line', figsize = (10, 6), cmap = 'viridis', alpha = 0.4)
+		else:
+			ax = strain_df_normalized.plot(ax = ax, kind = 'line', legend = None, cmap = 'viridis', alpha = 0.4)
 		traj_sum = traj_sum.add(strain_df_normalized, fill_value = 0)
 
 	traj_avg = traj_sum.div(len(run_success))
-	ax = traj_avg.plot(ax = ax, kind = 'line', cmap = 'viridis', linewidth = 3)
+	ax = traj_avg.plot(ax = ax, kind = 'line', legend = None, cmap = 'viridis', linewidth = 3)
 
 	# MAYBE STACKING IS BETTER
 	plt.xlabel('Generations')
@@ -513,40 +519,11 @@ def plot_all_strain_trajectory(wk_dir_, seed_size, host_size, n_generation, run_
 	plt.title('Proportion of Different strains Through Time')
 	plt.xlim(0, n_generation)
 	plt.ylim(0, 1)
-	ax.legend(loc = 'center left', bbox_to_anchor = (1, 0.5), title = 'Strains')
 
 	plt.tight_layout()
 
 	plt.savefig(os.path.join(wk_dir_, "all_strains_trajectory.png"))
 	plt.close()
-	# each_wk_dir_ = os.path.join(wk_dir_, str(run_success[0]))
-	# strain_df = pd.read_csv(os.path.join(each_wk_dir_, "strain_trajectory.csv.gz"), header=None, names=[str(i) for i in range(seed_size)])
-	# strain_df = pd.concat([pd.DataFrame({str(i): [1] for i in range(seed_size)}), strain_df]).reset_index(drop=True)
-	# strain_df_normalized = strain_df.div(strain_df.sum(axis=1), axis=0)
 
-	# ax = strain_df_normalized.plot(kind='line', figsize=(10, 6), cmap='viridis', alpha=0.4)
-	# eff_size_sum = strain_df_normalized
-
-	# for runid in run_success[1:]:
-	# 	each_wk_dir_ = os.path.join(wk_dir_, str(runid))
-	# 	strain_df = pd.read_csv(os.path.join(each_wk_dir_, "strain_trajectory.csv.gz"), header=None, names=[str(i) for i in range(seed_size)])
-	# 	strain_df = pd.concat([pd.DataFrame({str(i): [1] for i in range(seed_size)}), strain_df]).reset_index(drop=True)
-	# 	strain_df_normalized = strain_df.div(strain_df.sum(axis=1), axis=0)
-	# 	ax = strain_df_normalized.plot(ax = ax, kind='line', cmap='viridis', legend=None, alpha=0.4)
-	# 	eff_size_sum = eff_size_sum.add(strain_df_normalized, fill_value=0)
-
-	# eff_size_avg = eff_size_sum.div(len(run_success))
-	# ax = eff_size_avg.plot(ax = ax, kind='line', cmap='viridis', legend=None, linewidth=3)
-
-	# plt.xlabel('Generations')
-	# plt.ylabel('Proportion of strain')
-	# plt.title('Change of the Proportion of Different strains Through Time')
-	# plt.xlim(0, n_generation)
-
-
-	# plt.tight_layout()
-
-	# plt.savefig(os.path.join(wk_dir_, "all_strains_trajectory.png"))
-	# plt.close()
 
 		
