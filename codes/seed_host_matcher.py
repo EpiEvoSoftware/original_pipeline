@@ -265,7 +265,7 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 	"""		
 	# Generate network path
 	ntwk_path = os.path.join(wkdir, "contact_network.adjlist")
-	
+	seed_vs_host = {}
 	# Process the parameters and save the matching results have we match all host
 	try:
 		if method=="user_input":
@@ -292,32 +292,23 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 				except json.decoder.JSONDecodeError:
 					if list(set(match_scheme.values())) != ["Random"]:
 						raise CustomizedError(f"The matching parameters {match_scheme_param} is \
-			# 			   not a valid json format.")
+	 			    not a valid json format.")
 					elif match_scheme_param == "": 
 						raise CustomizedError(f"Please specify the matching parameters (-match_scheme_param) for " \
 						   "'Ranking' or 'Percentile'.")
 					match_scheme_param = {seed_id: None for seed_id in range(num_seed)}
-			# if list(set(match_scheme.values())) != ["Random"]:
-			# 	if match_scheme_param == "":
-			# 		raise CustomizedError(f"Please specify the matching parameters (-match_scheme_param) for \
-			# 			   'Ranking' or 'Percentile'.")
-			# 	try:
-			# 		match_scheme_param = json.loads(match_scheme_param)
-			# 	except json.decoder.JSONDecodeError: 
-			# 		raise CustomizedError(f"The matching parameters {match_scheme_param} is \
-			# 			   not a valid json format.")
-
-			write_match(match_all_hosts(ntwk_=read_network(ntwk_path), match_method = match_scheme, 
-							   param = match_scheme_param, num_seed = num_seed), wkdir)
-			print(f"The matching process has successfully terminated. Please see working \
-		 directory {wkdir}/seed_host_match.csv for the seed host matching file.")
+			seed_vs_host = match_all_hosts(ntwk_=read_network(ntwk_path), match_method = match_scheme, 
+							   param = match_scheme_param, num_seed = num_seed)
+			write_match(seed_vs_host, wkdir)
+			print("The matching process has successfully terminated. Please see working \n"
+		f"directory {wkdir}/seed_host_match.csv \nfor the seed host matching file.")
 		else:
-			raise CustomizedError(f"Please provide a permitted method (-method): \
-						 user_input/Randomly_generate instead of your current input {method}.")
-		print("\n")
+			raise CustomizedError(f"Please provide a permitted method (-method): "
+						"user_input/Randomly_generate instead of your current input {method}.")
 		print("******************************************************************** \n" +
               "                         SEEDS HOSTS MACTHED                         \n" +
               "******************************************************************** \n")
+		return seed_vs_host
 	except Exception as e:
 		print(f"Seed and host match - A violation of input parameters occured: {e}")
 

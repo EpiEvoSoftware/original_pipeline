@@ -113,6 +113,7 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
         m (int): param for BA graph.
     """
     try: 
+        ntwk = None
         if method == "user_input":
             copy_input_network(wk_dir, path_network, pop_size)
     
@@ -121,7 +122,6 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
                 raise CustomizedError("You need to specify a random graph model (-model) in random \
                                       generate mode. (Supported model: ER/RP/BA)")
             if model == "ER": 
-                print(wk_dir)
                 write_network(ER_generate(pop_size, p_ER), wk_dir)
             elif model == "RP": 
                 write_network(rp_generate(pop_size, rp_size, p_within, p_between), wk_dir)
@@ -132,6 +132,7 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
         print("******************************************************************** \n" +
               "                   CONTACT NETWORK GENERATED                         \n" +
               "******************************************************************** \n")
+        
     except Exception as e:
         raise CustomizedError(f"Contact network generation - A violation of input parameters occured {e}.")
 
