@@ -111,28 +111,37 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
         p_within (list[float]): param for RP graph.
         p_between (float): param for RP graph.
         m (int): param for BA graph.
+    
+    Returns:
+        ntwk (nx.Graph): Generated network.
     """
     try: 
         ntwk = None
         if method == "user_input":
             copy_input_network(wk_dir, path_network, pop_size)
-    
+
         elif method=="randomly_generate":
             if not model in ["ER", "BP", "BA"]: 
                 raise CustomizedError("You need to specify a random graph model (-model) in random \
                                       generate mode. (Supported model: ER/RP/BA)")
+            
             if model == "ER": 
-                write_network(ER_generate(pop_size, p_ER), wk_dir)
-            elif model == "RP": 
-                write_network(rp_generate(pop_size, rp_size, p_within, p_between), wk_dir)
+                ntwk = ER_generate(pop_size, p_ER)
+                # write_network(ER_generate(pop_size, p_ER), wk_dir)
+            elif model == "RP":
+                ntwk = rp_generate(pop_size, rp_size, p_within, p_between)
+                # write_network(rp_generate(pop_size, rp_size, p_within, p_between), wk_dir)
             else:
-                write_network(ba_generate(pop_size, m), wk_dir)
+                ntwk = ba_generate(pop_size, m)
+                # write_network(ba_generate(pop_size, m), wk_dir)
         else:
             CustomizedError("Please provide a permitted method (user_input/randomly_generate).")
+        # No Error occur
+        write_network(ntwk, wk_dir)
         print("******************************************************************** \n" +
               "                   CONTACT NETWORK GENERATED                         \n" +
               "******************************************************************** \n")
-        
+        return ntwk   
     except Exception as e:
         raise CustomizedError(f"Contact network generation - A violation of input parameters occured {e}.")
 

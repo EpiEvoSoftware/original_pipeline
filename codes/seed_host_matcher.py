@@ -268,7 +268,7 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 	seed_vs_host = {}
 	# Process the parameters and save the matching results have we match all host
 	try:
-		if method=="user_input":
+		if method == "user_input":
 			if path_matching=="":
 				raise CustomizedError("Path to the user-provided matching file (-path_matching) \
 						  needs to be provided in user_provided mode.")
@@ -277,7 +277,7 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 						  doesn't exist.")
 			else: 
 				read_user_matchingfile(path_matching)
-		elif method=="Randomly_generate":
+		elif method == "Randomly_generate":
 			if match_scheme == "" and match_scheme_param == "":
 				match_scheme = {seed_id: "Random" for seed_id in range(num_seed)}
 				match_scheme_param = {seed_id: None for seed_id in range(num_seed)}
@@ -304,7 +304,7 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 		f"directory {wkdir}/seed_host_match.csv \nfor the seed host matching file.")
 		else:
 			raise CustomizedError(f"Please provide a permitted method (-method): "
-						"user_input/Randomly_generate instead of your current input {method}.")
+						f"user_input/Randomly_generate instead of your current input {method}.")
 		print("******************************************************************** \n" +
               "                         SEEDS HOSTS MACTHED                         \n" +
               "******************************************************************** \n")
