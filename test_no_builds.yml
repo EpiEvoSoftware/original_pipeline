@@ -54,6 +54,7 @@ dependencies:
   - numpy=1.26.0
   - openjpeg=2.5.0
   - openssl=3.2.0
+  - pytest
   - packaging=23.1
   - pandas=2.1.1
   - pillow=10.1.0

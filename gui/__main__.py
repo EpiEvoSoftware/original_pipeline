@@ -10,7 +10,8 @@ from tkinter import ttk
 import json
 
 from tabs.t1_configuration import Configuration
-from tabs.t2_seeds import Seeds
+from tabs.t1_configuration_v2 import Configurationv2
+from tabs.t2_evolutionarymodel import EvolutionaryModel
 from tabs.t3_networkmodel import NetworkModel
 from tabs.t4_seeds_configuration import SeedsConfiguration
 from tabs.t5_genome_element import GenomeElement
@@ -65,7 +66,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def launch_gui(config_path):
+def launch_gui(config_path, hide = False):
     """
     Launches the gui application
     """
@@ -73,6 +74,7 @@ def launch_gui(config_path):
     root = tk.Tk()
 
     tab_parent = ttk.Notebook(root)
+
     tab1 = ttk.Frame(tab_parent)
     tab2 = ttk.Frame(tab_parent)
     tab3 = ttk.Frame(tab_parent)
@@ -81,17 +83,18 @@ def launch_gui(config_path):
     tab6 = ttk.Frame(tab_parent)
     tab7 = ttk.Frame(tab_parent)
     tab8 = ttk.Frame(tab_parent)
+
     network_app = Configuration(tab1, tab_parent, config_path)
-    network_app = Seeds(tab2, tab_parent, config_path)
+    network_app = EvolutionaryModel(tab2, tab_parent, config_path)
+    # network_app = Configurationv2(tab2, tab_parent, config_path)
     network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path)
     network_model_app = NetworkModel(tab3, tab_parent, network_graph_app, config_path)
     network_app = SeedsConfiguration(tab4, tab_parent, config_path)
     network_app = GenomeElement(tab5, tab_parent, config_path)
     network_app = EpidemiologyModel(tab7, tab_parent, config_path)
     network_app = PostProcessing(tab8, tab_parent, config_path)
-    
 
-    
+
     tab_parent.add(tab1, text="Basic Configuration")
     tab_parent.add(tab2, text="Evolutionary Model")
     tab_parent.add(tab3, text="Network Model Parameters")
@@ -100,6 +103,11 @@ def launch_gui(config_path):
     tab_parent.add(tab6, text="Network Graph")
     tab_parent.add(tab7, text="Epidemiology Model")
     tab_parent.add(tab8, text="Post Processing Options")
+
+    if hide:
+        tabs = [tab2, tab3, tab4, tab5, tab6, tab7, tab8]
+        for tab in tabs:
+            tab_parent.hide(tab)
 
     tab_parent.pack(expand=1, fill='both')
 
