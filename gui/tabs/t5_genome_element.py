@@ -268,7 +268,6 @@ class GenomeElement:
                 """
                 try:
                     new_normalize = str(self.normalize_var.get())
-                    gff_value = str(self.gff_entry.get())
                     unstripped_list_genes_num_value = self.genes_num_entry.get().strip()
                     stripped_list_genes_num_value = unstripped_list_genes_num_value.strip("[]").strip()
                     unstripped_list_effsize_min_value = self.effsize_min_entry.get().strip()
@@ -282,7 +281,6 @@ class GenomeElement:
                     effsize_max_value = clean_list_input(stripped_list_effsize_max_value, unstripped_list_effsize_max_value)
 
                     config = self.load_config_as_dict()
-                    config['GenomeElement']['effect_size']['randomly_generate']["gff"] = gff_value
                     config['GenomeElement']['effect_size']['randomly_generate']['genes_num'] = genes_num_value
                     config['GenomeElement']['effect_size']['randomly_generate']['effsize_min'] = effsize_min_value
                     config['GenomeElement']['effect_size']['randomly_generate']['effsize_max'] = effsize_max_value
@@ -291,13 +289,26 @@ class GenomeElement:
                     messagebox.showinfo("Update Successful")
                 except ValueError:
                     messagebox.showerror("Update Error", "Invalid Input.") 
-                
+
+            def choose_gff():
+                """
+                path selector
+                self.gff = self.load_config_as_dict()['GenomeElement']['effect_size']['randomly_generate']["gff"]
+                """
+                chosen_file = filedialog.askopenfilename(title="Select a gff path")
+                if chosen_file:  
+                    self.gff = chosen_file
+                    self.current_gff_label.config(text=f"Ref Path: {self.gff}") 
+                    config = self.load_config_as_dict()
+                    config['GenomeElement']['effect_size']['randomly_generate']["gff"] = self.gff
+                    self.save_config(config)
             
-            self.gff_label = ttk.Label(self.scrollable_frame, text="gff: (TODO: Update to path)")
-            self.gff_label.pack()
-            self.gff_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-            self.gff_entry.insert(0, self.gff)  
-            self.gff_entry.pack()
+            self.choose_gff_label = ttk.Label(self.scrollable_frame, text="Choose gff path:")
+            self.choose_gff_label.pack()
+            self.choose_gff_button = tk.Button(self.scrollable_frame, text="Choose path", command=choose_gff)
+            self.choose_gff_button.pack()
+            self.current_gff_label = ttk.Label(self.scrollable_frame, text="Current gff path:" + self.gff)
+            self.current_gff_label.pack()
 
             self.genes_num_label = ttk.Label(self.scrollable_frame, text="genes_num:")
             self.genes_num_label.pack()
@@ -329,8 +340,9 @@ class GenomeElement:
 
             self.render_run_button()
         else:
-            self.gff_label.pack()
-            self.gff_entry.pack()
+            self.choose_gff_label.pack()
+            self.choose_gff_button.pack()
+            self.current_gff_label.pack
             self.genes_num_label.pack()
             self.genes_num_entry.pack()
             self.effsize_min_label.pack()
