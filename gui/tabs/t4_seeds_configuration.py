@@ -385,7 +385,7 @@ class SeedsConfiguration:
 
     def update_seed_size(self):
         try:
-            new_seed_size = int(self.seed_size_entry.get())  
+            new_seed_size = int(float(self.seed_size_entry.get()))  
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['seed_size'] = new_seed_size 
             self.save_config(config)  
@@ -395,7 +395,7 @@ class SeedsConfiguration:
 
     def update_burn_in_Ne(self):
         try:
-            new_burn_in_Ne = int(self.burn_in_Ne_entry.get())  
+            new_burn_in_Ne = int(float(self.burn_in_Ne_entry.get()))
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_Ne'] = new_burn_in_Ne 
             self.save_config(config)  
@@ -405,7 +405,7 @@ class SeedsConfiguration:
     
     def update_burn_in_generations_wf(self):
         try:
-            new_burn_in_generations_wf = int(self.burn_in_generations_wf_entry.get())  
+            new_burn_in_generations_wf = int(float(self.burn_in_generations_wf_entry.get()))
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_generations'] = new_burn_in_generations_wf 
             self.save_config(config)  
@@ -416,7 +416,7 @@ class SeedsConfiguration:
 
     def update_burn_in_mutrate_wf(self):
         try:
-            new_burn_in_mutrate_wf = int(self.burn_in_mutrate_wf_entry.get())  
+            new_burn_in_mutrate_wf = float(self.burn_in_mutrate_wf_entry.get())  
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_mutrate'] = new_burn_in_mutrate_wf 
             self.save_config(config)  
@@ -429,7 +429,7 @@ class SeedsConfiguration:
     # EPI
     def update_burn_in_generations_epi(self):
         try:
-            new_burn_in_generations_epi = int(self.burn_in_generations_epi_entry.get())  
+            new_burn_in_generations_epi = int(float(self.burn_in_generations_epi_entry.get()))
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_generations'] = new_burn_in_generations_epi
             self.save_config(config)  
@@ -455,9 +455,9 @@ class SeedsConfiguration:
             if cleaned_input == "":
                 parsed_new_seeded_host_id = []
             elif cleaned_input.isdigit():
-                parsed_new_seeded_host_id = [int(cleaned_input)]
+                parsed_new_seeded_host_id = [int(float(cleaned_input))]
             elif "," in new_seeded_host_id:
-                parsed_new_seeded_host_id = [int(item.strip()) for item in cleaned_input.split(',')]
+                parsed_new_seeded_host_id = [int(float(item.strip())) for item in cleaned_input.split(',')]
             else:
                 raise ValueError("Invalid input format.")
                     
@@ -509,7 +509,7 @@ class SeedsConfiguration:
 
     def update_latency_prob(self):
         try:
-            new_latency_prob = int(self.latency_prob_entry.get())  
+            new_latency_prob = int(float(self.latency_prob_entry.get()))
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['SLiM_burnin_epi']['latency_prob'] = new_latency_prob 
             self.save_config(config)  

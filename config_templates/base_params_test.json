@@ -13,9 +13,9 @@
         "cap_withinhost": 1
     },
     "SeedsConfiguration": {
-        "seed_size": 6,
+        "seed_size": 600.0,
         "use_reference": false,
-        "method": "SLiM_burnin_epi",
+        "method": "SLiM_burnin_WF",
         "user_input": {
             "path_seeds_vcf": "",
             "path_seeds_phylogeny": ""
