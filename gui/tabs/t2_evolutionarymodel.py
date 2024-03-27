@@ -87,7 +87,7 @@ class EvolutionaryModel:
 
     def update_n_generation(self):
         try:
-            new_n_generation = int(self.n_generation_entry.get())  
+            new_n_generation = int(float(self.n_generation_entry.get()))  
             config = self.load_config_as_dict() 
             config['EvolutionModel']['n_generation'] = new_n_generation 
             self.save_config(config)  
@@ -97,7 +97,7 @@ class EvolutionaryModel:
 
     def update_mut_rate(self):
         try:
-            new_mut_rate = int(self.mut_rate_entry.get())  
+            new_mut_rate = int(float(self.mut_rate_entry.get()))  
             config = self.load_config_as_dict() 
             config['EvolutionModel']['mut_rate'] = new_mut_rate 
             self.save_config(config)  
@@ -107,7 +107,7 @@ class EvolutionaryModel:
 
     def update_cap_withinhost(self):
         try:
-            new_cap_withinhost = int(self.cap_withinhost_entry.get())  
+            new_cap_withinhost = int(float(self.cap_withinhost_entry.get()))  
             config = self.load_config_as_dict() 
             config['EvolutionModel']['cap_withinhost'] = new_cap_withinhost 
             self.save_config(config)  
@@ -117,7 +117,7 @@ class EvolutionaryModel:
 
     def update_within_host_reproduction_rate(self):
         try:
-            new_within_host_reproduction_rate = int(self.within_host_reproduction_rate_entry.get())  
+            new_within_host_reproduction_rate = int(float(self.within_host_reproduction_rate_entry.get()))  
             config = self.load_config_as_dict() 
             config['EvolutionModel']['within_host_reproduction_rate'] = new_within_host_reproduction_rate 
             self.save_config(config)  

@@ -133,7 +133,8 @@ class Configuration:
 
     def update_n_replicates(self):
         try:
-            new_n_replicates = int(self.n_replicates_entry.get())  
+            new_n_replicates = int(float(self.n_replicates_entry.get()))
+            # int() doesn't process scientific notation for strings, but float() does
             config = self.load_config_as_dict() 
             config['BasicRunConfiguration']['n_replicates'] = new_n_replicates 
             self.save_config(config)  

@@ -140,8 +140,8 @@ class GenomeElement:
                         Updates the self.traits_num value in the params file
                         """
                         try:
-                            traits_num_size_value = int(self.traits_num_entry.get())
-                            traits_num_size_value_2 = int(self.traits_num_entry_2.get())
+                            traits_num_size_value = int(float(self.traits_num_entry.get()))
+                            traits_num_size_value_2 = int(float(self.traits_num_entry_2.get()))
                             config = self.load_config_as_dict()
                             config['GenomeElement']['traits_num'] = [traits_num_size_value, traits_num_size_value_2]
                             self.save_config(config)   
@@ -249,9 +249,9 @@ class GenomeElement:
                 if stripped_list_input == "":
                     parsed_new_seeded_host_id = []
                 elif stripped_list_input.isdigit():
-                    parsed_new_seeded_host_id = [int(stripped_list_input)]
+                    parsed_new_seeded_host_id = [int(float(stripped_list_input))]
                 elif "," in unstripped_list_input:
-                    parsed_new_seeded_host_id = [int(item.strip()) for item in stripped_list_input.split(',')]
+                    parsed_new_seeded_host_id = [int(float(item.strip())) for item in stripped_list_input.split(',')]
                 else:
                     raise ValueError("Invalid input format.")
                 
@@ -267,7 +267,7 @@ class GenomeElement:
                     self.normalize = ['GenomeElement']['effect_size']['randomly_generate']['normalize']
                 """
                 try:
-                    new_normalize = str(self.normalize_var.get())
+                    new_normalize = str(self.normalize_var.get()))
                     unstripped_list_genes_num_value = self.genes_num_entry.get().strip()
                     stripped_list_genes_num_value = unstripped_list_genes_num_value.strip("[]").strip()
                     unstripped_list_effsize_min_value = self.effsize_min_entry.get().strip()
@@ -356,7 +356,7 @@ class GenomeElement:
     def parse_list_input(input_str):
         if input_str.startswith('[') and input_str.endswith(']'):
             input_str = input_str[1:-1]  
-        return [int(item.strip()) for item in input_str.split(',') if item.strip().isdigit()]
+        return [int(float(item.strip())) for item in input_str.split(',') if item.strip().isdigit()]
 
     def render_run_button(self):
         def effect_size_generation():
