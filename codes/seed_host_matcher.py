@@ -81,17 +81,17 @@ def _Percentile_to_index(Percentile, node_per_percent):
 		node_per_percent: The number of nodes equivalent to a Percentile
 	"""
 	if len(Percentile) != 2:
-		raise CustomizedError(f"The Percentile range {Percentile} is not a list of two element.")
+		raise CustomizedError(f"The Percentile range {Percentile} is not a list of two element")
 	l_per, h_per = Percentile
 	# check if the Percentiles are int
 	if type(l_per) != int or type(h_per) != int:
-		raise CustomizedError(f"The Percentile range {Percentile} is not a list of integers, please reset the range.")
+		raise CustomizedError(f"The Percentile range {Percentile} is not a list of integers, please reset the range")
 	# check if the ends are out of bound
 	if min(l_per, h_per) < ZERO or max(l_per, h_per) > HUNDRED:
-		raise CustomizedError(f"The Percentile range {Percentile} is not within the closed 0-100 interval.")
+		raise CustomizedError(f"The Percentile range {Percentile} is not within the closed 0-100 interval")
 	# check the relationship between the lower and higher ends
 	if h_per <= l_per:
-		raise CustomizedError(f"The Percentile range {Percentile} is not a valid interval.")
+		raise CustomizedError(f"The Percentile range {Percentile} is not a valid interval")
 	# round the index to make sure those are integers
 	low_idx = math.ceil(node_per_percent * l_per)
 	high_idx = math.floor(node_per_percent * h_per)
@@ -110,7 +110,7 @@ def read_user_matchingfile(file_path):
 
 	# check if file exists
 	if not file_path.exists():
-		raise FileNotFoundError(f"File {file_path} not found.")
+		raise FileNotFoundError(f"Path to user defined matching file {file_path} not found")
 	# check if the json file is a valid matching file
 	if file_path.suffix.lower() == ".json":
 		try:
@@ -118,7 +118,7 @@ def read_user_matchingfile(file_path):
 				matching = json.load(file)
 				return _read_user_matchingfile_info_json(matching)
 		except json.JSONDecodeError:
-			raise ValueError(f"Invalid JSON format in {file_path}.")
+			raise ValueError(f"Invalid JSON format in {file_path}")
 	# check if the csv file is a valid matching file
 	elif file_path.suffix.lower() == ".csv":
 		try:
@@ -126,7 +126,7 @@ def read_user_matchingfile(file_path):
 			return _read_user_matchingfile_info_csv(matching)
 		except pd.errors.ParserError:
 			raise ValueError(f"Invalid CSV format in {file_path}")
-	raise ValueError("Host-seed matching file is not CSV or JSON.")
+	raise ValueError("Host-seed matching file is not CSV or JSON")
 
 def read_network(network_path):
 	"""
@@ -137,9 +137,9 @@ def read_network(network_path):
 	"""
 	network_path = Path(network_path)
 	if not network_path.exists():
-		raise FileNotFoundError(f"The provided networkX path '{network_path}' doesn't exist. \
-							Please run network_generation first before running this script \
-						  	and make sure the given working directory is correct.")
+		raise FileNotFoundError(f"The provided networkX path '{network_path}' doesn't exist. "
+							"Please run network_generation first before running this script "
+						  	"and make sure the given working directory is correct.")
 	return nx.read_adjlist(network_path, nodetype=int)
 
 def match_Random(nodes_sorted, taken_hosts, param = None):
@@ -164,10 +164,10 @@ def match_Ranking(nodes_sorted, taken_hosts, rank):
 	"""
 	ntwk_size = len(nodes_sorted)
 	if rank > ntwk_size:
-		raise CustomizedError(f"Your provided Ranking {rank} exceed host size {ntwk_size}.")
+		raise CustomizedError(f"Your provided Ranking {rank} exceed host size {ntwk_size}")
 	host = nodes_sorted[rank - 1]
 	if host in taken_hosts: 
-		raise CustomizedError(f"Host of specified rank {rank} is already taken.")
+		raise CustomizedError(f"Host of specified rank {rank} is already taken")
 	return host
 
 def match_Percentile(nodes_sorted, taken_hosts, Percentile):
@@ -187,10 +187,10 @@ def match_Percentile(nodes_sorted, taken_hosts, Percentile):
 		taken_hosts_in_range = hosts_in_range.intersection(taken_hosts)
 		available_host = list(hosts_in_range.difference(taken_hosts_in_range))
 		if available_host == []: 
-			raise CustomizedError(f"There is no host left to match in the Percentile {Percentile}.")
+			raise CustomizedError(f"There is no host left to match in the Percentile {Percentile}")
 		host = sample(available_host, 1)[0]
 		return host
-	raise CustomizedError(f"There is no host to match in the range {Percentile}%.")
+	raise CustomizedError(f"There is no host to match in the range {Percentile}%")
 	
 def write_match(match_dict, wk_dir):
 	"""
@@ -202,7 +202,9 @@ def write_match(match_dict, wk_dir):
 		wk_dir (str): Full path to the working directory.
 	"""
 	sorted_match = dict(sorted(match_dict.items(), key=lambda x:x[1]))
-	_save_dict_to_csv(sorted_match, os.path.join(wk_dir, "seed_host_match.csv"))
+	match_path = os.path.join(wk_dir, "seed_host_match.csv")
+	_save_dict_to_csv(sorted_match, match_path)
+	return match_path
 
 def match_all_hosts(ntwk_, match_method, param, num_seed):
 	"""
@@ -218,8 +220,8 @@ def match_all_hosts(ntwk_, match_method, param, num_seed):
 	"""
 	ntwk_size = ntwk_.number_of_nodes()
 	if num_seed > ntwk_size:
-		raise CustomizedError(f"It is not allowed to match {num_seed} seeds to {ntwk_size} hosts. \
-						Please reduce the number of seeds or increase the host population size.")
+		raise CustomizedError(f"It is not allowed to match {num_seed} seeds to {ntwk_size} hosts. "
+						"Please reduce the number of seeds or increase the host population size")
 	
 	# Preprocess the network
 	dict_edges_node = _build_dict_edges_node(ntwk_)
@@ -232,8 +234,8 @@ def match_all_hosts(ntwk_, match_method, param, num_seed):
 	for seed_id in range(num_seed):
 		idx_method = match_method.get(str(seed_id))
 		if idx_method not in [None, 'Ranking', 'Percentile', 'Random']:
-			raise CustomizedError(f"Please provide a valid matching method in ('Ranking', \
-						 'Percentile', 'Random') instead of {method} for seed {seed_id}")
+			raise CustomizedError("Please provide a valid matching method in ('Ranking', "
+						f"'Percentile', 'Random') instead of {method} for seed {seed_id}")
 		elif idx_method != None:
 			dict_method_seeds[idx_method].append(seed_id) 
 		else: 
@@ -256,7 +258,7 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 	in the specified directory.
 
 	Parameters:
-		method (str): "user_input" for user-provided matching or "Randomly_generated".
+		method (str): "user_input" for user-provided matching or "randomly_generated".
 		wkdir (str): Full path to the workding directory.
 		num_seed (int): Number of seeds for matching.
 		path_matching (str): Full path to the user-provided matching file.
@@ -268,16 +270,17 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 	seed_vs_host = {}
 	# Process the parameters and save the matching results have we match all host
 	try:
+		match_path = None
 		if method == "user_input":
 			if path_matching=="":
-				raise CustomizedError("Path to the user-provided matching file (-path_matching) \
-						  needs to be provided in user_provided mode.")
+				raise CustomizedError("Path to the user-provided matching file (-path_matching) "
+						  "needs to be provided in user_provided mode")
 			elif os.path.exists(path_matching) == False:
-				raise CustomizedError("Path to the user-provided matching file (-path_matching) \
-						  doesn't exist.")
+				raise CustomizedError("Path to the user-provided matching file (-path_matching) "
+						  "doesn't exist")
 			else: 
 				read_user_matchingfile(path_matching)
-		elif method == "Randomly_generate":
+		elif method == "randomly_generate":
 			if match_scheme == "" and match_scheme_param == "":
 				match_scheme = {seed_id: "Random" for seed_id in range(num_seed)}
 				match_scheme_param = {seed_id: None for seed_id in range(num_seed)}
@@ -285,30 +288,28 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 				try:
 					match_scheme = json.loads(match_scheme)
 				except json.decoder.JSONDecodeError:
-					raise CustomizedError(f"The matching methods {match_scheme} is \
-						   not a valid json format.")
+					raise CustomizedError(f"The matching methods {match_scheme} is "
+						   "not a valid json format")
 				try:
 					match_scheme_param = json.loads(match_scheme_param)
 				except json.decoder.JSONDecodeError:
 					if list(set(match_scheme.values())) != ["Random"]:
-						raise CustomizedError(f"The matching parameters {match_scheme_param} is \
-	 			    not a valid json format.")
+						raise CustomizedError(f"The matching parameters {match_scheme_param} is "
+	 			    "not a valid json format")
 					elif match_scheme_param == "": 
 						raise CustomizedError(f"Please specify the matching parameters (-match_scheme_param) for " \
-						   "'Ranking' or 'Percentile'.")
+						   "'Ranking' or 'Percentile'")
 					match_scheme_param = {seed_id: None for seed_id in range(num_seed)}
 			seed_vs_host = match_all_hosts(ntwk_=read_network(ntwk_path), match_method = match_scheme, 
 							   param = match_scheme_param, num_seed = num_seed)
-			write_match(seed_vs_host, wkdir)
-			print("The matching process has successfully terminated. Please see working \n"
-		f"directory {wkdir}/seed_host_match.csv \nfor the seed host matching file.")
+			match_path = write_match(seed_vs_host, wkdir)
 		else:
 			raise CustomizedError(f"Please provide a permitted method (-method): "
-						f"user_input/Randomly_generate instead of your current input {method}.")
+						f"user_input/randomly_generate instead of your current input {method}")
 		print("******************************************************************** \n" +
-              "                         SEEDS HOSTS MACTHED                         \n" +
-              "******************************************************************** \n")
-  
+              "                         SEEDS AND HOSTS MATCHED                     \n" +
+              "********************************************************************")
+		print(f"{match_path}")
 		return seed_vs_host
 	except Exception as e:
 		print(f"Seed and host match - A violation of input parameters occured: {e}")
@@ -322,11 +323,11 @@ def read_config_and_match(file_path, num_seed):
 		num_seed (int): Number of seeds.
 	"""
 	config_all = read_params(file_path)
-	config = config_all["SeedHostMatching"]["Randomly_generated"]
+	config = config_all["SeedHostMatching"]["randomly_generated"]
 	match_method = config["match_scheme"]
 	match_method_param = config["match_scheme_param"]
 	path_matching = config_all["SeedHostMatching"]["user_input"]["path_matching"]
-	method = "user_input" if path_matching != "" else "Randomly_generated"
+	method = "user_input" if path_matching != "" else "randomly_generated"
 	run_seed_host_match(method=method, wkdir=config_all["BasicRunConfiguration"]["cwdir"], 
 					 num_seed=num_seed, path_matching=path_matching, 
 	match_scheme=match_method, match_scheme_param=match_method_param)
