@@ -1,11 +1,11 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "",
+        "cwdir": "/Users/vivianzhao/Desktop/TB_software/wkdir",
         "n_replicates": 1
     },
     "EvolutionModel": {
-        "n_generation": 2,
-        "mut_rate": 0,
+        "n_generation": 3650,
+        "mut_rate": 3.12e-10,
         "trans_type": "additive",
         "dr_type": "additive",
         "within_host_reproduction": false,
@@ -13,7 +13,7 @@
         "cap_withinhost": 1
     },
     "SeedsConfiguration": {
-        "seed_size": 6000,
+        "seed_size": 5,
         "use_reference": false,
         "method": "SLiM_burnin_WF",
         "user_input": {
@@ -21,9 +21,9 @@
             "path_seeds_phylogeny": ""
         },
         "SLiM_burnin_WF": {
-            "burn_in_Ne": 0,
-            "burn_in_generations": 0,
-            "burn_in_mutrate": 0
+            "burn_in_Ne": 1000,
+            "burn_in_generations": 4000,
+            "burn_in_mutrate": 1.1e-07
         },
         "SLiM_burnin_epi": {
             "burn_in_generations": 0,
@@ -45,19 +45,19 @@
         "use_genetic_model": true,
         "ref_path": "",
         "traits_num": [
-            16,
-            7
+            1,
+            1
         ],
         "effect_size": {
-            "method": "",
+            "method": "randomly_generate",
             "user_input": {
                 "path_effsize_table": "/Volumes/T7/software/Downloads/new_design.pdf"
             },
             "randomly_generate": {
-                "gff": "/Users/andrewhahn/Downloads/new_design.pdf",
+                "gff": "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
                 "genes_num": [
-                    1,
-                    1
+                    10,
+                    5
                 ],
                 "effsize_min": [
                     4,
@@ -95,7 +95,7 @@
                 "p_between": 9
             },
             "BA": {
-                "ba_m": 2
+                "ba_m": 1
             }
         }
     },

@@ -168,7 +168,10 @@ class GenomeElement:
                         """
                         Updates the self.traits_num value in the params file
                         """
-                        new_effect_size_method = self.effect_size_method_var.get().strip().lower()
+                        new_effect_size_method = self.effect_size_method_var.get().strip().lower().replace(" ", "_")
+                        config = self.load_config_as_dict()
+                        config['GenomeElement']['effect_size']['method'] = new_effect_size_method
+                        self.save_config(config)
                         try:
                             if new_effect_size_method == "user_input":
                                 self.hide_elements_update_methods()
@@ -181,7 +184,7 @@ class GenomeElement:
                                 #     self.choose_path_network_button.pack()
                                 #     self.chosen_path_network_label.pack()
 
-                            elif new_effect_size_method == "randomly generate":
+                            elif new_effect_size_method == "randomly_generate":
                                 self.hide_elements_update_methods()
                                 self.render_rg_options()
                         except ValueError:
@@ -190,7 +193,7 @@ class GenomeElement:
                     self.effect_size_method_label = ttk.Label(self.scrollable_frame, text="effect_size_method:")
                     self.effect_size_method_label.pack()
                     self.effect_size_method_var = tk.StringVar()
-                    self.effect_size_method_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.effect_size_method_var, values=["user_input", "randomly generate"], state="readonly")
+                    self.effect_size_method_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.effect_size_method_var, values=["user_input", "randomly_generate"], state="readonly")
                     self.effect_size_method_combobox.pack()
                     self.update_effect_size_method_button = tk.Button(self.scrollable_frame, text="Update effect_size_method", command=update_effect_size_method)
                     self.update_effect_size_method_button.pack()
@@ -361,25 +364,23 @@ class GenomeElement:
 
     def render_run_button(self):
         def effect_size_generation():
-            method = self.effect_size_method_var.get().strip().lower()
             config = self.load_config_as_dict() 
+
+            method = config['GenomeElement']['effect_size']['method']
             wk_dir = config["BasicRunConfiguration"]["cwdir"]
             n_gen = config["EvolutionModel"]["n_generation"]
             mut_rate = config["EvolutionModel"]["mut_rate"]
+            trait_n = config['GenomeElement']['traits_num']
 
-            if method == "user input":
-                method = "user_input"
-                effsize_path = self.path_effsize_table
-                trait_n = self.traits_num  
-            elif method == "randomly generate":
-                method = "randomly_generate"
+            if method == "user_input":
+                effsize_path = config['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
+            elif method == "randomly_generate":
                 effsize_path = ""
-                gff_in = self.gff
-                trait_n = self.traits_num
-                causal_sizes = self.genes_num
-                es_lows = self.effsize_min
-                es_highs = self.effsize_max
-                norm_or_not = self.normalize
+                gff_in = config['GenomeElement']['effect_size']['randomly_generate']["gff"]
+                causal_sizes = config['GenomeElement']['effect_size']['randomly_generate']['genes_num']
+                es_lows = config['GenomeElement']['effect_size']['randomly_generate']['effsize_min']
+                es_highs = config['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
+                norm_or_not = config['GenomeElement']['effect_size']['randomly_generate']['normalize']
             else:
                 print("Invalid method specified")
                 return

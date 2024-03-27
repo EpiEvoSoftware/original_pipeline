@@ -423,8 +423,6 @@ class NetworkModelConfigurations:
                     self.ba_m_entry.pack()
                     self.update_ER_button.pack()
 
-            # else:
-            #     self.hide_elements_network_values()
 
             self.render_run_network_generation()
             messagebox.showinfo("Update Successful", "network_model changed to " + new_network_model_unconverted + ".")
@@ -440,7 +438,7 @@ class NetworkModelConfigurations:
             pop_size = int(float(self.host_size_entry.get()))
             graph_type = self.network_model_var.get()
             if graph_type == "Erdős–Rényi":
-                p_ER = float(self.p_ER_entry.get())  # Assuming p_ER_entry is an input field in your GUI
+                p_ER = float(self.p_ER_entry.get())
                 run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="ER", p_ER=p_ER)
             elif graph_type == "Barabási-Albert":
                 m = int(float(self.ba_m_entry.get()))  # Assuming ba_m_entry is an input field in your GUI

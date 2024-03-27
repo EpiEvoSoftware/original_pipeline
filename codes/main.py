@@ -4,7 +4,7 @@ from base_func import *
 from seeds_func import *
 from genetic_effect_func import *
 from seed_host_match_func import *
-from simulation_func import *
+from original_pipeline.codes.outbreak_simulator import *
 
 
 
