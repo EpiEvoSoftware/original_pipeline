@@ -131,6 +131,7 @@ class GenomeElement:
             config = self.load_config_as_dict()
             config['GenomeElement']['use_genetic_model'] = self.string_to_bool_mapping[new_use_network_model]
             self.save_config(config)
+            
 
             # break
             if new_use_network_model == "Yes":
@@ -267,7 +268,7 @@ class GenomeElement:
                     self.normalize = ['GenomeElement']['effect_size']['randomly_generate']['normalize']
                 """
                 try:
-                    new_normalize = str(self.normalize_var.get()))
+                    new_normalize = str(self.normalize_var.get())
                     unstripped_list_genes_num_value = self.genes_num_entry.get().strip()
                     stripped_list_genes_num_value = unstripped_list_genes_num_value.strip("[]").strip()
                     unstripped_list_effsize_min_value = self.effsize_min_entry.get().strip()

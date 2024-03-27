@@ -106,6 +106,7 @@ def launch_gui(config_path, hide = False):
 
     if hide:
         tabs = [tab2, tab3, tab4, tab5, tab6, tab7, tab8]
+        # tabs = [ tab4, tab5, tab6, tab7, tab8]
         for tab in tabs:
             tab_parent.hide(tab)
 
