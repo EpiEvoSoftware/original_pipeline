@@ -3,6 +3,14 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import json
 import os
+import sys
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+from seed_generator import *
+
+
 # TODO: seed_size = len(seeded_host_id), validate
 class SeedsConfiguration:
     def __init__(self, parent, tab_parent, config_path):
@@ -353,7 +361,7 @@ class SeedsConfiguration:
                     self.R_S_rate_entry.pack()
                     self.update_R_S_rate_button.pack()
 
-
+            self.render_run_button()
             messagebox.showinfo("Update Successful", "method changed.")
         else:
             messagebox.showerror("Update Error", "Please enter a valid entry for method.")
@@ -385,7 +393,7 @@ class SeedsConfiguration:
 
     def update_seed_size(self):
         try:
-            new_seed_size = int(self.seed_size_entry.get())  
+            new_seed_size = int(float(self.seed_size_entry.get()))  
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['seed_size'] = new_seed_size 
             self.save_config(config)  
@@ -395,7 +403,7 @@ class SeedsConfiguration:
 
     def update_burn_in_Ne(self):
         try:
-            new_burn_in_Ne = int(self.burn_in_Ne_entry.get())  
+            new_burn_in_Ne = int(float(self.burn_in_Ne_entry.get()))
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_Ne'] = new_burn_in_Ne 
             self.save_config(config)  
@@ -405,7 +413,7 @@ class SeedsConfiguration:
     
     def update_burn_in_generations_wf(self):
         try:
-            new_burn_in_generations_wf = int(self.burn_in_generations_wf_entry.get())  
+            new_burn_in_generations_wf = int(float(self.burn_in_generations_wf_entry.get()))
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_generations'] = new_burn_in_generations_wf 
             self.save_config(config)  
@@ -416,7 +424,7 @@ class SeedsConfiguration:
 
     def update_burn_in_mutrate_wf(self):
         try:
-            new_burn_in_mutrate_wf = int(self.burn_in_mutrate_wf_entry.get())  
+            new_burn_in_mutrate_wf = float(self.burn_in_mutrate_wf_entry.get())  
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_mutrate'] = new_burn_in_mutrate_wf 
             self.save_config(config)  
@@ -429,7 +437,7 @@ class SeedsConfiguration:
     # EPI
     def update_burn_in_generations_epi(self):
         try:
-            new_burn_in_generations_epi = int(self.burn_in_generations_epi_entry.get())  
+            new_burn_in_generations_epi = int(float(self.burn_in_generations_epi_entry.get()))
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_generations'] = new_burn_in_generations_epi
             self.save_config(config)  
@@ -455,9 +463,9 @@ class SeedsConfiguration:
             if cleaned_input == "":
                 parsed_new_seeded_host_id = []
             elif cleaned_input.isdigit():
-                parsed_new_seeded_host_id = [int(cleaned_input)]
+                parsed_new_seeded_host_id = [int(float(cleaned_input))]
             elif "," in new_seeded_host_id:
-                parsed_new_seeded_host_id = [int(item.strip()) for item in cleaned_input.split(',')]
+                parsed_new_seeded_host_id = [int(float(item.strip())) for item in cleaned_input.split(',')]
             else:
                 raise ValueError("Invalid input format.")
                     
@@ -509,7 +517,7 @@ class SeedsConfiguration:
 
     def update_latency_prob(self):
         try:
-            new_latency_prob = int(self.latency_prob_entry.get())  
+            new_latency_prob = int(float(self.latency_prob_entry.get()))
             config = self.load_config_as_dict() 
             config['SeedsConfiguration']['SLiM_burnin_epi']['latency_prob'] = new_latency_prob 
             self.save_config(config)  
@@ -617,4 +625,43 @@ class SeedsConfiguration:
             self.R_S_rate_label.pack_forget()
             self.R_S_rate_entry.pack_forget()
             self.update_R_S_rate_button.pack_forget()
-            # 
+    def render_run_button(self):
+        def seed_generation():
+            config = self.load_config_as_dict()
+            cwdir = config["BasicRunConfiguration"]["cwdir"]
+            seed_size = config["SeedsConfiguration"]["seed_size"]
+            method = config["SeedsConfiguration"]["method"]
+            ref_path = "/Users/vivianzhao/Desktop/TB_software/TB_software_new/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.fna"
+            
+            if method == "SLiM_burnin_WF":
+                Ne = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_Ne"]
+                n_gen = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_generations"]
+                mu = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_mutrate"]
+                run_seed_generation(method=method, wk_dir=cwdir, seed_size=seed_size, Ne=Ne,
+                                    mu=mu, n_gen=n_gen, ref_path=ref_path)
+            elif method == "SLiM_burnin_epi":
+                n_gen = config["SeedsConfiguration"]["SLiM_burnin_epi"]["burn_in_generations"]
+                mu = config["SeedsConfiguration"]["SLiM_burnin_epi"]["burn_in_mutrate"]
+                seeded_host_id = config["SeedsConfiguration"]["SLiM_burnin_epi"]["seeded_host_id"]
+                S_IE_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["S_IE_rate"]
+                E_I_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["E_I_rate"]
+                E_R_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["E_R_rate"]
+                latency_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"]["latency_prob"]
+                I_R_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["I_R_rate"]
+                I_E_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["I_E_rate"]
+                R_S_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["R_S_rate"]
+                host_size = config["NetworkModelParameters"]["host_size"]
+                
+                run_seed_generation(method=method, wk_dir=cwdir, seed_size=seed_size, mu=mu, n_gen=n_gen, 
+                            seeded_host_id=seeded_host_id, S_IE_rate=S_IE_rate, E_I_rate=E_I_rate,
+                            E_R_rate=E_R_rate, latency_prob=latency_prob, I_R_rate=I_R_rate, 
+                            I_E_rate=I_E_rate, R_S_rate=R_S_rate, host_size=host_size, ref_path=ref_path)
+
+            elif method == "user_input":
+                path_seeds_vcf = config["SeedsConfiguration"]["user_input"]["path_seeds_vcf"]
+                path_seeds_phylogeny = config["SeedsConfiguration"]["user_input"]["path_seeds_phylogeny"]
+                run_seed_generation(method=method, wk_dir=cwdir, seed_size=seed_size, seed_vcf=path_seeds_vcf, 
+                                    path_seeds_phylogeny=path_seeds_phylogeny)
+
+        self.run_seed_generation_button = tk.Button(self.scrollable_frame, text="Run Seed Generation", command=seed_generation)
+        self.run_seed_generation_button.pack()

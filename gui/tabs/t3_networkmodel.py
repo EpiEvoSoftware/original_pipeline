@@ -138,7 +138,7 @@ class NetworkModelConfigurations:
 
     def update_host_size(self):
         try:
-            new_host_size = int(self.host_size_entry.get())  
+            new_host_size = int(float(self.host_size_entry.get()))
             config = self.load_config_as_dict() 
             config['NetworkModelParameters']['host_size'] = new_host_size 
             self.save_config(config)  
@@ -148,7 +148,7 @@ class NetworkModelConfigurations:
 
     def update_mut_rate(self):
         try:
-            new_mut_rate = int(self.mut_rate_entry.get())  
+            new_mut_rate = int(float(self.mut_rate_entry.get()))  
             config = self.load_config_as_dict() 
             config['EvolutionModel']['mut_rate'] = new_mut_rate 
             self.save_config(config)  
@@ -158,7 +158,7 @@ class NetworkModelConfigurations:
 
     def update_cap_withinhost(self):
         try:
-            new_cap_withinhost = int(self.cap_withinhost_entry.get())  
+            new_cap_withinhost = int(float(self.cap_withinhost_entry.get()))
             config = self.load_config_as_dict() 
             config['EvolutionModel']['cap_withinhost'] = new_cap_withinhost 
             self.save_config(config)  
@@ -168,7 +168,7 @@ class NetworkModelConfigurations:
 
     def update_within_host_reproduction_rate(self):
         try:
-            new_within_host_reproduction_rate = int(self.within_host_reproduction_rate_entry.get())  
+            new_within_host_reproduction_rate = int(float(self.within_host_reproduction_rate_entry.get()))
             config = self.load_config_as_dict() 
             config['EvolutionModel']['within_host_reproduction_rate'] = new_within_host_reproduction_rate 
             self.save_config(config)  
@@ -338,11 +338,11 @@ class NetworkModelConfigurations:
                         Updates the self.rp_size value in the params file
                         """
                         try:
-                            rp_size_value = int(self.rp_size_entry.get())
-                            rp_size_value_2 = int(self.rp_size_entry_2.get())
-                            p_within_value = int(self.p_within_entry.get())
-                            p_within_value_2 = int(self.p_within_entry_2.get())
-                            p_between_value = int(self.p_between_entry.get())
+                            rp_size_value = int(float(self.rp_size_entry.get()))
+                            rp_size_value_2 = int(float(self.rp_size_entry_2.get()))
+                            p_within_value = int(float(self.p_within_entry.get()))
+                            p_within_value_2 = int(float(self.p_within_entry_2.get()))
+                            p_between_value = int(float(self.p_between_entry.get()))
 
                             config = self.load_config_as_dict()
                             config['NetworkModelParameters']['randomly_generate']['RP']['rp_size'] = [rp_size_value, rp_size_value_2]
@@ -403,7 +403,7 @@ class NetworkModelConfigurations:
                         Updates the self.ba_m value in the params file
                         """
                         try:
-                            ba_m_value = int(self.ba_m_entry.get())
+                            ba_m_value = int(float(self.ba_m_entry.get()))
                             config = self.load_config_as_dict()
                             config['NetworkModelParameters']['randomly_generate']['BA']['ba_m'] = ba_m_value
                             self.save_config(config)   
@@ -423,8 +423,6 @@ class NetworkModelConfigurations:
                     self.ba_m_entry.pack()
                     self.update_ER_button.pack()
 
-            # else:
-            #     self.hide_elements_network_values()
 
             self.render_run_network_generation()
             messagebox.showinfo("Update Successful", "network_model changed to " + new_network_model_unconverted + ".")
@@ -437,17 +435,17 @@ class NetworkModelConfigurations:
         config = self.load_config_as_dict() 
         wk_dir = config["BasicRunConfiguration"]["cwdir"]
         def run_network_generate():
-            pop_size = int(self.host_size_entry.get())
+            pop_size = int(float(self.host_size_entry.get()))
             graph_type = self.network_model_var.get()
             if graph_type == "Erdős–Rényi":
-                p_ER = float(self.p_ER_entry.get())  # Assuming p_ER_entry is an input field in your GUI
+                p_ER = float(self.p_ER_entry.get())
                 run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="ER", p_ER=p_ER)
             elif graph_type == "Barabási-Albert":
-                m = int(self.ba_m_entry.get())  # Assuming ba_m_entry is an input field in your GUI
+                m = int(float(self.ba_m_entry.get()))  # Assuming ba_m_entry is an input field in your GUI
                 run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="BA", m=m)
             elif graph_type == "Random Partition":
                 # Assuming rp_size_entry, p_within_entry, p_between_entry are input fields in your GUI
-                rp_size = [int(part) for part in self.rp_size_entry.get().split(',')]  # User inputs comma-separated sizes
+                rp_size = [int(float(part)) for part in self.rp_size_entry.get().split(',')]  # User inputs comma-separated sizes
                 p_within = [float(p) for p in self.p_within_entry.get().split(',')]  # User inputs comma-separated probabilities
                 p_between = float(self.p_between_entry.get())
                 run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="RP", rp_size=rp_size, p_within=p_within, p_between=p_between)

@@ -22,6 +22,7 @@ class PostProcessing:
         self.config_path = config_path
 
         self.cwdir = self.load_config_as_dict()['BasicRunConfiguration']['cwdir']
+        
 # Postprocessing_options Configurations
         self.do_postprocess = self.load_config_as_dict()['Postprocessing_options']['do_postprocess']
         self.branch_color_trait = self.load_config_as_dict()['Postprocessing_options']['tree_plotting']['branch_color_trait']

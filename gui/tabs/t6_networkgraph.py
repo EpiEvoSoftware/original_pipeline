@@ -1,13 +1,13 @@
 import sys
 import os
+import json
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
-# from seed_host_match_func import *
-# from network_func import *
-from seed_host_match_func import *
+from seed_host_matcher import *
 from network_generator import *
 from base_func import read_params
 
@@ -240,15 +240,14 @@ class NetworkGraphApp:
         return [""]
 
     def match_hosts(self):
-        wk_dir = self.load_config_as_dict()["BasicRunConfiguration"]["cwdir"]
-        ntwk_path = os.path.join(wk_dir, "contact_network.adjlist")
+        wkdir = self.load_config_as_dict()["BasicRunConfiguration"]["cwdir"]
+        ntwk_path = os.path.join(wkdir, "contact_network.adjlist")
         ntwk = read_network(ntwk_path)
         
         num_seed = len(self.table.get_children())
 
         match_methods, match_params = self.collect_matching_criteria()
-
-        match_dict = match_all_hosts(ntwk, match_methods, match_params, num_seed)
+        match_dict = run_seed_host_match("Randomly_generate", wkdir, num_seed, match_scheme=match_methods, match_scheme_param=match_params)
 
 
         for child in self.table.get_children():
@@ -344,6 +343,8 @@ class NetworkGraphApp:
             else:  # For "Random", no specific parameter is needed
                 match_params[seed_id] = None
 
+        match_methods = json.dumps(match_methods)
+        match_params = json.dumps(match_params)
         return match_methods, match_params
     
     def load_config_as_dict(self):

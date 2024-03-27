@@ -140,8 +140,8 @@ class GenomeElement:
                         Updates the self.traits_num value in the params file
                         """
                         try:
-                            traits_num_size_value = int(self.traits_num_entry.get())
-                            traits_num_size_value_2 = int(self.traits_num_entry_2.get())
+                            traits_num_size_value = int(float(self.traits_num_entry.get()))
+                            traits_num_size_value_2 = int(float(self.traits_num_entry_2.get()))
                             config = self.load_config_as_dict()
                             config['GenomeElement']['traits_num'] = [traits_num_size_value, traits_num_size_value_2]
                             self.save_config(config)   
@@ -167,7 +167,10 @@ class GenomeElement:
                         """
                         Updates the self.traits_num value in the params file
                         """
-                        new_effect_size_method = self.effect_size_method_var.get().strip().lower()
+                        new_effect_size_method = self.effect_size_method_var.get().strip().lower().replace(" ", "_")
+                        config = self.load_config_as_dict()
+                        config['GenomeElement']['effect_size']['method'] = new_effect_size_method
+                        self.save_config(config)
                         try:
                             if new_effect_size_method == "user_input":
                                 self.hide_elements_update_methods()
@@ -180,7 +183,7 @@ class GenomeElement:
                                 #     self.choose_path_network_button.pack()
                                 #     self.chosen_path_network_label.pack()
 
-                            elif new_effect_size_method == "randomly generate":
+                            elif new_effect_size_method == "randomly_generate":
                                 self.hide_elements_update_methods()
                                 self.render_rg_options()
                         except ValueError:
@@ -189,7 +192,7 @@ class GenomeElement:
                     self.effect_size_method_label = ttk.Label(self.scrollable_frame, text="effect_size_method:")
                     self.effect_size_method_label.pack()
                     self.effect_size_method_var = tk.StringVar()
-                    self.effect_size_method_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.effect_size_method_var, values=["user_input", "randomly generate"], state="readonly")
+                    self.effect_size_method_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.effect_size_method_var, values=["user_input", "randomly_generate"], state="readonly")
                     self.effect_size_method_combobox.pack()
                     self.update_effect_size_method_button = tk.Button(self.scrollable_frame, text="Update effect_size_method", command=update_effect_size_method)
                     self.update_effect_size_method_button.pack()
@@ -249,9 +252,9 @@ class GenomeElement:
                 if stripped_list_input == "":
                     parsed_new_seeded_host_id = []
                 elif stripped_list_input.isdigit():
-                    parsed_new_seeded_host_id = [int(stripped_list_input)]
+                    parsed_new_seeded_host_id = [int(float(stripped_list_input))]
                 elif "," in unstripped_list_input:
-                    parsed_new_seeded_host_id = [int(item.strip()) for item in stripped_list_input.split(',')]
+                    parsed_new_seeded_host_id = [int(float(item.strip())) for item in stripped_list_input.split(',')]
                 else:
                     raise ValueError("Invalid input format.")
                 
@@ -268,7 +271,6 @@ class GenomeElement:
                 """
                 try:
                     new_normalize = str(self.normalize_var.get())
-                    gff_value = str(self.gff_entry.get())
                     unstripped_list_genes_num_value = self.genes_num_entry.get().strip()
                     stripped_list_genes_num_value = unstripped_list_genes_num_value.strip("[]").strip()
                     unstripped_list_effsize_min_value = self.effsize_min_entry.get().strip()
@@ -282,7 +284,6 @@ class GenomeElement:
                     effsize_max_value = clean_list_input(stripped_list_effsize_max_value, unstripped_list_effsize_max_value)
 
                     config = self.load_config_as_dict()
-                    config['GenomeElement']['effect_size']['randomly_generate']["gff"] = gff_value
                     config['GenomeElement']['effect_size']['randomly_generate']['genes_num'] = genes_num_value
                     config['GenomeElement']['effect_size']['randomly_generate']['effsize_min'] = effsize_min_value
                     config['GenomeElement']['effect_size']['randomly_generate']['effsize_max'] = effsize_max_value
@@ -291,13 +292,26 @@ class GenomeElement:
                     messagebox.showinfo("Update Successful")
                 except ValueError:
                     messagebox.showerror("Update Error", "Invalid Input.") 
-                
+
+            def choose_gff():
+                """
+                path selector
+                self.gff = self.load_config_as_dict()['GenomeElement']['effect_size']['randomly_generate']["gff"]
+                """
+                chosen_file = filedialog.askopenfilename(title="Select a gff path")
+                if chosen_file:  
+                    self.gff = chosen_file
+                    self.current_gff_label.config(text=f"Ref Path: {self.gff}") 
+                    config = self.load_config_as_dict()
+                    config['GenomeElement']['effect_size']['randomly_generate']["gff"] = self.gff
+                    self.save_config(config)
             
-            self.gff_label = ttk.Label(self.scrollable_frame, text="gff:")
-            self.gff_label.pack()
-            self.gff_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-            self.gff_entry.insert(0, self.gff)  
-            self.gff_entry.pack()
+            self.choose_gff_label = ttk.Label(self.scrollable_frame, text="Choose gff path:")
+            self.choose_gff_label.pack()
+            self.choose_gff_button = tk.Button(self.scrollable_frame, text="Choose path", command=choose_gff)
+            self.choose_gff_button.pack()
+            self.current_gff_label = ttk.Label(self.scrollable_frame, text="Current gff path:" + self.gff)
+            self.current_gff_label.pack()
 
             self.genes_num_label = ttk.Label(self.scrollable_frame, text="genes_num:")
             self.genes_num_label.pack()
@@ -329,8 +343,9 @@ class GenomeElement:
 
             self.render_run_button()
         else:
-            self.gff_label.pack()
-            self.gff_entry.pack()
+            self.choose_gff_label.pack()
+            self.choose_gff_button.pack()
+            self.current_gff_label.pack
             self.genes_num_label.pack()
             self.genes_num_entry.pack()
             self.effsize_min_label.pack()
@@ -344,29 +359,27 @@ class GenomeElement:
     def parse_list_input(input_str):
         if input_str.startswith('[') and input_str.endswith(']'):
             input_str = input_str[1:-1]  
-        return [int(item.strip()) for item in input_str.split(',') if item.strip().isdigit()]
+        return [int(float(item.strip())) for item in input_str.split(',') if item.strip().isdigit()]
 
     def render_run_button(self):
         def effect_size_generation():
-            method = self.effect_size_method_var.get().strip().lower()
             config = self.load_config_as_dict() 
+
+            method = config['GenomeElement']['effect_size']['method']
             wk_dir = config["BasicRunConfiguration"]["cwdir"]
             n_gen = config["EvolutionModel"]["n_generation"]
             mut_rate = config["EvolutionModel"]["mut_rate"]
+            trait_n = config['GenomeElement']['traits_num']
 
-            if method == "user input":
-                method = "user_input"
-                effsize_path = self.path_effsize_table
-                trait_n = self.traits_num  
-            elif method == "randomly generate":
-                method = "randomly_generate"
+            if method == "user_input":
+                effsize_path = config['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
+            elif method == "randomly_generate":
                 effsize_path = ""
-                gff_in = self.gff
-                trait_n = self.traits_num
-                causal_sizes = self.genes_num
-                es_lows = self.effsize_min
-                es_highs = self.effsize_max
-                norm_or_not = self.normalize
+                gff_in = config['GenomeElement']['effect_size']['randomly_generate']["gff"]
+                causal_sizes = config['GenomeElement']['effect_size']['randomly_generate']['genes_num']
+                es_lows = config['GenomeElement']['effect_size']['randomly_generate']['effsize_min']
+                es_highs = config['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
+                norm_or_not = config['GenomeElement']['effect_size']['randomly_generate']['normalize']
             else:
                 print("Invalid method specified")
                 return
