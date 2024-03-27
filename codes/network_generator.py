@@ -97,8 +97,7 @@ def copy_input_network(wk_dir, path_network, pop_size):
         raise CustomizedError("The provided network doesn't have the same number of nodes "
                               f"({len(ntwk)}) as the host population size ({pop_size}) specified.")
 
-    write_network(ntwk, wk_dir)
-
+    return ntwk
 
 def run_network_generation(pop_size, wk_dir, method, model="", path_network="", p_ER=0, rp_size=[], p_within=[], p_between=0, m=0):
     """
@@ -122,7 +121,7 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
     try: 
         ntwk = None
         if method == "user_input":
-            copy_input_network(wk_dir, path_network, pop_size)
+            ntwk = copy_input_network(wk_dir, path_network, pop_size)
 
         elif method == "randomly_generate":
             if not model in ["ER", "BP", "BA"]: 
