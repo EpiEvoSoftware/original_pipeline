@@ -5,10 +5,5 @@ workdir
 # Global ignore for Python cache directories
 **/__pycache__/
 
-<<<<<<< HEAD
-.vscode/*
-=======
 
-# Global ignore for Python cache directories
-**/__pycache__/
->>>>>>> af65f0580da44aee9a842ebc418dec02aeac2049
+.vscode/*
