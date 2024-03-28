@@ -40,7 +40,7 @@ class Configurationv2:
         # Pack the treeview finally
         tree.pack(expand=True, fill='both')
 
-
+#         self.control_frame = ttk.Frame(self.parent, width=300)
 #         diagnostic_label = ttk.Label(self.control_frame, text="Choose Working Directory")
 #         diagnostic_label.pack()
 #         choose_directory_button = tk.Button(self.control_frame, text="Choose Directory", command=self.choose_directory)

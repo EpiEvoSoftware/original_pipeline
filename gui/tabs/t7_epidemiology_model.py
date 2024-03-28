@@ -90,50 +90,34 @@ class EpidemiologyModel:
         self.render_model()
         self.render_n_epoch()
         self.render_epoch_changing_generation()
-        self.render_transmissibility()
-        
+        self.render_transmissibility()  
         self.render_cap_transmissibility()
-
         self.render_cap_drugresist()
-            
-        self.render_drug_resistance()
-                
-       
-                
+        self.render_drug_resistance()     
         self.render_S_IE_rate()
-                
         self.render_I_R_rate()
-                
         self.render_R_S_rate()
-                
         self.render_latency_prob()
-                
         self.render_E_I_rate()
-                
         self.render_I_E_rate()
-                
         self.render_E_R_rate()
-                
         self.render_sample_rate()
-                
         self.render_transition_rate_recovery_prob_after_sampling()
-                
         self.render_massive_sampling()
-                
         self.render_massive_sampling_generation()
-                
         self.render_massive_sampling_probability()
-                
         self.render_massive_sampling_after_sampling()
-                
-        
         self.render_super_infection()
-          
 
     def update_generic(self):
         return
     
     def render_model(self):
+        def update_model():
+            self.model = self.model_var.get()
+            self.save_config(self.model)
+            messagebox.showinfo("Model Updated", "Model has been updated to " + self.model)
+    
         self.model_label = ttk.Label(self.scrollable_frame, text="model:")
         self.model_label.pack()
         self.model_var = tk.StringVar(value=self.model)
