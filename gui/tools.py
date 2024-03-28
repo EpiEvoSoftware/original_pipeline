@@ -5,6 +5,7 @@ import traceback
 import os, sys
 import tkinter as tk
 import json
+# from tkinter import ttk, messagebox, filedialog
 
 class CreateToolTip(object):
     """
@@ -158,3 +159,52 @@ def load_config_as_dict(config_path):
 def save_config(config_path, config):
     with open(config_path, 'w') as file:
         json.dump(config, file, indent=4)
+
+def update_nested_dict(d, keys, value):
+    """
+    Update a nested dictionary of arbitrary depth
+    """
+    if len(keys) == 1:
+        d[keys[0]] = value
+    else:
+        update_nested_dict(d[keys[0]], keys[1:], value)
+
+def update_list_int_params(entry, keys_path, config_path, prev_val = None, instance_name = ""):
+    try:
+        stripped_entry = entry.get().strip()
+        cleaned_input = stripped_entry.strip("[]").strip()
+        
+        if cleaned_input == "":
+            new_parsed = []
+        elif cleaned_input.isdigit():
+            new_parsed = [int(float(cleaned_input))]
+        elif "," in stripped_entry:
+            new_parsed = [int(float(item.strip())) for item in cleaned_input.split(',')]
+        else:
+            raise ValueError("Invalid input format.")
+        
+        config = load_config_as_dict(config_path)
+        update_nested_dict(config, keys_path, new_parsed)
+        save_config(config_path, config)
+
+        # if new_parsed != prev_val:
+            # setattr(self, keys_path[-1], new_parsed)
+            # messagebox.showinfo("Success", "Updated successfully") 
+        tk.messagebox.showinfo("Success", "Updated successfully") 
+    except ValueError: # This catches cases where conversion to integer fails
+        tk.messagebox.showerror("Update Error", "Please enter a valid list of numbers, separated by commas.")
+    except Exception as e: # General error handling (e.g., file operation failures)
+        tk.messagebox.showerror("Update Error", str(e))
+
+
+string_to_bool_mapping = {
+    "yes": True,
+    "no": False,
+    "Yes": True,
+    "No": False
+}
+
+bool_to_string_mapping = {
+    True: "Yes",
+    False: "No"
+}

@@ -110,16 +110,26 @@
         }
     },
     "EpidemiologyModel": {
-        "model": "",
+        "model": "SIR",
         "epoch_changing": {
-            "n_epoch": 1,
-            "epoch_changing_generation": []
+            "n_epoch": 3,
+            "epoch_changing_generation": [
+                1,
+                2,
+                4
+            ]
         },
         "genetic_architecture": {
             "transmissibility": [],
-            "cap_transmissibility": [],
+            "cap_transmissibility": [
+                1,
+                2
+            ],
             "drug_resistance": [],
-            "cap_drugresist": []
+            "cap_drugresist": [
+                1,
+                5
+            ]
         },
         "transiton_rate": {
             "S_IE_rate": [],
@@ -130,7 +140,10 @@
             "I_E_rate": [],
             "E_R_rate": [],
             "sample_rate": [],
-            "recovery_prob_after_sampling": []
+            "recovery_prob_after_sampling": [
+                1,
+                9
+            ]
         },
         "massive_sampling": {
             "event_num": 0,
