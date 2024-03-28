@@ -58,7 +58,7 @@ def seeds_trait_calc(wk_dir, dict_c_g):
 						"If you want to use seed sequence different than reference genome, "
 						"you must run seed_generator first")
 
-	seeds = os.listdir(seeds_vcf_dir)
+	seeds = ["seed." + str(i) + ".vcf" for i in range(len(os.listdir(seeds_vcf_dir)))]
 	for seed in seeds:
 		# iterate through all seeds
 		sum_trait = 0
