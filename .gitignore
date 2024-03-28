@@ -12,3 +12,6 @@ workdir
 
 gui/__pycache__/*
 codes/__pycache__/*
+__pycache__/
+*.pyc
+*.pyo
