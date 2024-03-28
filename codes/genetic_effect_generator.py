@@ -1,11 +1,9 @@
 from base_func import *
 from random import sample
 from error_handling import CustomizedError
-import os
-import statistics
 import numpy as np
 import pandas as pd
-import argparse
+import argparse, sys, statistics, os
 
 START_IDX = 0
 END_IDX = 1
@@ -15,6 +13,7 @@ GFF_START = 3
 GFF_END = 4
 GFF_INFO = 8
 
+os.environ['PYTHONUNBUFFERED'] = '1'
 
 def _count_gff_genes(gff_path):
 	"""
@@ -360,7 +359,11 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[
         norm_or_not (bool, optional): Boolean indicating whether to normalize effect sizes.
         n_gen (int, optional): Number of generations for randomly_generate method.
         mut_rate (float or int, optional): Mutation rate for randomly_generate method.
+
+	Returns:
+		error_message (str): Error message.
 	"""
+	error_message = None
 	try:
 		if len(trait_n) != 2:
 			raise CustomizedError("Please specify exactly 2 traits quantities in a list (-trait_n for transmissibility and drug resistance)")
@@ -377,7 +380,10 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[
               "                  GENETIC ARCHITECTURES GENERATED		            \n" +
               "******************************************************************** \n")
 	except Exception as e:
-		print(f"Genetic effects generation - A violation of input parameters occured: {e}.")
+		print(f"Genetic effects generation - An error occured: {e}.")
+		error_message = e
+
+	return error_message
 
 def effsize_generation_byconfig(all_config):
 	"""
@@ -392,13 +398,14 @@ def effsize_generation_byconfig(all_config):
 	effsize_method = genetic_config["effect_size"]["method"]
 
 
-	eff_params_config = genetic_config["randomly_generate"]
-	run_effsize_generation(method=effsize_method, wk_dir=wk_dir, trait_n=genetic_config["traits_num"], 
+	eff_params_config = genetic_config["effect_size"]["randomly_generate"]
+	error = run_effsize_generation(method=effsize_method, wk_dir=wk_dir, trait_n=genetic_config["traits_num"], 
 						 effsize_path=genetic_config["effect_size"]["user_input"]["path_effsize_table"],
 						 causal_sizes=eff_params_config["genes_num"], es_lows=eff_params_config["effsize_min"], 
 						 es_highs=eff_params_config["effsize_max"], gff_in=eff_params_config["gff"], 
 						 n_gen=all_config["EvolutionModel"]["n_generation"], mut_rate=all_config["EvolutionModel"]["mut_rate"], 
 						 norm_or_not=eff_params_config["normalize"])
+	return error
 
 
 def main():
