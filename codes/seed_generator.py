@@ -1,4 +1,4 @@
-import os, subprocess, shutil, tskit, random, pyslim, argparse
+import os, subprocess, shutil, tskit, random, pyslim, argparse, sys
 from error_handling import CustomizedError
 from base_func import *
 import ete3 as Tree
@@ -31,7 +31,7 @@ VCF_HEAD = """\
 """
 
 NODES_PER_IND = 2
-PHYLO_DIR = "seeds_phylogeny_uncoalesced"
+# PHYLO_DIR = "seeds_phylogeny_uncoalesced"
 NW_PRE = ".nwk"
 NW_PATH = "seeds.nwk"
 VCF_PATH = "seeds.vcf"
@@ -41,6 +41,8 @@ WF_SLIM = "burnin_WF.slim"
 EPI_SLIM = "burnin_epi.slim"
 OUT_SLIM = "burn-in_slim.stdout"
 TRAJ = "burn_in_SEIR_trajectory.csv.gz"
+
+os.environ['PYTHONUNBUFFERED'] = '1'
 
 def _create_seeds_directory(wk_dir):
 	"""
@@ -162,6 +164,7 @@ def _write_newick_file(wk_dir, sampled_tree, node_labels):
 	# Write newicks depending on whether this is a multi-root tree
 	if len(roots) > 1:
 		for r in roots:
+			os.mkdir(phylo_path)
 			with open(os.path.join(phylo_path, str(r) + NEWICK_SUFFIX), "w") as nwk:	
 				nwk.write(sampled_tree.first().as_newick(root=r, node_labels = node_labels))
 	else:
@@ -423,7 +426,11 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
         I_R_rate (float, optional): Rate of transition from infected to recovered.
         I_E_rate (float, optional): Rate of transition from infected to exposed.
         R_S_rate (float, optional): Rate of transition from recovered to susceptible.
+
+		Returns:
+			error_message (str): Error message.
     """
+	error_message = None
 	try:	
 		if not os.path.exists(wk_dir):
 			raise CustomizedError(f"The provided working ({wk_dir}) doesn't exist")
@@ -440,11 +447,11 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 			elif not os.path.exists(ref_path):
 				raise FileNotFoundError(f"The path to the reference genome {ref_path} provided doesn't exist")
 			if mu <= 0:
-				raise CustomizedError(f"You need to specify a mutation rate (-mu) bigger than 0 "
-						"instead of {mu} in SLiM burn-in mode")
+				raise CustomizedError("You need to specify a mutation rate (-mu) bigger than 0 "
+						f"instead of {mu} in SLiM burn-in mode")
 			if n_gen <= 0:
-				raise CustomizedError(f"You need to specify a burn-in generation (-n_gen) bigger than 0 "
-						"instead of {n_gen} in SLiM burn-in mode")
+				raise CustomizedError("You need to specify a burn-in generation (-n_gen) bigger than 0 "
+						f"instead of {n_gen} in SLiM burn-in mode")
 			if method == "SLiM_burnin_WF":
 				seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen)
 			else:
@@ -457,9 +464,13 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
               "                   	    SEEDS GENERATED		                        \n" +
               "******************************************************************** \n")
 	except Exception as e:
-		print(f"Seed sequences generation - A violation of input parameters occured: {e}.")
+		print(f"Seed sequences generation - A error occured: {e}.")
+		error_message = e
+	
+	return error_message
 
-def seeds_generation_byconfig(file_path):
+
+def seeds_generation_byconfig(all_config):
 	"""
 	Generate seed sequences and phylogenies given the configuration file.
 
@@ -467,27 +478,23 @@ def seeds_generation_byconfig(file_path):
 		file_path (str): Full path to the configuration file.
 	"""
 	# Read parameters
-	all_config = read_params(file_path)
+	# all_config = read_params(file_path, "base_params.json")
 	seeds_config = all_config["SeedsConfiguration"]
-	wk_dir = seeds_config["BasicRunConfiguration"]["cwdir"]
+	wk_dir = all_config["BasicRunConfiguration"]["cwdir"]
 	method = seeds_config["method"]
-	seed_size = seeds_config["seeds_size"]
+	seed_size = seeds_config["seed_size"]
 	seed_vcf = seeds_config["user_input"]["path_seeds_vcf"]
 	path_seeds_phylogeny = seeds_config["user_input"]["path_seeds_phylogeny"]
 	Ne = seeds_config["SLiM_burnin_WF"]["burn_in_Ne"]
 	ref_path = all_config["GenomeElement"]["ref_path"]
 	if method== "user_input":
 		n_gen = 0
-	elif method == "SLiM_burnin_WF":
-		n_gen = seeds_config["SLiM_burnin_WF"]["burn_in_generations"]
-		mu = seeds_config["SLiM_burnin_WF"]["burn_in_Ne"]
-	elif method == "SLiM_burnin_epi":
-		n_gen = seeds_config["SLiM_burnin_epi"]["burn_in_generations"]
-		mu = seeds_config["SLiM_burnin_epi"]["burn_in_Ne"]
+	n_gen = seeds_config[method]["burn_in_generations"]
+	mu = seeds_config[method]["burn_in_mutrate"]
 
 	host_size = all_config["NetworkModelParameters"]["host_size"]
 	seeded_host_id = seeds_config["SLiM_burnin_epi"]["seeded_host_id"]
-	S_IE_rate = seeds_config["user_input"]["S_IE_rate"]
+	S_IE_rate = seeds_config["SLiM_burnin_epi"]["S_IE_rate"]
 	E_I_rate = seeds_config["SLiM_burnin_epi"]["E_I_rate"]
 	E_R_rate = seeds_config["SLiM_burnin_epi"]["E_R_rate"]
 	latency_prob = seeds_config["SLiM_burnin_epi"]["latency_prob"]
@@ -496,12 +503,12 @@ def seeds_generation_byconfig(file_path):
 	R_S_rate = seeds_config["SLiM_burnin_epi"]["R_S_rate"]
 
 	# Run simulation for seed generation
-	run_seed_generation(method=method, wk_dir=wk_dir, seed_size=seed_size, seed_vcf=seed_vcf, Ne=Ne, \
+	error = run_seed_generation(method=method, wk_dir=wk_dir, seed_size=seed_size, seed_vcf=seed_vcf, Ne=Ne, \
 					 	ref_path=ref_path, mu=mu, n_gen=n_gen, path_seeds_phylogeny=path_seeds_phylogeny, \
 						host_size=host_size, seeded_host_id=seeded_host_id, S_IE_rate=S_IE_rate, \
 						E_I_rate=E_I_rate, E_R_rate=E_R_rate, latency_prob=latency_prob, 
 						I_R_rate=I_R_rate, I_E_rate=I_E_rate, R_S_rate=R_S_rate)
-
+	return error
 
 def main():
 	parser = argparse.ArgumentParser(description='Generate or modify seeds.')

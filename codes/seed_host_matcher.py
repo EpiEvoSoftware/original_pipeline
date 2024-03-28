@@ -1,9 +1,11 @@
-import os, networkx as nx, json, pandas as pd, math, argparse
+import os, networkx as nx, json, pandas as pd, math, argparse, sys
 from random import sample
 from collections import defaultdict
 from pathlib import Path
 from error_handling import CustomizedError
 from base_func import *
+
+os.environ['PYTHONUNBUFFERED'] = '1'
 
 # Magic numbers
 HUNDRED = 100
@@ -264,10 +266,15 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 		path_matching (str): Full path to the user-provided matching file.
 		match_scheme (str): JSON string of matching methods for seeds.
 		match_scheme_param (str): JSON string of matching parameters for seeds.
+
+	Returns:
+		seed_vs_host (dict[int, int]): A dictionary that maps seeds to hosts.
+		error_message (str): Error message.
 	"""		
 	# Generate network path
 	ntwk_path = os.path.join(wkdir, "contact_network.adjlist")
-	seed_vs_host = {}
+	seed_vs_host = None
+	error_message = None
 	# Process the parameters and save the matching results have we match all host
 	try:
 		match_path = None
@@ -309,12 +316,14 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 		print("******************************************************************** \n" +
               "                         SEEDS AND HOSTS MATCHED                     \n" +
               "********************************************************************")
-		print(f"{match_path}")
-		return seed_vs_host
+		print("Seed host matching:", match_path)
 	except Exception as e:
-		print(f"Seed and host match - A violation of input parameters occured: {e}")
+		print(f"Seed and host match - A error occured: {e}.")
+		error_message = e
 
-def read_config_and_match(file_path, num_seed):
+	return seed_vs_host, error_message
+
+def read_config_and_match(config_all):
 	"""
 	Write matching file given the configuration file.
 
@@ -322,15 +331,17 @@ def read_config_and_match(file_path, num_seed):
 		file_path (str): Full path to the configuration file.
 		num_seed (int): Number of seeds.
 	"""
-	config_all = read_params(file_path)
-	config = config_all["SeedHostMatching"]["randomly_generated"]
-	match_method = config["match_scheme"]
-	match_method_param = config["match_scheme_param"]
+	match_random_config = config_all["SeedHostMatching"]["randomly_generate"]
+	match_method = match_random_config["match_scheme"]
+	match_method_param = match_random_config["match_scheme_param"]
 	path_matching = config_all["SeedHostMatching"]["user_input"]["path_matching"]
-	method = "user_input" if path_matching != "" else "randomly_generated"
-	run_seed_host_match(method=method, wkdir=config_all["BasicRunConfiguration"]["cwdir"], 
-					 num_seed=num_seed, path_matching=path_matching, 
-	match_scheme=match_method, match_scheme_param=match_method_param)
+	method = config_all["SeedHostMatching"]['method']
+	num_seed = config_all["SeedsConfiguration"]["seed_size"]
+	_, error = run_seed_host_match(method = method, wkdir = config_all["BasicRunConfiguration"]["cwdir"], 
+					 num_seed = num_seed, path_matching = path_matching, 
+	match_scheme = match_method, match_scheme_param = match_method_param)
+
+	return error
 
 def main():
 	parser = argparse.ArgumentParser(description='Match seeds and hosts.')
@@ -356,8 +367,8 @@ def main():
 	match_scheme = args.match_scheme
 	match_scheme_param = args.match_scheme_param
 
-	run_seed_host_match(method=method, wkdir=wkdir, num_seed=num_seed, path_matching=path_matching, 
-                     match_scheme=match_scheme, match_scheme_param=match_scheme_param)
+	run_seed_host_match(method = method, wkdir = wkdir, num_seed = num_seed, path_matching = path_matching, 
+                     match_scheme = match_scheme, match_scheme_param = match_scheme_param)
 
 if __name__ == "__main__":
     main()

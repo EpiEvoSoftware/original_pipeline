@@ -1,7 +1,8 @@
-import networkx as nx, os, argparse
+import networkx as nx, os, argparse, sys
 from base_func import *
 from error_handling import CustomizedError
 
+os.environ['PYTHONUNBUFFERED'] = '1'
 
 def write_network(ntwk_, wk_dir):
     """
@@ -120,9 +121,11 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
     
     Returns:
         ntwk (nx.Graph): Generated network.
+        error_message (str): Error message.
     """
+    ntwk = None
+    error_message = None
     try: 
-        ntwk = None
         if method == "user_input":
             ntwk = copy_input_network(wk_dir, path_network, pop_size)
 
@@ -144,10 +147,13 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
         print("******************************************************************** \n" +
               "                   CONTACT NETWORK GENERATED                         \n" +
               "********************************************************************")
-        print(ntwk_path)
-        return ntwk   
+        print("Contact network:", ntwk_path)  
     except Exception as e:
-        print(f"Contact network generation - A violation of input parameters occured: {e}.")
+        print(f"Contact network generation - An error occured: {e}.")
+        error_message = e
+
+
+    return ntwk, error_message
 
 def network_generation_byconfig(all_config):
     ntwk_config = all_config["NetworkModelParameters"]
@@ -169,10 +175,11 @@ def network_generation_byconfig(all_config):
     # BA params
     ba_m=ntwk_config["randomly_generate"]["BA"]["ba_m"]
 
-    run_network_generation(pop_size = pop_size, wk_dir = wk_dir, method = ntwk_method, 
+    _, error = run_network_generation(pop_size = pop_size, wk_dir = wk_dir, method = ntwk_method, 
                            path_network = path_network, model = model, p_ER = p_ER, 
                            p_within = p_within, p_between = p_between, 
-                           rp_size = rp_size, ba_m = ba_m)
+                           rp_size = rp_size, m = ba_m)
+    return error
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a contact network for the population \

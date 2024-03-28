@@ -1,5 +1,5 @@
 ### The main script to run the whole pipeline
-import argparse
+import argparse, sys
 from base_func import *
 from network_generator import network_generation_byconfig
 from seed_generator import seeds_generation_byconfig
@@ -8,6 +8,20 @@ from seed_host_matcher import read_config_and_match
 from outbreak_simulator import all_slim_simulation_by_config
 
 
+header = r"""
+
+	_______ .__   __.  __  ____    ____  ______    __      
+	|   ____||  \ |  | |  | \   \  /   / /  __  \  |  |     
+	|  |__   |   \|  | |  |  \   \/   / |  |  |  | |  |     
+	|   __|  |  . `  | |  |   \      /  |  |  |  | |  |     
+	|  |____ |  |\   | |  |    \    /   |  `--'  | |  `----.
+	|_______||__| \__| |__|     \__/     \______/  |_______|
+                                                        
+"""
+
+def _exit(error_m):
+	if error_m != None:
+		sys.exit("Simulation ends.")
 
 def main():
 	parser = argparse.ArgumentParser(description='Run the whole simulation process by the configuration provided.')
@@ -20,24 +34,26 @@ def main():
 	## Read the parameters and store them into a dictionary
 	param_dict = read_params(config_path, "base_params.json")
 
-	# try:
-	# Network generation
-	network_generation_byconfig(param_dict)
+	print(header)
+	## Network generation
+	error = network_generation_byconfig(param_dict)
+	_exit(error)
 
 	## Seeds generation
-	seeds_generation_byconfig(param_dict)
+	error = seeds_generation_byconfig(param_dict)
+	_exit(error)
 
 	## Effect size generation
-	effsize_generation_byconfig(param_dict)
+	error = effsize_generation_byconfig(param_dict)
+	_exit(error)
 
 	## Seed-host match
-	read_config_and_match(param_dict) ######## UNIFINISHED
+	error = read_config_and_match(param_dict) ######## UNIFINISHED
+	_exit(error)
 
 	## Simulation
-	all_slim_simulation_by_config(param_dict)
-
-	# except Exception as e:
-	# 	print(e)
+	error = all_slim_simulation_by_config(param_dict)
+	_exit(error)
 
 
 if __name__ == "__main__":
