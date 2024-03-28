@@ -3,6 +3,12 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import json
 import os
+import shutil
+import sys
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
 
 class PostProcessing:
     def __init__(self, parent, tab_parent, config_path):
@@ -42,7 +48,15 @@ class PostProcessing:
         generate_config_file_button.pack()
 
     def generate_config_file(self):
-        return
+        source = 'config_templates/base_params_test.json'
+        target = os.path.join(self.cwdir, 'base_params.json')
+        
+        try:
+            shutil.copy(source, target)
+        except IOError as e:
+            print("Unable to copy file. %s" % e)
+        
+
 
     def load_config_as_dict(self):
         with open(self.config_path, 'r') as file:

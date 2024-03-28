@@ -15,3 +15,7 @@ codes/__pycache__/*
 __pycache__/
 *.pyc
 *.pyo
+
+
+__pycache__/
+*.pyc
