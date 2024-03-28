@@ -1,21 +1,12 @@
 workdir
 .python-version
-.python-version
 
 # Global ignore for Python cache directories
 **/__pycache__/
 .vscode/*
-
-**/__pycache__/
-
-.vscode/*
-
 gui/__pycache__/*
 codes/__pycache__/*
 __pycache__/
 *.pyc
 *.pyo
 
-
-__pycache__/
-*.pyc
