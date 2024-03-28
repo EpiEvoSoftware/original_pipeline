@@ -131,6 +131,7 @@ class GenomeElement:
             config = self.load_config_as_dict()
             config['GenomeElement']['use_genetic_model'] = self.string_to_bool_mapping[new_use_network_model]
             self.save_config(config)
+            
 
             # break
             if new_use_network_model == "Yes":

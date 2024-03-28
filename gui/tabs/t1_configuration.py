@@ -24,6 +24,8 @@ class Configuration:
 
         self.render_ref_path_label()
 
+        self.render_next_button()
+
 
     def render_next_button(self):
         # next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)

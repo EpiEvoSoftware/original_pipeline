@@ -9,7 +9,7 @@ class EpidemiologyModel:
 
         self.config_path = config_path
 
-# Epidemiology Model Configurations
+    # Epidemiology Model Configurations
         self.model = self.load_config_as_dict()['EpidemiologyModel']['model']
 
     # epoch changing
