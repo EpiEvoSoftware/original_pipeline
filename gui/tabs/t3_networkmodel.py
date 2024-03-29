@@ -21,20 +21,25 @@ from tabs.t6_networkgraph import NetworkGraphApp
 
 
 class NetworkModel:
-    def __init__(self, parent, tab_parent, network_graph_app, config_path):
+    def __init__(self, parent, tab_parent, network_graph_app, config_path, tab_title, tab_index, hide = False):
         self.top_frame = ttk.Frame(parent)
         self.bottom_frame = ttk.Frame(parent)
         
         self.top_frame.pack(side="top", fill="both", expand=True)
         self.bottom_frame.pack(side="bottom", fill="both", expand=True)
         
-        self.graph = NetworkModelGraph(self.bottom_frame, tab_parent, network_graph_app, config_path)
-        self.sidebar = NetworkModelConfigurations(self.top_frame, tab_parent, config_path, self.graph)
+        self.graph = NetworkModelGraph(self.bottom_frame, tab_parent, network_graph_app, config_path, tab_title)
+        self.sidebar = NetworkModelConfigurations(self.top_frame, tab_parent, config_path, self.graph, tab_title)
+        self.tab_parent = tab_parent
+        self.tab_parent.add(parent, text=tab_title)
+        if hide:
+            self.tab_parent.tab(tab_index, state="disabled")
+        self.tab_index = tab_index
 
         
 
 class NetworkModelConfigurations:
-    def __init__(self, parent, tab_parent, config_path, graph):
+    def __init__(self, parent, tab_parent, config_path, graph, tab_title):
         self.graph = graph
         self.network_model_to_string = {
             "Erdős–Rényi": "ER",
@@ -50,10 +55,6 @@ class NetworkModelConfigurations:
         
         self.graph_values = ["Erdős–Rényi", "Barabási-Albert", "Random Partition"]
 
-        bool_to_string_mapping = {
-            True: "Yes",
-            False: "No"
-        }
 
         self.config_path = config_path
 
@@ -76,7 +77,7 @@ class NetworkModelConfigurations:
 
         self.parent = parent
         self.tab_parent = tab_parent
-        self.dynamic_widgets = []
+        
 
         self.control_frame = ttk.Frame(self.parent, width=300)
         self.control_frame.pack(fill='both', expand=True) 
@@ -171,8 +172,9 @@ class NetworkModelConfigurations:
             messagebox.showerror("Update Error", "Please enter a valid integer for within_host_reproduction_rate.") 
 
     def go_to_next_tab(self):
-        current_tab_index = self.tab_parent.index(self.tab_parent.select())
+        current_tab_index = self.tab_index
         next_tab_index = (current_tab_index + 1) % self.tab_parent.index("end")
+        self.tab_parent.tab(next_tab_index, state="normal")
         self.tab_parent.select(next_tab_index)
 
     def load_config_as_dict(self):
@@ -524,7 +526,7 @@ class NetworkModelConfigurations:
             self.update_ER_button.pack_forget()
 
 class NetworkModelGraph:
-    def __init__(self, parent, tab_parent, network_graph_app, config_path):
+    def __init__(self, parent, tab_parent, network_graph_app, config_path, tab_title):
         self.parent = parent
         self.tab_parent = tab_parent
         self.config_path = config_path

@@ -5,7 +5,7 @@ import json
 from tools import *
 #TODO: change mut_rate and within_host_reproduction_rate to float
 class EvolutionaryModel:
-    def __init__(self, parent, tab_parent, config_path):
+    def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
         self.config_path = config_path
 
         self.n_generation = load_config_as_dict(self.config_path)['EvolutionModel']['n_generation']
@@ -18,7 +18,10 @@ class EvolutionaryModel:
 
         self.parent = parent
         self.tab_parent = tab_parent
-        self.dynamic_widgets = []
+        self.tab_index = tab_index
+        self.tab_parent.add(parent, text=tab_title)
+        if hide:
+            self.tab_parent.tab(self.tab_index, state="disabled")
 
         self.control_frame = ttk.Frame(self.parent, width=300)
         self.control_frame.pack(fill='both', expand=True) 
@@ -168,10 +171,11 @@ class EvolutionaryModel:
 
 
     def go_to_next_tab(self):
-        current_tab_index = self.tab_parent.index(self.tab_parent.select())
+        current_tab_index = self.tab_index
         next_tab_index = (current_tab_index + 1) % self.tab_parent.index("end")
+        self.tab_parent.tab(next_tab_index, state="normal")
         self.tab_parent.select(next_tab_index)
-
+        
     def load_config_as_dict(self):
         with open(self.config_path, 'r') as file:
             return json.load(file)

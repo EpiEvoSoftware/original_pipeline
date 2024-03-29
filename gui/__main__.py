@@ -17,6 +17,8 @@ from tabs.t4_seeds_configuration import SeedsConfiguration
 from tabs.t5_genome_element import GenomeElement
 from tabs.t6_networkgraph import NetworkGraphApp
 from tabs.t7_epidemiology_model import EpidemiologyModel
+from tabs.t7_epidemiology_model_v2 import EpidemiologyModelv2
+from tabs.t7_epidemiology_model_v3 import EpidemiologyModelv3
 from tabs.t8_post_processing import PostProcessing
 
 
@@ -63,6 +65,7 @@ def parse_args():
                         help='path to the configuration JSON file', default="config_templates/base_params_test.json")
     parser.add_argument('-v', '--view', action='store_true',
                         help='visualize network graph')
+    parser.add_argument('--hide', action='store_true', help='Set hide to False, default is True')
     return parser.parse_args()
 
 
@@ -72,6 +75,7 @@ def launch_gui(config_path, hide = False):
     """
 
     root = tk.Tk()
+    root.title("Epidemiology Evolution")
 
     tab_parent = ttk.Notebook(root)
 
@@ -84,31 +88,37 @@ def launch_gui(config_path, hide = False):
     tab7 = ttk.Frame(tab_parent)
     tab8 = ttk.Frame(tab_parent)
 
-    network_app = Configuration(tab1, tab_parent, config_path)
-    network_app = EvolutionaryModel(tab2, tab_parent, config_path)
-    # network_app = Configurationv2(tab2, tab_parent, config_path)
-    network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path)
-    network_model_app = NetworkModel(tab3, tab_parent, network_graph_app, config_path)
-    network_app = SeedsConfiguration(tab4, tab_parent, config_path)
-    network_app = GenomeElement(tab5, tab_parent, config_path)
-    network_app = EpidemiologyModel(tab7, tab_parent, config_path)
-    network_app = PostProcessing(tab8, tab_parent, config_path)
-
-
-    tab_parent.add(tab1, text="Basic Configuration")
-    tab_parent.add(tab2, text="Evolutionary Model")
-    tab_parent.add(tab3, text="Network Model Parameters")
-    tab_parent.add(tab4, text="Seeds Configuration")
-    tab_parent.add(tab5, text="Genome Element")
-    tab_parent.add(tab6, text="Network Graph")
-    tab_parent.add(tab7, text="Epidemiology Model")
-    tab_parent.add(tab8, text="Post Processing Options")
-
     if hide:
-        tabs = [tab2, tab3, tab4, tab5, tab6, tab7, tab8]
-        # tabs = [ tab4, tab5, tab6, tab7, tab8]
-        for tab in tabs:
-            tab_parent.hide(tab)
+        network_app = Configuration(tab1, tab_parent, config_path, "Basic Configuration", 0, hide = True)
+        network_app = EpidemiologyModelv2(tab2, tab_parent, config_path, "Evolutionary Model", 1, hide = True)
+        # network_app = Configurationv2(tab2, tab_parent, config_path, hide = True)
+        network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path, "Network Graph", 2, hide = True)
+        network_model_app = NetworkModel(tab3, tab_parent, network_graph_app, config_path, "Network Model Parameters", 3, hide = True)
+        network_app = Configurationv2(tab4, tab_parent, config_path, "Seeds Configuration", 4, hide = True)
+        network_app = GenomeElement(tab5, tab_parent, config_path, "Genome Element", 5, hide = True)
+        network_app = EpidemiologyModel(tab7, tab_parent, config_path, "Epidemiology Model", 6, hide = True)
+        network_app = PostProcessing(tab8, tab_parent, config_path, "Post Processing Options", 7, hide = True)
+    else:
+        network_app = Configuration(tab1, tab_parent, config_path, "Basic Configuration", 0)
+        network_app = EpidemiologyModelv2(tab2, tab_parent, config_path, "Evolutionary Model", 1)
+        # network_app = Configurationv2(tab2, tab_parent, config_path)
+        network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path, "Network Graph", 2)
+        network_model_app = NetworkModel(tab3, tab_parent, network_graph_app, config_path, "Network Model Parameters", 3)
+        network_app = Configurationv2(tab4, tab_parent, config_path, "Seeds Configuration", 4)
+        network_app = GenomeElement(tab5, tab_parent, config_path, "Genome Element", 5)
+        network_app = EpidemiologyModel(tab7, tab_parent, config_path, "Epidemiology Model", 6)
+        network_app = PostProcessing(tab8, tab_parent, config_path, "Post Processing Options", 7)
+
+    # # network_app = EpidemiologyModelv3(tab1, tab_parent, config_path)
+    # network_app = Configuration(tab1, tab_parent, config_path, "Basic Configuration", 0)
+    # network_app = EpidemiologyModelv2(tab2, tab_parent, config_path, "Evolutionary Model", 1)
+    # # network_app = Configurationv2(tab2, tab_parent, config_path)
+    # network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path, "Network Graph", 5)
+    # network_model_app = NetworkModel(tab3, tab_parent, network_graph_app, config_path, "Network Model Parameters", 2)
+    # network_app = Configurationv2(tab4, tab_parent, config_path, "Seeds Configuration", 3)
+    # network_app = GenomeElement(tab5, tab_parent, config_path, "Genome Element", 4)
+    # network_app = EpidemiologyModel(tab7, tab_parent, config_path, "Epidemiology Model", 6)
+    # network_app = PostProcessing(tab8, tab_parent, config_path, "Post Processing Options", 7)
 
     tab_parent.pack(expand=1, fill='both')
 
@@ -121,7 +131,7 @@ def execute():
     """
     args = parse_args()
     if args.config_path:
-        launch_gui(args.config_path)
+        launch_gui(args.config_path, args.hide)
     else:
         print("A valid configuration file is required to run the application.")
 

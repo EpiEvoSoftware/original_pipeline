@@ -36,7 +36,7 @@ class NetworkGraphApp:
     A class providing a visualization app.
     """
 
-    def __init__(self, parent, tab_parent, config_path):
+    def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
         """
         Initializes the visualization app.
 
@@ -52,6 +52,11 @@ class NetworkGraphApp:
 
         self.parent = parent
         self.tab_parent = tab_parent
+        self.tab_parent.add(parent, text=tab_title)
+        self.tab_index = tab_index
+        if hide:
+            self.tab_parent.tab(self.tab_index, state="disabled")
+        
 
         self.config_path = config_path
         

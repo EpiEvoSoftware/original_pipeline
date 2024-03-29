@@ -12,7 +12,7 @@ if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
 class PostProcessing:
-    def __init__(self, parent, tab_parent, config_path):
+    def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
 
         self.config_path = config_path
 
@@ -24,7 +24,9 @@ class PostProcessing:
 
         self.parent = parent
         self.tab_parent = tab_parent
-        self.dynamic_widgets = []
+        self.tab_parent.add(parent, text=tab_title)
+        if hide:
+            self.tab_parent.tab(tab_index, state="disabled")
         
         self.control_frame = ttk.Frame(self.parent)
         self.control_frame.pack(fill='both', expand=True)

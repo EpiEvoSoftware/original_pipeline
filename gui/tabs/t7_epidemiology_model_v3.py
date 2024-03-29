@@ -5,7 +5,7 @@ import json
 import os
 from tools import *
 
-class EpidemiologyModel:
+class EpidemiologyModelv3:
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
         self.config_path = config_path
 
@@ -70,12 +70,31 @@ class EpidemiologyModel:
         self.scrollbar.pack(side=tk.RIGHT, fill="y")
             # Testing End
         # 
+        columns = ('Name', 'Column 2', 'Column 3', 'Column 4', 'Column 5')
+
+        tree = ttk.Treeview(self.scrollable_frame, columns=columns, show="headings")
+
+        for col in columns:
+            tree.heading(col, text=col)
+
+        tree.tag_configure('oddrow', background='white')  
+        tree.tag_configure('evenrow', background='#F0F0F0')  
+        
+        for i in range(1, len(columns) + 1):
+            values = [f'Row {i} Value {j}' for j in range(1, 6)]
+            
+            if i % 2 == 0:
+                tree.insert('', 'end', values=values, tags=('evenrow',))
+            else:
+                tree.insert('', 'end', values=values, tags=('oddrow',))
+
+        tree.pack(expand=True, fill='both')
 
         self.render_all()
 
         # Next Button
         next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
-        next_button.pack()
+        next_button
 
 
     def go_to_next_tab(self):
@@ -121,15 +140,15 @@ class EpidemiologyModel:
             if prev_val != self.model:
                 messagebox.showinfo("Success", "Model updated successfully")
 
-        self.model_label = ttk.Label(self.scrollable_frame, text="model:").pack()
+        self.model_label = ttk.Label(self.scrollable_frame, text="model:")
         self.model_var = tk.StringVar(value=self.model)
 
         self.model_combobox = ttk.Combobox(
             self.scrollable_frame, textvariable=self.model_var, 
             values=["SIR", "SEIR"], state="readonly"
-            ).pack()
+            )
         
-        self.update_model_button = tk.Button(self.scrollable_frame, text="Update Method", command=update_model).pack()
+        self.update_model_button = tk.Button(self.scrollable_frame, text="Update Method", command=update_model)
     
     def render_n_epoch(self):
         """
@@ -152,12 +171,12 @@ class EpidemiologyModel:
                 messagebox.showerror("Update Error", str(e))
 
         self.n_epoch_label = ttk.Label(self.scrollable_frame, text="n_epoch:")
-        self.n_epoch_label.pack()
+        self.n_epoch_label
         self.n_epoch_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.n_epoch_entry.insert(0, self.n_epoch)  
-        self.n_epoch_entry.pack()
+        self.n_epoch_entry
         update_n_epoch_button = tk.Button(self.scrollable_frame, text="Update n_epoch", command=update_n_epoch)
-        update_n_epoch_button.pack()
+        update_n_epoch_button
     
     def render_epoch_changing_generation(self):
         """
@@ -169,12 +188,12 @@ class EpidemiologyModel:
             update_list_int_params(self.epoch_changing_generation_entry, keys_path, self.config_path)
 
         self.epoch_changing_generation_label = ttk.Label(self.scrollable_frame, text="epoch_changing_generation:")
-        self.epoch_changing_generation_label.pack()
+        self.epoch_changing_generation_label
         self.epoch_changing_generation_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.epoch_changing_generation_entry.insert(0, str(self.epoch_changing_generation))  
-        self.epoch_changing_generation_entry.pack()
+        self.epoch_changing_generation_entry
         self.update_epoch_changing_generation_button = tk.Button(self.scrollable_frame, text="Update epoch_changing_generation", command=update)
-        self.update_epoch_changing_generation_button.pack()
+        self.update_epoch_changing_generation_button
     
     def render_transmissibility(self):
         """
@@ -186,12 +205,12 @@ class EpidemiologyModel:
             update_list_int_params(self.transmissibility_entry, keys_path, self.config_path)
 
         self.transmissibility_label = ttk.Label(self.scrollable_frame, text="transmissibility:")
-        self.transmissibility_label.pack()
+        self.transmissibility_label
         self.transmissibility_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.transmissibility_entry.insert(0, str(self.transmissibility))  
-        self.transmissibility_entry.pack()
+        self.transmissibility_entry
         self.update_transmissibility_button = tk.Button(self.scrollable_frame, text="Update transmissibility", command=update)
-        self.update_transmissibility_button.pack()
+        self.update_transmissibility_button
 
     def render_cap_transmissibility(self):
         """
@@ -202,12 +221,12 @@ class EpidemiologyModel:
             update_list_int_params(self.cap_transmissibility_entry, keys_path, self.config_path)
 
         self.cap_transmissibility_label = ttk.Label(self.scrollable_frame, text="cap_transmissibility:")
-        self.cap_transmissibility_label.pack()
+        self.cap_transmissibility_label
         self.cap_transmissibility_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.cap_transmissibility_entry.insert(0, str(self.cap_transmissibility))  
-        self.cap_transmissibility_entry.pack()
+        self.cap_transmissibility_entry
         self.update_cap_transmissibility_button = tk.Button(self.scrollable_frame, text="Update cap_transmissibility", command=update)
-        self.update_cap_transmissibility_button.pack()
+        self.update_cap_transmissibility_button
 
     def render_drug_resistance(self):
         """
@@ -218,12 +237,12 @@ class EpidemiologyModel:
             update_list_int_params(self.drug_resistance_entry, keys_path, self.config_path)
 
         self.drug_resistance_label = ttk.Label(self.scrollable_frame, text="drug_resistance:")
-        self.drug_resistance_label.pack()
+        self.drug_resistance_label
         self.drug_resistance_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.drug_resistance_entry.insert(0, str(self.drug_resistance))  
-        self.drug_resistance_entry.pack()
+        self.drug_resistance_entry
         self.update_drug_resistance_button = tk.Button(self.scrollable_frame, text="Update drug_resistance", command=update)
-        self.update_drug_resistance_button.pack()    
+        self.update_drug_resistance_button    
 
     def render_cap_drugresist(self):
         """
@@ -233,12 +252,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'genetic_architecture', 'cap_drugresist']
             update_list_int_params(self.cap_drugresist_entry, keys_path, self.config_path)
         self.cap_drugresist_label = ttk.Label(self.scrollable_frame, text="cap_drugresist:")
-        self.cap_drugresist_label.pack()
+        self.cap_drugresist_label
         self.cap_drugresist_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.cap_drugresist_entry.insert(0, str(self.cap_drugresist))  
-        self.cap_drugresist_entry.pack()
+        self.cap_drugresist_entry
         self.update_cap_drugresist_button = tk.Button(self.scrollable_frame, text="Update cap_drugresist", command=update)
-        self.update_cap_drugresist_button.pack()   
+        self.update_cap_drugresist_button   
  
     def render_S_IE_rate(self):
         """
@@ -248,12 +267,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'transiton_rate', 'S_IE_rate']
             update_list_int_params(self.S_IE_rate_entry, keys_path, self.config_path)
         self.S_IE_rate_label = ttk.Label(self.scrollable_frame, text="S_IE_rate:")
-        self.S_IE_rate_label.pack()
+        self.S_IE_rate_label
         self.S_IE_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.S_IE_rate_entry.insert(0, str(self.S_IE_rate))  
-        self.S_IE_rate_entry.pack()
+        self.S_IE_rate_entry
         self.update_S_IE_rate_button = tk.Button(self.scrollable_frame, text="Update S_IE_rate", command=update)
-        self.update_S_IE_rate_button.pack()    
+        self.update_S_IE_rate_button    
 
     def render_I_R_rate(self):
         """
@@ -263,12 +282,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'transiton_rate', 'I_R_rate']
             update_list_int_params(self.I_R_rate_entry, keys_path, self.config_path)
         self.I_R_rate_label = ttk.Label(self.scrollable_frame, text="I_R_rate:")
-        self.I_R_rate_label.pack()
+        self.I_R_rate_label
         self.I_R_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.I_R_rate_entry.insert(0, str(self.I_R_rate))  
-        self.I_R_rate_entry.pack()
+        self.I_R_rate_entry
         self.update_I_R_rate_button = tk.Button(self.scrollable_frame, text="Update I_R_rate", command=update)
-        self.update_I_R_rate_button.pack()  
+        self.update_I_R_rate_button  
 
     def render_R_S_rate(self):
         """
@@ -278,12 +297,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'transiton_rate', 'R_S_rate']
             update_list_int_params(self.R_S_rate_entry, keys_path, self.config_path)
         self.R_S_rate_label = ttk.Label(self.scrollable_frame, text="R_S_rate:")
-        self.R_S_rate_label.pack()
+        self.R_S_rate_label
         self.R_S_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.R_S_rate_entry.insert(0, str(self.R_S_rate))  
-        self.R_S_rate_entry.pack()
+        self.R_S_rate_entry
         self.update_R_S_rate_button = tk.Button(self.scrollable_frame, text="Update R_S_rate", command=update)
-        self.update_R_S_rate_button.pack()  
+        self.update_R_S_rate_button  
 
     def render_latency_prob(self):
         """
@@ -294,12 +313,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'transiton_rate', 'latency_prob']
             update_list_int_params(self.latency_prob_entry, keys_path, self.config_path)
         self.latency_prob_label = ttk.Label(self.scrollable_frame, text="latency_prob:")
-        self.latency_prob_label.pack()
+        self.latency_prob_label
         self.latency_prob_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.latency_prob_entry.insert(0, str(self.latency_prob))  
-        self.latency_prob_entry.pack()
+        self.latency_prob_entry
         self.update_latency_prob_button = tk.Button(self.scrollable_frame, text="Update latency_prob", command=update)
-        self.update_latency_prob_button.pack()    
+        self.update_latency_prob_button    
 
     def render_E_I_rate(self):
         """
@@ -310,12 +329,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'transiton_rate', 'E_I_rate']
             update_list_int_params(self.E_I_rate_entry, keys_path, self.config_path)
         self.E_I_rate_label = ttk.Label(self.scrollable_frame, text="E_I_rate:")
-        self.E_I_rate_label.pack()
+        self.E_I_rate_label
         self.E_I_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.E_I_rate_entry.insert(0, str(self.E_I_rate))  
-        self.E_I_rate_entry.pack()
+        self.E_I_rate_entry
         self.update_E_I_rate_button = tk.Button(self.scrollable_frame, text="Update E_I_rate", command=update)
-        self.update_E_I_rate_button.pack() 
+        self.update_E_I_rate_button 
 
     def render_I_E_rate(self):
         """
@@ -326,12 +345,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'transiton_rate', 'I_E_rate']
             update_list_int_params(self.I_E_rate_entry, keys_path, self.config_path)
         self.I_E_rate_label = ttk.Label(self.scrollable_frame, text="I_E_rate:")
-        self.I_E_rate_label.pack()
+        self.I_E_rate_label
         self.I_E_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.I_E_rate_entry.insert(0, str(self.I_E_rate))  
-        self.I_E_rate_entry.pack()
+        self.I_E_rate_entry
         self.update_I_E_rate_button = tk.Button(self.scrollable_frame, text="Update I_E_rate", command=update)
-        self.update_I_E_rate_button.pack()  
+        self.update_I_E_rate_button  
 
     def render_E_R_rate(self):
         """
@@ -342,12 +361,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'transiton_rate', 'E_R_rate']
             update_list_int_params(self.E_R_rate_entry, keys_path, self.config_path)
         self.E_R_rate_label = ttk.Label(self.scrollable_frame, text="E_R_rate:")
-        self.E_R_rate_label.pack()
+        self.E_R_rate_label
         self.E_R_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.E_R_rate_entry.insert(0, str(self.E_R_rate))  
-        self.E_R_rate_entry.pack()
+        self.E_R_rate_entry
         self.update_E_R_rate_button = tk.Button(self.scrollable_frame, text="Update E_R_rate", command=update)
-        self.update_E_R_rate_button.pack()   
+        self.update_E_R_rate_button   
         
     def render_sample_rate(self):
         """
@@ -358,12 +377,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'transiton_rate', 'sample_rate']
             update_list_int_params(self.sample_rate_entry, keys_path, self.config_path)
         self.sample_rate_label = ttk.Label(self.scrollable_frame, text="sample_rate:")
-        self.sample_rate_label.pack()
+        self.sample_rate_label
         self.sample_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.sample_rate_entry.insert(0, str(self.sample_rate))  
-        self.sample_rate_entry.pack()
+        self.sample_rate_entry
         self.update_sample_rate_button = tk.Button(self.scrollable_frame, text="Update sample_rate", command=update)
-        self.update_sample_rate_button.pack()
+        self.update_sample_rate_button
 
     def render_transition_rate_recovery_prob_after_sampling(self):
         """
@@ -374,12 +393,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'transiton_rate', 'recovery_prob_after_sampling']
             update_list_int_params(self.transition_rate_recovery_prob_after_sampling_entry, keys_path, self.config_path)
         self.transition_rate_recovery_prob_after_sampling_label = ttk.Label(self.scrollable_frame, text="transition_rate_recovery_prob_after_sampling:")
-        self.transition_rate_recovery_prob_after_sampling_label.pack()
+        self.transition_rate_recovery_prob_after_sampling_label
         self.transition_rate_recovery_prob_after_sampling_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.transition_rate_recovery_prob_after_sampling_entry.insert(0, str(self.transition_rate_recovery_prob_after_sampling))  
-        self.transition_rate_recovery_prob_after_sampling_entry.pack()
+        self.transition_rate_recovery_prob_after_sampling_entry
         self.update_transition_rate_recovery_prob_after_sampling_button = tk.Button(self.scrollable_frame, text="Update transition_rate_recovery_prob_after_sampling", command=update)
-        self.update_transition_rate_recovery_prob_after_sampling_button.pack()
+        self.update_transition_rate_recovery_prob_after_sampling_button
 
     def render_massive_sampling(self):
         """
@@ -390,12 +409,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'massive_sampling', 'event_num']
             update_list_int_params(self.massive_sampling_entry, keys_path, self.config_path)
         self.massive_sampling_label = ttk.Label(self.scrollable_frame, text="massive_sampling:")
-        self.massive_sampling_label.pack()
+        self.massive_sampling_label
         self.massive_sampling_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.massive_sampling_entry.insert(0, self.event_num)  
-        self.massive_sampling_entry.pack()
+        self.massive_sampling_entry
         update_massive_sampling_button = tk.Button(self.scrollable_frame, text="Update massive_sampling", command=update)
-        update_massive_sampling_button.pack()    
+        update_massive_sampling_button    
 
     def render_massive_sampling_generation(self):
         """
@@ -406,12 +425,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'massive_sampling', 'generation']
             update_list_int_params(self.massive_sampling_generation_entry, keys_path, self.config_path)
         self.massive_sampling_generation_label = ttk.Label(self.scrollable_frame, text="massive_sampling_generation:")
-        self.massive_sampling_generation_label.pack()
+        self.massive_sampling_generation_label
         self.massive_sampling_generation_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.massive_sampling_generation_entry.insert(0, str(self.generation))  
-        self.massive_sampling_generation_entry.pack()
+        self.massive_sampling_generation_entry
         self.update_massive_sampling_generation_button = tk.Button(self.scrollable_frame, text="Update massive_sampling_generation", command=update)
-        self.update_massive_sampling_generation_button.pack()      
+        self.update_massive_sampling_generation_button      
     def render_massive_sampling_probability(self):
         """
         self.sampling_prob = load_config_as_dict(self.config_path)['EpidemiologyModel']['massive_sampling']['sampling_prob']
@@ -421,12 +440,12 @@ class EpidemiologyModel:
             keys_path = ['EpidemiologyModel', 'massive_sampling', 'sampling_prob']
             update_list_int_params(self.massive_sampling_probability_entry, keys_path, self.config_path)
         self.massive_sampling_probability_label = ttk.Label(self.scrollable_frame, text="massive_sampling_probability:")
-        self.massive_sampling_probability_label.pack()
+        self.massive_sampling_probability_label
         self.massive_sampling_probability_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.massive_sampling_probability_entry.insert(0, str(self.sampling_prob))  
-        self.massive_sampling_probability_entry.pack()
+        self.massive_sampling_probability_entry
         self.update_massive_sampling_probability_button = tk.Button(self.scrollable_frame, text="Update massive_sampling_probability", command=update)
-        self.update_massive_sampling_probability_button.pack()   
+        self.update_massive_sampling_probability_button   
 
     def render_massive_sampling_after_sampling(self):
         """
@@ -438,12 +457,12 @@ class EpidemiologyModel:
             update_list_int_params(self.massive_sampling_after_sampling_entry, keys_path, self.config_path)
             
         self.massive_sampling_after_sampling_label = ttk.Label(self.scrollable_frame, text="massive_sampling_after_sampling:")
-        self.massive_sampling_after_sampling_label.pack()
+        self.massive_sampling_after_sampling_label
         self.massive_sampling_after_sampling_entry = ttk.Entry(self.scrollable_frame, foreground="black")
         self.massive_sampling_after_sampling_entry.insert(0, str(self.massive_sampling_recovery_prob_after_sampling))  
-        self.massive_sampling_after_sampling_entry.pack()
+        self.massive_sampling_after_sampling_entry
         self.update_massive_sampling_after_sampling_button = tk.Button(self.scrollable_frame, text="Update massive_sampling_after_sampling", command=update)
-        self.update_massive_sampling_after_sampling_button.pack()      
+        self.update_massive_sampling_after_sampling_button      
     
     def render_super_infection(self):
         """
@@ -461,13 +480,13 @@ class EpidemiologyModel:
                 messagebox.showinfo("Success", "Updated successfully") 
 
         self.super_infection_label = ttk.Label(self.scrollable_frame, text="super_infection:")
-        self.super_infection_label.pack()
+        self.super_infection_label
         self.super_infection_var = tk.StringVar(value=bool_to_string_mapping[self.super_infection])
         self.super_infection_combobox = ttk.Combobox(
             self.scrollable_frame, textvariable=self.super_infection_var, 
             values=["Yes", "No"], state="readonly"
             )
         
-        self.super_infection_combobox.pack()
+        self.super_infection_combobox
         self.update_super_infection_button = tk.Button(self.scrollable_frame, text="Update Method", command=update)
-        self.update_super_infection_button.pack()
+        self.update_super_infection_button

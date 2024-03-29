@@ -5,7 +5,7 @@ import json
 import os
 from tools import *
 
-class EpidemiologyModel:
+class EpidemiologyModelv2:
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
         self.config_path = config_path
 
