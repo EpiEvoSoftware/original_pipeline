@@ -8,9 +8,9 @@ from tools import *
 class Configurationv2:
     def __init__(self, parent, tab_parent, config_path):
         self.config_path = config_path
-        self.cwd = self.load_config_as_dict()['BasicRunConfiguration']['cwdir']
-        self.n_replicates = self.load_config_as_dict()['BasicRunConfiguration']['n_replicates']
-        self.ref_path = self.load_config_as_dict()['GenomeElement']['ref_path']
+        self.cwd = load_config_as_dict(self.config_path)['BasicRunConfiguration']['cwdir']
+        self.n_replicates = load_config_as_dict(self.config_path)['BasicRunConfiguration']['n_replicates']
+        self.ref_path = load_config_as_dict(self.config_path)['GenomeElement']['ref_path']
         self.parent = parent
         self.tab_parent = tab_parent
 
@@ -96,9 +96,9 @@ class Configurationv2:
         if chosen_directory:  
             self.cwd = chosen_directory
             self.diagnostic_label.config(text=f"Working Directory: {self.cwd}")  # Update the label with the new directory
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['BasicRunConfiguration']['cwdir'] = self.cwd
-            self.save_config(config)
+            save_config(self.config_path, config)
      
     def choose_ref_path(self):  
         filetypes = ( #don't need to check if its genome file: or use python package jaehee said
@@ -109,16 +109,16 @@ class Configurationv2:
         if chosen_file:  
             self.ref_path = chosen_file
             self.ref_path_label.config(text=f"Ref Path: {self.ref_path}") 
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['GenomeElement']['ref_path'] = self.ref_path
-            self.save_config(config)
+            save_config(self.config_path, config)
 
     def update_n_replicates(self):
         try:
             new_n_replicates = int(self.n_replicates_entry.get())  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['BasicRunConfiguration']['n_replicates'] = new_n_replicates 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "n_replicates changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for n_replicates.") 

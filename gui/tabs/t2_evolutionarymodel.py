@@ -8,13 +8,13 @@ class EvolutionaryModel:
     def __init__(self, parent, tab_parent, config_path):
         self.config_path = config_path
 
-        self.n_generation = self.load_config_as_dict()['EvolutionModel']['n_generation']
-        self.mut_rate = self.load_config_as_dict()['EvolutionModel']['mut_rate']
-        self.trans_type = self.load_config_as_dict()['EvolutionModel']['trans_type']
-        self.dr_type = self.load_config_as_dict()['EvolutionModel']['dr_type']
-        self.within_host_reproduction = self.load_config_as_dict()['EvolutionModel']['within_host_reproduction']
-        self.within_host_reproduction_rate = self.load_config_as_dict()['EvolutionModel']['within_host_reproduction_rate']
-        self.cap_withinhost = self.load_config_as_dict()['EvolutionModel']['cap_withinhost']
+        self.n_generation = load_config_as_dict(self.config_path)['EvolutionModel']['n_generation']
+        self.mut_rate = load_config_as_dict(self.config_path)['EvolutionModel']['mut_rate']
+        self.trans_type = load_config_as_dict(self.config_path)['EvolutionModel']['trans_type']
+        self.dr_type = load_config_as_dict(self.config_path)['EvolutionModel']['dr_type']
+        self.within_host_reproduction = load_config_as_dict(self.config_path)['EvolutionModel']['within_host_reproduction']
+        self.within_host_reproduction_rate = load_config_as_dict(self.config_path)['EvolutionModel']['within_host_reproduction_rate']
+        self.cap_withinhost = load_config_as_dict(self.config_path)['EvolutionModel']['cap_withinhost']
 
         self.parent = parent
         self.tab_parent = tab_parent
@@ -89,9 +89,9 @@ class EvolutionaryModel:
     def update_n_generation(self):
         try:
             new_n_generation = int(float(self.n_generation_entry.get()))  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['EvolutionModel']['n_generation'] = new_n_generation 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "n_generation changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for n_generation.") 
@@ -99,9 +99,9 @@ class EvolutionaryModel:
     def update_mut_rate(self):
         try:
             new_mut_rate = int(float(self.mut_rate_entry.get()))  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['EvolutionModel']['mut_rate'] = new_mut_rate 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "mut_rate changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for mut_rate.") 
@@ -109,9 +109,9 @@ class EvolutionaryModel:
     def update_cap_withinhost(self):
         try:
             new_cap_withinhost = int(float(self.cap_withinhost_entry.get()))  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['EvolutionModel']['cap_withinhost'] = new_cap_withinhost 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "cap_withinhost changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for cap_withinhost.") 
@@ -119,9 +119,9 @@ class EvolutionaryModel:
     def update_within_host_reproduction_rate(self):
         try:
             new_within_host_reproduction_rate = int(float(self.within_host_reproduction_rate_entry.get()))  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['EvolutionModel']['within_host_reproduction_rate'] = new_within_host_reproduction_rate 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "within_host_reproduction_rate changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for within_host_reproduction_rate.") 
@@ -129,9 +129,9 @@ class EvolutionaryModel:
     def update_trans_type(self):
         new_trans_type = self.trans_type_var.get().strip().lower()  # Normalize input
         if new_trans_type in ["additive", "bi-allele"]: #TODO: change to dropdown
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['EvolutionModel']['trans_type'] = new_trans_type
-            self.save_config(config)
+            save_config(self.config_path, config)
             messagebox.showinfo("Update Successful", "trans_type changed.")
         else:
             messagebox.showerror("Update Error", "Please enter 'additive' or 'bi-allele' for trans_type.")
@@ -139,9 +139,9 @@ class EvolutionaryModel:
     def update_dr_type(self):
         new_dr_type = self.dr_type_var.get().strip().lower()  
         if new_dr_type in ["additive", "bi-allele"]:
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['EvolutionModel']['dr_type'] = new_dr_type
-            self.save_config(config)
+            save_config(self.config_path, config)
             messagebox.showinfo("Update Successful", "dr_type changed.")
         else:
             messagebox.showerror("Update Error", "Please enter 'additive' or 'bi-allele' for dr_type.")
@@ -159,9 +159,9 @@ class EvolutionaryModel:
                 self.within_host_reproduction_rate_label.pack_forget()
                 self.within_host_reproduction_rate_entry.pack_forget()
                 self.update_within_host_reproduction_rate_button.pack_forget()
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['EvolutionModel']['within_host_reproduction'] = new_within_host_reproduction
-            self.save_config(config)
+            save_config(self.config_path, config)
             messagebox.showinfo("Update Successful", "within_host_reproduction changed.")
         else:
             messagebox.showerror("Update Error", "Please enter 'true' or 'false' for within_host_reproduction.")

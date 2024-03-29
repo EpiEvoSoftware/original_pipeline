@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox, filedialog
 import json
 import os
 import sys
+from tools import *
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
 if parent_dir not in sys.path:
@@ -45,23 +46,23 @@ class GenomeElement:
 
     # User Configurations
         # bool
-        self.use_genetic_model = self.load_config_as_dict()['GenomeElement']['use_genetic_model']
+        self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
         # list
-        self.traits_num = self.load_config_as_dict()['GenomeElement']['traits_num']
+        self.traits_num = load_config_as_dict(self.config_path)['GenomeElement']['traits_num']
 
         # str
-        self.path_effsize_table = self.load_config_as_dict()['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
+        self.path_effsize_table = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
 
         # str
-        self.gff = self.load_config_as_dict()['GenomeElement']['effect_size']['randomly_generate']["gff"]
+        self.gff = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']["gff"]
         # list
-        self.genes_num = self.load_config_as_dict()['GenomeElement']['effect_size']['randomly_generate']['genes_num']
+        self.genes_num = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']['genes_num']
         # list
-        self.effsize_min = self.load_config_as_dict()['GenomeElement']['effect_size']['randomly_generate']['effsize_min']
+        self.effsize_min = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']['effsize_min']
         # list
-        self.effsize_max = self.load_config_as_dict()['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
+        self.effsize_max = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
         # bool
-        self.normalize = self.load_config_as_dict()['GenomeElement']['effect_size']['randomly_generate']['normalize']
+        self.normalize = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']['normalize']
     # 
 
         self.parent = parent
@@ -114,23 +115,17 @@ class GenomeElement:
         next_tab_index = (current_tab_index + 1) % self.tab_parent.index("end")
         self.tab_parent.select(next_tab_index)
 
-    def load_config_as_dict(self):
-        with open(self.config_path, 'r') as file:
-            return json.load(file)
 
-    def save_config(self, config):
-        with open(self.config_path, 'w') as file:
-            json.dump(config, file, indent=4)
     # 
 # 
     def update_use_genetic_model(self):
-        # self.use_genetic_model = self.load_config_as_dict()['GenomeElement']['use_genetic_model']
+        # self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
         self.hide_elements_update_methods()
         new_use_network_model = self.use_genetic_model_var.get()
         if new_use_network_model in ["Yes", "No"]: 
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['GenomeElement']['use_genetic_model'] = self.string_to_bool_mapping[new_use_network_model]
-            self.save_config(config)
+            save_config(self.config_path, config)
             
 
             # break
@@ -143,9 +138,9 @@ class GenomeElement:
                         try:
                             traits_num_size_value = int(float(self.traits_num_entry.get()))
                             traits_num_size_value_2 = int(float(self.traits_num_entry_2.get()))
-                            config = self.load_config_as_dict()
+                            config = load_config_as_dict(self.config_path)
                             config['GenomeElement']['traits_num'] = [traits_num_size_value, traits_num_size_value_2]
-                            self.save_config(config)   
+                            save_config(self.config_path, config)   
                             message = "RP Parameters changed.\n\n" + "traits_num: " + str([traits_num_size_value, traits_num_size_value_2])
                             messagebox.showinfo("Update Successful", message)
                         except ValueError:
@@ -169,9 +164,9 @@ class GenomeElement:
                         Updates the self.traits_num value in the params file
                         """
                         new_effect_size_method = self.effect_size_method_var.get().strip().lower().replace(" ", "_")
-                        config = self.load_config_as_dict()
+                        config = load_config_as_dict(self.config_path)
                         config['GenomeElement']['effect_size']['method'] = new_effect_size_method
-                        self.save_config(config)
+                        save_config(self.config_path, config)
                         try:
                             if new_effect_size_method == "user_input":
                                 self.hide_elements_update_methods()
@@ -229,12 +224,12 @@ class GenomeElement:
         def choose_and_update_path():
             chosen_file = filedialog.askopenfilename(title="Select a path_effsize_table")
             if chosen_file:  
-                # self.path_effsize_table = self.load_config_as_dict()['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
+                # self.path_effsize_table = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
                 self.path_effsize_table = chosen_file
                 self.chosen_path_network_label.config(text=f"path_effsize_table: {self.path_effsize_table}") 
-                config = self.load_config_as_dict()
+                config = load_config_as_dict(self.config_path)
                 config['GenomeElement']['effect_size']['user_input']["path_effsize_table"] = self.path_effsize_table
-                self.save_config(config)
+                save_config(self.config_path, config)
 
 
         self.path_network_label = ttk.Label(self.scrollable_frame, text="Choose path_effsize_table")
@@ -284,12 +279,12 @@ class GenomeElement:
                     effsize_min_value = clean_list_input(stripped_list_effsize_min_value, unstripped_list_effsize_min_value)
                     effsize_max_value = clean_list_input(stripped_list_effsize_max_value, unstripped_list_effsize_max_value)
 
-                    config = self.load_config_as_dict()
+                    config = load_config_as_dict(self.config_path)
                     config['GenomeElement']['effect_size']['randomly_generate']['genes_num'] = genes_num_value
                     config['GenomeElement']['effect_size']['randomly_generate']['effsize_min'] = effsize_min_value
                     config['GenomeElement']['effect_size']['randomly_generate']['effsize_max'] = effsize_max_value
                     config['GenomeElement']['effect_size']['randomly_generate']['normalize'] = self.string_to_bool_mapping[new_normalize]
-                    self.save_config(config)   
+                    save_config(self.config_path, config)   
                     messagebox.showinfo("Update Successful")
                 except ValueError:
                     messagebox.showerror("Update Error", "Invalid Input.") 
@@ -297,15 +292,15 @@ class GenomeElement:
             def choose_gff():
                 """
                 path selector
-                self.gff = self.load_config_as_dict()['GenomeElement']['effect_size']['randomly_generate']["gff"]
+                self.gff = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']["gff"]
                 """
                 chosen_file = filedialog.askopenfilename(title="Select a gff path")
                 if chosen_file:  
                     self.gff = chosen_file
                     self.current_gff_label.config(text=f"Ref Path: {self.gff}") 
-                    config = self.load_config_as_dict()
+                    config = load_config_as_dict(self.config_path)
                     config['GenomeElement']['effect_size']['randomly_generate']["gff"] = self.gff
-                    self.save_config(config)
+                    save_config(self.config_path, config)
             
             self.choose_gff_label = ttk.Label(self.scrollable_frame, text="Choose gff path:")
             self.choose_gff_label.pack()
@@ -364,7 +359,7 @@ class GenomeElement:
 
     def render_run_button(self):
         def effect_size_generation():
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
 
             method = config['GenomeElement']['effect_size']['method']
             wk_dir = config["BasicRunConfiguration"]["cwdir"]

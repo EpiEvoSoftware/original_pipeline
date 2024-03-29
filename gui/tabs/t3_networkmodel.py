@@ -65,20 +65,20 @@ class NetworkModelConfigurations:
         self.config_path = config_path
 
         # User Configurations
-        self.use_network_model = self.load_config_as_dict()['NetworkModelParameters']['use_network_model']
-        self.host_size = self.load_config_as_dict()['NetworkModelParameters']['host_size']
+        self.use_network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['use_network_model']
+        self.host_size = load_config_as_dict(self.config_path)['NetworkModelParameters']['host_size']
 
-        self.path_network = self.load_config_as_dict()['NetworkModelParameters']['user_input']["path_network"]
+        self.path_network = load_config_as_dict(self.config_path)['NetworkModelParameters']['user_input']["path_network"]
 
-        self.network_model = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']["network_model"]
+        self.network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']["network_model"]
 
-        self.p_ER = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['ER']['p_ER']
+        self.p_ER = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['ER']['p_ER']
 
-        self.rp_size = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['rp_size']
-        self.p_within = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['p_within']
-        self.p_between = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['p_between']
+        self.rp_size = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['RP']['rp_size']
+        self.p_within = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['RP']['p_within']
+        self.p_between = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['RP']['p_between']
 
-        self.ba_m = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['BA']['ba_m']
+        self.ba_m = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['BA']['ba_m']
         # 
 
         self.parent = parent
@@ -113,7 +113,7 @@ class NetworkModelConfigurations:
         # 
 
 
-        # host_size_label = self.load_config_as_dict()['NetworkModelParameters']['host_size']
+        # host_size_label = load_config_as_dict(self.config_path)['NetworkModelParameters']['host_size']
         self.host_size_label = ttk.Label(self.scrollable_frame, text="host_size:")
         self.host_size_label.pack()
         self.host_size_entry = ttk.Entry(self.scrollable_frame, foreground="black")
@@ -124,7 +124,7 @@ class NetworkModelConfigurations:
         # 
 
     
-        # self.use_network_model = self.load_config_as_dict()['NetworkModelParameters']['use_network_model']
+        # self.use_network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['use_network_model']
         self.use_network_model_label = ttk.Label(self.scrollable_frame, text="use_network_model:")
         self.use_network_model_label.pack()
         self.use_network_model_var = tk.StringVar(value=self.bool_to_string_mapping[self.use_network_model])
@@ -140,9 +140,9 @@ class NetworkModelConfigurations:
     def update_host_size(self):
         try:
             new_host_size = int(float(self.host_size_entry.get()))
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['NetworkModelParameters']['host_size'] = new_host_size 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "host_size changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for host_size.") 
@@ -150,9 +150,9 @@ class NetworkModelConfigurations:
     def update_mut_rate(self):
         try:
             new_mut_rate = int(float(self.mut_rate_entry.get()))  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['EvolutionModel']['mut_rate'] = new_mut_rate 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "mut_rate changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for mut_rate.") 
@@ -160,9 +160,9 @@ class NetworkModelConfigurations:
     def update_cap_withinhost(self):
         try:
             new_cap_withinhost = int(float(self.cap_withinhost_entry.get()))
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['EvolutionModel']['cap_withinhost'] = new_cap_withinhost 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "cap_withinhost changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for cap_withinhost.") 
@@ -170,9 +170,9 @@ class NetworkModelConfigurations:
     def update_within_host_reproduction_rate(self):
         try:
             new_within_host_reproduction_rate = int(float(self.within_host_reproduction_rate_entry.get()))
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['EvolutionModel']['within_host_reproduction_rate'] = new_within_host_reproduction_rate 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "within_host_reproduction_rate changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for within_host_reproduction_rate.") 
@@ -197,17 +197,17 @@ class NetworkModelConfigurations:
             self.network_path_label = ttk.Label(self.scrollable_frame, text="Current Network Path: " + self.network_path)
             self.network_path_label.pack()
             self.network_path_label.config(text=f"Path Network: {self.network_path}") 
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['NetworkModelParameters']['user_input']["path_network"] = self.network_path
-            self.save_config(config)
+            save_config(self.config_path, config)
 
     def update_use_network_model(self):
         self.hide_elements_update_methods()
         new_use_network_model = self.use_network_model_var.get()
         if new_use_network_model in ["Yes", "No"]: 
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['NetworkModelParameters']['use_network_model'] = self.string_to_bool_mapping[new_use_network_model]
-            self.save_config(config)
+            save_config(self.config_path, config)
 
             # break
             if new_use_network_model == "Yes":
@@ -266,7 +266,7 @@ class NetworkModelConfigurations:
                 self.hide_elements_update_methods()
                 
                 if not hasattr(self, 'network_model_label'): 
-                # self.network_model = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']["network_model"]
+                # self.network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']["network_model"]
                     self.network_model_label = ttk.Label(self.scrollable_frame, text="network_model:")
                     self.network_model_label.pack()
                     self.network_model_var = tk.StringVar(value = self.string_to_network_mode[self.network_model])
@@ -288,17 +288,17 @@ class NetworkModelConfigurations:
             messagebox.showerror("Update Error", "Please enter 'user_input' or 'randomly generate' for method.")
 
     def update_network_model(self):
-        # self.network_model = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']["network_model"]
+        # self.network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']["network_model"]
         new_network_model_unconverted = self.network_model_var.get()
         new_network_model = self.network_model_to_string[self.network_model_var.get()]
         if new_network_model in ["ER", "RP", "BA"]: 
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['NetworkModelParameters']['randomly_generate']["network_model"] = new_network_model
-            self.save_config(config)
+            save_config(self.config_path, config)
 
             self.hide_elements_network_values()
             if new_network_model == "ER":
-                # self.p_ER = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['ER']['p_ER']
+                # self.p_ER = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['ER']['p_ER']
                 if not hasattr(self, 'p_ER_label'):     
                     def update_ER():
                         """
@@ -306,9 +306,9 @@ class NetworkModelConfigurations:
                         """
                         try:
                             p_ER_value = float(self.p_ER_entry.get())
-                            config = self.load_config_as_dict()
+                            config = load_config_as_dict(self.config_path)
                             config['NetworkModelParameters']['randomly_generate']['ER']['p_ER'] = p_ER_value
-                            self.save_config(config)   
+                            save_config(self.config_path, config)   
                             messagebox.showinfo("Update Successful", "p_ER changed")
                         except ValueError:
                             messagebox.showerror("Update Error", "Please enter a valid float for host_size.") 
@@ -326,11 +326,11 @@ class NetworkModelConfigurations:
                     self.update_ER_button.pack()
 
             elif new_network_model == "RP":
-                # self.rp_size = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['rp_size']
+                # self.rp_size = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['RP']['rp_size']
                     # int int
-                # self.p_within = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['p_within']
+                # self.p_within = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['RP']['p_within']
                     # float float
-                # self.p_between = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['RP']['p_between']
+                # self.p_between = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['RP']['p_between']
                     # int
                 
                 if not hasattr(self, "RP"):
@@ -345,11 +345,11 @@ class NetworkModelConfigurations:
                             p_within_value_2 = int(float(self.p_within_entry_2.get()))
                             p_between_value = int(float(self.p_between_entry.get()))
 
-                            config = self.load_config_as_dict()
+                            config = load_config_as_dict(self.config_path)
                             config['NetworkModelParameters']['randomly_generate']['RP']['rp_size'] = [rp_size_value, rp_size_value_2]
                             config['NetworkModelParameters']['randomly_generate']['RP']['p_within'] = [p_within_value, p_within_value_2]
                             config['NetworkModelParameters']['randomly_generate']['RP']['p_between'] = p_between_value
-                            self.save_config(config)   
+                            save_config(self.config_path, config)   
                             message = "RP Parameters changed.\n\n" + "rp_size: " + str([rp_size_value, rp_size_value_2]) + "\n"
                             message2 = "p_within: " + str([p_within_value, p_within_value_2]) + "\n"
                             message3 = "p_between_value: " + str(p_between_value)
@@ -398,16 +398,16 @@ class NetworkModelConfigurations:
 
             elif new_network_model == "BA":
                 if not hasattr(self, "ba_m_label"):
-                    # self.ba_m = self.load_config_as_dict()['NetworkModelParameters']['randomly_generate']['BA']['ba_m']
+                    # self.ba_m = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['BA']['ba_m']
                     def update_ba_m():
                         """
                         Updates the self.ba_m value in the params file
                         """
                         try:
                             ba_m_value = int(float(self.ba_m_entry.get()))
-                            config = self.load_config_as_dict()
+                            config = load_config_as_dict(self.config_path)
                             config['NetworkModelParameters']['randomly_generate']['BA']['ba_m'] = ba_m_value
-                            self.save_config(config)   
+                            save_config(self.config_path, config)   
                             messagebox.showinfo("Update Successful", "ba_m changed")
                         except ValueError:
                             messagebox.showerror("Update Error", "Please enter a valid int for host_size.") 
@@ -433,7 +433,7 @@ class NetworkModelConfigurations:
 
     
     def render_run_network_generation(self):
-        config = self.load_config_as_dict() 
+        config = load_config_as_dict(self.config_path) 
         wk_dir = config["BasicRunConfiguration"]["cwdir"]
         def run_network_generate():
             pop_size = int(float(self.host_size_entry.get()))

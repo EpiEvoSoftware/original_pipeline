@@ -19,29 +19,29 @@ class SeedsConfiguration:
         self.config_path = config_path
 
         # SeedsConfiguration
-        self.seed_size = self.load_config_as_dict()['SeedsConfiguration']['seed_size']
-        self.method = self.load_config_as_dict()['SeedsConfiguration']['method']
+        self.seed_size = load_config_as_dict(self.config_path)['SeedsConfiguration']['seed_size']
+        self.method = load_config_as_dict(self.config_path)['SeedsConfiguration']['method']
 
         # user_input
-        self.path_seeds_vcf = self.load_config_as_dict()['SeedsConfiguration']['user_input']['path_seeds_vcf']
-        self.path_seeds_phylogeny = self.load_config_as_dict()['SeedsConfiguration']['user_input']["path_seeds_phylogeny"]
+        self.path_seeds_vcf = load_config_as_dict(self.config_path)['SeedsConfiguration']['user_input']['path_seeds_vcf']
+        self.path_seeds_phylogeny = load_config_as_dict(self.config_path)['SeedsConfiguration']['user_input']["path_seeds_phylogeny"]
 
         # SLiM_burnin_WF
-        self.burn_in_Ne = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_Ne']
-        self.burn_in_generations_wf = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_generations']
-        self.burn_in_mutrate_wf = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_mutrate']
+        self.burn_in_Ne = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_Ne']
+        self.burn_in_generations_wf = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_generations']
+        self.burn_in_mutrate_wf = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_mutrate']
 
         # SLiM_burnin_epi
-        self.burn_in_generations_epi = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_generations']
-        self.burn_in_mutrate_epi = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_mutrate']
-        self.seeded_host_id = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']["seeded_host_id"]
-        self.S_IE_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']["S_IE_rate"]
-        self.E_I_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']["E_I_rate"]
-        self.E_R_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']["E_R_rate"]
-        self.latency_prob = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']["latency_prob"]
-        self.I_R_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']['I_R_rate']
-        self.I_E_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']['I_E_rate']
-        self.R_S_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']['R_S_rate']
+        self.burn_in_generations_epi = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_generations']
+        self.burn_in_mutrate_epi = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_mutrate']
+        self.seeded_host_id = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["seeded_host_id"]
+        self.S_IE_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["S_IE_rate"]
+        self.E_I_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["E_I_rate"]
+        self.E_R_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["E_R_rate"]
+        self.latency_prob = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["latency_prob"]
+        self.I_R_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['I_R_rate']
+        self.I_E_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['I_E_rate']
+        self.R_S_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['R_S_rate']
 
         self.parent = parent
         self.tab_parent = tab_parent
@@ -136,9 +136,9 @@ class SeedsConfiguration:
     def update_use_method(self):
         new_use_method = self.use_method_var.get()
         if new_use_method in ["user_input", "SLiM_burnin_WF", "SLiM_burnin_epi"]: 
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['SeedsConfiguration']['method'] = new_use_method
-            self.save_config(config)
+            save_config(self.config_path, config)
 
             if new_use_method == "user_input":
                 if not hasattr(self, 'path_seeds_vcf_label'):  # create the label if it doesn't exist
@@ -219,7 +219,7 @@ class SeedsConfiguration:
                 if not hasattr(self, 'burn_in_generations_epi_label'):  # create the label if it doesn't exist
                     self.hide_elements()
                     
-                    # self.burn_in_generations_epi = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_generations']
+                    # self.burn_in_generations_epi = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_generations']
                     self.burn_in_generations_epi_label = ttk.Label(self.scrollable_frame, text="burn_in_generations:")
                     self.burn_in_generations_epi_label.pack()
                     self.burn_in_generations_epi_entry = ttk.Entry(self.scrollable_frame, foreground="black")
@@ -229,7 +229,7 @@ class SeedsConfiguration:
                     self.update_burn_in_generations_epi_button.pack()
                     # 
 
-                    # self.burn_in_mutrate_epi = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_mutrate']
+                    # self.burn_in_mutrate_epi = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_mutrate']
                     self.burn_in_mutrate_epi_label = ttk.Label(self.scrollable_frame, text="burn_in_mutrate_epi:")
                     self.burn_in_mutrate_epi_label.pack()
                     self.burn_in_mutrate_epi_entry = ttk.Entry(self.scrollable_frame, foreground="black")
@@ -239,7 +239,7 @@ class SeedsConfiguration:
                     self.update_burn_in_mutrate_epi_button.pack()
                     # 
 
-                    # self.seeded_host_id = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']["seeded_host_id"]
+                    # self.seeded_host_id = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["seeded_host_id"]
                     self.seeded_host_id_label = ttk.Label(self.scrollable_frame, text="seeded_host_id:")
                     self.seeded_host_id_label.pack()
                     self.seeded_host_id_entry = ttk.Entry(self.scrollable_frame, foreground="black")
@@ -249,7 +249,7 @@ class SeedsConfiguration:
                     self.update_seeded_host_id_button.pack()
                     # 
 
-                    # self.S_IE_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']["S_IE_rate"]
+                    # self.S_IE_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["S_IE_rate"]
                     self.S_IE_rate_label = ttk.Label(self.scrollable_frame, text="S_IE_rate:")
                     self.S_IE_rate_label.pack()
                     self.S_IE_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
@@ -259,7 +259,7 @@ class SeedsConfiguration:
                     self.update_S_IE_rate_button.pack()
                     # 
 
-                    # self.E_I_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']["E_I_rate"]
+                    # self.E_I_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["E_I_rate"]
                     self.E_I_rate_label = ttk.Label(self.scrollable_frame, text="E_I_rate:")
                     self.E_I_rate_label.pack()
                     self.E_I_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
@@ -269,7 +269,7 @@ class SeedsConfiguration:
                     self.update_E_I_rate_button.pack()
                     # 
 
-                    # self.E_R_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']["E_R_rate"]
+                    # self.E_R_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["E_R_rate"]
                     self.E_R_rate_label = ttk.Label(self.scrollable_frame, text="E_R_rate:")
                     self.E_R_rate_label.pack()
                     self.E_R_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
@@ -279,7 +279,7 @@ class SeedsConfiguration:
                     self.update_E_R_rate_button.pack()
                     # 
 
-                    # self.latency_prob = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']["latency_prob"]
+                    # self.latency_prob = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["latency_prob"]
                     self.latency_prob_label = ttk.Label(self.scrollable_frame, text="latency_prob:")
                     self.latency_prob_label.pack()
                     self.latency_prob_entry = ttk.Entry(self.scrollable_frame, foreground="black")
@@ -289,7 +289,7 @@ class SeedsConfiguration:
                     self.update_latency_prob_button.pack()
                     #                     
 
-                    # self.I_R_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']['I_R_rate']
+                    # self.I_R_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['I_R_rate']
                     self.I_R_rate_label = ttk.Label(self.scrollable_frame, text="I_R_rate:")
                     self.I_R_rate_label.pack()
                     self.I_R_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
@@ -299,7 +299,7 @@ class SeedsConfiguration:
                     self.update_I_R_rate_button.pack()
                     # 
 
-                    # self.I_E_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']['I_E_rate']
+                    # self.I_E_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['I_E_rate']
                     self.I_E_rate_label = ttk.Label(self.scrollable_frame, text="I_E_rate:")
                     self.I_E_rate_label.pack()
                     self.I_E_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
@@ -309,7 +309,7 @@ class SeedsConfiguration:
                     self.update_I_E_rate_button.pack()
                     # 
 
-                    # self.R_S_rate = self.load_config_as_dict()['SeedsConfiguration']['SLiM_burnin_epi']['R_S_rate']
+                    # self.R_S_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['R_S_rate']
                     self.R_S_rate_label = ttk.Label(self.scrollable_frame, text="R_S_rate:")
                     self.R_S_rate_label.pack()
                     self.R_S_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
@@ -374,9 +374,9 @@ class SeedsConfiguration:
             self.network_path_label = ttk.Label(self.scrollable_frame, text="Current Network Path: " + self.network_path)
             self.network_path_label.pack()
             self.network_path_label.config(text=f"Path Network: {self.network_path}") 
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['SeedsConfiguration']['user_input']["path_network"] = self.network_path
-            self.save_config(config)
+            save_config(self.config_path, config)
     
     def choose_and_update_path_seeds_vcf(self):  
         filetypes = ( #don't need to check if its genome file: or use python package jaehee said
@@ -387,17 +387,17 @@ class SeedsConfiguration:
         if chosen_file:  
             self.path_seeds_vcf = chosen_file
             self.path_seeds_vcf_indicator.config(text=f"choose_path_seeds_vcf: {self.path_seeds_vcf}") 
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             config['SeedsConfiguration']['user_input']['path_seeds_vcf'] = self.path_seeds_vcf
-            self.save_config(config)
+            save_config(self.config_path, config)
 
 
     def update_seed_size(self):
         try:
             new_seed_size = int(float(self.seed_size_entry.get()))  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['seed_size'] = new_seed_size 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "seed_size changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for seed_size.") 
@@ -405,9 +405,9 @@ class SeedsConfiguration:
     def update_burn_in_Ne(self):
         try:
             new_burn_in_Ne = int(float(self.burn_in_Ne_entry.get()))
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_Ne'] = new_burn_in_Ne 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "burn_in_Ne changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for burn_in_Ne.") 
@@ -415,9 +415,9 @@ class SeedsConfiguration:
     def update_burn_in_generations_wf(self):
         try:
             new_burn_in_generations_wf = int(float(self.burn_in_generations_wf_entry.get()))
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_generations'] = new_burn_in_generations_wf 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "burn_in_generations_wf changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for burn_in_generations_wf.") 
@@ -426,9 +426,9 @@ class SeedsConfiguration:
     def update_burn_in_mutrate_wf(self):
         try:
             new_burn_in_mutrate_wf = float(self.burn_in_mutrate_wf_entry.get())  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_mutrate'] = new_burn_in_mutrate_wf 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "burn_in_mutrate_wf changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for burn_in_mutrate_wf.") 
@@ -439,9 +439,9 @@ class SeedsConfiguration:
     def update_burn_in_generations_epi(self):
         try:
             new_burn_in_generations_epi = int(float(self.burn_in_generations_epi_entry.get()))
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_generations'] = new_burn_in_generations_epi
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "burn_in_generations changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for burn_in_generations.") 
@@ -449,9 +449,9 @@ class SeedsConfiguration:
     def update_burn_in_mutrate_epi(self):
         try:
             new_burn_in_mutrate_epi = float(self.burn_in_mutrate_epi_entry.get())  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_generations'] = new_burn_in_mutrate_epi 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "burn_in_mutrate_epi changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid float for burn_in_mutrate_epi.") 
@@ -471,9 +471,9 @@ class SeedsConfiguration:
                 raise ValueError("Invalid input format.")
                     
 
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_epi']['seeded_host_id'] = parsed_new_seeded_host_id
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "burn_in_generations changed.")  
         except ValueError: # This catches cases where conversion to integer fails
             messagebox.showerror("Update Error", "Please enter a valid list of integers for seeded_host_id, separated by commas.")
@@ -483,9 +483,9 @@ class SeedsConfiguration:
     def update_S_IE_rate(self):
         try:
             new_S_IE_rate = float(self.S_IE_rate_entry.get())  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_epi']['S_IE_rate'] = new_S_IE_rate 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "S_IE_rate changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid float for S_IE_rate.") 
@@ -495,9 +495,9 @@ class SeedsConfiguration:
     def update_E_I_rate(self):
         try:
             new_E_I_rate = float(self.E_I_rate_entry.get())  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_epi']['E_I_rate'] = new_E_I_rate 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "E_I_rate changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid float for E_I_rate.") 
@@ -507,9 +507,9 @@ class SeedsConfiguration:
     def update_E_R_rate(self):
         try:
             new_E_R_rate = float(self.E_R_rate_entry.get())  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_epi']['E_R_rate'] = new_E_R_rate 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "E_R_rate changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid float for E_R_rate.") 
@@ -519,9 +519,9 @@ class SeedsConfiguration:
     def update_latency_prob(self):
         try:
             new_latency_prob = int(float(self.latency_prob_entry.get()))
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_epi']['latency_prob'] = new_latency_prob 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "latency_prob changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid float for latency_prob.") 
@@ -531,9 +531,9 @@ class SeedsConfiguration:
     def update_I_R_rate(self):
         try:
             new_I_R_rate = float(self.I_R_rate_entry.get())  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_epi']['I_R_rate'] = new_I_R_rate 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "I_R_rate changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid float for I_R_rate.") 
@@ -543,9 +543,9 @@ class SeedsConfiguration:
     def update_I_E_rate(self):
         try:
             new_I_E_rate = float(self.I_E_rate_entry.get())  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_epi']['I_E_rate'] = new_I_E_rate 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "I_E_rate changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid float for I_E_rate.") 
@@ -555,9 +555,9 @@ class SeedsConfiguration:
     def update_R_S_rate(self):
         try:
             new_R_S_rate = float(self.R_S_rate_entry.get())  
-            config = self.load_config_as_dict() 
+            config = load_config_as_dict(self.config_path) 
             config['SeedsConfiguration']['SLiM_burnin_epi']['R_S_rate'] = new_R_S_rate 
-            self.save_config(config)  
+            save_config(self.config_path, config)  
             messagebox.showinfo("Update Successful", "R_S_rate changed.")  
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid float for R_S_rate.") 
@@ -628,7 +628,7 @@ class SeedsConfiguration:
             self.update_R_S_rate_button.pack_forget()
     def render_run_button(self):
         def seed_generation():
-            config = self.load_config_as_dict()
+            config = load_config_as_dict(self.config_path)
             cwdir = config["BasicRunConfiguration"]["cwdir"]
             seed_size = config["SeedsConfiguration"]["seed_size"]
             method = config["SeedsConfiguration"]["method"]

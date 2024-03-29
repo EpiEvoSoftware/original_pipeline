@@ -55,7 +55,8 @@ class NetworkGraphApp:
 
         self.config_path = config_path
         
-        self.config = self.load_config_as_dict()
+        self.config = load_config_as_dict(self.config_path)
+        # fix loadings
         wk_dir = self.config["BasicRunConfiguration"]["cwdir"]
         self.network_file_path = os.path.join(wk_dir, "contact_network.adjlist")
         
@@ -241,7 +242,7 @@ class NetworkGraphApp:
         return [""]
 
     def match_hosts(self):
-        wkdir = self.load_config_as_dict()["BasicRunConfiguration"]["cwdir"]
+        wkdir = load_config_as_dict(self.config_path)["BasicRunConfiguration"]["cwdir"]
         ntwk_path = os.path.join(wkdir, "contact_network.adjlist")
         ntwk = read_network(ntwk_path)
         
