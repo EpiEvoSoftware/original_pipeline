@@ -15,7 +15,7 @@
     "SeedsConfiguration": {
         "seed_size": 5,
         "use_reference": false,
-        "method": "SLiM_burnin_WF",
+        "method": "SLiM_burnin_epi",
         "user_input": {
             "path_seeds_vcf": "",
             "path_seeds_phylogeny": ""
@@ -30,7 +30,7 @@
             "burn_in_mutrate": 0,
             "seeded_host_id": [
                 1,
-                3
+                7
             ],
             "S_IE_rate": 0,
             "E_I_rate": 0,

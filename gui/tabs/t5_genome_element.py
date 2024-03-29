@@ -30,14 +30,8 @@ class GenomeElement:
         
         self.graph_values = ["Erdős–Rényi", "Barabási-Albert", "Random Partition"]
 
-        self.string_to_bool_mapping = {
-            "yes": True,
-            "no": False,
-            "Yes": True,
-            "No": False
-        }
 
-        self.bool_to_string_mapping = {
+        bool_to_string_mapping = {
             True: "Yes",
             False: "No"
         }
@@ -99,7 +93,7 @@ class GenomeElement:
 
         self.use_genetic_model_label = ttk.Label(self.scrollable_frame, text="use_genetic_model:")
         self.use_genetic_model_label.pack()
-        self.use_genetic_model_var = tk.StringVar(value=self.bool_to_string_mapping[self.use_genetic_model])
+        self.use_genetic_model_var = tk.StringVar(value=bool_to_string_mapping[self.use_genetic_model])
         self.use_genetic_model_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.use_genetic_model_var, values=["Yes", "No"], state="readonly")
         self.use_genetic_model_combobox.pack()
         self.update_use_genetic_model_button = tk.Button(self.scrollable_frame, text="Update use_genetic_model", command=self.update_use_genetic_model)
@@ -124,7 +118,7 @@ class GenomeElement:
         new_use_network_model = self.use_genetic_model_var.get()
         if new_use_network_model in ["Yes", "No"]: 
             config = load_config_as_dict(self.config_path)
-            config['GenomeElement']['use_genetic_model'] = self.string_to_bool_mapping[new_use_network_model]
+            config['GenomeElement']['use_genetic_model'] = string_to_bool_mapping[new_use_network_model]
             save_config(self.config_path, config)
             
 
@@ -283,7 +277,7 @@ class GenomeElement:
                     config['GenomeElement']['effect_size']['randomly_generate']['genes_num'] = genes_num_value
                     config['GenomeElement']['effect_size']['randomly_generate']['effsize_min'] = effsize_min_value
                     config['GenomeElement']['effect_size']['randomly_generate']['effsize_max'] = effsize_max_value
-                    config['GenomeElement']['effect_size']['randomly_generate']['normalize'] = self.string_to_bool_mapping[new_normalize]
+                    config['GenomeElement']['effect_size']['randomly_generate']['normalize'] = string_to_bool_mapping[new_normalize]
                     save_config(self.config_path, config)   
                     messagebox.showinfo("Update Successful")
                 except ValueError:
@@ -329,7 +323,7 @@ class GenomeElement:
 
             self.normalize_label = ttk.Label(self.scrollable_frame, text="normalize:")
             self.normalize_label.pack()
-            self.normalize_var = tk.StringVar(value=self.bool_to_string_mapping[self.normalize])
+            self.normalize_var = tk.StringVar(value=bool_to_string_mapping[self.normalize])
             self.normalize_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.normalize_var, values=["Yes", "No"], state="readonly")
             self.normalize_combobox.pack() 
 

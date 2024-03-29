@@ -457,29 +457,9 @@ class SeedsConfiguration:
             messagebox.showerror("Update Error", "Please enter a valid float for burn_in_mutrate_epi.") 
 
     def update_seeded_host_id(self):
-        try:
-            new_seeded_host_id = self.seeded_host_id_entry.get().strip()
-            cleaned_input = new_seeded_host_id.strip("[]").strip()
-            
-            if cleaned_input == "":
-                parsed_new_seeded_host_id = []
-            elif cleaned_input.isdigit():
-                parsed_new_seeded_host_id = [int(float(cleaned_input))]
-            elif "," in new_seeded_host_id:
-                parsed_new_seeded_host_id = [int(float(item.strip())) for item in cleaned_input.split(',')]
-            else:
-                raise ValueError("Invalid input format.")
-                    
-
-            config = load_config_as_dict(self.config_path) 
-            config['SeedsConfiguration']['SLiM_burnin_epi']['seeded_host_id'] = parsed_new_seeded_host_id
-            save_config(self.config_path, config)  
-            messagebox.showinfo("Update Successful", "burn_in_generations changed.")  
-        except ValueError: # This catches cases where conversion to integer fails
-            messagebox.showerror("Update Error", "Please enter a valid list of integers for seeded_host_id, separated by commas.")
-        except Exception as e: # General error handling (e.g., file operation failures)
-            messagebox.showerror("Update Error", str(e))           
-
+        keys_path = ['SeedsConfiguration', 'SLiM_burnin_epi', 'seeded_host_id']
+        update_list_int_params(self.seeded_host_id_entry, keys_path, self.config_path)
+        
     def update_S_IE_rate(self):
         try:
             new_S_IE_rate = float(self.S_IE_rate_entry.get())  

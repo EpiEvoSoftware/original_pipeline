@@ -50,14 +50,7 @@ class NetworkModelConfigurations:
         
         self.graph_values = ["Erdős–Rényi", "Barabási-Albert", "Random Partition"]
 
-        self.string_to_bool_mapping = {
-            "yes": True,
-            "no": False,
-            "Yes": True,
-            "No": False
-        }
-
-        self.bool_to_string_mapping = {
+        bool_to_string_mapping = {
             True: "Yes",
             False: "No"
         }
@@ -127,7 +120,7 @@ class NetworkModelConfigurations:
         # self.use_network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['use_network_model']
         self.use_network_model_label = ttk.Label(self.scrollable_frame, text="use_network_model:")
         self.use_network_model_label.pack()
-        self.use_network_model_var = tk.StringVar(value=self.bool_to_string_mapping[self.use_network_model])
+        self.use_network_model_var = tk.StringVar(value=bool_to_string_mapping[self.use_network_model])
         self.use_network_model_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.use_network_model_var, values=["Yes", "No"], state="readonly")
         self.use_network_model_combobox.pack()
         self.update_use_network_model_button = tk.Button(self.scrollable_frame, text="Update use_network_model", command=self.update_use_network_model)
@@ -206,7 +199,7 @@ class NetworkModelConfigurations:
         new_use_network_model = self.use_network_model_var.get()
         if new_use_network_model in ["Yes", "No"]: 
             config = load_config_as_dict(self.config_path)
-            config['NetworkModelParameters']['use_network_model'] = self.string_to_bool_mapping[new_use_network_model]
+            config['NetworkModelParameters']['use_network_model'] = string_to_bool_mapping[new_use_network_model]
             save_config(self.config_path, config)
 
             # break
