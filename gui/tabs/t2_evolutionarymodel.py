@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk, messagebox
 import json
+from tools import *
 #TODO: change mut_rate and within_host_reproduction_rate to float
 class EvolutionaryModel:
     def __init__(self, parent, tab_parent, config_path):

@@ -4,6 +4,7 @@ from tkinter import ttk, messagebox, filedialog
 import json
 import os
 import sys
+from tools import *
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
 if parent_dir not in sys.path:
