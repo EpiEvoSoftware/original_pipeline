@@ -10,7 +10,7 @@ from outbreak_simulator import all_slim_simulation_by_config
 
 header = r"""
 
-	_______ .__   __.  __  ____    ____  ______    __      
+	 _______ .__   __.  __  ____    ____  ______    __      
 	|   ____||  \ |  | |  | \   \  /   / /  __  \  |  |     
 	|  |__   |   \|  | |  |  \   \/   / |  |  |  | |  |     
 	|   __|  |  . `  | |  |   \      /  |  |  |  | |  |     
@@ -19,9 +19,6 @@ header = r"""
                                                         
 """
 
-def _exit(error_m):
-	if error_m != None:
-		sys.exit("Simulation ends.")
 
 def main():
 	parser = argparse.ArgumentParser(description='Run the whole simulation process by the configuration provided.')
@@ -35,6 +32,11 @@ def main():
 	param_dict = read_params(config_path, "base_params.json")
 
 	print(header)
+
+	def _exit(error_m):
+		if error_m != None:
+			sys.exit("Simulation ends.")
+
 	## Network generation
 	error = network_generation_byconfig(param_dict)
 	_exit(error)
