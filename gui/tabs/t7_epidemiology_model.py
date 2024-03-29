@@ -432,6 +432,7 @@ class EpidemiologyModel:
         def update():
             keys_path = ['EpidemiologyModel', 'massive_sampling', 'recovery_prob_after_sampling']
             update_list_int_params(self.massive_sampling_after_sampling_entry, keys_path, self.config_path)
+            
         self.massive_sampling_after_sampling_label = ttk.Label(self.scrollable_frame, text="massive_sampling_after_sampling:")
         self.massive_sampling_after_sampling_label.pack()
         self.massive_sampling_after_sampling_entry = ttk.Entry(self.scrollable_frame, foreground="black")
