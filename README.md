@@ -11,5 +11,6 @@ https://stackoverflow.com/questions/42352841/how-to-update-an-existing-conda-env
 deployment: https://github.com/TomSchimansky/CustomTkinter/issues/2322
 
 
-
-Credit theme by https://github.com/rdbende/Azure-ttk-theme
+distributing for macos:
+pip install pyinstaller
+pyinstaller --onefile --windowed --icon=__icon__.ico __script__.py

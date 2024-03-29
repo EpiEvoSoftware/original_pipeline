@@ -29,7 +29,6 @@ class Configurationv2:
         for col in columns:
             tree.heading(col, text=col)
 
-
         tree.tag_configure('evenrow', background='#F0F0F0')  # Light grey for odd rows
         tree.tag_configure('oddrow', background='white')  # White for even rows
 

@@ -215,7 +215,8 @@ def render_next_button(tab_index, tab_parent, parent):
         go_to_next_tab(tab_index, tab_parent)
         
     next_button = tk.ttk.Button(parent, text="Next",  command=next_tab)
-    next_button.pack(side='right')
+    next_button.pack()
+    # next_button.pack(side='bottom')
 
 def go_to_next_tab(tab_index, tab_parent):
     # next_button = ttk.Button(self.parent, text="Next", style="Custom.TButton", command=self.go_to_next_tab)

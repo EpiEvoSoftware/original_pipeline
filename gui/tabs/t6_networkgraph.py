@@ -126,7 +126,6 @@ class NetworkGraphApp:
         self.populate_table_from_csv('test/test_drugresist/seeds_trait_values.csv') 
 
         self.table.bind("<Double-1>", self.on_double_click)
-        
 
         self.degree_button = ttk.Button(
             self.table_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')

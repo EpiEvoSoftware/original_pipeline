@@ -1,6 +1,6 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "/Users/vivianzhao/Desktop/TB_software/wkdir",
+        "cwdir": "/System",
         "n_replicates": 1
     },
     "EvolutionModel": {
@@ -43,7 +43,7 @@
     },
     "GenomeElement": {
         "use_genetic_model": true,
-        "ref_path": "",
+        "ref_path": "/System/iOSSupport/dyld/macOS-deny-list.txt",
         "traits_num": [
             1,
             1

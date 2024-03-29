@@ -11,6 +11,7 @@ import json
 
 from tabs.t1_configuration import Configuration
 from tabs.t1_configuration_v2 import Configurationv2
+from tabs.t1_configuration_v3 import Configurationv3
 from tabs.t2_evolutionarymodel import EvolutionaryModel
 from tabs.t3_networkmodel import NetworkModel
 from tabs.t4_seeds_configuration import SeedsConfiguration
@@ -74,10 +75,11 @@ def launch_gui(config_path, hide = False):
     Launches the gui application
     """
     root = tk.Tk()
+    root.iconbitmap('')
     style = ttk.Style(root)
     if 'aqua' in style.theme_names():
         style.theme_use('aqua')
-    root.title("Epidemiology Evolution")
+    root.title("EnivolCrossing: Simulation Framework for Genetic Epidemiology")
 
     tab_parent = ttk.Notebook(root)
 
@@ -91,7 +93,7 @@ def launch_gui(config_path, hide = False):
     tab8 = ttk.Frame(tab_parent)
 
     if hide:
-        network_app = Configuration(tab1, tab_parent, config_path, "Basic Configuration", 0, hide = True)
+        network_app = Configurationv3(tab1, tab_parent, config_path, "Basic Configuration", 0, hide = True)
         network_app = EpidemiologyModelv2(tab2, tab_parent, config_path, "Evolutionary Model", 1, hide = True)
         # network_app = Configurationv2(tab2, tab_parent, config_path, hide = True)
         network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path, "Network Graph", 2, hide = True)
@@ -101,7 +103,7 @@ def launch_gui(config_path, hide = False):
         network_app = EpidemiologyModel(tab7, tab_parent, config_path, "Epidemiology Model", 6, hide = True)
         network_app = PostProcessing(tab8, tab_parent, config_path, "Post Processing Options", 7, hide = True)
     else:
-        network_app = Configuration(tab1, tab_parent, config_path, "Basic Configuration", 0)
+        network_app = Configurationv3(tab1, tab_parent, config_path, "Basic Configuration", 0)
         network_app = EpidemiologyModelv2(tab2, tab_parent, config_path, "Evolutionary Model", 1)
         # network_app = Configurationv2(tab2, tab_parent, config_path)
         network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path, "Network Graph", 2)
@@ -123,7 +125,7 @@ def launch_gui(config_path, hide = False):
     # network_app = PostProcessing(tab8, tab_parent, config_path, "Post Processing Options", 7)
 
     tab_parent.pack(expand=1, fill='both')
-
+    root.configure(background='black')
     root.mainloop()
 
 
