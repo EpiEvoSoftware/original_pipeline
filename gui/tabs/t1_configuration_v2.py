@@ -45,6 +45,8 @@ class Configurationv2:
         # Pack the treeview finally
         tree.pack(expand=True, fill='both')
 
+        render_next_button(self.tab_index, self.tab_parent, self.parent)
+
 #         self.control_frame = ttk.Frame(self.parent, width=300)
 #         diagnostic_label = ttk.Label(self.control_frame, text="Choose Working Directory")
 #         diagnostic_label.pack()
@@ -74,28 +76,9 @@ class Configurationv2:
 #         self.ref_path_label = ttk.Label(self.control_frame, text="Current Ref Path: " + self.ref_path)
 #         self.ref_path_label.pack()
 
-        next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab, state = "disabled")
-        next_button.pack()
-        next_button.configure(state="normal")
 
+        
 
-    def go_to_next_tab(self):
-        current_tab_index = self.tab_index
-        next_tab_index = (current_tab_index + 1) % self.tab_parent.index("end")
-        self.tab_parent.tab(next_tab_index, state="normal")
-        self.tab_parent.select(next_tab_index)
-
-    def load_config_as_dict(self):
-        with open(self.config_path, 'r') as file:
-            return json.load(file)
-
-    def save_config(self, config):
-        with open(self.config_path, 'w') as file:
-            json.dump(config, file, indent=4)
-
-    def save_ref_path(self, config):
-        with open(self.ref_path, 'w') as file:
-            json.dump(config, file, indent=4)
 
     def choose_directory(self):  
         chosen_directory = filedialog.askdirectory(title="Select a Directory")

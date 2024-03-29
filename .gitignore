@@ -10,3 +10,8 @@ __pycache__/
 *.pyc
 *.pyo
 
+
+# Themes
+Azure-ttk-theme/
+ttk-Breeze/
+itft1/

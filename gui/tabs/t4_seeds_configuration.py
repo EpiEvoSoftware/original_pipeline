@@ -119,23 +119,7 @@ class SeedsConfiguration:
 
 
 
-        # Next Button
-        next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
-        next_button.pack()
-
-    def go_to_next_tab(self):
-        current_tab_index = self.tab_index
-        next_tab_index = (current_tab_index + 1) % self.tab_parent.index("end")
-        self.tab_parent.tab(next_tab_index, state="normal")
-        self.tab_parent.select(next_tab_index)
-
-    def load_config_as_dict(self):
-        with open(self.config_path, 'r') as file:
-            return json.load(file)
-
-    def save_config(self, config):
-        with open(self.config_path, 'w') as file:
-            json.dump(config, file, indent=4)
+        render_next_button(self.tab_index, self.tab_parent, self.parent)
 
     def update_use_method(self):
         new_use_method = self.use_method_var.get()

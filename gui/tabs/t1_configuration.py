@@ -30,15 +30,8 @@ class Configuration:
 
         self.render_ref_path_label()
 
-        self.render_next_button()
+        render_next_button(self.tab_index, self.tab_parent, self.parent)
         
-
-
-    def render_next_button(self):
-        # next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
-        # next_button.pack()
-        next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
-        next_button.pack(side='bottom', fill='x', padx=5, pady=5)
 
     def render_working_directory(self):
         def diagnostic_label_title():
@@ -101,11 +94,6 @@ class Configuration:
         # self.ref_path_label = ttk.Label(self.control_frame, text="Current Ref Path: " + self.ref_path)
         # self.ref_path_label.pack()
 
-    def go_to_next_tab(self):
-        current_tab_index = self.tab_index
-        next_tab_index = (current_tab_index + 1) % self.tab_parent.index("end")
-        self.tab_parent.tab(next_tab_index, state="normal")
-        self.tab_parent.select(next_tab_index)
 
     def save_ref_path(self, config):
         with open(self.ref_path, 'w') as file:

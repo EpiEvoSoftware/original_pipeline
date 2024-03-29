@@ -73,8 +73,10 @@ def launch_gui(config_path, hide = False):
     """
     Launches the gui application
     """
-
     root = tk.Tk()
+    style = ttk.Style(root)
+    if 'aqua' in style.theme_names():
+        style.theme_use('aqua')
     root.title("Epidemiology Evolution")
 
     tab_parent = ttk.Notebook(root)

@@ -28,10 +28,11 @@ class NetworkModel:
         self.top_frame.pack(side="top", fill="both", expand=True)
         self.bottom_frame.pack(side="bottom", fill="both", expand=True)
         
-        self.graph = NetworkModelGraph(self.bottom_frame, tab_parent, network_graph_app, config_path, tab_title)
-        self.sidebar = NetworkModelConfigurations(self.top_frame, tab_parent, config_path, self.graph, tab_title)
+        self.graph = NetworkModelGraph(self.bottom_frame, tab_parent, network_graph_app, config_path, tab_index, tab_title)
+        self.sidebar = NetworkModelConfigurations(self.top_frame, tab_parent, config_path, self.graph, tab_index, tab_title)
         self.tab_parent = tab_parent
         self.tab_parent.add(parent, text=tab_title)
+        self.parent = parent
         if hide:
             self.tab_parent.tab(tab_index, state="disabled")
         self.tab_index = tab_index
@@ -39,7 +40,7 @@ class NetworkModel:
         
 
 class NetworkModelConfigurations:
-    def __init__(self, parent, tab_parent, config_path, graph, tab_title):
+    def __init__(self, parent, tab_parent, config_path, graph, tab_index, tab_title):
         self.graph = graph
         self.network_model_to_string = {
             "Erdős–Rényi": "ER",
@@ -57,6 +58,7 @@ class NetworkModelConfigurations:
 
 
         self.config_path = config_path
+        self.tab_index = tab_index
 
         # User Configurations
         self.use_network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['use_network_model']
@@ -126,10 +128,9 @@ class NetworkModelConfigurations:
         self.use_network_model_combobox.pack()
         self.update_use_network_model_button = tk.Button(self.scrollable_frame, text="Update use_network_model", command=self.update_use_network_model)
         self.update_use_network_model_button.pack()
-        
 
-        next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
-        next_button.pack()
+        render_next_button(self.tab_index, self.tab_parent, self.parent)
+
 
     def update_host_size(self):
         try:
@@ -171,19 +172,6 @@ class NetworkModelConfigurations:
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for within_host_reproduction_rate.") 
 
-    def go_to_next_tab(self):
-        current_tab_index = self.tab_index
-        next_tab_index = (current_tab_index + 1) % self.tab_parent.index("end")
-        self.tab_parent.tab(next_tab_index, state="normal")
-        self.tab_parent.select(next_tab_index)
-
-    def load_config_as_dict(self):
-        with open(self.config_path, 'r') as file:
-            return json.load(file)
-
-    def save_config(self, config):
-        with open(self.config_path, 'w') as file:
-            json.dump(config, file, indent=4)
 
     def choose_network_path(self):  
         chosen_path = filedialog.askdirectory(title="Select a Directory")
@@ -526,17 +514,18 @@ class NetworkModelConfigurations:
             self.update_ER_button.pack_forget()
 
 class NetworkModelGraph:
-    def __init__(self, parent, tab_parent, network_graph_app, config_path, tab_title):
+    def __init__(self, parent, tab_parent, network_graph_app, config_path, tab_index, tab_title):
         self.parent = parent
         self.tab_parent = tab_parent
         self.config_path = config_path
         self.network_graph_app = network_graph_app
+        self.tab_index = tab_index
         self.create_graph_frame()
 
     def create_graph_frame(self):
         self.graph_frame = ttk.Frame(self.parent)
         self.graph_frame.pack(fill='both', expand=True)
-
+        
     def plot_degree_distribution(self, degrees):
         for widget in self.graph_frame.winfo_children():
             widget.destroy()

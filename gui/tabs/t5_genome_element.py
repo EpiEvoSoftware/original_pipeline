@@ -97,16 +97,7 @@ class GenomeElement:
         self.update_use_genetic_model_button = tk.Button(self.scrollable_frame, text="Update use_genetic_model", command=self.update_use_genetic_model)
         self.update_use_genetic_model_button.pack()
 
-        next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
-        next_button.pack()
-
-# Setup
-    #   
-    def go_to_next_tab(self):
-        current_tab_index = self.tab_index
-        next_tab_index = (current_tab_index + 1) % self.tab_parent.index("end")
-        self.tab_parent.tab(next_tab_index, state="normal")
-        self.tab_parent.select(next_tab_index)
+        render_next_button(self.tab_index, self.tab_parent, self.parent)
 
 
     # 
