@@ -92,7 +92,8 @@ class PostProcessing:
                 messagebox.showerror("Update Error", str(e))
         self.branch_color_trait_label = ttk.Label(self.control_frame, text="branch_color_trait:").pack()
         self.branch_color_trait_entry = ttk.Entry(self.control_frame, foreground="black")
-        self.branch_color_trait_entry.insert(0, self.branch_color_trait).pack()
+        self.branch_color_trait_entry.pack()
+        self.branch_color_trait_entry.insert(0, self.branch_color_trait)
         self.update_branch_color_trait_button = tk.Button(self.control_frame, text="Update branch_color_trait", command=update).pack()
 
     def render_drug_resistance_heatmap(self):
