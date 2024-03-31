@@ -31,7 +31,7 @@ class GenomeElement:
         self.graph_values = ["Erdős–Rényi", "Barabási-Albert", "Random Partition"]
 
         self.config_path = config_path
-
+# testingrp
     # User Configurations
         # bool
         self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
@@ -59,9 +59,14 @@ class GenomeElement:
         self.tab_parent.add(parent, text=tab_title)
         if hide:
             self.tab_parent.tab(self.tab_index, state="disabled")
+            
+
+        
 
         self.control_frame = ttk.Frame(self.parent, width=300)
         self.control_frame.pack(fill='both', expand=True) 
+
+        
         
 
 
@@ -87,13 +92,23 @@ class GenomeElement:
         self.scrollbar.pack(side=tk.RIGHT, fill="y")
             # 
         # 
+        selected_option = tk.StringVar()
+        radio_button1 = tk.Radiobutton(self.scrollable_frame, text="Option 1", variable=selected_option, value="Option 1").pack()
+        radio_button2 = tk.Radiobutton(self.scrollable_frame, text="Option 2", variable=selected_option, value="Option 2").pack()
 
+        test1 = ttk.Label(self.scrollable_frame, text="use_genetic_model:", state = 'disabled')
+        test1.pack()
+        test = ttk.Entry(self.scrollable_frame)
+        test.pack()
+        test.insert(0, "sdafsaf") 
+        test.configure(state="disabled")
 
         self.use_genetic_model_label = ttk.Label(self.scrollable_frame, text="use_genetic_model:")
         self.use_genetic_model_label.pack()
         self.use_genetic_model_var = tk.StringVar(value=bool_to_string_mapping[self.use_genetic_model])
         self.use_genetic_model_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.use_genetic_model_var, values=["Yes", "No"], state="readonly")
         self.use_genetic_model_combobox.pack()
+        self.use_genetic_model_combobox.configure(state="disabled")
         self.update_use_genetic_model_button = tk.Button(self.scrollable_frame, text="Update use_genetic_model", command=self.update_use_genetic_model)
         self.update_use_genetic_model_button.pack()
 

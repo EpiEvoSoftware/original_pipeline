@@ -30,11 +30,11 @@ class Configurationv3:
 
         # tree = ttk.Treeview(self.control_frame).grid(row=0, column=0, sticky='ew', padx=5, pady=5)
         self.render_working_directory()
+        self.render_ref_path_label()
 
         self.render_n_replicates()
 
-        self.render_ref_path_label()
-        # self.control_frame.columnconfigure(0, minsize=80, weight = 0)
+                # self.control_frame.columnconfigure(0, minsize=80, weight = 0)
 
         render_next_button(self.tab_index, self.tab_parent, self.parent)
         
@@ -76,7 +76,11 @@ class Configurationv3:
         self.working_directory_label.grid(row=0, column=0, pady=5, sticky='w')
         
         # self.n_replicates_label.grid(row=3, column=1, sticky='ew', padx=5, pady=5)
-        self.user_working_directory_label = ttk.Label(self.control_frame, text = self.cwd, foreground="black", width = 60)
+        if self.cwd == "":
+            self.user_working_directory_label = ttk.Label(self.control_frame, text = "None Selected", foreground="black", width = 60)
+        else:
+            self.user_working_directory_label = ttk.Label(self.control_frame, text = self.cwd, foreground="black", width = 60)
+
         # self.n_replicates_entry.insert(0, self.n_replicates)
         # self.n_replicates_entry.insert(0, "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff")
         # self.n_replicates_entry.delete(0, tk.END)
@@ -99,14 +103,14 @@ class Configurationv3:
 
 
         # update_n_replicates_button.grid(row=5, column=0, sticky='ew', padx=5, pady=5)
-        self.n_replicates_label = ttk.Label(self.control_frame, text="n_replicates:", style="Bold.TLabel")
-        self.n_replicates_label2 = ttk.Label(self.control_frame, text="(Integer)")
-        self.n_replicates_label.grid(row=4, column=0, sticky='w', pady=5)
-        self.n_replicates_label2.grid(row=4, column=0, sticky='w', pady=5, padx=88)
+        self.n_replicates_label = ttk.Label(self.control_frame, text="Number of Simulation Replicates", style="Bold.TLabel")
+        self.n_replicates_label2 = ttk.Label(self.control_frame, text="(Integer):")
+        self.n_replicates_label.grid(row=7, column=0, sticky='w', pady=5)
+        self.n_replicates_label2.grid(row=7, column=0, sticky='w', pady=5, padx=215)
         # self.n_replicates_label.pack()
         self.n_replicates_entry = ttk.Entry(self.control_frame, foreground="black", width = 20)
-        self.n_replicates_entry.grid(row=5, column=0, sticky='w', pady=5)
-        # self.n_replicates_entry.insert(0, self.n_replicates)  
+        self.n_replicates_entry.grid(row=8, column=0, sticky='w', pady=5)
+        self.n_replicates_entry.insert(0, self.n_replicates)  
         # self.n_replicates_entry.pack()
         # update_n_replicates_button = tk.Button(self.control_frame, text="Update n_replicates", command=self.update_n_replicates)
         # update_n_replicates_button.pack()
@@ -118,16 +122,25 @@ class Configurationv3:
    'est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.')
         
     def render_ref_path_label(self):
-        ref_path_label = ttk.Label(self.control_frame, text="Current Ref Path:", style="Bold.TLabel")
-        ref_path_label.grid(row=6, column=0, sticky='ew', pady=5)
+        ref_path_label = ttk.Label(self.control_frame, text="Pathogen Reference Genome File", style="Bold.TLabel")
+        ref_path_label.grid(row=4, column=0, sticky='ew', pady=5)
+        ref_path_label = ttk.Label(self.control_frame, text="(FASTA Format):")
+        ref_path_label.grid(row=4, column=0, sticky='ew', pady=5, padx=220)
         # self.n_replicates_entry23 = ttk.Label(self.control_frame, text = self.ref_path, foreground="black", width = 60)
-        self.ref_path_label = ttk.Label(self.control_frame, text = "None selected", foreground="black", width = 60)
-        self.ref_path_label.grid(row=7, column=0, pady=5, sticky='w')
+        if self.ref_path == "":
+            self.ref_path_label = ttk.Label(self.control_frame, text = "None selected", foreground="black", width = 60)
+        else:
+            self.ref_path_label = ttk.Label(self.control_frame, text = self.ref_path, foreground="black", width = 60)
+
+
+
+
+        self.ref_path_label.grid(row=5, column=0, pady=5, sticky='w')
 
         # choose_directory_button = tk.Button(self.control_frame, text="Choose Directory", command=self.choose_directory)
         # choose_directory_button.grid(row=2, column=0, sticky='e')
         choose_ref_path_button = tk.Button(self.control_frame, text="Choose File", command=self.choose_ref_path)
-        choose_ref_path_button.grid(row=8, column=0, sticky='e', pady=5)
+        choose_ref_path_button.grid(row=6, column=0, sticky='e', pady=5)
 
         # self.ref_path_label = ttk.Label(self.control_frame, text="Current Ref Path: " + self.ref_path)
         # self.ref_path_label.grid(row=9, column=0, sticky='ew', padx=5, pady=5)
@@ -140,15 +153,11 @@ class Configurationv3:
         # self.ref_path_label.pack()
 
 
-    def save_ref_path(self, config):
-        with open(self.ref_path, 'w') as file:
-            json.dump(config, file, indent=4)
-
     def choose_directory(self):  
         chosen_directory = filedialog.askdirectory(title="Select a Directory")
         if chosen_directory:  
             self.cwd = chosen_directory
-            self.user_working_directory_label.config(text=f"Working Directory: {self.cwd}")  # Update the label with the new directory
+            self.user_working_directory_label.config(text=f"{self.cwd}")  # Update the label with the new directory
             config = load_config_as_dict(self.config_path)
             config['BasicRunConfiguration']['cwdir'] = self.cwd
             save_config(self.config_path, config)

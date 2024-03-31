@@ -94,7 +94,8 @@ def launch_gui(config_path, hide = False):
 
     if hide:
         network_app = Configurationv3(tab1, tab_parent, config_path, "Basic Configuration", 0, hide = True)
-        network_app = EpidemiologyModelv2(tab2, tab_parent, config_path, "Evolutionary Model", 1, hide = True)
+        
+        network_app = EvolutionaryModel(tab2, tab_parent, config_path, "Evolutionary Model", 1, hide = True)
         # network_app = Configurationv2(tab2, tab_parent, config_path, hide = True)
         network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path, "Network Graph", 2, hide = True)
         network_model_app = NetworkModel(tab3, tab_parent, network_graph_app, config_path, "Network Model Parameters", 3, hide = True)
@@ -104,7 +105,7 @@ def launch_gui(config_path, hide = False):
         network_app = PostProcessing(tab8, tab_parent, config_path, "Post Processing Options", 7, hide = True)
     else:
         network_app = Configurationv3(tab1, tab_parent, config_path, "Basic Configuration", 0)
-        network_app = EpidemiologyModelv2(tab2, tab_parent, config_path, "Evolutionary Model", 1)
+        network_app = EvolutionaryModel(tab2, tab_parent, config_path, "Evolutionary Model", 1)
         # network_app = Configurationv2(tab2, tab_parent, config_path)
         network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path, "Network Graph", 2)
         network_model_app = NetworkModel(tab3, tab_parent, network_graph_app, config_path, "Network Model Parameters", 3)

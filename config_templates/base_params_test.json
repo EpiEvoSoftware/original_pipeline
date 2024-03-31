@@ -1,6 +1,6 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "/System",
+        "cwdir": "",
         "n_replicates": 1
     },
     "EvolutionModel": {
