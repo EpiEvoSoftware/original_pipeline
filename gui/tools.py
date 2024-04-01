@@ -243,3 +243,5 @@ def go_to_next_tab(tab_index, tab_parent):
     next_tab_index = (current_tab_index + 1) % tab_parent.index("end")
     tab_parent.tab(next_tab_index, state="normal")
     tab_parent.select(next_tab_index)
+
+minwidth = 100

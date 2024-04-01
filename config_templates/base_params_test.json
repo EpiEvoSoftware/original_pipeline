@@ -1,6 +1,6 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "",
+        "cwdir": "/Applications/Utilities",
         "n_replicates": 1
     },
     "EvolutionModel": {

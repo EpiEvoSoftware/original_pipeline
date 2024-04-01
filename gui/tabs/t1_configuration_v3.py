@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import json
-import tkinter.font as tkFont
 from tools import *
 
 
@@ -62,24 +61,15 @@ class Configurationv3:
         # diagnostic_label()
 
     def render_n_replicates(self):
-        style = ttk.Style()
-        default_font = tkFont.nametofont("TkDefaultFont")
-
-        # Extract font details
-        font_family = default_font.cget("family")
-        font_size = default_font.cget("size")
-        font_weight = default_font.cget("weight")
-        # print(str(font_weight))
-        style.configure("Bold.TLabel", font=(font_family, font_size, 'bold'))
-
-        self.working_directory_label = ttk.Label(self.control_frame, text="Current Working Directory:", style="Bold.TLabel")
+        
+        self.working_directory_label = ttk.Label(self.control_frame, text="Working Directory:", style="Bold.TLabel")
         self.working_directory_label.grid(row=0, column=0, pady=5, sticky='w')
         
         # self.n_replicates_label.grid(row=3, column=1, sticky='ew', padx=5, pady=5)
         if self.cwd == "":
-            self.user_working_directory_label = ttk.Label(self.control_frame, text = "None Selected", foreground="black", width = 60)
+            self.user_working_directory_label = ttk.Label(self.control_frame, text = "None Selected", foreground="black", width = minwidth)
         else:
-            self.user_working_directory_label = ttk.Label(self.control_frame, text = self.cwd, foreground="black", width = 60)
+            self.user_working_directory_label = ttk.Label(self.control_frame, text = self.cwd, foreground="black", width = minwidth)
 
         # self.n_replicates_entry.insert(0, self.n_replicates)
         # self.n_replicates_entry.insert(0, "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff")
@@ -126,11 +116,11 @@ class Configurationv3:
         ref_path_label.grid(row=4, column=0, sticky='ew', pady=5)
         ref_path_label = ttk.Label(self.control_frame, text="(FASTA Format):")
         ref_path_label.grid(row=4, column=0, sticky='ew', pady=5, padx=220)
-        # self.n_replicates_entry23 = ttk.Label(self.control_frame, text = self.ref_path, foreground="black", width = 60)
+        # self.n_replicates_entry23 = ttk.Label(self.control_frame, text = self.ref_path, foreground="black", width = minwidth)
         if self.ref_path == "":
-            self.ref_path_label = ttk.Label(self.control_frame, text = "None selected", foreground="black", width = 60)
+            self.ref_path_label = ttk.Label(self.control_frame, text = "None selected", foreground="black", width = minwidth)
         else:
-            self.ref_path_label = ttk.Label(self.control_frame, text = self.ref_path, foreground="black", width = 60)
+            self.ref_path_label = ttk.Label(self.control_frame, text = self.ref_path, foreground="black", width = minwidth)
 
 
 
