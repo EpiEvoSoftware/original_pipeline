@@ -10,8 +10,6 @@ POS_COL = 1
 TRANS_INDEX = 0
 DRUG_RES_INDEX = 1
 
-os.environ['PYTHONUNBUFFERED'] = '1'
-
 def read_tseq(each_wk_dir_):
 	"""
 	Returns the tree sequence, sampled tree, sample size, 

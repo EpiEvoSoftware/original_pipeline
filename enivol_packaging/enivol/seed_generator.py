@@ -1,4 +1,4 @@
-import os, subprocess, shutil, tskit, random, pyslim, argparse, sys
+import os, subprocess, shutil, tskit, pyslim, numpy as np
 from error_handling import CustomizedError
 from base_func import *
 import ete3 as Tree
@@ -31,7 +31,6 @@ VCF_HEAD = """\
 """
 
 NODES_PER_IND = 2
-# PHYLO_DIR = "seeds_phylogeny_uncoalesced"
 NW_PRE = ".nwk"
 NW_PATH = "seeds.nwk"
 VCF_PATH = "seeds.vcf"
@@ -41,8 +40,6 @@ WF_SLIM = "burnin_WF.slim"
 EPI_SLIM = "burnin_epi.slim"
 OUT_SLIM = "burn-in_slim.stdout"
 TRAJ = "burn_in_SEIR_trajectory.csv.gz"
-
-os.environ['PYTHONUNBUFFERED'] = '1'
 
 def _create_seeds_directory(wk_dir):
 	"""
@@ -137,7 +134,7 @@ def _generate_sample_indices(ts, seed_size):
 	if ts.tables.individuals.num_rows < seed_size:
 		raise ValueError("Not enough genomes to choose seeds from. "
 						 "Please rerun the seed generation or adjust parameters.")
-	sampled_inds = random.sample(range(ts.tables.individuals.num_rows), seed_size)
+	sampled_inds = np.random.choice(ts.tables.individuals.num_rows, seed_size, replace = False)
 	genome_ids = [NODES_PER_IND * i for i in sampled_inds]
 	return genome_ids
 
@@ -403,7 +400,7 @@ def seeds_tree_scaling(tree_path, scale_factor, wk_dir):
 
 def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="", mu=0, n_gen=0, \
 						path_seeds_phylogeny="", host_size=0, seeded_host_id=[], S_IE_rate=0, E_I_rate=0, \
-						E_R_rate=0, latency_prob=0, I_R_rate=0, I_E_rate=0, R_S_rate=0):
+						E_R_rate=0, latency_prob=0, I_R_rate=0, I_E_rate=0, R_S_rate=0, rand_seed = None):
 	"""
 	Generate seeds's phylogeny and individual VCFs.
 
@@ -430,6 +427,8 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 		Returns:
 			error_message (str): Error message.
     """
+	if rand_seed != None:
+		np.random.seed(rand_seed)
 	error_message = None
 	try:	
 		if not os.path.exists(wk_dir):
@@ -501,13 +500,14 @@ def seeds_generation_byconfig(all_config):
 	I_R_rate = seeds_config["SLiM_burnin_epi"]["I_R_rate"]
 	I_E_rate = seeds_config["SLiM_burnin_epi"]["I_E_rate"]
 	R_S_rate = seeds_config["SLiM_burnin_epi"]["R_S_rate"]
+	random_number_seed = all_config["BasicRunConfiguration"]["random_number_seed"]
 
 	# Run simulation for seed generation
 	error = run_seed_generation(method=method, wk_dir=wk_dir, seed_size=seed_size, seed_vcf=seed_vcf, Ne=Ne, \
 					 	ref_path=ref_path, mu=mu, n_gen=n_gen, path_seeds_phylogeny=path_seeds_phylogeny, \
 						host_size=host_size, seeded_host_id=seeded_host_id, S_IE_rate=S_IE_rate, \
 						E_I_rate=E_I_rate, E_R_rate=E_R_rate, latency_prob=latency_prob, 
-						I_R_rate=I_R_rate, I_E_rate=I_E_rate, R_S_rate=R_S_rate)
+						I_R_rate=I_R_rate, I_E_rate=I_E_rate, R_S_rate=R_S_rate, rand_seed = random_number_seed)
 	return error
 
 def main():
@@ -530,6 +530,7 @@ def main():
 	parser.add_argument('-I_R_rate', action='store',dest='I_R_rate', type=float, required=False, help="Probability of recovery (I>R) for each infected host per generation", default=0)
 	parser.add_argument('-I_E_rate', action='store',dest='I_E_rate', type=float, required=False, help="Probability of deactivation (I>E) for each infected host per generation", default=0)
 	parser.add_argument('-R_S_rate', action='store',dest='R_S_rate', type=float, required=False, help="Probability of immunity loss (R>S) for each recovered host per generation", default=0)
+	parser.add_argument('-random_seed', action = 'store', dest = 'random_seed', required = False, type = int, default = None)
 
 
 
@@ -553,12 +554,14 @@ def main():
 	I_R_rate = args.I_R_rate
 	I_E_rate = args.I_E_rate
 	R_S_rate = args.R_S_rate
+	rand_seed = args.random_seed
+
 
 	run_seed_generation(method=method, wk_dir=wk_dir, seed_size=seed_size, seed_vcf=seed_vcf, Ne=Ne, \
 					ref_path=ref_path, mu=mu, n_gen=n_gen, path_seeds_phylogeny=path_seeds_phylogeny, \
 					host_size=host_size, seeded_host_id=seeded_host_id, S_IE_rate=S_IE_rate, \
 					E_I_rate=E_I_rate, E_R_rate=E_R_rate, latency_prob=latency_prob, I_R_rate=I_R_rate, \
-					I_E_rate=I_E_rate, R_S_rate=R_S_rate)
+					I_E_rate=I_E_rate, R_S_rate=R_S_rate, rand_seed = rand_seed)
 
 
 if __name__ == "__main__":

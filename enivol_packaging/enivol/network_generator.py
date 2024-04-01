@@ -1,8 +1,6 @@
-import networkx as nx, os, argparse, sys
+import networkx as nx, numpy as np, os, argparse
 from base_func import *
 from error_handling import CustomizedError
-
-os.environ['PYTHONUNBUFFERED'] = '1'
 
 def write_network(ntwk_, wk_dir):
     """
@@ -29,7 +27,7 @@ def ER_generate(pop_size, p_ER):
     """
     if not 0 < p_ER <= 1: 
         raise CustomizedError("You need to specify a p>0 (-p_ER) in Erdos-Renyi graph")
-    er_graph = nx.erdos_renyi_graph(pop_size, p_ER)
+    er_graph = nx.erdos_renyi_graph(pop_size, p_ER, seed = np.random)
     return er_graph
 
 def rp_generate(pop_size, rp_size, p_within, p_between):
@@ -64,7 +62,7 @@ def rp_generate(pop_size, rp_size, p_within, p_between):
         p[k][k] = p_within[k]
 
     # Generate random partition graph
-    rp_graph = nx.stochastic_block_model(rp_size, p)
+    rp_graph = nx.stochastic_block_model(rp_size, p, seed = np.random)
     return rp_graph
 
 
@@ -76,7 +74,7 @@ def ba_generate(pop_size, m):
         pop_size (int): Population size.
         m (int): Number of edges to attach from a new node to existing nodes.
     """
-    ba_graph = nx.barabasi_albert_graph(pop_size, m)
+    ba_graph = nx.barabasi_albert_graph(pop_size, m, seed = np.random)
     return ba_graph
 
 def copy_input_network(wk_dir, path_network, pop_size):
@@ -101,7 +99,8 @@ def copy_input_network(wk_dir, path_network, pop_size):
 
     return ntwk
 
-def run_network_generation(pop_size, wk_dir, method, model="", path_network="", p_ER=0, rp_size=[], p_within=[], p_between=0, m=0):
+def run_network_generation(pop_size, wk_dir, method, model = "", path_network = "", p_ER = 0, rp_size = [], 
+                           p_within = [], p_between = 0, m = 0, rand_seed = None):
     """
     Generates the contact network given parameters.
     
@@ -121,6 +120,8 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
         ntwk (nx.Graph): Generated network.
         error_message (str): Error message.
     """
+    if rand_seed != None:
+        np.random.seed(rand_seed)
     ntwk = None
     error_message = None
     try: 
@@ -174,17 +175,20 @@ def network_generation_byconfig(all_config):
     # BA params
     ba_m=ntwk_config["randomly_generate"]["BA"]["ba_m"]
 
+    # Random Number generator
+    random_number_seed = all_config["BasicRunConfiguration"]["random_number_seed"]
+
     _, error = run_network_generation(pop_size = pop_size, wk_dir = wk_dir, method = ntwk_method, 
                            path_network = path_network, model = model, p_ER = p_ER, 
                            p_within = p_within, p_between = p_between, 
-                           rp_size = rp_size, m = ba_m)
+                           rp_size = rp_size, m = ba_m, rand_seed = random_number_seed)
     return error
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a contact network for the population \
                                      size specified and store it in the working directory as an adjacency list.')
-    parser.add_argument('-popsize', action='store',dest='popsize', required=True, type=int)
-    parser.add_argument('-wkdir', action='store',dest='wkdir', required=True, type=str)
+    parser.add_argument('-popsize', action ='store',dest ='popsize', required =True, type = int)
+    parser.add_argument('-wkdir', action = 'store',dest = 'wkdir', required = True, type = str)
     parser.add_argument('-method', action='store',dest='method', required=True, type=str)
     parser.add_argument('-model', action='store',dest='model', required=False, type=str, default="")
     parser.add_argument('-path_network', action='store',dest='path_network', required=False, type=str, default="")
@@ -193,8 +197,9 @@ def main():
                         required=False, type=int, default=[])
     parser.add_argument('-p_within','--p_within', nargs='+', help='probability of edges for different groups \
                         (descending order), take 2 elements rn', required=False, type=float, default=[])
-    parser.add_argument('-p_between', action='store',dest='p_between', required=False, type=float, default=0)
-    parser.add_argument('-m', action='store',dest='m', required=False, type=int, default=0)
+    parser.add_argument('-p_between', action ='store',dest='p_between', required=False, type=float, default=0)
+    parser.add_argument('-m', action='store',dest= 'm', required=False, type=int, default=0)
+    parser.add_argument('-random_seed', action = 'store', dest = 'random_seed', required = False, type = int, default = None)
     
     args = parser.parse_args()
     pop_size = args.popsize
@@ -207,9 +212,10 @@ def main():
     p_within = args.p_within
     p_between = args.p_between
     m = args.m
+    rand_seed = args.random_seed
     
     run_network_generation(pop_size = pop_size, wk_dir = wk_dir, method = method, model = model, path_network = path_network, 
-                           p_ER = p_ER, rp_size = rp_size, p_within = p_within, p_between = p_between, m = m)
+                           p_ER = p_ER, rp_size = rp_size, p_within = p_within, p_between = p_between, m = m, rand_seed = rand_seed)
 
 
 if __name__ == "__main__":

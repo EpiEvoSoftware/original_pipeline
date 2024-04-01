@@ -1,7 +1,8 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test",
-        "n_replicates": 1
+        "cwdir": "",
+        "n_replicates": 1,
+        "random_number_seed": 2024
     },
     "EvolutionModel": {
         "n_generation": 0,
@@ -89,6 +90,7 @@
         }
     },
     "EpidemiologyModel": {
+        "slim_replicate_seed_file_path": "/workdir/sl984/balabala.csv",
         "model": "",
         "epoch_changing": {
             "n_epoch": 1,

@@ -1,11 +1,8 @@
-import os, networkx as nx, json, pandas as pd, math, argparse, sys
-from random import sample
+import os, networkx as nx, json, pandas as pd, math, argparse, numpy as np
 from collections import defaultdict
 from pathlib import Path
 from error_handling import CustomizedError
 from base_func import *
-
-os.environ['PYTHONUNBUFFERED'] = '1'
 
 # Magic numbers
 HUNDRED = 100
@@ -153,7 +150,7 @@ def match_random(nodes_sorted, taken_hosts, param = None):
 		taken_hosts (list[int]): Hosts already matched to a seed.
 	"""
 	available_host = list(set(nodes_sorted).difference(set(taken_hosts)))
-	host = sample(available_host, 1)[0]
+	host = np.random.choice(available_host, 1)[0]
 	return host
 
 def match_ranking(nodes_sorted, taken_hosts, rank):
@@ -192,7 +189,7 @@ def match_percentile(nodes_sorted, taken_hosts, percentile):
 		available_host = list(hosts_in_range.difference(taken_hosts_in_range))
 		if available_host == []: 
 			raise CustomizedError(f"There is no host left to match in the percentile {percentile}")
-		host = sample(available_host, 1)[0]
+		host = np.random.choice(available_host, 1)[0]
 		return host
 	raise CustomizedError(f"There is no host to match in the range {percentile}%")
 	
@@ -256,7 +253,7 @@ def match_all_hosts(ntwk_, match_method, param, num_seed):
 			taken_hosts_id.append(matched_host)
 	return match_dict
 
-def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme="", match_scheme_param = ""):
+def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme="", match_scheme_param = "", rand_seed = None):
 	"""
 	Executes seed host matching process in command line and write the matching file 
 	in the specified directory.
@@ -272,7 +269,9 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 	Returns:
 		seed_vs_host (dict[int, int]): A dictionary that maps seeds to hosts.
 		error_message (str): Error message.
-	"""		
+	"""
+	if rand_seed != None:
+		np.random.seed(rand_seed)		
 	# Generate network path
 	ntwk_path = os.path.join(wkdir, "contact_network.adjlist")
 	seed_vs_host = None
@@ -339,9 +338,10 @@ def read_config_and_match(config_all):
 	path_matching = config_all["SeedHostMatching"]["user_input"]["path_matching"]
 	method = config_all["SeedHostMatching"]['method']
 	num_seed = config_all["SeedsConfiguration"]["seed_size"]
+	rand_seed = config_all["BasicConfiguration"]["random_number_seed"]
 	_, error = run_seed_host_match(method = method, wkdir = config_all["BasicRunConfiguration"]["cwdir"], 
 					 num_seed = num_seed, path_matching = path_matching, 
-	match_scheme = match_method, match_scheme_param = match_method_param)
+	match_scheme = match_method, match_scheme_param = match_method_param, rand_seed = rand_seed)
 
 	return error
 
@@ -360,6 +360,7 @@ def main():
                      required=False, help="Scheme of matching", default="")
 	parser.add_argument('-match_scheme_param', action='store', dest='match_scheme_param', 
                      type=str, required=False, help="Matching parameters for each seed", default="")
+	parser.add_argument('-random_seed', action = 'store', dest = 'random_seed', required = False, type = int, default = None)
 
 	args = parser.parse_args()
 	method = args.method
@@ -368,9 +369,10 @@ def main():
 	path_matching = args.path_matching
 	match_scheme = args.match_scheme
 	match_scheme_param = args.match_scheme_param
+	rand_seed = args.random_seed
 
 	run_seed_host_match(method = method, wkdir = wkdir, num_seed = num_seed, path_matching = path_matching, 
-                     match_scheme = match_scheme, match_scheme_param = match_scheme_param)
+                     match_scheme = match_scheme, match_scheme_param = match_scheme_param, rand_seed = rand_seed)
 
 if __name__ == "__main__":
     main()

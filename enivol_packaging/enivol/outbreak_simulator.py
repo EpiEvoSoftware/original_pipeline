@@ -1,11 +1,9 @@
-import os, shutil, subprocess, argparse, sys
+import os, shutil, subprocess, argparse
 # import tskit, pyslim
 from base_func import *
 from post_simulation_func import *
 from error_handling import CustomizedError
 
-# Prevent buffering in printing so that everything is printed in order
-os.environ['PYTHONUNBUFFERED'] = '1'
 
 def _writebinary(v):
 	"""
@@ -525,9 +523,9 @@ def all_slim_simulation_by_config(all_config):
 
 	# Run all SLiM simulations
 	error = run_all_slim_simulation(
-		slim_config_path=os.path.join(wk_dir, "slim.params"),
-		slim_pars=slim_pars,
-		dataprocess_pars=dataprocess_pars)
+		slim_config_path = os.path.join(wk_dir, "slim.params"),
+		slim_pars = slim_pars,
+		dataprocess_pars = dataprocess_pars)
 
 	return error
 

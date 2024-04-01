@@ -10,7 +10,7 @@ def read_params(path_config, default_config):
         default_config (str): Relative path to the template (e.g., "base_params.json", "slim_only_template.json")
     """
     # Read default template
-    default_config = open(os.path.join(os.path.dirname(__file__), default_config), "r")
+    default_config = open(os.path.join(os.path.dirname(__file__), "config_template", default_config), "r")
     default_param_dict = json.loads(default_config.read())
     # Read the user defined parameters
     config = open(path_config, "r")

@@ -1,9 +1,8 @@
 from base_func import *
-from random import sample
 from error_handling import CustomizedError
 import numpy as np
 import pandas as pd
-import argparse, sys, statistics, os
+import argparse, statistics, os
 
 START_IDX = 0
 END_IDX = 1
@@ -12,8 +11,6 @@ E_SIZE = 2
 GFF_START = 3
 GFF_END = 4
 GFF_INFO = 8
-
-os.environ['PYTHONUNBUFFERED'] = '1'
 
 def _count_gff_genes(gff_path):
 	"""
@@ -134,7 +131,8 @@ def generate_eff_vals(gff_, causal, es_low, es_high, wk_dir, n_gen, mut_rate, no
 
 	# select genes from the gff file for causals
 	n_genes = _count_gff_genes(gff_)
-	genes = sample(range(n_genes), causal)
+	# genes = sample(range(n_genes), causal)
+	genes = np.random.choice(n_genes, causal, replace = False)
 
 	dict_causal_genes = {}
 
@@ -343,7 +341,7 @@ def read_effvals(wk_dir, effsize_path, traits_num):
 
 
 def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[0,0], causal_sizes=[], es_lows=[], es_highs=[], 
-						   norm_or_not=False, n_gen=0, mut_rate=0):
+						   norm_or_not=False, n_gen=0, mut_rate=0, rand_seed = None):
 	"""
 	Generate effect sizes for genes and computes trait values for seeds' sequences.
 
@@ -363,6 +361,8 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[
 	Returns:
 		error_message (str): Error message.
 	"""
+	if rand_seed != None:
+		np.random.seed(rand_seed)
 	error_message = None
 	try:
 		if len(trait_n) != 2:
@@ -396,6 +396,7 @@ def effsize_generation_byconfig(all_config):
 	genetic_config = all_config["GenomeElement"]
 	wk_dir = all_config["BasicRunConfiguration"]["cwdir"]
 	effsize_method = genetic_config["effect_size"]["method"]
+	random_seed = all_config["BasicRunConfiguration"]["random_number_seed"]
 
 
 	eff_params_config = genetic_config["effect_size"]["randomly_generate"]
@@ -404,7 +405,7 @@ def effsize_generation_byconfig(all_config):
 						 causal_sizes=eff_params_config["genes_num"], es_lows=eff_params_config["effsize_min"], 
 						 es_highs=eff_params_config["effsize_max"], gff_in=eff_params_config["gff"], 
 						 n_gen=all_config["EvolutionModel"]["n_generation"], mut_rate=all_config["EvolutionModel"]["mut_rate"], 
-						 norm_or_not=eff_params_config["normalize"])
+						 norm_or_not=eff_params_config["normalize"], rand_seed = random_seed)
 	return error
 
 
@@ -421,6 +422,7 @@ def main():
 	parser.add_argument('-normalize','--normalize', default=False, required=False, type=str2bool, help='Whether to normalize the effect size based on sim_generations and mut_rate')
 	parser.add_argument('-sim_generation', action='store',dest='sim_generation', required=False, type=int, default=0)
 	parser.add_argument('-mut_rate', action='store',dest='mut_rate', required=False, type=float, default=0)
+	parser.add_argument('-random_seed', action = 'store', dest = 'random_seed', required = False, type = int, default = None)
 
 
 	args = parser.parse_args()
@@ -435,10 +437,11 @@ def main():
 	n_gen = args.sim_generation
 	mut_rate = args.mut_rate
 	norm_or_not = args.normalize
+	rand_seed = args.random_seed
 
 	run_effsize_generation(method=method, wk_dir=wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, 
 						causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, 
-						n_gen=n_gen, mut_rate=mut_rate)
+						n_gen=n_gen, mut_rate=mut_rate, rand_seed = rand_seed)
 
 
 if __name__ == "__main__":
