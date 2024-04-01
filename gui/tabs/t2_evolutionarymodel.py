@@ -75,20 +75,23 @@ class EvolutionaryModel:
         update_mut_rate_button = tk.Button(self.control_frame, text="Update mut_rate", command=self.update_mut_rate)
 #         update_mut_rate_button.grid()
     def render_trans_type(self):
-        self.trans_type_label = ttk.Label(self.control_frame, text="Transmissibility Trait Type")
+        self.trans_type_label = ttk.Label(self.control_frame, text="Transmissibility Trait Type", style = "Bold.TLabel")
         self.trans_type_label.grid(row = 3, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
+        
         self.trans_type_var = tk.StringVar(value=self.trans_type)
-        self.trans_type_combobox = ttk.Combobox(self.control_frame, textvariable=self.trans_type_var, values=["Bi-Allelic", "Additive"], state="readonly", width = minwidth-15)
+        self.trans_type_combobox = ttk.Combobox(self.control_frame, textvariable=self.trans_type_var, values=["Bi-Allelic", "Additive"], state="readonly")
+#         self.trans_type_combobox = ttk.Combobox(self.control_frame, textvariable=self.trans_type_var, values=["Bi-Allelic", "Additive"], state="readonly", width = minwidth-15)
         self.trans_type_combobox.grid(row = 4, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
 #         update_trans_type_button = tk.Button(self.control_frame, text="Update trans_type", command=self.update_trans_type)
 #         update_trans_type_button.grid()
     def render_dr_type(self):
         def update(event):
             value = self.dr_type_combobox.get()
-        self.dr_type_label = ttk.Label(self.control_frame, text="Drug-Resistance Trait Type")
+        self.dr_type_label = ttk.Label(self.control_frame, text="Drug-Resistance Trait Type", style = "Bold.TLabel")
         self.dr_type_label.grid(row = 5, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
         self.dr_type_var = tk.StringVar(value=self.dr_type)
-        self.dr_type_combobox = ttk.Combobox(self.control_frame, textvariable=self.dr_type_var, values=["Bi-Allelic", "Additive"], state="readonly", width = minwidth-15)
+        self.dr_type_combobox = ttk.Combobox(self.control_frame, textvariable=self.dr_type_var, values=["Bi-Allelic", "Additive"], state="readonly")
+#         self.dr_type_combobox = ttk.Combobox(self.control_frame, textvariable=self.dr_type_var, values=["Bi-Allelic", "Additive"], state="readonly", width = minwidth-15)
         self.dr_type_combobox.grid(row = 6, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
         self.dr_type_combobox.bind("<<ComboboxSelected>>", update)        
 #         update_dr_type_button = tk.Button(self.control_frame, text="Update dr_type", command=self.update_dr_type)
@@ -99,7 +102,7 @@ class EvolutionaryModel:
             value = self.dr_type_combobox.get()
 
         self.within_host_reproduction_var = tk.BooleanVar(value=self.within_host_reproduction)  #
-        self.within_host_reproduction_label = ttk.Label(self.control_frame, text="Within-host Reproduction")
+        self.within_host_reproduction_label = ttk.Label(self.control_frame, text="Within-host Reproduction", style = "Bold.TLabel")
         self.within_host_reproduction_label.grid(row = 7, column = 0, sticky = 'w', pady = 5, padx=10)
 
         self.rb_true = ttk.Radiobutton(self.control_frame, text="Yes", variable=self.within_host_reproduction_var, value=True, command = update)
@@ -110,15 +113,15 @@ class EvolutionaryModel:
 
     def render_within_host_reproduction_rate(self):
         
-        self.within_host_reproduction_rate_label = ttk.Label(self.control_frame, text="Within-host Reproduction Rate Per Generation (Numerical)")
+        self.within_host_reproduction_rate_label = ttk.Label(self.control_frame, text="Within-host Reproduction Rate Per Generation (Numerical)", style = "Bold.TLabel")
         self.within_host_reproduction_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.within_host_reproduction_rate_entry.insert(0, self.within_host_reproduction_rate) 
         
-        self.within_host_reproduction_rate_label.grid(row = 7, column = 1, sticky = 'w', pady = 5, padx=10)
-        self.within_host_reproduction_rate_entry.grid(row = 8, column = 1, sticky = 'w', pady = 5, padx=10)
+        self.within_host_reproduction_rate_label.grid(row = 7, column = 1, sticky = 'w', pady = 5, padx=0)
+        self.within_host_reproduction_rate_entry.grid(row = 8, column = 1, sticky = 'w', pady = 5, padx=0)
  
     def render_cap_withinhost(self):
-        self.cap_withinhost_label = ttk.Label(self.control_frame, text="Maximum Number of Pathogens within Host (Integer)")
+        self.cap_withinhost_label = ttk.Label(self.control_frame, text="Maximum Number of Pathogens within Host (Integer)", style = "Bold.TLabel")
         self.cap_withinhost_label.grid(row = 10, column = 0, sticky = 'w', pady = 5, padx = self.padx_width)
         self.cap_withinhost_entry = ttk.Entry(self.control_frame, foreground="black")
         self.cap_withinhost_entry.insert(0, self.cap_withinhost)  

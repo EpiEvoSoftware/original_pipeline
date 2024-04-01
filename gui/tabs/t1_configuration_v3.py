@@ -93,10 +93,10 @@ class Configurationv3:
 
 
         # update_n_replicates_button.grid(row=5, column=0, sticky='ew', padx=5, pady=5)
-        self.n_replicates_label = ttk.Label(self.control_frame, text="Number of Simulation Replicates", style="Bold.TLabel")
-        self.n_replicates_label2 = ttk.Label(self.control_frame, text="(Integer):")
+        self.n_replicates_label = ttk.Label(self.control_frame, text="Number of Simulation Replicates (Integer)", style="Bold.TLabel")
+#         self.n_replicates_label2 = ttk.Label(self.control_frame, text="(Integer):")
         self.n_replicates_label.grid(row=7, column=0, sticky='w', pady=5)
-        self.n_replicates_label2.grid(row=7, column=0, sticky='w', pady=5, padx=215)
+#         self.n_replicates_label2.grid(row=7, column=0, sticky='w', pady=5, padx=215)
         # self.n_replicates_label.pack()
         self.n_replicates_entry = ttk.Entry(self.control_frame, foreground="black", width = 20)
         self.n_replicates_entry.grid(row=8, column=0, sticky='w', pady=5)
@@ -112,10 +112,10 @@ class Configurationv3:
    'est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.')
         
     def render_ref_path_label(self):
-        ref_path_label = ttk.Label(self.control_frame, text="Pathogen Reference Genome File", style="Bold.TLabel")
+        ref_path_label = ttk.Label(self.control_frame, text="Pathogen Reference Genome File (FASTA Format)", style="Bold.TLabel")
         ref_path_label.grid(row=4, column=0, sticky='ew', pady=5)
-        ref_path_label = ttk.Label(self.control_frame, text="(FASTA Format):")
-        ref_path_label.grid(row=4, column=0, sticky='ew', pady=5, padx=220)
+#         ref_path_label = ttk.Label(self.control_frame, text="(FASTA Format):")
+#         ref_path_label.grid(row=4, column=0, sticky='ew', pady=5, padx=220)
         # self.n_replicates_entry23 = ttk.Label(self.control_frame, text = self.ref_path, foreground="black", width = minwidth)
         if self.ref_path == "":
             self.ref_path_label = ttk.Label(self.control_frame, text = "None selected", foreground="black", width = minwidth)
