@@ -284,7 +284,7 @@ def seeds_treeseq(wk_dir, seed_size):
 	_write_newick_file(wk_dir, sampled_tree, new_labels)
 	_write_vcf_file(wk_dir, sampled_tree, new_labels)
 
-def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen):
+def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen, rand_seed = None):
 	"""
 	Burn-in w/ Wright-Fisher model for seed generations and write the VCF/NWK of seeds to working diretory.
 
@@ -295,14 +295,20 @@ def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen):
         wk_dir (str): Working directory.
         mu (float): Mutation rate.
         n_gen (int): Number of generations.
+		rand_seed (int): Random number generator.
 	"""
 	
 	slim_script = os.path.join(os.path.dirname(__file__), SLIM_DIR, WF_SLIM)
 	slim_stdout_path = os.path.join(wk_dir, OUT_SLIM)
 	# Run SLiM
+
 	with open(slim_stdout_path, 'w') as fd:
-		subprocess.run(["slim", "-d", f"Ne={Ne}", "-d", f"ref_path=\"{ref_path}\"", "-d", \
-				  f"wk_dir=\"{wk_dir}\"", "-d", f"mu={mu}", "-d", f"n_gen={n_gen}", slim_script], stdout=fd)
+		if rand_seed == None:
+			subprocess.run(["slim", "-d", f"Ne={Ne}", "-d", f"ref_path=\"{ref_path}\"", "-d", \
+					f"wk_dir=\"{wk_dir}\"", "-d", f"mu={mu}", "-d", f"n_gen={n_gen}", slim_script], stdout=fd)
+		else:
+			subprocess.run(["slim", "-d", f"Ne={Ne}", "-d", f"ref_path=\"{ref_path}\"", "-d", \
+					f"wk_dir=\"{wk_dir}\"", "-d", f"mu={mu}", "-d", f"n_gen={n_gen}", "-d", f"seed={rand_seed}", slim_script], stdout=fd)
 	# VCF/NWK
 	seeds_treeseq(wk_dir, seed_size)
 	split_seedvcf(os.path.join(wk_dir, VCF_NAME), wk_dir, seed_size, "slim")
@@ -310,7 +316,7 @@ def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen):
 	os.remove(os.path.join(wk_dir, VCF_NAME))
 
 def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, S_IE_rate, \
-			 E_I_rate=0, E_R_rate=0, latency_prob=0, I_R_rate=0, I_E_rate=0, R_S_rate=0):
+			 E_I_rate=0, E_R_rate=0, latency_prob=0, I_R_rate=0, I_E_rate=0, R_S_rate=0, rand_seed = None):
 	"""
 	Burn-in w/ an epidemiological model for seed generations and write the VCF/NWK of seeds to working directory.
 	Note: The network and all epidemiological parameters must be available for this burn-in method.
@@ -364,14 +370,25 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
 	slim_stdout_path = os.path.join(wk_dir, OUT_SLIM)
 	# Run SLiM
 	with open(slim_stdout_path, 'w') as fd:
-		subprocess.run(["slim", "-d", f"cwdir=\"{wk_dir}\"", "-d", f"ref_path=\"{ref_path}\"", "-d", \
-				  f"contact_network_path=\"{os.path.join(wk_dir, "contact_network.adjlist")}\"", "-d", \
-					f"host_size={host_size}", "-d", f"mut_rate={mu}", "-d", f"n_generation={n_gen}", "-d", \
-					f"seeded_host_id=c({",".join([str(i) for i in seeded_host_id])})", "-d", \
-					f"S_IE_rate={S_IE_rate}", "-d", f"E_I_rate={E_I_rate}", "-d", \
-					f"E_R_rate={E_R_rate}", "-d", f"latency_prob={latency_prob}", "-d", \
-					f"I_R_rate={I_R_rate}", "-d", f"I_E_rate={I_E_rate}", "-d", f"R_S_rate={R_S_rate}", \
-					slim_script], stdout=fd)
+		if rand_seed == None:
+			subprocess.run(["slim", "-d", f"cwdir=\"{wk_dir}\"", "-d", f"ref_path=\"{ref_path}\"", "-d", \
+					f"contact_network_path=\"{os.path.join(wk_dir, "contact_network.adjlist")}\"", "-d", \
+						f"host_size={host_size}", "-d", f"mut_rate={mu}", "-d", f"n_generation={n_gen}", "-d", \
+						f"seeded_host_id=c({",".join([str(i) for i in seeded_host_id])})", "-d", \
+						f"S_IE_rate={S_IE_rate}", "-d", f"E_I_rate={E_I_rate}", "-d", \
+						f"E_R_rate={E_R_rate}", "-d", f"latency_prob={latency_prob}", "-d", \
+						f"I_R_rate={I_R_rate}", "-d", f"I_E_rate={I_E_rate}", "-d", f"R_S_rate={R_S_rate}", \
+						slim_script], stdout=fd)
+		else:
+			subprocess.run(["slim", "-d", f"cwdir=\"{wk_dir}\"", "-d", f"ref_path=\"{ref_path}\"", "-d", \
+					f"contact_network_path=\"{os.path.join(wk_dir, "contact_network.adjlist")}\"", "-d", \
+						f"host_size={host_size}", "-d", f"mut_rate={mu}", "-d", f"n_generation={n_gen}", "-d", \
+						f"seeded_host_id=c({",".join([str(i) for i in seeded_host_id])})", "-d", \
+						f"S_IE_rate={S_IE_rate}", "-d", f"E_I_rate={E_I_rate}", "-d", \
+						f"E_R_rate={E_R_rate}", "-d", f"latency_prob={latency_prob}", "-d", \
+						f"I_R_rate={I_R_rate}", "-d", f"I_E_rate={I_E_rate}", "-d", f"R_S_rate={R_S_rate}", "-d", \
+						f"seed={rand_seed}", slim_script], stdout=fd)
+
 
 	# VCF/NWK
 	seeds_treeseq(wk_dir, seed_size)

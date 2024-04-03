@@ -90,7 +90,7 @@
         }
     },
     "EpidemiologyModel": {
-        "slim_replicate_seed_file_path": "/workdir/sl984/balabala.csv",
+        "slim_replicate_seed_file_path": "",
         "model": "",
         "epoch_changing": {
             "n_epoch": 1,

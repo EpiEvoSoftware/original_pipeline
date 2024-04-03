@@ -32,7 +32,7 @@ setup(
 
     ],
     install_requires = ['matplotlib>=matplotlib=3.8.2', 'pandas>=2.2.0', 'ete3>=3.1.3', 'numpy>=1.26',
-                        'tskit>=0.5.6', 'pyslim>=1.0.4'],
+                        'tskit>=0.5.6', 'pyslim>=1.0.4', 'slim=4.1', 'r-base>=4.3.2', 'r-ape=5.7_1', ],
     python_requires = ">=3.12",
     keywords = ['phylodynamics', 'epidemiology', ''],
     entry_points = {

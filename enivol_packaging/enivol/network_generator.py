@@ -77,7 +77,7 @@ def ba_generate(pop_size, m):
     ba_graph = nx.barabasi_albert_graph(pop_size, m, seed = np.random)
     return ba_graph
 
-def copy_input_network(wk_dir, path_network, pop_size):
+def read_input_network(path_network, pop_size):
     """
     Checks the format of the input network and copy it in the working directory.
     
@@ -126,8 +126,8 @@ def run_network_generation(pop_size, wk_dir, method, model = "", path_network = 
     error_message = None
     try: 
         if method == "user_input":
-            ntwk = copy_input_network(wk_dir, path_network, pop_size)
-            ntwk = copy_input_network(wk_dir, path_network, pop_size)
+            # change function name
+            ntwk = read_input_network(wk_dir, path_network, pop_size)
 
         elif method == "randomly_generate":
             if not model in ["ER", "BP", "BA"]: 

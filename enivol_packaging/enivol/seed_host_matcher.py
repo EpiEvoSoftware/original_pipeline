@@ -338,7 +338,7 @@ def read_config_and_match(config_all):
 	path_matching = config_all["SeedHostMatching"]["user_input"]["path_matching"]
 	method = config_all["SeedHostMatching"]['method']
 	num_seed = config_all["SeedsConfiguration"]["seed_size"]
-	rand_seed = config_all["BasicConfiguration"]["random_number_seed"]
+	rand_seed = config_all["BasicRunConfiguration"]["random_number_seed"]
 	_, error = run_seed_host_match(method = method, wkdir = config_all["BasicRunConfiguration"]["cwdir"], 
 					 num_seed = num_seed, path_matching = path_matching, 
 	match_scheme = match_method, match_scheme_param = match_method_param, rand_seed = rand_seed)
