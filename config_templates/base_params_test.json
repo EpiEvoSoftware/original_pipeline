@@ -17,8 +17,8 @@
         "use_reference": false,
         "method": "SLiM_burnin_WF",
         "user_input": {
-            "path_seeds_vcf": "",
-            "path_seeds_phylogeny": ""
+            "path_seeds_vcf": "/System/Applications/Books.app",
+            "path_seeds_phylogeny": "/System/Applications/Clock.app"
         },
         "SLiM_burnin_WF": {
             "burn_in_Ne": 1000,

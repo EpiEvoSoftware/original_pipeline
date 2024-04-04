@@ -54,16 +54,21 @@ class SeedsConfiguration:
         
         self.control_frame = ttk.Frame(self.parent)
         self.control_frame.pack(padx=10, pady=10)
-        # self.control_frame = ttk.Frame(self.parent, width=300)
-        # self.control_frame.pack(padx=10, pady=10)
 
-        # seed_size:
         self.render_seeds_size()
-        # self.render_use_reference()
+        self.render_use_reference()
         self.render_use_method()
 
-        self.user_input_components = self.render_user_input()
+    # user input
+        # self.user_input_components = self.render_user_input()
+        # self.grid_configs = self.derender_components(self.user_input_components)
+        # self.rerender_components(self.user_input_components, self.grid_configs)
+    # wf
+        self.wf_components = self.render_wf()
+        # self.grid_configs = self.derender_components(self.wf_components)
+        # self.rerender_components(self.wf_components, self.grid_configs)
 
+    # epi
         # self.epi_components = self.render_epi()
         # self.grid_configs = self.derender_components(self.epi_components)
         # self.rerender_components(self.epi_components, self.grid_configs)
@@ -73,6 +78,18 @@ class SeedsConfiguration:
     def update(self):
         return
     
+    def render_wf(self):
+        """
+        self.burn_in_Ne = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_Ne']
+        self.burn_in_generations_wf = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_generations']
+        self.burn_in_mutrate_wf = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_mutrate']
+        """
+        wf_components = set()
+        self.render_tab_title(wf_components, 5+3, 1, 3)
+        self.render_burn_in_ne(wf_components)
+        self.render_burn_in_generations_wf(wf_components)
+        self.render_burn_in_mutrate_wf(wf_components)
+        return wf_components
     
     def render_within_host_reproduction(self):
         def update():
@@ -102,9 +119,9 @@ class SeedsConfiguration:
 
     def render_user_input(self):
         user_input_components = set()
-        self.render_tab_title(user_input_components, 5+3, 1, 1)
-        # self.render_path_seeds(user_input_components)
-        # self.render_path_seeds_phylogeny()
+        self.render_tab_title(user_input_components, 5+3, 0, 3)
+        self.render_path_seeds_vcf(user_input_components)
+        self.render_path_seeds_phylogeny(user_input_components)
         return user_input_components
     
     def render_epi(self):
@@ -140,49 +157,93 @@ class SeedsConfiguration:
         self.render_seeds_size_components = []
         self.render_seeds_size_components.append(self.seed_size_label)
         self.render_seeds_size_components.append(self.seed_size_entry)
-        # update_seed_size_button = tk.Button(self.control_frame, text="Update seed_size", command=self.update_seed_size)
-        # update_seed_size_button.grid()
-    def render_use_reference(self, user_input_components):
+
+    def render_path_seeds_vcf(self, components):
+        """
+        self.path_seeds_vcf = load_config_as_dict(self.config_path)['SeedsConfiguration']['user_input']['path_seeds_vcf']
+        """
+        def update():
+            chosen_file = filedialog.askopenfilename(title="Select a File")
+            if chosen_file:  
+                self.path_seeds_vcf = chosen_file
+                self.path_seeds_vcf_value_label.config(text=self.path_seeds_vcf) 
+                config = load_config_as_dict(self.config_path)
+                config['SeedsConfiguration']['user_input']['path_seeds_vcf'] = self.path_seeds_vcf
+                save_config(self.config_path, config)
+
+        self.render_path_seeds_vcf_text = "The vcf file of the seeding pathogen sequences (VCF format)"
+        self.path_seeds_vcf_var = tk.StringVar(value=self.path_seeds_vcf)
+        self.path_seeds_vcf_label = ttk.Label(self.control_frame, text=self.render_path_seeds_vcf_text, style = "Bold.TLabel")
+
+        if self.path_seeds_vcf == "":
+            self.path_seeds_vcf_value_label = ttk.Label(self.control_frame, text = "None selected", foreground="black")
+        else:
+            self.path_seeds_vcf_value_label = ttk.Label(self.control_frame, text = self.path_seeds_vcf, foreground="black")
+
+        self.path_seeds_vcf_button = tk.Button(self.control_frame, text="Choose File", command=update)
+        # self.delete_path_seeds_vcf_button = tk.Button(self.control_frame, text="Delete File", command=update)
+
+        self.path_seeds_vcf_label.grid(row = 9, column = 1, sticky = 'w', pady = 5)
+        self.path_seeds_vcf_value_label.grid(row=10, column=1, sticky='w', pady=5)
+        self.path_seeds_vcf_button.grid(row=11, column=1, sticky='e', pady=5)
+        # self.delete_path_seeds_vcf_button.grid(row=11, column=1, sticky='w', pady=5)
+
+        components.add(self.path_seeds_vcf_label)
+        components.add(self.path_seeds_vcf_value_label)
+        components.add(self.path_seeds_vcf_button)
+        # components.add(self.delete_path_seeds_vcf_button)
+
+
+
+    def render_path_seeds_phylogeny(self, components):
+        """
+        self.path_seeds_phylogeny = load_config_as_dict(self.config_path)['SeedsConfiguration']['user_input']["path_seeds_phylogeny"]
+        """
+        def update():
+            chosen_file = filedialog.askopenfilename(title="Select a File")
+            if chosen_file:  
+                self.path_seeds_phylogeny = chosen_file
+                self.path_seeds_phylogeny_value_label.config(text=self.path_seeds_phylogeny) 
+                config = load_config_as_dict(self.config_path)
+                config['SeedsConfiguration']['user_input']["path_seeds_phylogeny"] = self.path_seeds_phylogeny
+                save_config(self.config_path, config)
+
+        self.render_path_seeds_phylogeny_text = "The phylogeny of the seeding sequences (nwk format, optional)"
+        self.path_seeds_phylogeny_var = tk.StringVar(value=self.path_seeds_phylogeny)
+        self.path_seeds_phylogeny_label = ttk.Label(self.control_frame, text=self.render_path_seeds_phylogeny_text, style = "Bold.TLabel")
+
+        if self.path_seeds_phylogeny == "":
+            self.path_seeds_phylogeny_value_label = ttk.Label(self.control_frame, text = "None selected", foreground="black")
+        else:
+            self.path_seeds_phylogeny_value_label = ttk.Label(self.control_frame, text = self.path_seeds_phylogeny, foreground="black")
+
+        self.path_seeds_phylogeny_button = tk.Button(self.control_frame, text="Choose File", command=update)
+        # self.delete_path_seeds_phylogeny_button = tk.Button(self.control_frame, text="Delete File", command=update)
+
+        self.path_seeds_phylogeny_label.grid(row = 12, column = 1, sticky = 'w', pady = 5)
+        self.path_seeds_phylogeny_value_label.grid(row=13, column=1, sticky='w', pady=5)
+        self.path_seeds_phylogeny_button.grid(row=14, column=1, sticky='e', pady=5)
+        # self.delete_path_seeds_phylogeny_button.grid(row=11, column=1, sticky='w', pady=5)
+
+        components.add(self.path_seeds_phylogeny_label)
+        components.add(self.path_seeds_phylogeny_value_label)
+        components.add(self.path_seeds_phylogeny_button)
+        # components.add(self.delete_path_seeds_phylogeny_button)
+
+    def render_use_reference(self):
         def update():
             value = self.dr_type_combobox.get()
 
         self.render_use_reference_text = "Do you want to use the same sequence (reference genome) as seeding sequences?"
-        self.use_reference_var = tk.BooleanVar(value=self.use_reference)
-        self.use_reference_label = ttk.Label(self.control_frame, text=self.render_use_reference_text, style = "Bold.TLabel")
-        self.use_reference_label.grid(row = 3, column = 1, sticky = 'w', pady = 5)
+        self.within_host_reproduction_var = tk.BooleanVar(value=self.use_reference)
+        self.within_host_reproduction_label = ttk.Label(self.control_frame, text=self.render_use_reference_text, style = "Bold.TLabel")
+        self.within_host_reproduction_label.grid(row = 3, column = 1, sticky = 'w', pady = 5)
 
-        if self.ref_path == "":
-            self.use_reference_label = ttk.Label(self.control_frame, text = "None selected", foreground="black", width = minwidth)
-        else:
-            self.use_reference_label = ttk.Label(self.control_frame, text = self.ref_path, foreground="black", width = minwidth)
+        self.rb_true = ttk.Radiobutton(self.control_frame, text="Yes", variable=self.within_host_reproduction_var, value=True, command = update)
+        self.rb_true.grid(row = 4, column = 1, columnspan= 3, sticky='w', pady=5)
 
-        self.use_reference_label.grid(row=5, column=0, pady=5, sticky='w')
-
-        choose_ref_path_button = tk.Button(self.control_frame, text="Choose File", command=self.choose_ref_path)
-        choose_ref_path_button.grid(row=6, column=0, sticky='e', pady=5)
-        self.path_seeds_vcf_label = ttk.Label(self.control_frame, text="Choose path_seeds_vcf")
-        self.choose_path_seeds_vcf_button = tk.Button(self.control_frame, text="Choose path_seeds_vcf", command=self.choose_and_update_path_seeds_vcf)
-
-        self.path_seeds_vcf_label.grid()
-        self.choose_path_seeds_vcf_button.grid()
-
-        user_input_components.add(self.path_seeds_vcf_label)
-        user_input_components.add(self.choose_path_seeds_vcf_button)
-
-    # def render_use_reference(self):
-    #     def update():
-    #         value = self.dr_type_combobox.get()
-
-    #     self.render_use_reference_text = "Do you want to use the same sequence (reference genome) as seeding sequences?"
-    #     self.within_host_reproduction_var = tk.BooleanVar(value=self.use_reference)
-    #     self.within_host_reproduction_label = ttk.Label(self.control_frame, text=self.render_use_reference_text, style = "Bold.TLabel")
-    #     self.within_host_reproduction_label.grid(row = 3, column = 1, sticky = 'w', pady = 5)
-
-    #     self.rb_true = ttk.Radiobutton(self.control_frame, text="Yes", variable=self.within_host_reproduction_var, value=True, command = update)
-    #     self.rb_true.grid(row = 4, column = 1, columnspan= 3, sticky='w', pady=5)
-
-    #     self.rb_false = ttk.Radiobutton(self.control_frame, text="No", variable=self.within_host_reproduction_var, value=False, command = update)
-    #     self.rb_false.grid(row = 5, column = 1, columnspan= 3, sticky='w', pady=5)
+        self.rb_false = ttk.Radiobutton(self.control_frame, text="No", variable=self.within_host_reproduction_var, value=False, command = update)
+        self.rb_false.grid(row = 5, column = 1, columnspan= 3, sticky='w', pady=5)
 
     def render_use_method(self):
         def update():
@@ -228,47 +289,47 @@ class SeedsConfiguration:
     #     choose_ref_path_button = tk.Button(self.control_frame, text="Choose File", command=self.choose_ref_path)
     #     choose_ref_path_button.grid(row=6, column=0, sticky='e', pady=5)
 
-    def choose_ref_path(self):  
-        filetypes = ( #don't need to check if its genome file: or use python package jaehee said
-            ("Genome files", ("*.fasta", "*.fa", "*.gb", "*.gtf", "*.vcf", "*.bam", "*.sam", "*.fna")),
-            ("All files", "*.*")
-        )
-        # chosen_file = filedialog.askopenfilename(title="Select a Genome Reference File", filetypes=filetypes)
-        chosen_file = filedialog.askopenfilename(title="Select a Genome Reference File")
-        if chosen_file:  
-            self.ref_path = chosen_file
-            self.ref_path_label.config(text=self.ref_path) 
-            config = load_config_as_dict(self.config_path)
-            config['GenomeElement']['ref_path'] = self.ref_path
-            save_config(self.config_path, config)
-
-
-    def render_burn_in_ne(self):
-        self.burn_in_Ne_label = ttk.Label(self.control_frame, text="burn_in_Ne:")
-        self.burn_in_Ne_label.grid()
+    def render_burn_in_ne(self, components):
+        self.render_burn_in_ne_text= "Effective Population Size (Integer)"
+        self.burn_in_Ne_label = ttk.Label(self.control_frame, text=self.render_burn_in_ne_text, style = "Bold.TLabel")
         self.burn_in_Ne_entry = ttk.Entry(self.control_frame, foreground="black")
         self.burn_in_Ne_entry.insert(0, self.burn_in_Ne)  
-        self.burn_in_Ne_entry.grid()
-        self.update_burn_in_Ne_button = tk.Button(self.control_frame, text="Update burn_in_Ne", command=self.update_burn_in_Ne)
-        self.update_burn_in_Ne_button.grid()
+        # self.update_burn_in_Ne_button = tk.Button(self.control_frame, text="Update burn_in_Ne", command=self.update_burn_in_Ne)
 
-    def render_burn_in_generations_wf(self):
-        self.burn_in_generations_wf_label = ttk.Label(self.control_frame, text="burn_in_generations_wf:")
-        self.burn_in_generations_wf_label.grid()
+        self.burn_in_Ne_label.grid(row = 9, column = 1, sticky='w', pady=5)
+        self.burn_in_Ne_entry.grid(row = 10, column = 1, sticky='w', pady=5)
+
+        components.add(self.burn_in_Ne_label)
+        components.add(self.burn_in_Ne_entry)
+
+    def render_burn_in_generations_wf(self, components):
+
+        self.render_burn_in_generations_wf_text = "Number of Burn-in Generations (integer)"
+        self.burn_in_generations_wf_label = ttk.Label(self.control_frame, text=self.render_burn_in_generations_wf_text, style = "Bold.TLabel")
         self.burn_in_generations_wf_entry = ttk.Entry(self.control_frame, foreground="black")
         self.burn_in_generations_wf_entry.insert(0, self.burn_in_generations_wf)  
-        self.burn_in_generations_wf_entry.grid()
-        self.update_burn_in_generations_wf_button = tk.Button(self.control_frame, text="Update burn_in_generations_wf", command=self.update_burn_in_generations_wf)
-        self.update_burn_in_generations_wf_button.grid()
+        # self.update_burn_in_generations_wf_button = tk.Button(self.control_frame, text="Update burn_in_generations_wf", command=self.update_burn_in_generations_wf)
+        
+        self.burn_in_generations_wf_label.grid(row = 9, column = 2, sticky='w', pady=5)
+        self.burn_in_generations_wf_entry.grid(row = 10, column = 2, sticky='w', pady=5)
+        # self.update_burn_in_generations_wf_button.grid()
 
-    def render_burn_in_mutrate_wf(self):
-        self.burn_in_mutrate_wf_label = ttk.Label(self.control_frame, text="burn_in_mutrate_wf:")
-        self.burn_in_mutrate_wf_label.grid()
+        components.add(self.burn_in_generations_wf_label)
+        components.add(self.burn_in_generations_wf_entry)
+
+    def render_burn_in_mutrate_wf(self, components):
+        self.render_burn_in_mutrate_wf_text = "Burn-in Mutation Rate (Numerical)"
+        self.burn_in_mutrate_wf_label = ttk.Label(self.control_frame, text=self.render_burn_in_mutrate_wf_text, style = "Bold.TLabel")
         self.burn_in_mutrate_wf_entry = ttk.Entry(self.control_frame, foreground="black")
         self.burn_in_mutrate_wf_entry.insert(0, self.burn_in_mutrate_wf)  
-        self.burn_in_mutrate_wf_entry.grid()
-        self.update_burn_in_mutrate_wf_button = tk.Button(self.control_frame, text="Update burn_in_mutrate_wf", command=self.update_burn_in_mutrate_wf)
-        self.update_burn_in_mutrate_wf_button.grid()
+        
+        self.burn_in_mutrate_wf_label.grid(row = 11, column = 1, sticky='w', pady=5)
+        self.burn_in_mutrate_wf_entry.grid(row = 12, column = 1, sticky='w', pady=5)
+        # self.update_burn_in_mutrate_wf_button = tk.Button(self.control_frame, text="Update burn_in_mutrate_wf", command=self.update_burn_in_mutrate_wf)
+        # self.update_burn_in_mutrate_wf_button.grid()
+
+        components.add(self.burn_in_mutrate_wf_label)
+        components.add(self.burn_in_mutrate_wf_entry)
 
     # startofepi
     def render_burn_in_generations_epi(self, epi_components):
@@ -451,7 +512,7 @@ class SeedsConfiguration:
                     # 
 
                     # Labels Creating
-                    self.render_path_seeds_vcf()
+                    # self.render_path_seeds_vcf()
                 else:
                     # Hide other labels if initialized
                     self.hide_elements()
