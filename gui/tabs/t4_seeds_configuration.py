@@ -17,6 +17,16 @@ from seed_generator import *
 class SeedsConfiguration:
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
 
+        self.init_val(config_path)
+        self.init_tab(parent, tab_parent, tab_title, tab_index, hide)
+        self.initial_load()
+
+        render_next_button(self.tab_index, self.tab_parent, self.parent, self.update)
+
+    def update(self):
+        return
+    
+    def init_val(self, config_path):
         self.config_path = config_path
 
         # SeedsConfiguration
@@ -44,7 +54,8 @@ class SeedsConfiguration:
         self.I_R_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['I_R_rate']
         self.I_E_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['I_E_rate']
         self.R_S_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['R_S_rate']
-
+    
+    def init_tab(self, parent, tab_parent, tab_title, tab_index, hide = False):
         self.parent = parent
         self.tab_parent = tab_parent
         self.tab_parent.add(self.parent, text=tab_title)
@@ -55,28 +66,39 @@ class SeedsConfiguration:
         self.control_frame = ttk.Frame(self.parent)
         self.control_frame.pack(padx=10, pady=10)
 
+    def initial_load(self):
         self.render_seeds_size()
         self.render_use_reference()
-        self.render_use_method()
+        self.use_method_components = self.render_use_method()
+        self.use_method_grid_configs = derender_components(self.use_method_components)
+             
+        if not self.use_reference:
+            rerender_components(self.use_method_components, self.use_method_grid_configs)
 
-    # user input
-        # self.user_input_components = self.render_user_input()
-        # self.grid_configs = self.derender_components(self.user_input_components)
-        # self.rerender_components(self.user_input_components, self.grid_configs)
-    # wf
+        self.user_input_components = self.render_user_input()
+        self.user_input_grid_configs = derender_components(self.user_input_components)
+
         self.wf_components = self.render_wf()
-        # self.grid_configs = self.derender_components(self.wf_components)
-        # self.rerender_components(self.wf_components, self.grid_configs)
+        self.wf_grid_configs = derender_components(self.wf_components)
 
-    # epi
-        # self.epi_components = self.render_epi()
-        # self.grid_configs = self.derender_components(self.epi_components)
-        # self.rerender_components(self.epi_components, self.grid_configs)
+        self.epi_components = self.render_epi()
+        self.epi_grid_configs = derender_components(self.epi_components)
 
-        render_next_button(self.tab_index, self.tab_parent, self.parent, self.update)
+        match self.method:
+            case "user_input":
+                rerender_components(self.user_input_components, self.user_input_grid_configs)  
+            case "SLiM_burnin_WF":
+                rerender_components(self.wf_components, self.wf_grid_configs)    
+            case "SLiM_burnin_epi":
+                rerender_components(self.epi_components, self.epi_grid_configs)
 
-    def update(self):
-        return
+
+    def render_user_input(self):
+        user_input_components = set()
+        self.render_tab_title(user_input_components, 5+3, 0, 3)
+        self.render_path_seeds_vcf(user_input_components)
+        self.render_path_seeds_phylogeny(user_input_components)
+        return user_input_components
     
     def render_wf(self):
         """
@@ -85,44 +107,11 @@ class SeedsConfiguration:
         self.burn_in_mutrate_wf = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_mutrate']
         """
         wf_components = set()
-        self.render_tab_title(wf_components, 5+3, 1, 3)
+        self.render_tab_title(wf_components, 5+3, 0, 3)
         self.render_burn_in_ne(wf_components)
         self.render_burn_in_generations_wf(wf_components)
         self.render_burn_in_mutrate_wf(wf_components)
         return wf_components
-    
-    def render_within_host_reproduction(self):
-        def update():
-            value = self.dr_type_combobox.get()
-        self.within_host_reproduction_var = tk.BooleanVar(value=self.within_host_reproduction)  #
-        self.within_host_reproduction_label = ttk.Label(self.control_frame, text="Within-host Reproduction", style = "Bold.TLabel")
-        self.within_host_reproduction_label.grid(row = 7, column = 0, sticky = 'w', pady = 5, padx=10)
-
-        self.rb_true = ttk.Radiobutton(self.control_frame, text="Yes", variable=self.within_host_reproduction_var, value=True, command = update)
-        self.rb_true.grid(row = 8, column = 0, sticky = 'w', pady = 5, padx=10)
-
-        self.rb_false = ttk.Radiobutton(self.control_frame, text="No", variable=self.within_host_reproduction_var, value=False, command = update)
-        self.rb_false.grid(row = 9, column = 0, sticky = 'w', pady = 5, padx=10)
-
-    def derender_components(self, components: set):
-        grid_configs = {}
-        for component in components:
-            grid_configs[component] = component.grid_info()
-            component.grid_forget()
-
-        return grid_configs
-
-    def rerender_components(self, components: set, grid_configs: dict = {}):
-        for component in components:
-            grid_info = grid_configs.get(component, {})
-            component.grid(**grid_info)
-
-    def render_user_input(self):
-        user_input_components = set()
-        self.render_tab_title(user_input_components, 5+3, 0, 3)
-        self.render_path_seeds_vcf(user_input_components)
-        self.render_path_seeds_phylogeny(user_input_components)
-        return user_input_components
     
     def render_epi(self):
         epi_components = set()
@@ -232,7 +221,27 @@ class SeedsConfiguration:
 
     def render_use_reference(self):
         def update():
-            value = self.dr_type_combobox.get()
+            keys_path = ['SeedsConfiguration', 'use_reference']
+            no_validate_update(self.within_host_reproduction_var, self.config_path, keys_path)
+            use_ref_local = get_dict_val(load_config_as_dict(self.config_path), keys_path)
+            if use_ref_local:
+                self.use_method_grid_configs = derender_components(self.use_method_components)
+                self.user_input_grid_configs = derender_components(self.user_input_components)
+                self.wf_grid_configs = derender_components(self.wf_components)
+                self.epi_grid_configs = derender_components(self.epi_components)
+            else:
+                rerender_components(self.use_method_components, self.use_method_grid_configs)
+                rerender_components(self.user_input_components, self.user_input_grid_configs)  
+                keys_path = ['SeedsConfiguration', 'method']
+                use_method_local = get_dict_val(load_config_as_dict(self.config_path), keys_path)
+                match use_method_local:
+                    case "user_input":
+                        rerender_components(self.user_input_components, self.user_input_grid_configs)  
+                    case "SLiM_burnin_WF":
+                        rerender_components(self.wf_components, self.wf_grid_configs)    
+                    case "SLiM_burnin_epi":
+                        rerender_components(self.epi_components, self.epi_grid_configs)
+            
 
         self.render_use_reference_text = "Do you want to use the same sequence (reference genome) as seeding sequences?"
         self.within_host_reproduction_var = tk.BooleanVar(value=self.use_reference)
@@ -242,52 +251,44 @@ class SeedsConfiguration:
         self.rb_true = ttk.Radiobutton(self.control_frame, text="Yes", variable=self.within_host_reproduction_var, value=True, command = update)
         self.rb_true.grid(row = 4, column = 1, columnspan= 3, sticky='w', pady=5)
 
-        self.rb_false = ttk.Radiobutton(self.control_frame, text="No", variable=self.within_host_reproduction_var, value=False, command = update)
+        self.rb_false = ttk.Radiobutton(self.control_frame, text="No (Run the burn-in process or provide seeding sequences)", variable=self.within_host_reproduction_var, value=False, command = update)
         self.rb_false.grid(row = 5, column = 1, columnspan= 3, sticky='w', pady=5)
 
     def render_use_method(self):
-        def update():
-            return
+        def update(event):
+            keys_path = ['SeedsConfiguration', 'method']
+            no_validate_update(self.use_method_var, self.config_path, keys_path, mapping = render_to_val_ui_wf_epi_mapping)
+            match get_dict_val(load_config_as_dict(self.config_path), keys_path):
+                case "user_input":
+                    self.wf_grid_configs = derender_components(self.wf_components)
+                    self.epi_grid_configs = derender_components(self.epi_components)
+                    rerender_components(self.user_input_components, self.user_input_grid_configs)  
+                case "SLiM_burnin_WF":
+                    self.epi_grid_configs = derender_components(self.epi_components)
+                    self.user_input_grid_configs = derender_components(self.user_input_components)
+                    rerender_components(self.wf_components, self.wf_grid_configs)    
+                case "SLiM_burnin_epi":
+                    self.wf_grid_configs = derender_components(self.wf_components)
+                    self.user_input_grid_configs = derender_components(self.user_input_components)
+                    rerender_components(self.epi_components, self.epi_grid_configs)
         
         self.render_use_method_title = "Method to Generate Sequences of the Seeding Pathogens"
         self.use_method_label = ttk.Label(self.control_frame, text=self.render_use_method_title, style="Bold.TLabel")
         self.use_method_label.grid(row=6, column=1, columnspan= 3, sticky='w', pady=5)
-        self.use_method_var = tk.StringVar(value=self.method)
+        self.use_method_var = tk.StringVar(value=val_to_render_ui_wf_epi_mapping[self.method])
+        combobox_vals = list(render_to_val_ui_wf_epi_mapping.keys())
         self.use_method_combobox = ttk.Combobox(
             self.control_frame, textvariable=self.use_method_var, 
-            values=["user_input", "SLiM_burnin_WF", "SLiM_burnin_epi"], state="readonly"
-            # TODO Change labels, set width
+            values=combobox_vals, state="readonly",
+            width = 50
             )
         self.use_method_combobox.grid(row=7, column=1, columnspan= 3, sticky='w', pady=5)
-        self.use_method_combobox.bind("<<ComboboxSelected>>", self.update_use_method)
+        self.use_method_combobox.bind("<<ComboboxSelected>>", update)
 
-        if self.method == "user_input":
-            return
-            self.method_label = ttk.Label(self.control_frame, text="method:")
-            self.method_label.grid()
-            self.method_var = tk.StringVar()
-            self.method_combobox = ttk.Combobox(self.control_frame, textvariable=self.method_var, values=["randomly generate", "user_input"], state="readonly")
-            self.method_combobox.grid()
-            self.update_method_button = tk.Button(self.control_frame, text="Update method", command=self.update_method)
-            self.update_method_button.grid()
-        elif self.method == "SLiM_burnin_WF":
-            return
-        elif self.method == "SLiM_burnin_epi":
-            return
-        
-    # def render_ref_path_label(self):
-    #     ref_path_label = ttk.Label(self.control_frame, text="Pathogen Reference Genome File (FASTA Format)", style="Bold.TLabel")
-    #     ref_path_label.grid(row=4, column=0, sticky='ew', pady=5)
-
-    #     if self.ref_path == "":
-    #         self.ref_path_label = ttk.Label(self.control_frame, text = "None selected", foreground="black", width = minwidth)
-    #     else:
-    #         self.ref_path_label = ttk.Label(self.control_frame, text = self.ref_path, foreground="black", width = minwidth)
-
-    #     self.ref_path_label.grid(row=5, column=0, pady=5, sticky='w')
-
-    #     choose_ref_path_button = tk.Button(self.control_frame, text="Choose File", command=self.choose_ref_path)
-    #     choose_ref_path_button.grid(row=6, column=0, sticky='e', pady=5)
+        use_method_components = set()
+        use_method_components.add(self.use_method_label)
+        use_method_components.add(self.use_method_combobox)
+        return use_method_components
 
     def render_burn_in_ne(self, components):
         self.render_burn_in_ne_text= "Effective Population Size (Integer)"
@@ -298,20 +299,20 @@ class SeedsConfiguration:
 
         self.burn_in_Ne_label.grid(row = 9, column = 1, sticky='w', pady=5)
         self.burn_in_Ne_entry.grid(row = 10, column = 1, sticky='w', pady=5)
-
+# no east
         components.add(self.burn_in_Ne_label)
         components.add(self.burn_in_Ne_entry)
 
     def render_burn_in_generations_wf(self, components):
 
-        self.render_burn_in_generations_wf_text = "Number of Burn-in Generations (integer)"
+        self.render_burn_in_generations_wf_text = "Number of Burn-in Generations (Integer)"
         self.burn_in_generations_wf_label = ttk.Label(self.control_frame, text=self.render_burn_in_generations_wf_text, style = "Bold.TLabel")
         self.burn_in_generations_wf_entry = ttk.Entry(self.control_frame, foreground="black")
         self.burn_in_generations_wf_entry.insert(0, self.burn_in_generations_wf)  
         # self.update_burn_in_generations_wf_button = tk.Button(self.control_frame, text="Update burn_in_generations_wf", command=self.update_burn_in_generations_wf)
         
-        self.burn_in_generations_wf_label.grid(row = 9, column = 2, sticky='w', pady=5)
-        self.burn_in_generations_wf_entry.grid(row = 10, column = 2, sticky='w', pady=5)
+        self.burn_in_generations_wf_label.grid(row = 11, column = 1, sticky='w', pady=5)
+        self.burn_in_generations_wf_entry.grid(row = 12, column = 1, sticky='w', pady=5)
         # self.update_burn_in_generations_wf_button.grid()
 
         components.add(self.burn_in_generations_wf_label)
@@ -323,8 +324,8 @@ class SeedsConfiguration:
         self.burn_in_mutrate_wf_entry = ttk.Entry(self.control_frame, foreground="black")
         self.burn_in_mutrate_wf_entry.insert(0, self.burn_in_mutrate_wf)  
         
-        self.burn_in_mutrate_wf_label.grid(row = 11, column = 1, sticky='w', pady=5)
-        self.burn_in_mutrate_wf_entry.grid(row = 12, column = 1, sticky='w', pady=5)
+        self.burn_in_mutrate_wf_label.grid(row = 13, column = 1, sticky='w', pady=5)
+        self.burn_in_mutrate_wf_entry.grid(row = 14, column = 1, sticky='w', pady=5)
         # self.update_burn_in_mutrate_wf_button = tk.Button(self.control_frame, text="Update burn_in_mutrate_wf", command=self.update_burn_in_mutrate_wf)
         # self.update_burn_in_mutrate_wf_button.grid()
 

@@ -15,7 +15,7 @@
     "SeedsConfiguration": {
         "seed_size": 54,
         "use_reference": false,
-        "method": "SLiM_burnin_WF",
+        "method": "SLiM_burnin_epi",
         "user_input": {
             "path_seeds_vcf": "/System/Applications/Books.app",
             "path_seeds_phylogeny": "/System/Applications/Clock.app"

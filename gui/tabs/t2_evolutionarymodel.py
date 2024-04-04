@@ -81,7 +81,6 @@ class EvolutionaryModel:
         self.trans_type_label.grid(row = 3, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
         
         self.trans_type_var = tk.StringVar(value=self.trans_type)
-        print("trans_type_var", self.trans_type_var.get())
         self.trans_type_combobox = ttk.Combobox(self.control_frame, textvariable=self.trans_type_var, values=["Bi-Allelic", "Additive"], state="readonly")
         self.trans_type_combobox.grid(row = 4, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
     def render_dr_type(self):
@@ -90,7 +89,6 @@ class EvolutionaryModel:
         self.dr_type_label = ttk.Label(self.control_frame, text="Drug-Resistance Trait Type", style = "Bold.TLabel")
         self.dr_type_label.grid(row = 5, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
         self.dr_type_var = tk.StringVar(value=self.dr_type)
-        print("dr_type_var", self.dr_type_var.get())
         self.dr_type_combobox = ttk.Combobox(self.control_frame, textvariable=self.dr_type_var, values=["Bi-Allelic", "Additive"], state="readonly")
         self.dr_type_combobox.grid(row = 6, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
         self.dr_type_combobox.bind("<<ComboboxSelected>>", update)        

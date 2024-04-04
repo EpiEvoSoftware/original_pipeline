@@ -230,6 +230,7 @@ def go_to_next_tab(tab_index, tab_parent):
     tab_parent.select(next_tab_index)
 
 minwidth = 100
+
 def validate_input(P):
     if P.strip() in ["e", ".", ""]:
             return True
@@ -248,3 +249,41 @@ def choose_ref_path(self, title, config_path, var, filetypes = None):
         config = load_config_as_dict(config_path)
         config['GenomeElement']['ref_path'] = var
         save_config(config_path, config)
+
+def no_validate_update(var, config_path, keys_path, mapping = None):
+    if mapping:
+        var_get = mapping[var.get()]
+    else:
+        var_get = var.get()
+    config = load_config_as_dict(config_path)
+    update_nested_dict(config, keys_path, var_get)
+    save_config(config_path, config)
+
+def get_dict_val(d, keys):
+    for key in keys:
+        d = d[key]
+    return d
+
+val_to_render_ui_wf_epi_mapping = {
+    "user_input": "User Input", 
+    "SLiM_burnin_WF": "Burn-in by a Wright-Fisher Model", 
+    "SLiM_burnin_epi": "Burn-in by an Epidemiological Model"
+}
+
+render_to_val_ui_wf_epi_mapping = {value: key for key, value in val_to_render_ui_wf_epi_mapping.items()}
+
+
+def derender_components(components: set):
+    grid_configs = {}
+    for component in components:
+        grid_configs[component] = component.grid_info()
+        component.grid_forget()
+
+    return grid_configs
+
+
+
+def rerender_components(components: set, grid_configs: dict = {}):
+    for component in components:
+        grid_info = grid_configs.get(component, {})
+        component.grid(**grid_info)
