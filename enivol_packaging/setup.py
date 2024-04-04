@@ -1,21 +1,20 @@
 import os
 from setuptools import setup, find_packages
 
-with open("README_PYPI.md", "r") as f:
-    long_description = f.read()
+# with open("README_PYPI.md", "r") as f:
+#     long_description = f.read()
 
 setup(
     name = "enivol", # cannot repeat w/ other names on PyPI
-    version = "0.0.1", # need to look into this
+    version = "0.0.2", # need to look into this
     description = "An epi-evo simulator for infectious disease outbreak", # description for the software 
     packages = find_packages(), # "flat-layout (a.k.a. adhoc structure, python automatically detects the package)"
-    long_description = long_description, # readme
+    # long_description = long_description, # readme
     long_description_content_type = "text/markdown", # confused
     include_package_data = True, # I think this will be for the template and stuff
     package_data = {"enivol": [os.path.join("burn_in_slim_scripts", "*.slim"),
                                os.path.join("config_template", "*.json"),
                                os.path.join("slim_scripts", "*.slim")]},
-    url = "github",
     author = "Perry Xu, Shenni Liang",
     author_email = "shenni.liang@gmail.com",
     maintainer = "",
@@ -31,18 +30,19 @@ setup(
         'Programming Language :: R'
 
     ],
-    install_requires = ['matplotlib>=matplotlib=3.8.2', 'pandas>=2.2.0', 'ete3>=3.1.3', 'numpy>=1.26',
-                        'tskit>=0.5.6', 'pyslim>=1.0.4', 'slim=4.1', 'r-base>=4.3.2', 'r-ape=5.7_1', ],
+    install_requires = ['matplotlib>=3.8.2', 'pandas>=2.2.0', 'ete3>=3.1.3', 'numpy>=1.26',
+                        'tskit>=0.5.6', 'pyslim>=1.0.4', 'r-base>=4.3.2', 'r-ape>=5.7', 
+                        'r-phylobase>=0.8.12', 'bioconductor-ggtree>=3.10.0', 'r-ggplot2>=3.4.4'],
     python_requires = ">=3.12",
-    keywords = ['phylodynamics', 'epidemiology', ''],
+    keywords = ['phylodynamics', 'epidemiology'],
     entry_points = {
         'console_scripts': [
-            'enivol = enivol.enivol:main',
-            'network_generator = enivol.network_generator:main'
-            'init_seq_generator = enivol.init_seq_generator:main',
+            'enivol = enivol.main',
+            'network_generator = enivol.network_generator:main',
+            'seed_generator = enivol.seed_generator:main',
             'genetic_effect_generator = enivol.genetic_effect_generator:main',
-            'seed_host_matcher = enviol.seed_host_matcher:main'
-            'outbreak_simulator = enivol.outbreak_simulator:main'
+            'seed_host_matcher = enviol.seed_host_matcher:main',
+            'outbreak_simulator = enivol.outbreak_simulator:main',
         ]
     }
 )

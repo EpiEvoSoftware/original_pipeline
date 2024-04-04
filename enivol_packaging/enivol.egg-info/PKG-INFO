@@ -1,0 +1,31 @@
+Metadata-Version: 2.1
+Name: enivol
+Version: 0.0.2
+Summary: An epi-evo simulator for infectious disease outbreak
+Author: Perry Xu, Shenni Liang
+Author-email: shenni.liang@gmail.com
+Maintainer: 
+Maintainer-email: 
+License: MIT
+Keywords: phylodynamics,epidemiology
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Environment :: Console
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: R
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: matplotlib>=3.8.2
+Requires-Dist: pandas>=2.2.0
+Requires-Dist: ete3>=3.1.3
+Requires-Dist: numpy>=1.26
+Requires-Dist: tskit>=0.5.6
+Requires-Dist: pyslim>=1.0.4
+Requires-Dist: r-base>=4.3.2
+Requires-Dist: r-ape>=5.7
+Requires-Dist: r-phylobase>=0.8.12
+Requires-Dist: bioconductor-ggtree>=3.10.0
+Requires-Dist: r-ggplot2>=3.4.4

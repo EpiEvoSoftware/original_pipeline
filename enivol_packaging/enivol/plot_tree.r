@@ -51,47 +51,6 @@ assign_id <- function(meta_df, g1, id_value, new_layer, ancestor_ids, nTips_g1, 
     return(id_value)
   }
 }
-# assign_id <- function(meta_df, g1, id_value, new_layer) {
-#   nodes_num = length(nodeId(g1))
-#   which_root = 0
-#   ancestor_ids = c()
-#   for (i in 1:nodes_num) {
-#     ancestor_id = ancestor(g1, i)
-#     ancestor_ids = c(ancestor_ids, ancestor_id)
-#   }
-#   new_new_layer = c()
-#   for (i in new_layer) {
-#     ancestor_id = ancestor(g1, i)
-    
-#     if (is.na(ancestor_id)) {
-#       child_ids = which(ancestor_ids==i)
-#       id_value[i,]$ori_id = meta_df[which(meta_df$node_id %in% id_value[child_ids,]$ori_id),]$parent_id[1]
-#       #return(id_value)
-#     }
-#     else {
-#       new_new_layer = c(new_new_layer, ancestor_id)
-#       if (i > nTips(g1)) {
-#         child_ids = which(ancestor_ids==i)
-#         id_value[i,]$ori_id = meta_df[which(meta_df$node_id %in% id_value[child_ids,]$ori_id),]$parent_id[1]
-#       }
-#       else {
-#         name = labels(g1)[i]
-#         id_value[i,]$ori_id = meta_df[which(meta_df$name==name),]$node_id
-#       }
-#     }
-#   }
-#   new_new_layer = unique(new_new_layer)
-#   if (any(is.na(id_value$ori_id))) {
-#     if (is.null(new_new_layer))
-#     {
-#       id_value[which(is.na(id_value$ori_id)),]$ori_id = -1
-#     }
-#     return(assign_id(meta_df, g1, id_value, new_new_layer))
-#   }
-#   else {
-#     return(id_value)
-#   }
-# }
 
 # Function to assign color
 assign_color <- function(meta_df, id_value, g1) {
@@ -236,19 +195,12 @@ plot_transmission_tree <- function(seed_id, wk_dir, meta_df, n_trans, n_dr, whol
     # Check if the tree has only on tip, not suitable for visualization
     if (length(tree$tip.label) == 1) {
       cat("Sorry, we do NOT support visualizing single branch tree.\n")
-      # if (whole_phylo_output) {
-      #   # Drop the tip if requested for whole phylogenetic output
-      #   seed_phylo <- drop.tip(seed_phylo, as.character(seed_id - 1))
-      # }
     } else { # Convert the tree into phylo4 object
       plot_transmission_tree_helper(tree, meta_df, n_dr, n_trans, wk_dir, seed_id)
     }
     return(tree)
   } else { # If the seed has no progeny sampled
     cat("No samples for this seed's progeny.\n")
-    # if (whole_phylo_output) { # Drop the tip if request for whole phylogenetic output
-    #     seed_phylo <- drop.tip(seed_phylo, as.character(seed_id - 1))
-    # }
     return(NULL)
   }
 }

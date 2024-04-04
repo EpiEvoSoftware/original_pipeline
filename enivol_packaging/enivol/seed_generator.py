@@ -477,8 +477,8 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 			raise CustomizedError(f"{method} isn't a valid method. Please provide a permitted method. "
 							"(user_input/SLiM_burnin_WF/SLiM_burnin_epi)")
 		print("******************************************************************** \n" +
-              "                   	    SEEDS GENERATED		                        \n" +
-              "******************************************************************** \n")
+				"                   	    SEEDS GENERATED		                        \n" +
+				"******************************************************************** \n")
 	except Exception as e:
 		print(f"Seed sequences generation - A error occured: {e}.")
 		error_message = e
