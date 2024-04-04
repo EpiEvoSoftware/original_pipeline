@@ -40,6 +40,17 @@ class Configurationv3:
         choose_directory_button()
 
     def update(self):
+        error_messages = []
+        self.update_n_replicates(error_messages)
+        if len(error_messages) == 0:
+            messagebox.showinfo("Update Successful", "Parameters Updated.")
+            return 0
+        else:
+            error_message_str = "\n".join(error_messages)
+            messagebox.showerror("Update Error", error_message_str) 
+            return 1
+
+    def update_n_replicates(self, error_messages):
         """
         note: int() doesn't process scientific notation for strings but float() does
         """
@@ -48,11 +59,8 @@ class Configurationv3:
             config = load_config_as_dict(self.config_path) 
             config['BasicRunConfiguration']['n_replicates'] = new_n_replicates 
             save_config(self.config_path, config)  
-            messagebox.showinfo("Update Successful", "Parameters Updated.")
-            return 0
         except ValueError:
-            messagebox.showerror("Update Error", "Please enter a valid integer for the number of replicates.") 
-            return 1
+            error_messages.append("Please enter a valid integer for the number of replicates.") 
 
     def render_n_replicates(self):
 

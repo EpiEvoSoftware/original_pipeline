@@ -38,7 +38,6 @@ class NetworkModel:
         self.tab_index = tab_index
 
         
-
 class NetworkModelConfigurations:
     def __init__(self, parent, tab_parent, config_path, graph, tab_index, tab_title):
         self.graph = graph
@@ -131,6 +130,8 @@ class NetworkModelConfigurations:
 
         render_next_button(self.tab_index, self.tab_parent, self.parent)
 
+    def update(self):
+        return
 
     def update_host_size(self):
         try:

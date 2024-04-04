@@ -1,9 +1,10 @@
 
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, messagebox, filedialog, PhotoImage
 import json
 import os
 import sys
+from PIL import Image, ImageTk
 from tools import *
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
@@ -45,88 +46,330 @@ class SeedsConfiguration:
 
         self.parent = parent
         self.tab_parent = tab_parent
-        self.tab_parent.add(parent, text=tab_title)
+        self.tab_parent.add(self.parent, text=tab_title)
         self.tab_index = tab_index
         if hide:
             self.tab_parent.tab(self.tab_index, state="disabled")
         
         self.control_frame = ttk.Frame(self.parent)
-        self.control_frame.pack(fill='both', expand=True)
-
-
-        # Modified part for scrolling
-            # Testings
-        self.canvas = tk.Canvas(self.control_frame)
-        self.scrollbar = ttk.Scrollbar(self.control_frame, orient="vertical", command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
-        
-        self.scrollable_frame = ttk.Frame(self.canvas)
-        self.canvas_frame = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-        
-        def configure_scroll_region(event):
-            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-        
-        def configure_canvas_width(event):
-            self.canvas.itemconfig(self.canvas_frame, width=event.width)
-        
-        self.scrollable_frame.bind("<Configure>", configure_scroll_region)
-        self.canvas.bind("<Configure>", configure_canvas_width)
-        
-        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.scrollbar.pack(side=tk.RIGHT, fill="y")
-            # Testing End
-        # 
-
-
-
+        self.control_frame.pack(padx=10, pady=10)
+        # self.control_frame = ttk.Frame(self.parent, width=300)
+        # self.control_frame.pack(padx=10, pady=10)
 
         # seed_size:
-        self.seed_size_label = ttk.Label(self.scrollable_frame, text="seed_size:")
-        self.seed_size_label.pack()
-        self.seed_size_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-        self.seed_size_entry.insert(0, self.seed_size)  
-        self.seed_size_entry.pack()
-        update_seed_size_button = tk.Button(self.scrollable_frame, text="Update seed_size", command=self.update_seed_size)
-        update_seed_size_button.pack()
-        # end of seed_size
+        self.render_seeds_size()
+        self.render_use_method()
+        
+        self.epi_components = self.render_epi()
+        self.grid_configs = self.derender_components(self.epi_components)
+        self.rerender_components(self.epi_components, self.grid_configs)
 
-        # Method:
-        self.use_method_label = ttk.Label(self.scrollable_frame, text="method:")
-        self.use_method_label.pack()
+        render_next_button(self.tab_index, self.tab_parent, self.parent, self.update)
+
+    def update(self):
+        return
+    
+    
+    def render_within_host_reproduction(self):
+        def update():
+            value = self.dr_type_combobox.get()
+        self.within_host_reproduction_var = tk.BooleanVar(value=self.within_host_reproduction)  #
+        self.within_host_reproduction_label = ttk.Label(self.control_frame, text="Within-host Reproduction", style = "Bold.TLabel")
+        self.within_host_reproduction_label.grid(row = 7, column = 0, sticky = 'w', pady = 5, padx=10)
+
+        self.rb_true = ttk.Radiobutton(self.control_frame, text="Yes", variable=self.within_host_reproduction_var, value=True, command = update)
+        self.rb_true.grid(row = 8, column = 0, sticky = 'w', pady = 5, padx=10)
+
+        self.rb_false = ttk.Radiobutton(self.control_frame, text="No", variable=self.within_host_reproduction_var, value=False, command = update)
+        self.rb_false.grid(row = 9, column = 0, sticky = 'w', pady = 5, padx=10)
+
+    def derender_components(self, components: set):
+        grid_configs = {}
+        for component in components:
+            grid_configs[component] = component.grid_info()
+            component.grid_forget()
+
+        return grid_configs
+
+    def rerender_components(self, components: set, grid_configs: dict = {}):
+        for component in components:
+            grid_info = grid_configs.get(component, {})
+            component.grid(**grid_info)
+    
+    def render_epi(self):
+        epi_components = set()
+        self.render_epi_title(epi_components)
+        self.render_burn_in_generations_epi(epi_components)
+        self.render_burn_in_mutrate_epi(epi_components)
+        self.render_seeded_host_id(epi_components)
+        self.render_S_IE_rate(epi_components)
+        self.render_E_I_rate(epi_components)
+        self.render_E_R_rate(epi_components)
+        self.render_latency_prob(epi_components)
+        self.render_I_R_rate(epi_components)
+        self.render_I_E_rate(epi_components)
+        self.render_R_S_rate(epi_components)
+        self.render_image("assets/t4.png", epi_components, 700, 255)
+        return epi_components
+
+    def render_epi_title(self, epi_components):
+        self.render_t4_title_text = "Burn-in Settings:"
+        self.t4_title = ttk.Label(self.control_frame, text=self.render_t4_title_text, style="Title.TLabel", width = 100)
+        self.t4_title.grid(row=5, column=0, columnspan = 3, sticky='w', pady=5)
+        epi_components.add(self.t4_title)
+    
+    def render_seeds_size(self):
+        self.render_seeds_size_title = "Number of Seeding Pathogens (Integer)"
+        self.seed_size_label = ttk.Label(self.control_frame, text=self.render_seeds_size_title, style="Bold.TLabel")
+        self.seed_size_label.grid(row=1, column=1, columnspan= 3, sticky='w', pady=5)
+        self.seed_size_entry = ttk.Entry(self.control_frame, foreground="black", width = 20)
+        self.seed_size_entry.insert(0, self.seed_size)  
+        self.seed_size_entry.grid(row=2, column=1, columnspan= 3, sticky='w', pady=5)
+
+        self.render_seeds_size_components = []
+        self.render_seeds_size_components.append(self.seed_size_label)
+        self.render_seeds_size_components.append(self.seed_size_entry)
+        # update_seed_size_button = tk.Button(self.control_frame, text="Update seed_size", command=self.update_seed_size)
+        # update_seed_size_button.grid()
+
+    def render_use_method(self):
+        def update():
+            return
+        
+        self.render_use_method_title = "Method to Generate Sequences of the Seeding Pathogens"
+        self.use_method_label = ttk.Label(self.control_frame, text=self.render_use_method_title, style="Bold.TLabel")
+        self.use_method_label.grid(row=3, column=1, columnspan= 3, sticky='w', pady=5)
         self.use_method_var = tk.StringVar(value=self.method)
         self.use_method_combobox = ttk.Combobox(
-            self.scrollable_frame, textvariable=self.use_method_var, 
+            self.control_frame, textvariable=self.use_method_var, 
             values=["user_input", "SLiM_burnin_WF", "SLiM_burnin_epi"], state="readonly"
+            # TODO Change labels, set width
             )
-        self.use_method_combobox.pack()
-        update_use_method_button = tk.Button(self.scrollable_frame, text="Update Method", command=self.update_use_method)
-        update_use_method_button.pack()
+        self.use_method_combobox.grid(row=4, column=1, columnspan= 3, sticky='w', pady=5)
+        self.use_method_combobox.bind("<<ComboboxSelected>>", self.update_use_method)
 
         if self.method == "user_input":
             return
             self.method_label = ttk.Label(self.control_frame, text="method:")
-            self.method_label.pack()
+            self.method_label.grid()
             self.method_var = tk.StringVar()
             self.method_combobox = ttk.Combobox(self.control_frame, textvariable=self.method_var, values=["randomly generate", "user_input"], state="readonly")
-            self.method_combobox.pack()
+            self.method_combobox.grid()
             self.update_method_button = tk.Button(self.control_frame, text="Update method", command=self.update_method)
-            self.update_method_button.pack()
+            self.update_method_button.grid()
         elif self.method == "SLiM_burnin_WF":
             return
         elif self.method == "SLiM_burnin_epi":
             return
-        # End of Method
+        
+    def render_path_seeds_vcf(self):
+        self.path_seeds_vcf_label = ttk.Label(self.control_frame, text="Choose path_seeds_vcf")
+        self.path_seeds_vcf_label.grid()
+        self.choose_path_seeds_vcf_button = tk.Button(self.control_frame, text="Choose path_seeds_vcf", command=self.choose_and_update_path_seeds_vcf)
+        self.choose_path_seeds_vcf_button.grid()
+        self.path_seeds_vcf_indicator = ttk.Label(self.control_frame, text="Current path_seeds_vcf: " + self.path_seeds_vcf)
+        self.path_seeds_vcf_indicator.grid()
 
+    def render_burn_in_ne(self):
+        self.burn_in_Ne_label = ttk.Label(self.control_frame, text="burn_in_Ne:")
+        self.burn_in_Ne_label.grid()
+        self.burn_in_Ne_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.burn_in_Ne_entry.insert(0, self.burn_in_Ne)  
+        self.burn_in_Ne_entry.grid()
+        self.update_burn_in_Ne_button = tk.Button(self.control_frame, text="Update burn_in_Ne", command=self.update_burn_in_Ne)
+        self.update_burn_in_Ne_button.grid()
 
+    def render_burn_in_generations_wf(self):
+        self.burn_in_generations_wf_label = ttk.Label(self.control_frame, text="burn_in_generations_wf:")
+        self.burn_in_generations_wf_label.grid()
+        self.burn_in_generations_wf_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.burn_in_generations_wf_entry.insert(0, self.burn_in_generations_wf)  
+        self.burn_in_generations_wf_entry.grid()
+        self.update_burn_in_generations_wf_button = tk.Button(self.control_frame, text="Update burn_in_generations_wf", command=self.update_burn_in_generations_wf)
+        self.update_burn_in_generations_wf_button.grid()
 
-        render_next_button(self.tab_index, self.tab_parent, self.parent)
+    def render_burn_in_mutrate_wf(self):
+        self.burn_in_mutrate_wf_label = ttk.Label(self.control_frame, text="burn_in_mutrate_wf:")
+        self.burn_in_mutrate_wf_label.grid()
+        self.burn_in_mutrate_wf_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.burn_in_mutrate_wf_entry.insert(0, self.burn_in_mutrate_wf)  
+        self.burn_in_mutrate_wf_entry.grid()
+        self.update_burn_in_mutrate_wf_button = tk.Button(self.control_frame, text="Update burn_in_mutrate_wf", command=self.update_burn_in_mutrate_wf)
+        self.update_burn_in_mutrate_wf_button.grid()
 
-    def update_use_method(self):
+    # startofepi
+    def render_burn_in_generations_epi(self, epi_components):
+        self.render_burn_in_generations_epi_text = "Number of Burn-in Generations (Integer)"
+        self.burn_in_generations_epi_label = ttk.Label(self.control_frame, text=self.render_burn_in_generations_epi_text, style="Bold.TLabel")
+        self.burn_in_generations_epi_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.burn_in_generations_epi_entry.insert(0, self.burn_in_generations_epi)  
+
+        self.burn_in_generations_epi_label.grid(row=6, column=0, sticky='w', pady=5)
+        self.burn_in_generations_epi_entry.grid(row=7, column=0, sticky='w', pady=5)
+
+        # self.render_burn_in_generations_epi_components = []
+        epi_components.add(self.burn_in_generations_epi_label)
+        epi_components.add(self.burn_in_generations_epi_entry)
+
+        # self.update_burn_in_generations_epi_button = tk.Button(self.control_frame, text="Update burn_in_generations", command=self.update_burn_in_generations_epi)
+        # self.update_burn_in_generations_epi_button.grid()
+
+        # self.t4_title.grid(row=7, column=0, sticky='w', pady=5)
+
+    def render_burn_in_mutrate_epi(self, epi_components):
+
+        self.render_burn_in_mutrate_epi_text = "Burn-in Mutation Rate (Numerical)"
+        self.burn_in_mutrate_epi_label = ttk.Label(self.control_frame, text=self.render_burn_in_mutrate_epi_text, style="Bold.TLabel")
+        self.burn_in_mutrate_epi_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.burn_in_mutrate_epi_entry.insert(0, self.burn_in_mutrate_epi)
+
+        self.burn_in_mutrate_epi_label.grid(row=6, column=1, sticky='w', pady=5)
+        self.burn_in_mutrate_epi_entry.grid(row=7, column=1, sticky='w', pady=5)
+
+        # self.render_burn_in_mutrate_epi_components = []
+        epi_components.add(self.burn_in_mutrate_epi_label)
+        epi_components.add(self.burn_in_mutrate_epi_entry)
+        # self.update_burn_in_mutrate_epi_button = tk.Button(self.control_frame, text="Update burn_in_mutrate_epi", command=self.update_burn_in_mutrate_epi)
+        # self.update_burn_in_mutrate_epi_button.grid()
+
+    def render_seeded_host_id(self, epi_components):
+        self.render_seeded_host_id_text = "Seeded Host (Patient 0) ID(s) (integer)"
+
+        self.seeded_host_id_label = ttk.Label(self.control_frame, text=self.render_seeded_host_id_text, style="Bold.TLabel")
+        self.seeded_host_id_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.seeded_host_id_entry.insert(0, str(self.seeded_host_id))  
+
+        self.seeded_host_id_label.grid(row=6, column=2, sticky='w', pady=5)
+        self.seeded_host_id_entry.grid(row=7, column=2, sticky='w', pady=5)
+
+        # self.render_seeded_host_id_components = []
+        epi_components.add(self.seeded_host_id_label)
+        epi_components.add(self.seeded_host_id_entry)
+        # self.update_seeded_host_id_button = tk.Button(self.control_frame, text="Update seeded_host_id", command=self.update_seeded_host_id)
+        # self.update_seeded_host_id_button.grid()
+
+    def render_S_IE_rate(self, epi_components):
+
+        self.render_S_IE_rate_text = "Transmission Rate \u03B2 (Numerical)"
+        self.S_IE_rate_label = ttk.Label(self.control_frame, text=self.render_S_IE_rate_text, style="Bold.TLabel")
+        self.S_IE_rate_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.S_IE_rate_entry.insert(0, self.S_IE_rate)  
+
+        self.S_IE_rate_label.grid(row=8, column=0, sticky='w', pady=5)
+        self.S_IE_rate_entry.grid(row=9, column=0, sticky='w', pady=5)
+
+        # self.render_S_IE_rate_components = []
+        epi_components.add(self.S_IE_rate_label)
+        epi_components.add(self.S_IE_rate_entry)
+
+    def render_E_R_rate(self, epi_components):
+        
+        self.render_E_R_rate_text = "Latent Recovery Rate \u03C4 (Numerical)"
+        self.E_R_rate_label = ttk.Label(self.control_frame, text=self.render_E_R_rate_text, style="Bold.TLabel")
+        self.E_R_rate_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.E_R_rate_entry.insert(0, self.E_R_rate)  
+
+        self.E_R_rate_label.grid(row=8, column=2, sticky='w', pady=5)
+        self.E_R_rate_entry.grid(row=9, column=2, sticky='w', pady=5)
+
+        # self.render_E_R_rate_components = []
+        epi_components.add(self.E_R_rate_label)
+        epi_components.add(self.E_R_rate_entry)
+    
+    def render_latency_prob(self, epi_components):
+        self.render_latency_prob_text = "Latency Probability p (Numerical)"
+        self.latency_prob_label = ttk.Label(self.control_frame, text=self.render_latency_prob_text, style="Bold.TLabel")
+        self.latency_prob_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.latency_prob_entry.insert(0, self.latency_prob)  
+
+        self.latency_prob_label.grid(row=8, column=1, sticky='w', pady=5)
+        self.latency_prob_entry.grid(row=9, column=1, sticky='w', pady=5)
+        
+        # self.render_latency_prob_components = []
+        epi_components.add(self.latency_prob_label)
+        epi_components.add(self.latency_prob_entry)
+
+               
+    def render_E_I_rate(self, epi_components):
+
+        self.render_E_I_rate_text = "Activation Rate v (Numerical)"
+        self.E_I_rate_label = ttk.Label(self.control_frame, text=self.render_E_I_rate_text, style="Bold.TLabel")
+        self.E_I_rate_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.E_I_rate_entry.insert(0, self.E_I_rate)  
+
+        self.E_I_rate_label.grid(row=10, column=0, sticky='w', pady=5)
+        self.E_I_rate_entry.grid(row=11, column=0, sticky='w', pady=5)
+
+        epi_components.add(self.E_I_rate_label)
+        epi_components.add(self.E_I_rate_entry)
+        
+    
+    def render_I_E_rate(self, epi_components):
+        self.render_I_E_rate_text = "De-activaton Rate \u03C6 (numerical)"
+        self.I_E_rate_label = ttk.Label(self.control_frame, text=self.render_I_E_rate_text, style="Bold.TLabel")
+        self.I_E_rate_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.I_E_rate_entry.insert(0, self.I_E_rate)  
+
+        self.I_E_rate_label.grid(row=12, column=0, sticky='w', pady=5)
+        self.I_E_rate_entry.grid(row=13, column=0, sticky='w', pady=5)
+
+        # self.render_I_E_rate_components = []
+        epi_components.add(self.I_E_rate_label)
+        epi_components.add(self.I_E_rate_entry)
+    
+    def render_R_S_rate(self, epi_components):
+        self.render_R_S_rate_text = "Immunity Loss Rate \u03C9 (numerical)"
+        self.R_S_rate_label = ttk.Label(self.control_frame, text=self.render_R_S_rate_text, style="Bold.TLabel")
+        self.R_S_rate_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.R_S_rate_entry.insert(0, self.R_S_rate)  
+        
+        self.R_S_rate_label.grid(row=14, column=0, sticky='w', pady=5)
+        self.R_S_rate_entry.grid(row=15, column=0, sticky='w', pady=5)
+
+        # self.render_R_S_rate_components = []
+        epi_components.add(self.R_S_rate_label)
+        epi_components.add(self.R_S_rate_entry)
+
+    def render_I_R_rate(self, epi_components):
+        self.render_I_R_rate_text = "Active Recovery Rate \u03B3 (numerical)"
+        self.I_R_rate_label = ttk.Label(self.control_frame, text=self.render_I_R_rate_text, style="Bold.TLabel")
+        self.I_R_rate_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.I_R_rate_entry.insert(0, self.I_R_rate)  
+
+        self.I_R_rate_label.grid(row=16, column=0, sticky='w', pady=5)
+        self.I_R_rate_entry.grid(row=17, column=0, sticky='w', pady=5)
+
+        # self.render_I_R_rate_components = []
+        epi_components.add(self.I_R_rate_label)
+        epi_components.add(self.I_R_rate_entry)
+
+    def render_image(self, image_path, epi_components, desired_width, desired_height):
+    # Open the image using Pillow
+        with Image.open(image_path) as img:
+            # Resize the image to the desired dimensions
+            # img = img.resize((desired_width, desired_height), Image.ANTIALIAS)
+            img = img.resize((desired_width, desired_height))
+            
+            # Convert the image to a format that Tkinter can use
+            photo = ImageTk.PhotoImage(img)
+            
+            # Keep a reference to the image object
+            self.photo = photo
+            
+            # Create and grid the label
+            image_label = tk.Label(self.control_frame, image=photo)
+            image_label.grid(column=1, row=10, columnspan=2, rowspan=8, sticky="nsew")
+            
+            # Add the label to epi_components, if necessary
+            epi_components.add(image_label)
+                    
+    def update_use_method(self, event):
         new_use_method = self.use_method_var.get()
         if new_use_method in ["user_input", "SLiM_burnin_WF", "SLiM_burnin_epi"]: 
             config = load_config_as_dict(self.config_path)
             config['SeedsConfiguration']['method'] = new_use_method
             save_config(self.config_path, config)
+            messagebox.showinfo("Update Successful", "Method Updated.")
 
             if new_use_method == "user_input":
                 if not hasattr(self, 'path_seeds_vcf_label'):  # create the label if it doesn't exist
@@ -135,21 +378,16 @@ class SeedsConfiguration:
                     # 
 
                     # Labels Creating
-                    self.path_seeds_vcf_label = ttk.Label(self.scrollable_frame, text="Choose path_seeds_vcf")
-                    self.path_seeds_vcf_label.pack()
-                    self.choose_path_seeds_vcf_button = tk.Button(self.scrollable_frame, text="Choose path_seeds_vcf", command=self.choose_and_update_path_seeds_vcf)
-                    self.choose_path_seeds_vcf_button.pack()
-                    self.path_seeds_vcf_indicator = ttk.Label(self.scrollable_frame, text="Current path_seeds_vcf: " + self.path_seeds_vcf)
-                    self.path_seeds_vcf_indicator.pack()
+                    self.render_path_seeds_vcf()
                 else:
                     # Hide other labels if initialized
                     self.hide_elements()
                     #
 
                     # show the label if it was previously created
-                    self.path_seeds_vcf_label.pack()
-                    self.choose_path_seeds_vcf_button.pack()
-                    self.path_seeds_vcf_indicator.pack()
+                    self.path_seeds_vcf_label.grid()
+                    self.choose_path_seeds_vcf_button.grid()
+                    self.path_seeds_vcf_indicator.grid()
                     
 
             elif new_use_method == "SLiM_burnin_WF":
@@ -159,48 +397,31 @@ class SeedsConfiguration:
                     # 
 
                     # burn_in_Ne, burn_in_generations_wf, burn_in_mutrate_wf
-                    self.burn_in_Ne_label = ttk.Label(self.scrollable_frame, text="burn_in_Ne:")
-                    self.burn_in_Ne_label.pack()
-                    self.burn_in_Ne_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.burn_in_Ne_entry.insert(0, self.burn_in_Ne)  
-                    self.burn_in_Ne_entry.pack()
-                    self.update_burn_in_Ne_button = tk.Button(self.scrollable_frame, text="Update burn_in_Ne", command=self.update_burn_in_Ne)
-                    self.update_burn_in_Ne_button.pack()
+                    self.render_burn_in_ne()
 
                     # burn_in_generations_wf
-                    self.burn_in_generations_wf_label = ttk.Label(self.scrollable_frame, text="burn_in_generations_wf:")
-                    self.burn_in_generations_wf_label.pack()
-                    self.burn_in_generations_wf_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.burn_in_generations_wf_entry.insert(0, self.burn_in_generations_wf)  
-                    self.burn_in_generations_wf_entry.pack()
-                    self.update_burn_in_generations_wf_button = tk.Button(self.scrollable_frame, text="Update burn_in_generations_wf", command=self.update_burn_in_generations_wf)
-                    self.update_burn_in_generations_wf_button.pack()
+                    self.render_burn_in_generations_wf()
 
                     # burn_in_mutrate_wf
-                    self.burn_in_mutrate_wf_label = ttk.Label(self.scrollable_frame, text="burn_in_mutrate_wf:")
-                    self.burn_in_mutrate_wf_label.pack()
-                    self.burn_in_mutrate_wf_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.burn_in_mutrate_wf_entry.insert(0, self.burn_in_mutrate_wf)  
-                    self.burn_in_mutrate_wf_entry.pack()
-                    self.update_burn_in_mutrate_wf_button = tk.Button(self.scrollable_frame, text="Update burn_in_mutrate_wf", command=self.update_burn_in_mutrate_wf)
-                    self.update_burn_in_mutrate_wf_button.pack()
+                    self.render_burn_in_mutrate_wf()
+
                 else: # Show the label if it was previously created
                     # Hide other labels if initialized
                     self.hide_elements()
                     # 
 
                     # Show Labels
-                    self.burn_in_Ne_label.pack()
-                    self.burn_in_Ne_entry.pack()
-                    self.update_burn_in_Ne_button.pack()
+                    self.burn_in_Ne_label.grid()
+                    self.burn_in_Ne_entry.grid()
+                    self.update_burn_in_Ne_button.grid()
 
-                    self.burn_in_generations_wf_label.pack()
-                    self.burn_in_generations_wf_entry.pack()
-                    self.update_burn_in_generations_wf_button.pack()
+                    self.burn_in_generations_wf_label.grid()
+                    self.burn_in_generations_wf_entry.grid()
+                    self.update_burn_in_generations_wf_button.grid()
 
-                    self.burn_in_mutrate_wf_label.pack()
-                    self.burn_in_mutrate_wf_entry.pack()
-                    self.update_burn_in_mutrate_wf_button.pack()
+                    self.burn_in_mutrate_wf_label.grid()
+                    self.burn_in_mutrate_wf_entry.grid()
+                    self.update_burn_in_mutrate_wf_button.grid()
                     
 
             elif new_use_method == "SLiM_burnin_epi":
@@ -208,147 +429,88 @@ class SeedsConfiguration:
                     self.hide_elements()
                     
                     # self.burn_in_generations_epi = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_generations']
-                    self.burn_in_generations_epi_label = ttk.Label(self.scrollable_frame, text="burn_in_generations:")
-                    self.burn_in_generations_epi_label.pack()
-                    self.burn_in_generations_epi_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.burn_in_generations_epi_entry.insert(0, self.burn_in_generations_epi)  
-                    self.burn_in_generations_epi_entry.pack()
-                    self.update_burn_in_generations_epi_button = tk.Button(self.scrollable_frame, text="Update burn_in_generations", command=self.update_burn_in_generations_epi)
-                    self.update_burn_in_generations_epi_button.pack()
-                    # 
+                    self.render_burn_in_generations_epi()
 
                     # self.burn_in_mutrate_epi = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_mutrate']
-                    self.burn_in_mutrate_epi_label = ttk.Label(self.scrollable_frame, text="burn_in_mutrate_epi:")
-                    self.burn_in_mutrate_epi_label.pack()
-                    self.burn_in_mutrate_epi_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.burn_in_mutrate_epi_entry.insert(0, self.burn_in_mutrate_epi)  
-                    self.burn_in_mutrate_epi_entry.pack()
-                    self.update_burn_in_mutrate_epi_button = tk.Button(self.scrollable_frame, text="Update burn_in_mutrate_epi", command=self.update_burn_in_mutrate_epi)
-                    self.update_burn_in_mutrate_epi_button.pack()
+                    self.render_burn_in_mutrate_epi()
+
                     # 
 
                     # self.seeded_host_id = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["seeded_host_id"]
-                    self.seeded_host_id_label = ttk.Label(self.scrollable_frame, text="seeded_host_id:")
-                    self.seeded_host_id_label.pack()
-                    self.seeded_host_id_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.seeded_host_id_entry.insert(0, str(self.seeded_host_id))  
-                    self.seeded_host_id_entry.pack()
-                    self.update_seeded_host_id_button = tk.Button(self.scrollable_frame, text="Update seeded_host_id", command=self.update_seeded_host_id)
-                    self.update_seeded_host_id_button.pack()
+                    self.render_seeded_host_id()
+
                     # 
 
                     # self.S_IE_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["S_IE_rate"]
-                    self.S_IE_rate_label = ttk.Label(self.scrollable_frame, text="S_IE_rate:")
-                    self.S_IE_rate_label.pack()
-                    self.S_IE_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.S_IE_rate_entry.insert(0, self.S_IE_rate)  
-                    self.S_IE_rate_entry.pack()
-                    self.update_S_IE_rate_button = tk.Button(self.scrollable_frame, text="Update S_IE_rate", command=self.update_S_IE_rate)
-                    self.update_S_IE_rate_button.pack()
+                    self.render_S_IE_rate()
+
                     # 
 
                     # self.E_I_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["E_I_rate"]
-                    self.E_I_rate_label = ttk.Label(self.scrollable_frame, text="E_I_rate:")
-                    self.E_I_rate_label.pack()
-                    self.E_I_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.E_I_rate_entry.insert(0, self.E_I_rate)  
-                    self.E_I_rate_entry.pack()
-                    self.update_E_I_rate_button = tk.Button(self.scrollable_frame, text="Update E_I_rate", command=self.update_E_I_rate)
-                    self.update_E_I_rate_button.pack()
+                    self.render_E_I_rate()
+
                     # 
 
                     # self.E_R_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["E_R_rate"]
-                    self.E_R_rate_label = ttk.Label(self.scrollable_frame, text="E_R_rate:")
-                    self.E_R_rate_label.pack()
-                    self.E_R_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.E_R_rate_entry.insert(0, self.E_R_rate)  
-                    self.E_R_rate_entry.pack()
-                    self.update_E_R_rate_button = tk.Button(self.scrollable_frame, text="Update E_R_rate", command=self.update_E_R_rate)
-                    self.update_E_R_rate_button.pack()
-                    # 
+                    self.render_E_R_rate()
 
                     # self.latency_prob = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["latency_prob"]
-                    self.latency_prob_label = ttk.Label(self.scrollable_frame, text="latency_prob:")
-                    self.latency_prob_label.pack()
-                    self.latency_prob_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.latency_prob_entry.insert(0, self.latency_prob)  
-                    self.latency_prob_entry.pack()
-                    self.update_latency_prob_button = tk.Button(self.scrollable_frame, text="Update latency_prob", command=self.update_latency_prob)
-                    self.update_latency_prob_button.pack()
-                    #                     
+                    self.render_latency_prob()
+ 
 
                     # self.I_R_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['I_R_rate']
-                    self.I_R_rate_label = ttk.Label(self.scrollable_frame, text="I_R_rate:")
-                    self.I_R_rate_label.pack()
-                    self.I_R_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.I_R_rate_entry.insert(0, self.I_R_rate)  
-                    self.I_R_rate_entry.pack()
-                    self.update_I_R_rate_button = tk.Button(self.scrollable_frame, text="Update I_R_rate", command=self.update_I_R_rate)
-                    self.update_I_R_rate_button.pack()
-                    # 
+                    self.render_I_R_rate()
 
                     # self.I_E_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['I_E_rate']
-                    self.I_E_rate_label = ttk.Label(self.scrollable_frame, text="I_E_rate:")
-                    self.I_E_rate_label.pack()
-                    self.I_E_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.I_E_rate_entry.insert(0, self.I_E_rate)  
-                    self.I_E_rate_entry.pack()
-                    self.update_I_E_rate_button = tk.Button(self.scrollable_frame, text="Update I_E_rate", command=self.update_I_E_rate)
-                    self.update_I_E_rate_button.pack()
-                    # 
+                    self.render_I_E_rate()
+                    
 
                     # self.R_S_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['R_S_rate']
-                    self.R_S_rate_label = ttk.Label(self.scrollable_frame, text="R_S_rate:")
-                    self.R_S_rate_label.pack()
-                    self.R_S_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-                    self.R_S_rate_entry.insert(0, self.R_S_rate)  
-                    self.R_S_rate_entry.pack()
-                    self.update_R_S_rate_button = tk.Button(self.scrollable_frame, text="Update R_S_rate", command=self.update_R_S_rate)
-                    self.update_R_S_rate_button.pack()
-                    # 
+                    self.render_R_S_rate()
+                    
 
                 else:
                     self.hide_elements()
                     # show the label if it was previously created
-                    self.burn_in_generations_epi_label.pack()
-                    self.burn_in_generations_epi_entry.pack()
-                    self.update_burn_in_generations_epi_button.pack()
+                    self.burn_in_generations_epi_label.grid()
+                    self.burn_in_generations_epi_entry.grid()
+                    self.update_burn_in_generations_epi_button.grid()
 
-                    self.burn_in_mutrate_epi_label.pack()
-                    self.burn_in_mutrate_epi_entry.pack()
-                    self.update_burn_in_mutrate_epi_button.pack()
+                    self.burn_in_mutrate_epi_label.grid()
+                    self.burn_in_mutrate_epi_entry.grid()
+                    self.update_burn_in_mutrate_epi_button.grid()
                     
-                    self.seeded_host_id_label.pack()
-                    self.seeded_host_id_entry.pack()
-                    self.update_seeded_host_id_button.pack()
+                    self.seeded_host_id_label.grid()
+                    self.seeded_host_id_entry.grid()
+                    self.update_seeded_host_id_button.grid()
                     
-                    self.S_IE_rate_label.pack()
-                    self.S_IE_rate_entry.pack()
-                    self.update_S_IE_rate_button.pack()
+                    self.S_IE_rate_label.grid()
+                    self.S_IE_rate_entry.grid()
+                    self.update_S_IE_rate_button.grid()
                     
-                    self.E_I_rate_label.pack()
-                    self.E_I_rate_entry.pack()
-                    self.update_E_I_rate_button.pack()
+                    self.E_I_rate_label.grid()
+                    self.E_I_rate_entry.grid()
+                    self.update_E_I_rate_button.grid()
                     
-                    self.E_R_rate_label.pack()
-                    self.E_R_rate_entry.pack()
-                    self.update_E_R_rate_button.pack()
+                    self.E_R_rate_label.grid()
+                    self.E_R_rate_entry.grid()
+                    self.update_E_R_rate_button.grid()
                     
-                    self.latency_prob_label.pack()
-                    self.latency_prob_entry.pack()
-                    self.update_latency_prob_button.pack()
+                    self.latency_prob_label.grid()
+                    self.latency_prob_entry.grid()
+                    self.update_latency_prob_button.grid()
                     
-                    self.I_R_rate_label.pack()
-                    self.I_R_rate_entry.pack()
-                    self.update_I_R_rate_button.pack()
+                    self.I_R_rate_label.grid()
+                    self.I_R_rate_entry.grid()
+                    self.update_I_R_rate_button.grid()
                     
-                    self.I_E_rate_label.pack()
-                    self.I_E_rate_entry.pack()
-                    self.update_I_E_rate_button.pack()
+                    self.I_E_rate_label.grid()
+                    self.I_E_rate_entry.grid()
+                    self.update_I_E_rate_button.grid()
                     
-                    self.R_S_rate_label.pack()
-                    self.R_S_rate_entry.pack()
-                    self.update_R_S_rate_button.pack()
+                    self.R_S_rate_label.grid()
+                    self.R_S_rate_entry.grid()
+                    self.update_R_S_rate_button.grid()
 
             self.render_run_button()
             messagebox.showinfo("Update Successful", "method changed.")
@@ -359,8 +521,8 @@ class SeedsConfiguration:
         chosen_path = filedialog.askdirectory(title="Select a Directory")
         if chosen_path:  
             self.network_path = chosen_path
-            self.network_path_label = ttk.Label(self.scrollable_frame, text="Current Network Path: " + self.network_path)
-            self.network_path_label.pack()
+            self.network_path_label = ttk.Label(self.control_frame, text="Current Network Path: " + self.network_path)
+            self.network_path_label.grid()
             self.network_path_label.config(text=f"Path Network: {self.network_path}") 
             config = load_config_as_dict(self.config_path)
             config['SeedsConfiguration']['user_input']["path_network"] = self.network_path
@@ -421,9 +583,6 @@ class SeedsConfiguration:
         except ValueError:
             messagebox.showerror("Update Error", "Please enter a valid integer for burn_in_mutrate_wf.") 
 
-
-
-    # EPI
     def update_burn_in_generations_epi(self):
         try:
             new_burn_in_generations_epi = int(float(self.burn_in_generations_epi_entry.get()))
@@ -632,5 +791,5 @@ class SeedsConfiguration:
                 run_seed_generation(method=method, wk_dir=cwdir, seed_size=seed_size, seed_vcf=path_seeds_vcf, 
                                     path_seeds_phylogeny=path_seeds_phylogeny)
 
-        self.run_seed_generation_button = tk.Button(self.scrollable_frame, text="Run Seed Generation", command=seed_generation)
-        self.run_seed_generation_button.pack()
+        self.run_seed_generation_button = tk.Button(self.control_frame, text="Run Seed Generation", command=seed_generation)
+        self.run_seed_generation_button.grid()
