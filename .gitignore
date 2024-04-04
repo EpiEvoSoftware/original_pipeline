@@ -9,9 +9,11 @@ codes/__pycache__/*
 __pycache__/
 *.pyc
 *.pyo
-
+tags
 
 # Themes
 Azure-ttk-theme/
 ttk-Breeze/
 itft1/
+
+.ctags

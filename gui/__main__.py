@@ -71,6 +71,10 @@ def parse_args():
     return parser.parse_args()
 
 
+def validate_input(P):
+    if P.strip() in ["e", ".", ""]:
+            return True
+    return P.isdigit()
 def launch_gui(config_path, hide = False):
     """
     Launches the gui application
@@ -81,6 +85,7 @@ def launch_gui(config_path, hide = False):
     if 'aqua' in style.theme_names():
         style.theme_use('aqua')
     root.title("EnivolCrossing: Simulation Framework for Genetic Epidemiology")
+    vcmd = (root.register(validate_input), '%P')
 
     tab_parent = ttk.Notebook(root)
      

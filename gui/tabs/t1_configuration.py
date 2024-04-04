@@ -63,6 +63,9 @@ class Configuration:
         # self.diagnostic_label.pack()
 
     def render_n_replicates(self):
+        def update(event):
+            return
+
         self.n_replicates_label = ttk.Label(self.control_frame, text="n_replicates:").pack(side='left')
         # self.n_replicates_label.pack() #grid(row=3, column=1, sticky='ew', padx=5, pady=5)
         self.n_replicates_entry = ttk.Entry(self.control_frame, foreground="black", width = 80)

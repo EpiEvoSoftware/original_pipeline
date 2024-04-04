@@ -46,36 +46,7 @@ class Configurationv2:
 
         render_next_button(self.tab_index, self.tab_parent, self.parent)
 
-#         self.control_frame = ttk.Frame(self.parent, width=300)
-#         diagnostic_label = ttk.Label(self.control_frame, text="Choose Working Directory")
-#         diagnostic_label.pack()
-#         choose_directory_button = tk.Button(self.control_frame, text="Choose Directory", command=self.choose_directory)
-#         choose_directory_button.pack()
-#         self.diagnostic_label = ttk.Label(self.control_frame, text="Current Working Directory: " + self.cwd)
-#         self.diagnostic_label.pack()
-
-#         self.n_replicates_label = ttk.Label(self.control_frame, text="n_replicates:")
-#         self.n_replicates_label.pack()
-#         self.n_replicates_entry = ttk.Entry(self.control_frame, foreground="black")
-#         self.n_replicates_entry.insert(0, self.n_replicates)  
-#         self.n_replicates_entry.pack()
-#         update_n_replicates_button = tk.Button(self.control_frame, text="Update n_replicates", command=self.update_n_replicates)
-#         update_n_replicates_button.pack()
-#         CreateToolTip(update_n_replicates_button, \
-#    'Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, '
-#    'consectetur, adipisci velit. Neque porro quisquam est qui dolorem ipsum '
-#    'quia dolor sit amet, consectetur, adipisci velit. Neque porro quisquam '
-#    'est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.')
-
-        
-#         ref_path_label = ttk.Label(self.control_frame, text="Choose Ref Path")
-#         ref_path_label.pack()
-#         choose_ref_path_button = tk.Button(self.control_frame, text="Choose File", command=self.choose_ref_path)
-#         choose_ref_path_button.pack()
-#         self.ref_path_label = ttk.Label(self.control_frame, text="Current Ref Path: " + self.ref_path)
-#         self.ref_path_label.pack()
-
-
+#         
         
 
 

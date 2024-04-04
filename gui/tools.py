@@ -210,38 +210,27 @@ bool_to_string_mapping = {
 }
 
 
-def render_next_button(tab_index, tab_parent, parent):
+def render_next_button(tab_index, tab_parent, parent, update = None):
     def next_tab():
+        match update():
+            case 1:
+                return
+
         go_to_next_tab(tab_index, tab_parent)
-        
+
+            
     next_button = tk.ttk.Button(parent, text="Next",  command=next_tab)
     next_button.pack()
-    # next_button.pack(side='bottom')
 
 def go_to_next_tab(tab_index, tab_parent):
-    # next_button = ttk.Button(self.parent, text="Next", style="Custom.TButton", command=self.go_to_next_tab)
-        # next_button.pack()
-        
-        # next_button = ttk.Button(self.parent, text="Next", command=self.go_to_next_tab)
-        # next_button.pack(side='right')
-        # # next_button.tk.call("source", "Azure-ttk-theme/azure.tcl")
-        # # next_button.tk.call("source", "ttk-Breeze/breeze.tcl")
-        # # next_button.tk.call("set_theme", "")
-        # # tk.Button(self.parent, 
-        # #         bg='#b7f731',
-        # #         fg='#b7f731',
-        # #         relief='flat',
-        # #         text='hello button',
-        # #         width=20).pack()
-        # next_button.pack(side='right')
-        # # next_button = tk.Button(self.parent, text="Next", style="Custom.TButton", command=self.go_to_next_tab, justify = ["right"])
-        # # next_button.pack()
 
-        # next_button = tk.Button(self.parent, text="Next", command=self.go_to_next_tab)
-        # next_button.pack(side='bottom', fill='x', padx=5, pady=5)
     current_tab_index = tab_index
     next_tab_index = (current_tab_index + 1) % tab_parent.index("end")
     tab_parent.tab(next_tab_index, state="normal")
     tab_parent.select(next_tab_index)
 
 minwidth = 100
+def validate_input(P):
+    if P.strip() in ["e", ".", ""]:
+            return True
+    return P.isdigit()
