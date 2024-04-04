@@ -22,6 +22,7 @@ class SeedsConfiguration:
         # SeedsConfiguration
         self.seed_size = load_config_as_dict(self.config_path)['SeedsConfiguration']['seed_size']
         self.method = load_config_as_dict(self.config_path)['SeedsConfiguration']['method']
+        self.use_reference: bool = load_config_as_dict(self.config_path)['SeedsConfiguration']['use_reference']
 
         # user_input
         self.path_seeds_vcf = load_config_as_dict(self.config_path)['SeedsConfiguration']['user_input']['path_seeds_vcf']
@@ -58,11 +59,14 @@ class SeedsConfiguration:
 
         # seed_size:
         self.render_seeds_size()
+        # self.render_use_reference()
         self.render_use_method()
-        
-        self.epi_components = self.render_epi()
-        self.grid_configs = self.derender_components(self.epi_components)
-        self.rerender_components(self.epi_components, self.grid_configs)
+
+        self.user_input_components = self.render_user_input()
+
+        # self.epi_components = self.render_epi()
+        # self.grid_configs = self.derender_components(self.epi_components)
+        # self.rerender_components(self.epi_components, self.grid_configs)
 
         render_next_button(self.tab_index, self.tab_parent, self.parent, self.update)
 
@@ -95,10 +99,17 @@ class SeedsConfiguration:
         for component in components:
             grid_info = grid_configs.get(component, {})
             component.grid(**grid_info)
+
+    def render_user_input(self):
+        user_input_components = set()
+        self.render_tab_title(user_input_components, 5+3, 1, 1)
+        # self.render_path_seeds(user_input_components)
+        # self.render_path_seeds_phylogeny()
+        return user_input_components
     
     def render_epi(self):
         epi_components = set()
-        self.render_epi_title(epi_components)
+        self.render_tab_title(epi_components, 5+3, 0, 3)
         self.render_burn_in_generations_epi(epi_components)
         self.render_burn_in_mutrate_epi(epi_components)
         self.render_seeded_host_id(epi_components)
@@ -112,11 +123,11 @@ class SeedsConfiguration:
         self.render_image("assets/t4.png", epi_components, 700, 255)
         return epi_components
 
-    def render_epi_title(self, epi_components):
+    def render_tab_title(self, components, row, column, columnspan):
         self.render_t4_title_text = "Burn-in Settings:"
         self.t4_title = ttk.Label(self.control_frame, text=self.render_t4_title_text, style="Title.TLabel", width = 100)
-        self.t4_title.grid(row=5, column=0, columnspan = 3, sticky='w', pady=5)
-        epi_components.add(self.t4_title)
+        self.t4_title.grid(row=row, column=column, columnspan = columnspan, sticky='w', pady=5)
+        components.add(self.t4_title)
     
     def render_seeds_size(self):
         self.render_seeds_size_title = "Number of Seeding Pathogens (Integer)"
@@ -131,6 +142,47 @@ class SeedsConfiguration:
         self.render_seeds_size_components.append(self.seed_size_entry)
         # update_seed_size_button = tk.Button(self.control_frame, text="Update seed_size", command=self.update_seed_size)
         # update_seed_size_button.grid()
+    def render_use_reference(self, user_input_components):
+        def update():
+            value = self.dr_type_combobox.get()
+
+        self.render_use_reference_text = "Do you want to use the same sequence (reference genome) as seeding sequences?"
+        self.use_reference_var = tk.BooleanVar(value=self.use_reference)
+        self.use_reference_label = ttk.Label(self.control_frame, text=self.render_use_reference_text, style = "Bold.TLabel")
+        self.use_reference_label.grid(row = 3, column = 1, sticky = 'w', pady = 5)
+
+        if self.ref_path == "":
+            self.use_reference_label = ttk.Label(self.control_frame, text = "None selected", foreground="black", width = minwidth)
+        else:
+            self.use_reference_label = ttk.Label(self.control_frame, text = self.ref_path, foreground="black", width = minwidth)
+
+        self.use_reference_label.grid(row=5, column=0, pady=5, sticky='w')
+
+        choose_ref_path_button = tk.Button(self.control_frame, text="Choose File", command=self.choose_ref_path)
+        choose_ref_path_button.grid(row=6, column=0, sticky='e', pady=5)
+        self.path_seeds_vcf_label = ttk.Label(self.control_frame, text="Choose path_seeds_vcf")
+        self.choose_path_seeds_vcf_button = tk.Button(self.control_frame, text="Choose path_seeds_vcf", command=self.choose_and_update_path_seeds_vcf)
+
+        self.path_seeds_vcf_label.grid()
+        self.choose_path_seeds_vcf_button.grid()
+
+        user_input_components.add(self.path_seeds_vcf_label)
+        user_input_components.add(self.choose_path_seeds_vcf_button)
+
+    # def render_use_reference(self):
+    #     def update():
+    #         value = self.dr_type_combobox.get()
+
+    #     self.render_use_reference_text = "Do you want to use the same sequence (reference genome) as seeding sequences?"
+    #     self.within_host_reproduction_var = tk.BooleanVar(value=self.use_reference)
+    #     self.within_host_reproduction_label = ttk.Label(self.control_frame, text=self.render_use_reference_text, style = "Bold.TLabel")
+    #     self.within_host_reproduction_label.grid(row = 3, column = 1, sticky = 'w', pady = 5)
+
+    #     self.rb_true = ttk.Radiobutton(self.control_frame, text="Yes", variable=self.within_host_reproduction_var, value=True, command = update)
+    #     self.rb_true.grid(row = 4, column = 1, columnspan= 3, sticky='w', pady=5)
+
+    #     self.rb_false = ttk.Radiobutton(self.control_frame, text="No", variable=self.within_host_reproduction_var, value=False, command = update)
+    #     self.rb_false.grid(row = 5, column = 1, columnspan= 3, sticky='w', pady=5)
 
     def render_use_method(self):
         def update():
@@ -138,14 +190,14 @@ class SeedsConfiguration:
         
         self.render_use_method_title = "Method to Generate Sequences of the Seeding Pathogens"
         self.use_method_label = ttk.Label(self.control_frame, text=self.render_use_method_title, style="Bold.TLabel")
-        self.use_method_label.grid(row=3, column=1, columnspan= 3, sticky='w', pady=5)
+        self.use_method_label.grid(row=6, column=1, columnspan= 3, sticky='w', pady=5)
         self.use_method_var = tk.StringVar(value=self.method)
         self.use_method_combobox = ttk.Combobox(
             self.control_frame, textvariable=self.use_method_var, 
             values=["user_input", "SLiM_burnin_WF", "SLiM_burnin_epi"], state="readonly"
             # TODO Change labels, set width
             )
-        self.use_method_combobox.grid(row=4, column=1, columnspan= 3, sticky='w', pady=5)
+        self.use_method_combobox.grid(row=7, column=1, columnspan= 3, sticky='w', pady=5)
         self.use_method_combobox.bind("<<ComboboxSelected>>", self.update_use_method)
 
         if self.method == "user_input":
@@ -162,13 +214,34 @@ class SeedsConfiguration:
         elif self.method == "SLiM_burnin_epi":
             return
         
-    def render_path_seeds_vcf(self):
-        self.path_seeds_vcf_label = ttk.Label(self.control_frame, text="Choose path_seeds_vcf")
-        self.path_seeds_vcf_label.grid()
-        self.choose_path_seeds_vcf_button = tk.Button(self.control_frame, text="Choose path_seeds_vcf", command=self.choose_and_update_path_seeds_vcf)
-        self.choose_path_seeds_vcf_button.grid()
-        self.path_seeds_vcf_indicator = ttk.Label(self.control_frame, text="Current path_seeds_vcf: " + self.path_seeds_vcf)
-        self.path_seeds_vcf_indicator.grid()
+    # def render_ref_path_label(self):
+    #     ref_path_label = ttk.Label(self.control_frame, text="Pathogen Reference Genome File (FASTA Format)", style="Bold.TLabel")
+    #     ref_path_label.grid(row=4, column=0, sticky='ew', pady=5)
+
+    #     if self.ref_path == "":
+    #         self.ref_path_label = ttk.Label(self.control_frame, text = "None selected", foreground="black", width = minwidth)
+    #     else:
+    #         self.ref_path_label = ttk.Label(self.control_frame, text = self.ref_path, foreground="black", width = minwidth)
+
+    #     self.ref_path_label.grid(row=5, column=0, pady=5, sticky='w')
+
+    #     choose_ref_path_button = tk.Button(self.control_frame, text="Choose File", command=self.choose_ref_path)
+    #     choose_ref_path_button.grid(row=6, column=0, sticky='e', pady=5)
+
+    def choose_ref_path(self):  
+        filetypes = ( #don't need to check if its genome file: or use python package jaehee said
+            ("Genome files", ("*.fasta", "*.fa", "*.gb", "*.gtf", "*.vcf", "*.bam", "*.sam", "*.fna")),
+            ("All files", "*.*")
+        )
+        # chosen_file = filedialog.askopenfilename(title="Select a Genome Reference File", filetypes=filetypes)
+        chosen_file = filedialog.askopenfilename(title="Select a Genome Reference File")
+        if chosen_file:  
+            self.ref_path = chosen_file
+            self.ref_path_label.config(text=self.ref_path) 
+            config = load_config_as_dict(self.config_path)
+            config['GenomeElement']['ref_path'] = self.ref_path
+            save_config(self.config_path, config)
+
 
     def render_burn_in_ne(self):
         self.burn_in_Ne_label = ttk.Label(self.control_frame, text="burn_in_Ne:")
@@ -204,8 +277,8 @@ class SeedsConfiguration:
         self.burn_in_generations_epi_entry = ttk.Entry(self.control_frame, foreground="black")
         self.burn_in_generations_epi_entry.insert(0, self.burn_in_generations_epi)  
 
-        self.burn_in_generations_epi_label.grid(row=6, column=0, sticky='w', pady=5)
-        self.burn_in_generations_epi_entry.grid(row=7, column=0, sticky='w', pady=5)
+        self.burn_in_generations_epi_label.grid(row=6+3, column=0, sticky='w', pady=5)
+        self.burn_in_generations_epi_entry.grid(row=7+3, column=0, sticky='w', pady=5)
 
         # self.render_burn_in_generations_epi_components = []
         epi_components.add(self.burn_in_generations_epi_label)
@@ -223,8 +296,8 @@ class SeedsConfiguration:
         self.burn_in_mutrate_epi_entry = ttk.Entry(self.control_frame, foreground="black")
         self.burn_in_mutrate_epi_entry.insert(0, self.burn_in_mutrate_epi)
 
-        self.burn_in_mutrate_epi_label.grid(row=6, column=1, sticky='w', pady=5)
-        self.burn_in_mutrate_epi_entry.grid(row=7, column=1, sticky='w', pady=5)
+        self.burn_in_mutrate_epi_label.grid(row=6+3, column=1, sticky='w', pady=5)
+        self.burn_in_mutrate_epi_entry.grid(row=7+3, column=1, sticky='w', pady=5)
 
         # self.render_burn_in_mutrate_epi_components = []
         epi_components.add(self.burn_in_mutrate_epi_label)
@@ -239,8 +312,8 @@ class SeedsConfiguration:
         self.seeded_host_id_entry = ttk.Entry(self.control_frame, foreground="black")
         self.seeded_host_id_entry.insert(0, str(self.seeded_host_id))  
 
-        self.seeded_host_id_label.grid(row=6, column=2, sticky='w', pady=5)
-        self.seeded_host_id_entry.grid(row=7, column=2, sticky='w', pady=5)
+        self.seeded_host_id_label.grid(row=6+3, column=2, sticky='w', pady=5)
+        self.seeded_host_id_entry.grid(row=7+3, column=2, sticky='w', pady=5)
 
         # self.render_seeded_host_id_components = []
         epi_components.add(self.seeded_host_id_label)
@@ -255,8 +328,8 @@ class SeedsConfiguration:
         self.S_IE_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.S_IE_rate_entry.insert(0, self.S_IE_rate)  
 
-        self.S_IE_rate_label.grid(row=8, column=0, sticky='w', pady=5)
-        self.S_IE_rate_entry.grid(row=9, column=0, sticky='w', pady=5)
+        self.S_IE_rate_label.grid(row=8+3, column=0, sticky='w', pady=5)
+        self.S_IE_rate_entry.grid(row=9+3, column=0, sticky='w', pady=5)
 
         # self.render_S_IE_rate_components = []
         epi_components.add(self.S_IE_rate_label)
@@ -269,8 +342,8 @@ class SeedsConfiguration:
         self.E_R_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.E_R_rate_entry.insert(0, self.E_R_rate)  
 
-        self.E_R_rate_label.grid(row=8, column=2, sticky='w', pady=5)
-        self.E_R_rate_entry.grid(row=9, column=2, sticky='w', pady=5)
+        self.E_R_rate_label.grid(row=8+3, column=2, sticky='w', pady=5)
+        self.E_R_rate_entry.grid(row=9+3, column=2, sticky='w', pady=5)
 
         # self.render_E_R_rate_components = []
         epi_components.add(self.E_R_rate_label)
@@ -282,8 +355,8 @@ class SeedsConfiguration:
         self.latency_prob_entry = ttk.Entry(self.control_frame, foreground="black")
         self.latency_prob_entry.insert(0, self.latency_prob)  
 
-        self.latency_prob_label.grid(row=8, column=1, sticky='w', pady=5)
-        self.latency_prob_entry.grid(row=9, column=1, sticky='w', pady=5)
+        self.latency_prob_label.grid(row=8+3, column=1, sticky='w', pady=5)
+        self.latency_prob_entry.grid(row=9+3, column=1, sticky='w', pady=5)
         
         # self.render_latency_prob_components = []
         epi_components.add(self.latency_prob_label)
@@ -297,8 +370,8 @@ class SeedsConfiguration:
         self.E_I_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.E_I_rate_entry.insert(0, self.E_I_rate)  
 
-        self.E_I_rate_label.grid(row=10, column=0, sticky='w', pady=5)
-        self.E_I_rate_entry.grid(row=11, column=0, sticky='w', pady=5)
+        self.E_I_rate_label.grid(row=10+3, column=0, sticky='w', pady=5)
+        self.E_I_rate_entry.grid(row=11+3, column=0, sticky='w', pady=5)
 
         epi_components.add(self.E_I_rate_label)
         epi_components.add(self.E_I_rate_entry)
@@ -310,8 +383,8 @@ class SeedsConfiguration:
         self.I_E_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.I_E_rate_entry.insert(0, self.I_E_rate)  
 
-        self.I_E_rate_label.grid(row=12, column=0, sticky='w', pady=5)
-        self.I_E_rate_entry.grid(row=13, column=0, sticky='w', pady=5)
+        self.I_E_rate_label.grid(row=12+3, column=0, sticky='w', pady=5)
+        self.I_E_rate_entry.grid(row=13+3, column=0, sticky='w', pady=5)
 
         # self.render_I_E_rate_components = []
         epi_components.add(self.I_E_rate_label)
@@ -323,8 +396,8 @@ class SeedsConfiguration:
         self.R_S_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.R_S_rate_entry.insert(0, self.R_S_rate)  
         
-        self.R_S_rate_label.grid(row=14, column=0, sticky='w', pady=5)
-        self.R_S_rate_entry.grid(row=15, column=0, sticky='w', pady=5)
+        self.R_S_rate_label.grid(row=14+3, column=0, sticky='w', pady=5)
+        self.R_S_rate_entry.grid(row=15+3, column=0, sticky='w', pady=5)
 
         # self.render_R_S_rate_components = []
         epi_components.add(self.R_S_rate_label)
@@ -336,8 +409,8 @@ class SeedsConfiguration:
         self.I_R_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.I_R_rate_entry.insert(0, self.I_R_rate)  
 
-        self.I_R_rate_label.grid(row=16, column=0, sticky='w', pady=5)
-        self.I_R_rate_entry.grid(row=17, column=0, sticky='w', pady=5)
+        self.I_R_rate_label.grid(row=16+3, column=0, sticky='w', pady=5)
+        self.I_R_rate_entry.grid(row=17+3, column=0, sticky='w', pady=5)
 
         # self.render_I_R_rate_components = []
         epi_components.add(self.I_R_rate_label)
@@ -358,7 +431,7 @@ class SeedsConfiguration:
             
             # Create and grid the label
             image_label = tk.Label(self.control_frame, image=photo)
-            image_label.grid(column=1, row=10, columnspan=2, rowspan=8, sticky="nsew")
+            image_label.grid(column=1, row=10+3, columnspan=2, rowspan=8, sticky="nsew")
             
             # Add the label to epi_components, if necessary
             epi_components.add(image_label)

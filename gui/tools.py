@@ -5,7 +5,7 @@ import traceback
 import os, sys
 import tkinter as tk
 import json
-# from tkinter import ttk, messagebox, filedialog
+from tkinter import filedialog
 
 class CreateToolTip(object):
     """
@@ -234,3 +234,17 @@ def validate_input(P):
     if P.strip() in ["e", ".", ""]:
             return True
     return P.isdigit()
+
+def choose_ref_path(self, title, config_path, var, filetypes = None):  
+    filetypes = ( #don't need to check if its genome file: or use python package jaehee said
+        ("Genome files", ("*.fasta", "*.fa", "*.gb", "*.gtf", "*.vcf", "*.bam", "*.sam", "*.fna")),
+        ("All files", "*.*")
+    )
+    # chosen_file = filedialog.askopenfilename(title="Select a Genome Reference File", filetypes=filetypes)
+    chosen_file = filedialog.askopenfilename(title="Select a Genome Reference File")
+    if chosen_file:  
+        var = chosen_file
+        # self.ref_path_label.config(text=self.ref_path) 
+        config = load_config_as_dict(config_path)
+        config['GenomeElement']['ref_path'] = var
+        save_config(config_path, config)

@@ -105,7 +105,7 @@ class Configurationv3:
             config = load_config_as_dict(self.config_path)
             config['BasicRunConfiguration']['cwdir'] = self.cwd
             save_config(self.config_path, config)
-     
+    
     def choose_ref_path(self):  
         filetypes = ( #don't need to check if its genome file: or use python package jaehee said
             ("Genome files", ("*.fasta", "*.fa", "*.gb", "*.gtf", "*.vcf", "*.bam", "*.sam", "*.fna")),
