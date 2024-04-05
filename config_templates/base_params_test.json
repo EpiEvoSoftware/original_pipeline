@@ -40,7 +40,7 @@
         }
     },
     "GenomeElement": {
-        "use_genetic_model": false,
+        "use_genetic_model": true,
         "ref_path": "",
         "traits_num": [],
         "effect_size": {

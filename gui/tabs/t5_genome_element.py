@@ -25,7 +25,9 @@ class GenomeElement:
     def initial_load(self):
         self.render_use_genetic_model()
         self.render_generate_genetic_architecture_method()
-        self.render_randomly_generate()
+        
+        self.randomly_generate_components = self.render_randomly_generate()
+        self.randomly_generate_grid_configs = derender_components(self.randomly_generate_components)
 
     def init_val(self, config_path):
         # testingrp
@@ -81,32 +83,30 @@ class GenomeElement:
 # 
 
 
-    def render_number_of_traits(self):
+    def render_number_of_traits(self, components):
         self.render_number_of_traits_text = "Number of traits (integer):"
         self.number_of_traits_label = ttk.Label(self.control_frame, text=self.render_number_of_traits_text, style = "Bold.TLabel")
         self.number_of_traits_label.grid()
 
-    def render_transmissibility(self):
+    def render_transmissibility(self, components):
         self.render_transmissibility_text = "Transmissibility"
         self.transmissibility_label = ttk.Label(self.control_frame, text=self.render_transmissibility_text, style = "Bold.TLabel")
         self.transmissibility_entry = ttk.Entry(self.control_frame, foreground="black")
         self.transmissibility_entry.insert(0, self.transmissibility)
 
-        transmissibility_components = set()
         self.transmissibility_entry.grid()
         self.transmissibility_label.grid()
-        transmissibility_components.add(self.transmissibility, self.transmissibility_entry)
+        components.add(self.transmissibility, self.transmissibility_entry)
 
-    def render_drug_resistance(self):
+    def render_drug_resistance(self, components):
         self.render_drug_resistance_text = "Drug-Resistance"
         self.drug_resistance_label = ttk.Label(self.control_frame, text=self.render_drug_resistance_text, style = "Bold.TLabel")
         self.drug_resistance_entry = ttk.Entry(self.control_frame, foreground="black")
         self.drug_resistance_entry.insert(0, self.drug_resistance)
 
-        drug_resistance_components = set()
         self.drug_resistance_entry.grid()
         self.drug_resistance_label.grid()
-        drug_resistance_components.add(self.drug_resistance, self.drug_resistance_entry)
+        components.add(self.drug_resistance, self.drug_resistance_entry)
 
 
     def render_gff(self, components):
@@ -210,6 +210,7 @@ class GenomeElement:
         self.render_effsize_min(randomly_generate_components)
         self.render_effsize_max(randomly_generate_components)
         self.render_normalize(randomly_generate_components)
+        return randomly_generate_components
     def update_use_genetic_model(self):
         # self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
         self.hide_elements_update_methods()
