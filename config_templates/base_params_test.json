@@ -1,37 +1,35 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "/System/Applications",
-        "n_replicates": 3
+        "cwdir": "",
+        "n_replicates": 1,
+        "random_number_seed": 1
     },
     "EvolutionModel": {
-        "n_generation": 99,
-        "mut_rate": 99,
-        "trans_type": "Additive",
-        "dr_type": "Additive",
-        "within_host_reproduction": true,
-        "within_host_reproduction_rate": 99,
-        "cap_withinhost": 99
+        "n_generation": 0,
+        "mut_rate": 0,
+        "trans_type": "additive",
+        "dr_type": "additive",
+        "within_host_reproduction": false,
+        "within_host_reproduction_rate": 0,
+        "cap_withinhost": 1
     },
     "SeedsConfiguration": {
-        "seed_size": 54,
+        "seed_size": 1,
         "use_reference": false,
-        "method": "SLiM_burnin_epi",
+        "method": "",
         "user_input": {
-            "path_seeds_vcf": "/System/Applications/Books.app",
-            "path_seeds_phylogeny": "/System/Applications/Clock.app"
+            "path_seeds_vcf": "",
+            "path_seeds_phylogeny": ""
         },
         "SLiM_burnin_WF": {
-            "burn_in_Ne": 1000,
-            "burn_in_generations": 4000,
-            "burn_in_mutrate": 1.1e-07
+            "burn_in_Ne": 0,
+            "burn_in_generations": 0,
+            "burn_in_mutrate": 0
         },
         "SLiM_burnin_epi": {
             "burn_in_generations": 0,
             "burn_in_mutrate": 0,
-            "seeded_host_id": [
-                1,
-                7
-            ],
+            "seeded_host_id": [],
             "S_IE_rate": 0,
             "E_I_rate": 0,
             "E_R_rate": 0,
@@ -43,59 +41,41 @@
     },
     "GenomeElement": {
         "use_genetic_model": true,
-        "ref_path": "/System/Applications/Calendar.app",
-        "traits_num": [
-            1,
-            1
-        ],
+        "ref_path": "",
+        "traits_num": [],
         "effect_size": {
-            "method": "randomly_generate",
+            "method": "",
             "user_input": {
-                "path_effsize_table": "/Volumes/T7/software/Downloads/new_design.pdf"
+                "path_effsize_table": ""
             },
             "randomly_generate": {
-                "gff": "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
-                "genes_num": [
-                    10,
-                    5
-                ],
-                "effsize_min": [
-                    4,
-                    4
-                ],
-                "effsize_max": [
-                    5,
-                    5
-                ],
-                "normalize": true
+                "gff": "",
+                "genes_num": [],
+                "effsize_min": [],
+                "effsize_max": [],
+                "normalize": false
             }
         }
     },
     "NetworkModelParameters": {
         "use_network_model": true,
         "method": "",
-        "host_size": 1000,
+        "host_size": 0,
         "user_input": {
-            "path_network": "/System/DriverKit/Runtime"
+            "path_network": ""
         },
         "randomly_generate": {
-            "network_model": "BA",
+            "network_model": "",
             "ER": {
-                "p_ER": 0.5
+                "p_ER": 0
             },
             "RP": {
-                "rp_size": [
-                    5,
-                    56
-                ],
-                "p_within": [
-                    7,
-                    8
-                ],
-                "p_between": 9
+                "rp_size": [],
+                "p_within": [],
+                "p_between": 0
             },
             "BA": {
-                "ba_m": 1
+                "ba_m": 0
             }
         }
     },
@@ -110,26 +90,17 @@
         }
     },
     "EpidemiologyModel": {
-        "model": "SIR",
+        "slim_replicate_seed_file_path": "",
+        "model": "",
         "epoch_changing": {
-            "n_epoch": 3,
-            "epoch_changing_generation": [
-                1,
-                2,
-                4
-            ]
+            "n_epoch": 1,
+            "epoch_changing_generation": []
         },
         "genetic_architecture": {
             "transmissibility": [],
-            "cap_transmissibility": [
-                1,
-                2
-            ],
+            "cap_transmissibility": [],
             "drug_resistance": [],
-            "cap_drugresist": [
-                1,
-                5
-            ]
+            "cap_drugresist": []
         },
         "transiton_rate": {
             "S_IE_rate": [],
@@ -140,10 +111,7 @@
             "I_E_rate": [],
             "E_R_rate": [],
             "sample_rate": [],
-            "recovery_prob_after_sampling": [
-                1,
-                9
-            ]
+            "recovery_prob_after_sampling": []
         },
         "massive_sampling": {
             "event_num": 0,
@@ -154,10 +122,10 @@
         "super_infection": false
     },
     "Postprocessing_options": {
-        "do_postprocess": false,
+        "do_postprocess": true,
         "tree_plotting": {
-            "branch_color_trait": 3000,
-            "drug_resistance_heatmap": false
+            "branch_color_trait": 1,
+            "drug_resistance_heatmap": true
         }
     }
 }
