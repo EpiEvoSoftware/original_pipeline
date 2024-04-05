@@ -1,11 +1,9 @@
 from base_func import *
 from random import sample
 from error_handling import CustomizedError
-import os
-import statistics
 import numpy as np
 import pandas as pd
-import argparse
+import argparse, sys, statistics, os
 
 START_IDX = 0
 END_IDX = 1
@@ -15,6 +13,7 @@ GFF_START = 3
 GFF_END = 4
 GFF_INFO = 8
 
+os.environ['PYTHONUNBUFFERED'] = '1'
 
 def _count_gff_genes(gff_path):
 	"""
@@ -24,7 +23,7 @@ def _count_gff_genes(gff_path):
 		gff_path (str): Full path to the GFF-like file.
 	"""
 	if not os.path.isfile(gff_path):
-		raise CustomizedError(f"The provided path to gff file ({gff_path}) is not a valid file path.")
+		raise CustomizedError(f"The provided path to gff file ({gff_path}) is not a valid file path")
 	
 	n_genes = 0
 	with open(gff_path, "r") as gff:
@@ -55,11 +54,11 @@ def seeds_trait_calc(wk_dir, dict_c_g):
 
 	# raise exception if we do not have access to VCF of individual seeds
 	if not os.path.exists(seeds_vcf_dir):
-		raise CustomizedError(f"seed_generator.py hasn't been run. \
-						If you want to use seed sequence different than reference genome, \
-						you must run seed_generator first.")
+		raise CustomizedError("seed_generator.py hasn't been run. "
+						"If you want to use seed sequence different than reference genome, "
+						"you must run seed_generator first")
 
-	seeds = os.listdir(seeds_vcf_dir)
+	seeds = ["seed." + str(i) + ".vcf" for i in range(len(os.listdir(seeds_vcf_dir)))]
 	for seed in seeds:
 		# iterate through all seeds
 		sum_trait = 0
@@ -263,24 +262,24 @@ def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir,
 	"""
 	total_n_traits = sum(trait_n)
 	if len(causal_sizes) != total_n_traits:
-		raise CustomizedError(f"The given length of the number of causal genetic elements \
-						(-causal_size_each {len(causal_sizes)}) is not consistent with the \
-							number of traits ({total_n_traits}).")
+		raise CustomizedError("The given length of the number of causal genetic elements "
+						f"(-causal_size_each {len(causal_sizes)}) is not consistent with the "
+						f"number of traits ({total_n_traits})")
 	if len(es_lows) != total_n_traits:
-		raise CustomizedError(f"The given length of the lower bounds (-es_low {len(es_lows)}) \
-						is not consistent with the number of traits ({total_n_traits}).")
+		raise CustomizedError(f"The given length of the lower bounds (-es_low {len(es_lows)}) "
+						f"is not consistent with the number of traits ({total_n_traits})")
 	
 	if len(es_highs) != total_n_traits:
-		raise CustomizedError(f"The given length of the upper bounds (-es_low {len(es_lows)}) \
-						is not consistent with the number of traits ({total_n_traits}).")
+		raise CustomizedError(f"The given length of the upper bounds (-es_low {len(es_lows)}) "
+						f"is not consistent with the number of traits ({total_n_traits})")
 	
 	if norm_or_not:
 		if type(n_gen) != int or n_gen <= 0:
-			raise CustomizedError(f"Please specify a positive integer for generation \
-						 (-sim_generation) in normalization mode.")
+			raise CustomizedError("Please specify a positive integer for generation "
+						"(-sim_generation) in normalization mode")
 		if (type(mut_rate) != float and type(mut_rate) != int) or mut_rate <= 0:
-			raise CustomizedError(f"Please specify a positive number for mutation rate \
-						 (-mut_rate) in normalization mode.")
+			raise CustomizedError("Please specify a positive number for mutation rate "
+						"(-mut_rate) in normalization mode")
 	traits_dict =[]
 	seeds_trait_vals = []
 	# Generate effect sizes and calculate seeds' trait values for each trait
@@ -311,11 +310,11 @@ def read_effvals(wk_dir, effsize_path, traits_num):
               the trait values of seeds for a specific trait.
 	"""
 	if effsize_path == "":
-		raise CustomizedError(f"You need to specify a path to the effect size csv \
-						file (-effsize_path) in user_input mode.")
+		raise CustomizedError("You need to specify a path to the effect size csv "
+						"file (-effsize_path) in user_input mode.")
 	
 	if not os.path.exists(effsize_path):
-		raise FileNotFoundError(f"File '{effsize_path}' not found.")
+		raise FileNotFoundError(f"Path to effect size file '{effsize_path}' not found")
 	
 	eff_df = pd.read_csv(effsize_path)
 	num_cols = len(eff_df.columns)
@@ -323,8 +322,8 @@ def read_effvals(wk_dir, effsize_path, traits_num):
 
 	traits_num_sum = sum(traits_num)
 	if traits_num_sum != num_df_traits:
-		raise ValueError(f"The sum of traits specified ({traits_num_sum}) does not match the number \
-				   of traits in the file ({num_df_traits}).")
+		raise ValueError(f"The sum of traits specified ({traits_num_sum}) does not match the number "
+				   f"of traits in the file ({num_df_traits}).")
 	
 	gene_names = eff_df["gene_name"].tolist()
 	start_pos = eff_df["start"].tolist()
@@ -360,25 +359,31 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n=[
         norm_or_not (bool, optional): Boolean indicating whether to normalize effect sizes.
         n_gen (int, optional): Number of generations for randomly_generate method.
         mut_rate (float or int, optional): Mutation rate for randomly_generate method.
+
+	Returns:
+		error_message (str): Error message.
 	"""
+	error_message = None
 	try:
 		if len(trait_n) != 2:
-			raise CustomizedError(f"Please specify exactly 2 traits quantities in a list (-trait_n for transmissibility and drug resistance).")
+			raise CustomizedError("Please specify exactly 2 traits quantities in a list (-trait_n for transmissibility and drug resistance)")
 		if sum(trait_n) < 1:
-			raise CustomizedError(f"Please provide a list of trait quantities (-trait_n) that sums up to at least 1.")
+			raise CustomizedError("Please provide a list of trait quantities (-trait_n) that sums up to at least 1")
 		if method == "user_input":
 			write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path, trait_n), trait_n)
 		elif method == "randomly_generate":
 			generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, norm_or_not)
 		else:
-			raise CustomizedError(f"{method} isn't a valid method. Please provide a permitted method. \
-							(user_input/randomly_generate).")
-		print("\n")
+			raise CustomizedError(f"{method} isn't a valid method. Please provide a permitted method. "
+							"(user_input/randomly_generate)")
 		print("******************************************************************** \n" +
-              "                  GENETIC ARCHITECTURES GENERATE		                \n" +
+              "                  GENETIC ARCHITECTURES GENERATED		            \n" +
               "******************************************************************** \n")
 	except Exception as e:
-		raise CustomizedError(f"Genetic effects generation - A violation of input parameters occured: {e}.")
+		print(f"Genetic effects generation - An error occured: {e}.")
+		error_message = e
+
+	return error_message
 
 def effsize_generation_byconfig(all_config):
 	"""
@@ -393,13 +398,14 @@ def effsize_generation_byconfig(all_config):
 	effsize_method = genetic_config["effect_size"]["method"]
 
 
-	eff_params_config = genetic_config["randomly_generate"]
-	run_effsize_generation(method=effsize_method, wk_dir=wk_dir, trait_n=genetic_config["traits_num"], 
+	eff_params_config = genetic_config["effect_size"]["randomly_generate"]
+	error = run_effsize_generation(method=effsize_method, wk_dir=wk_dir, trait_n=genetic_config["traits_num"], 
 						 effsize_path=genetic_config["effect_size"]["user_input"]["path_effsize_table"],
 						 causal_sizes=eff_params_config["genes_num"], es_lows=eff_params_config["effsize_min"], 
 						 es_highs=eff_params_config["effsize_max"], gff_in=eff_params_config["gff"], 
 						 n_gen=all_config["EvolutionModel"]["n_generation"], mut_rate=all_config["EvolutionModel"]["mut_rate"], 
 						 norm_or_not=eff_params_config["normalize"])
+	return error
 
 
 def main():

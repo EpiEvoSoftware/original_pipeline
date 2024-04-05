@@ -1,18 +1,23 @@
-import networkx as nx, os, argparse
+import networkx as nx, os, argparse, sys
 from base_func import *
 from error_handling import CustomizedError
 
+os.environ['PYTHONUNBUFFERED'] = '1'
 
 def write_network(ntwk_, wk_dir):
     """
-    Writes a network to the workding directory.
+    Writes a network to the workding directory and returns the path to the network.
     
     Parameters:
         wk_dir (str): Working directory.
         ntwk_ (nx.Graph): Contact network.
-    """
-    nx.write_adjlist(ntwk_, os.path.join(wk_dir, "contact_network.adjlist"))
 
+    Returns:
+        ntwk_path (str): Path to the network.
+    """
+    ntwk_path = os.path.join(wk_dir, "contact_network.adjlist")
+    nx.write_adjlist(ntwk_, os.path.join(wk_dir, "contact_network.adjlist"))
+    return ntwk_path
 
 def ER_generate(pop_size, p_ER):
     """
@@ -23,13 +28,13 @@ def ER_generate(pop_size, p_ER):
         pop_size (int): Population size.
     """
     if not 0 < p_ER <= 1: 
-        raise CustomizedError("You need to specify a p>0 (-p_ER) in Erdos-Renyi graph.")
+        raise CustomizedError("You need to specify a p>0 (-p_ER) in Erdos-Renyi graph")
     er_graph = nx.erdos_renyi_graph(pop_size, p_ER)
     return er_graph
 
 def rp_generate(pop_size, rp_size, p_within, p_between):
     """
-    Returns a random partition graph with n groups, each group having a probability of \
+    Returns a random partition graph with n groups, each group having a probability of
         within-group edge, and there is a global between-group edge probability.
     
     Parameters:
@@ -43,15 +48,15 @@ def rp_generate(pop_size, rp_size, p_within, p_between):
 
     # Check for validity of inputs
     if sum(rp_size) != pop_size:
-        raise CustomizedError(f"Size of the partitions (-rp_size {rp_size}) has \
-                              to add up to the whole population size (-popsize {pop_size}). ")
+        raise CustomizedError(f"Size of the partitions (-rp_size {rp_size}) has "
+                              f"to add up to the whole population size (-popsize {pop_size})")
     if prob_size != block_size: 
-        raise CustomizedError(f"The number of partitions ({block_size}) does \
-                              not match the number of given within partition connection \
-                              probabilities ({prob_size}).")
+        raise CustomizedError(f"The number of partitions ({block_size}) does "
+                              "not match the number of given within partition connection "
+                              f"probabilities ({prob_size})")
     if p_between == 0: 
-        print("WARNING: You didn't specify a between partition connection probability (-p_between) \
-              or have set it to 0. This will lead to two completely isolated partitions.")
+        print("WARNING: You didn't specify a between partition connection probability (-p_between) "
+              "or have set it to 0. This will lead to two completely isolated partitions.")
     
     # Construct contact probability matrix
     p = [[p_between for _ in range(block_size)] for _ in range(block_size)]
@@ -83,18 +88,18 @@ def copy_input_network(wk_dir, path_network, pop_size):
         path_network (str): Path to the network file.
         pop_size (int): Population size.
     """
+    # print(path_network)
     if path_network == "":
-        raise CustomizedError(f"You need to specify a path to the user-provided network (-path_network).")    
+        raise CustomizedError(f"You need to specify a path to the user-provided network (-path_network)")    
     elif not os.path.exists(path_network):
-        raise FileNotFoundError(f"The provided network path ({path_network}) doesn't exist.")
-
+        raise FileNotFoundError(f"The provided network path ({path_network}) doesn't exist")
+    # print("reading network")
     ntwk = nx.read_adjlist(path_network)
     if len(ntwk) != pop_size:
-        raise CustomizedError(f"The provided network doesn't have the same number of nodes \
-                              ({len(ntwk)}) as the host population size ({pop_size}) specified.")
+        raise CustomizedError("The provided network doesn't have the same number of nodes "
+                              f"({len(ntwk)}) as the host population size ({pop_size}) specified.")
 
-    write_network(ntwk, wk_dir)
-
+    return ntwk
 
 def run_network_generation(pop_size, wk_dir, method, model="", path_network="", p_ER=0, rp_size=[], p_within=[], p_between=0, m=0):
     """
@@ -114,33 +119,40 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
     
     Returns:
         ntwk (nx.Graph): Generated network.
+        error_message (str): Error message.
     """
+    ntwk = None
+    error_message = None
     try: 
-        ntwk = None
         if method == "user_input":
-            copy_input_network(wk_dir, path_network, pop_size)
+            ntwk = copy_input_network(wk_dir, path_network, pop_size)
+            ntwk = copy_input_network(wk_dir, path_network, pop_size)
 
-        elif method=="randomly_generate":
+        elif method == "randomly_generate":
             if not model in ["ER", "BP", "BA"]: 
-                raise CustomizedError("You need to specify a random graph model (-model) in random \
-                                      generate mode. (Supported model: ER/RP/BA)")
+                raise CustomizedError("Please specify a legit random graph model (-model) in random "
+                                      "generate mode. (Supported model: ER/RP/BA)")
             
             if model == "ER": 
                 ntwk = ER_generate(pop_size, p_ER)
             elif model == "RP":
                 ntwk = rp_generate(pop_size, rp_size, p_within, p_between)
-            else:
+            elif model == "BA" :
                 ntwk = ba_generate(pop_size, m)
         else:
-            CustomizedError("Please provide a permitted method (user_input/randomly_generate).")
+            raise CustomizedError("Please provide a permitted method (user_input/randomly_generate)")
         # No Error occur
-        write_network(ntwk, wk_dir)
+        ntwk_path = write_network(ntwk, wk_dir)
         print("******************************************************************** \n" +
               "                   CONTACT NETWORK GENERATED                         \n" +
-              "******************************************************************** \n")
-        return ntwk   
+              "********************************************************************")
+        print("Contact network:", ntwk_path)  
     except Exception as e:
-        raise CustomizedError(f"Contact network generation - A violation of input parameters occured {e}.")
+        print(f"Contact network generation - An error occured: {e}.")
+        error_message = e
+
+
+    return ntwk, error_message
 
 def network_generation_byconfig(all_config):
     ntwk_config = all_config["NetworkModelParameters"]
@@ -162,10 +174,11 @@ def network_generation_byconfig(all_config):
     # BA params
     ba_m=ntwk_config["randomly_generate"]["BA"]["ba_m"]
 
-    run_network_generation(pop_size = pop_size, wk_dir = wk_dir, method = ntwk_method, 
+    _, error = run_network_generation(pop_size = pop_size, wk_dir = wk_dir, method = ntwk_method, 
                            path_network = path_network, model = model, p_ER = p_ER, 
                            p_within = p_within, p_between = p_between, 
-                           rp_size = rp_size, ba_m = ba_m)
+                           rp_size = rp_size, m = ba_m)
+    return error
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a contact network for the population \
@@ -195,8 +208,8 @@ def main():
     p_between = args.p_between
     m = args.m
     
-    run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method=method, model=model, path_network=path_network, 
-                           p_ER=p_ER, rp_size=rp_size, p_within=p_within, p_between=p_between, m=m)
+    run_network_generation(pop_size = pop_size, wk_dir = wk_dir, method = method, model = model, path_network = path_network, 
+                           p_ER = p_ER, rp_size = rp_size, p_within = p_within, p_between = p_between, m = m)
 
 
 if __name__ == "__main__":

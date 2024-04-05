@@ -10,6 +10,8 @@ POS_COL = 1
 TRANS_INDEX = 0
 DRUG_RES_INDEX = 1
 
+os.environ['PYTHONUNBUFFERED'] = '1'
+
 def read_tseq(each_wk_dir_):
 	"""
 	Returns the tree sequence, sampled tree, sample size, 
@@ -337,15 +339,30 @@ def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_
 	nwk_output(sampled_ts, real_label, each_wk_dir, seed_host_match_path)
 
 	# Determine if trait calculation is needed
-	if color_trait == 0:
-		gen_model = False
+	# if color_trait == 0:
+	# 	gen_model = False
+
+	# CHECK W/ PERRY
+	# if gen_model:
+	# 	traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, n_trait)
+	# 	trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
+	# 	mtdata = metadata_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
+	# 	write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
 
 	# CHECK W/ PERRY
 	if gen_model:
 		traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, n_trait)
-		trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
+		if color_trait > 0:
+			trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
+		else:
+			trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
+		if color_trait > 0:
+			trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
+		else:
+			trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
 		mtdata = metadata_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
 		write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
+
 	
 	# Output VCF file
 	output_tseq_vcf(each_wk_dir, real_label, sampled_ts)

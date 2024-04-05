@@ -1,6 +1,7 @@
 workdir
 .python-version
 *.swp
+
 # Global ignore for Python cache directories
 **/__pycache__/
 .vscode/*
