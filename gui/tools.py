@@ -270,6 +270,12 @@ def no_validate_update(var, config_path, keys_path, mapping = None):
     update_nested_dict(config, keys_path, var_get)
     save_config(config_path, config)
 
+
+def no_validate_update_val(val, config_path, keys_path):
+    config = load_config_as_dict(config_path)
+    update_nested_dict(config, keys_path, val)
+    save_config(config_path, config)
+
 def get_dict_val(d, keys):
     for key in keys:
         d = d[key]
@@ -315,3 +321,12 @@ network_model_to_string = {
 }
 
 graph_values = list(network_model_to_string.keys())
+
+val_to_render_generate_genetic_architecture_method = {
+    "user_input": "User Input", 
+    "randomly_generate": "Random Generation from the GFF file"
+}
+
+render_to_val_generate_genetic_architecture_method = {value: key for key, value in val_to_render_generate_genetic_architecture_method.items()}
+
+generate_genetic_architecture_method_values = list(val_to_render_generate_genetic_architecture_method.values())

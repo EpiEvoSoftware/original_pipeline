@@ -276,7 +276,8 @@ class SeedsConfiguration:
         self.render_use_method_title = "Method to Generate Sequences of the Seeding Pathogens"
         self.use_method_label = ttk.Label(self.control_frame, text=self.render_use_method_title, style="Bold.TLabel")
         self.use_method_label.grid(row=6, column=1, columnspan= 3, sticky='w', pady=5)
-        self.use_method_var = tk.StringVar(value=val_to_render_ui_wf_epi_mapping[self.method])
+        local_use_method_var = val_to_render_ui_wf_epi_mapping.get(self.method, "")
+        self.use_method_var = tk.StringVar(value=local_use_method_var)
         combobox_vals = list(render_to_val_ui_wf_epi_mapping.keys())
         self.use_method_combobox = ttk.Combobox(
             self.control_frame, textvariable=self.use_method_var, 

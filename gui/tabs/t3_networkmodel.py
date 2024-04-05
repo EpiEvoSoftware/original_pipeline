@@ -12,7 +12,7 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 from network_generator import *
-from seed_host_match_func import *
+# from seed_host_match_func import *
 from tabs.t6_networkgraph import NetworkGraphApp
 
 
