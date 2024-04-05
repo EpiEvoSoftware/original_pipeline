@@ -21,6 +21,7 @@ class SeedsConfiguration:
         self.init_tab(parent, tab_parent, tab_title, tab_index, hide)
         self.initial_load()
 
+        self.render_run_button()
         render_next_button(self.tab_index, self.tab_parent, self.parent, self.update)
 
     def update(self):

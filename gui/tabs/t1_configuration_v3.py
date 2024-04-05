@@ -31,6 +31,15 @@ class Configurationv3:
         render_next_button(self.tab_index, self.tab_parent, self.parent, self.update)
         
     
+    # def render_next_button(self):
+    #     def next_tab_fx():
+    #         match update():
+    #             case 1:
+    #                 return
+    #         go_to_next_tab(tab_index, tab_parent)
+
+    #     next_button()
+
     def render_working_directory(self):
 
         def choose_directory_button():

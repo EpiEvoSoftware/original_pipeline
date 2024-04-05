@@ -15,23 +15,72 @@ from genetic_effect_generator import *
 class GenomeElement:
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
         
-
-        self.network_model_to_string = {
-            "Erdős–Rényi": "ER",
-            "Barabási-Albert": "BA",
-            "Random Partition": "RP"
-        }
-
-        self.string_to_network_mode = {
-            "ER": "Erdős–Rényi",
-            "BA": "Barabási-Albert",
-            "RP": "Random Partition"
-        }
-        
-        self.graph_values = ["Erdős–Rényi", "Barabási-Albert", "Random Partition"]
-
         self.config_path = config_path
-# testingrp
+        self.init_val()
+
+        self.parent = parent
+        self.tab_parent = tab_parent
+        self.tab_index = tab_index
+        self.tab_parent.add(parent, text=tab_title)
+        if hide:
+            self.tab_parent.tab(self.tab_index, state="disabled")
+            
+
+        
+
+        self.control_frame = ttk.Frame(self.parent, width=300)
+        self.control_frame.pack(fill='both', expand=True) 
+
+        self.render_use_genetic_model()
+        # Modified part for scrolling
+            # 
+        # self.canvas = tk.Canvas(self.control_frame)
+        # self.scrollbar = ttk.Scrollbar(self.control_frame, orient="vertical", command=self.canvas.yview)
+        # self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        
+        # self.scrollable_frame = ttk.Frame(self.canvas)
+        # self.canvas_frame = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        
+        # def configure_scroll_region(event):
+        #     self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        
+        # def configure_canvas_width(event):
+        #     self.canvas.itemconfig(self.canvas_frame, width=event.width)
+        
+        # self.scrollable_frame.bind("<Configure>", configure_scroll_region)
+        # self.canvas.bind("<Configure>", configure_canvas_width)
+        
+        # self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        # self.scrollbar.pack(side=tk.RIGHT, fill="y")
+            # 
+        # 
+        # selected_option = tk.StringVar()
+        # radio_button1 = tk.Radiobutton(self.scrollable_frame, text="Option 1", variable=selected_option, value="Option 1").pack()
+        # radio_button2 = tk.Radiobutton(self.scrollable_frame, text="Option 2", variable=selected_option, value="Option 2").pack()
+
+        # test1 = ttk.Label(self.scrollable_frame, text="use_genetic_model:", state = 'disabled')
+        # test1.pack()
+        # test = ttk.Entry(self.scrollable_frame)
+        # test.pack()
+        # test.insert(0, "sdafsaf") 
+        # test.configure(state="disabled")
+
+        # self.use_genetic_model_label = ttk.Label(self.scrollable_frame, text="use_genetic_model:")
+        # self.use_genetic_model_label.pack()
+        # self.use_genetic_model_var = tk.StringVar(value=bool_to_string_mapping[self.use_genetic_model])
+        # self.use_genetic_model_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.use_genetic_model_var, values=["Yes", "No"], state="readonly")
+        # self.use_genetic_model_combobox.pack()
+        # self.use_genetic_model_combobox.configure(state="disabled")
+        # self.update_use_genetic_model_button = tk.Button(self.scrollable_frame, text="Update use_genetic_model", command=self.update_use_genetic_model)
+        # self.update_use_genetic_model_button.pack()
+
+        render_next_button(self.tab_index, self.tab_parent, self.parent)
+
+
+    # 
+
+    def init_val(self):
+        # testingrp
     # User Configurations
         # bool
         self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
@@ -51,70 +100,6 @@ class GenomeElement:
         self.effsize_max = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
         # bool
         self.normalize = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']['normalize']
-    # 
-
-        self.parent = parent
-        self.tab_parent = tab_parent
-        self.tab_index = tab_index
-        self.tab_parent.add(parent, text=tab_title)
-        if hide:
-            self.tab_parent.tab(self.tab_index, state="disabled")
-            
-
-        
-
-        self.control_frame = ttk.Frame(self.parent, width=300)
-        self.control_frame.pack(fill='both', expand=True) 
-
-        
-        
-
-
-        # Modified part for scrolling
-            # 
-        self.canvas = tk.Canvas(self.control_frame)
-        self.scrollbar = ttk.Scrollbar(self.control_frame, orient="vertical", command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
-        
-        self.scrollable_frame = ttk.Frame(self.canvas)
-        self.canvas_frame = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-        
-        def configure_scroll_region(event):
-            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-        
-        def configure_canvas_width(event):
-            self.canvas.itemconfig(self.canvas_frame, width=event.width)
-        
-        self.scrollable_frame.bind("<Configure>", configure_scroll_region)
-        self.canvas.bind("<Configure>", configure_canvas_width)
-        
-        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.scrollbar.pack(side=tk.RIGHT, fill="y")
-            # 
-        # 
-        selected_option = tk.StringVar()
-        radio_button1 = tk.Radiobutton(self.scrollable_frame, text="Option 1", variable=selected_option, value="Option 1").pack()
-        radio_button2 = tk.Radiobutton(self.scrollable_frame, text="Option 2", variable=selected_option, value="Option 2").pack()
-
-        test1 = ttk.Label(self.scrollable_frame, text="use_genetic_model:", state = 'disabled')
-        test1.pack()
-        test = ttk.Entry(self.scrollable_frame)
-        test.pack()
-        test.insert(0, "sdafsaf") 
-        test.configure(state="disabled")
-
-        self.use_genetic_model_label = ttk.Label(self.scrollable_frame, text="use_genetic_model:")
-        self.use_genetic_model_label.pack()
-        self.use_genetic_model_var = tk.StringVar(value=bool_to_string_mapping[self.use_genetic_model])
-        self.use_genetic_model_combobox = ttk.Combobox(self.scrollable_frame, textvariable=self.use_genetic_model_var, values=["Yes", "No"], state="readonly")
-        self.use_genetic_model_combobox.pack()
-        self.use_genetic_model_combobox.configure(state="disabled")
-        self.update_use_genetic_model_button = tk.Button(self.scrollable_frame, text="Update use_genetic_model", command=self.update_use_genetic_model)
-        self.update_use_genetic_model_button.pack()
-
-        render_next_button(self.tab_index, self.tab_parent, self.parent)
-
-
     # 
 # 
     def update_use_genetic_model(self):
@@ -213,10 +198,54 @@ class GenomeElement:
         else:
             messagebox.showerror("Update Error", "Please enter 'Yes' or 'No' for use_network_model.")
 
-# 
+    def render_use_genetic_model(self):
+        """
+        self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
+        """
+        def update():
+            keys_path = ['GenomeElement', 'use_genetic_model']
+            no_validate_update(self.use_genetic_model_var, self.config_path, keys_path)
+            use_genetic_model_local = get_dict_val(load_config_as_dict(self.config_path), keys_path)
+            if use_genetic_model_local:
+                print("use_genetic_model_local: ", use_genetic_model_local)
+                # self.use_method_grid_configs = derender_components(self.use_method_components)
+                # self.user_input_grid_configs = derender_components(self.user_input_components)
+                # self.wf_grid_configs = derender_components(self.wf_components)
+                # self.epi_grid_configs = derender_components(self.epi_components)
+            else:
+                print("use_genetic_model_local: ", use_genetic_model_local)
+                # rerender_components(self.use_method_components, self.use_method_grid_configs)
+                # rerender_components(self.user_input_components, self.user_input_grid_configs)  
+                # keys_path = ['SeedsConfiguration', 'method']
+                # use_method_local = get_dict_val(load_config_as_dict(self.config_path), keys_path)
+                # match use_method_local:
+                #     case "user_input":
+                #         rerender_components(self.user_input_components, self.user_input_grid_configs)  
+                #     case "SLiM_burnin_WF":
+                #         rerender_components(self.wf_components, self.wf_grid_configs)    
+                #     case "SLiM_burnin_epi":
+                #         rerender_components(self.epi_components, self.epi_grid_configs)
+            
+
+        self.render_use_genetic_model_text = "Do you want to use genetic architecture for traits (transmissibility and/or Drug-resistance)?"
+        self.use_genetic_model_var = tk.BooleanVar(value=self.use_genetic_model)
+        self.use_genetic_model_label = ttk.Label(self.control_frame, text=self.render_use_genetic_model_text, style = "Bold.TLabel")
+        self.use_genetic_true = ttk.Radiobutton(self.control_frame, text="Yes", variable=self.use_genetic_model_var, value=True, command = update)
+        self.use_genetic_false = ttk.Radiobutton(self.control_frame, text="No", variable=self.use_genetic_model_var, value=False, command = update)
+
+        self.use_genetic_model_label.grid()
+        self.use_genetic_true.grid()
+        self.use_genetic_false.grid()
+        # self.use_genetic_model_label.grid(row = 3, column = 1, sticky = 'w', pady = 5)
+        # self.use_genetic_true.grid(row = 4, column = 1, columnspan= 3, sticky='w', pady=5)
+        # self.use_genetic_false.grid(row = 5, column = 1, columnspan= 3, sticky='w', pady=5)
+
     def hide_elements_update_methods(self):
         return
     def update_method(self):
+        return
+    
+    def render_number_of_traits(self):
         return
     
     def render_path_eff_size_table(self):

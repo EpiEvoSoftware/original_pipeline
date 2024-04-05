@@ -209,6 +209,17 @@ bool_to_string_mapping = {
     False: "No"
 }
 
+def next_button(tab_index, tab_parent, parent, next_tab_fx):
+    def next_tab():
+        match update():
+            case 1:
+                return
+
+        go_to_next_tab(tab_index, tab_parent)
+
+            
+    next_button = tk.ttk.Button(parent, text="Next",  command=next_tab_fx)
+    next_button.pack()
 
 def render_next_button(tab_index, tab_parent, parent, update = None):
     def next_tab():
@@ -287,3 +298,20 @@ def rerender_components(components: set, grid_configs: dict = {}):
     for component in components:
         grid_info = grid_configs.get(component, {})
         component.grid(**grid_info)
+
+
+
+string_to_network_mode = {
+    "ER": "Erdős–Rényi",
+    "BA": "Barabási-Albert",
+    "RP": "Random Partition"
+}
+
+
+network_model_to_string = {
+    "Erdős–Rényi": "ER",
+    "Barabási-Albert": "BA",
+    "Random Partition": "RP"
+}
+
+graph_values = list(network_model_to_string.keys())
