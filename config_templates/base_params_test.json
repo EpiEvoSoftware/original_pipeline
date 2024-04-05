@@ -49,7 +49,7 @@
                 "path_effsize_table": ""
             },
             "randomly_generate": {
-                "gff": "",
+                "gff": "/System/iOSSupport/System/Library/AppleMediaServices/DynamicUI/PlugIns/CoreDynamicUIPlugin.bundle",
                 "genes_num": [],
                 "effsize_min": [],
                 "effsize_max": [],

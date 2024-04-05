@@ -330,3 +330,39 @@ val_to_render_generate_genetic_architecture_method = {
 render_to_val_generate_genetic_architecture_method = {value: key for key, value in val_to_render_generate_genetic_architecture_method.items()}
 
 generate_genetic_architecture_method_values = list(val_to_render_generate_genetic_architecture_method.values())
+
+
+
+def render_path_select(components, keys_path, config_path, render_text, control_frame, column, frow):
+    """
+    Renders a path select component in the GUI.
+    """
+    def update():
+        chosen_file = filedialog.askopenfilename(title="Select a File")
+        if chosen_file:
+            no_validate_update_val(chosen_file, config_path, keys_path)
+            value_label.config(text=chosen_file) 
+
+    dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
+    label = tk.ttk.Label(control_frame, text=render_text, style = "Bold.TLabel")
+
+    if dict_var == "":
+        value_label = tk.ttk.Label(control_frame, text = "None selected", foreground="black")
+    else:
+        value_label = tk.ttk.Label(control_frame, text = dict_var, foreground="black")
+
+    button = tk.Button(control_frame, text="Choose File", command=update)
+    if frow is None or column is None:
+        label.grid()
+        value_label.grid()
+        button.grid()
+    else:
+        label.grid(row = frow, column = column, sticky = 'w', pady = 5)
+        value_label.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
+        button.grid(row = frow+2, column = column, sticky = 'e', pady = 5)
+
+    components.add(label)
+    components.add(value_label)
+    components.add(button)
+
+

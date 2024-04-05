@@ -25,9 +25,10 @@ class GenomeElement:
     def initial_load(self):
         self.render_use_genetic_model()
         self.render_generate_genetic_architecture_method()
+        self.render_user_input()
         
         self.randomly_generate_components = self.render_randomly_generate()
-        self.randomly_generate_grid_configs = derender_components(self.randomly_generate_components)
+        # self.randomly_generate_grid_configs = derender_components(self.randomly_generate_components)
 
     def init_val(self, config_path):
         # testingrp
@@ -81,12 +82,66 @@ class GenomeElement:
         # self.normalize = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']['normalize']
     # 
 # 
+    def render_user_input(self):
+        user_input_components = set()
+        # self.render_gff(user_input_components)
+        # self.render_effsize_min(user_input_components)
+        # self.render_effsize_max(user_input_components)
+        # self.render_normalize(user_input_components)
+        return user_input_components
+    
+    # def render_path_select(components, keys_path, update_var, config_path, render_text, label, var)
+    def render_gff(self, components):
+        keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
+        config_path = self.config_path
+        render_text = "Please provide the genome annotation in a gff-like format:"
+        control_frame = self.control_frame
+        column, frow = None, None
+        render_path_select(components, keys_path, config_path, render_text, control_frame, column, frow)
+        # """
+        # self.gff = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']["gff"]
+        # keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
+        # """
+        # def update():
+        #     # chosen_file = filedialog.askopenfilename(title="Select a File", filetypes=[("gff files", "*.csv")])
+        #     chosen_file = filedialog.askopenfilename(title="Select a File")
+        #     if chosen_file:
+        #         keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
+        #         no_validate_update(self.gff_var, self.config_path, keys_path)
+        #         self.gff = chosen_file
+        #         self.gff_value_label.config(text=self.gff) 
 
+        # self.render_gff_text = "Please provide the genome annotation in a gff-like format:"
+        # self.gff_var = tk.StringVar(value=self.gff)
+        # self.gff_label = ttk.Label(self.control_frame, text=self.render_gff_text, style = "Bold.TLabel")
+
+        # if self.gff == "":
+        #     self.gff_value_label = ttk.Label(self.control_frame, text = "None selected", foreground="black")
+        # else:
+        #     self.gff_value_label = ttk.Label(self.control_frame, text = self.gff, foreground="black")
+
+        # self.gff_button = tk.Button(self.control_frame, text="Choose File", command=update)
+
+        # # self.gff_label.grid(row = 12, column = 1, sticky = 'w', pady = 5)
+        # # self.gff_value_label.grid(row=13, column=1, sticky='w', pady=5)
+        # # self.gff_button.grid(row=14, column=1, sticky='e', pady=5)
+        # self.gff_label.grid()
+        # self.gff_value_label.grid()
+        # self.gff_button.grid()
+
+
+        # components.add(self.gff_label)
+        # components.add(self.gff_value_label)
+        # components.add(self.gff_button)
 
     def render_number_of_traits(self, components):
+        return
+
+    def render_number_of_traits_title(self, components):
         self.render_number_of_traits_text = "Number of traits (integer):"
         self.number_of_traits_label = ttk.Label(self.control_frame, text=self.render_number_of_traits_text, style = "Bold.TLabel")
         self.number_of_traits_label.grid()
+        components.add(self.number_of_traits_label)
 
     def render_transmissibility(self, components):
         self.render_transmissibility_text = "Transmissibility"
@@ -109,42 +164,42 @@ class GenomeElement:
         components.add(self.drug_resistance, self.drug_resistance_entry)
 
 
-    def render_gff(self, components):
-        """
-        self.gff = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']["gff"]
-        keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
-        """
-        def update():
-            # chosen_file = filedialog.askopenfilename(title="Select a File", filetypes=[("gff files", "*.csv")])
-            chosen_file = filedialog.askopenfilename(title="Select a File")
-            if chosen_file:
-                keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
-                no_validate_update(self.gff_var, self.config_path, keys_path)
-                self.gff = chosen_file
-                self.gff_value_label.config(text=self.gff) 
+    # def render_gff(self, components):
+    #     """
+    #     self.gff = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']["gff"]
+    #     keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
+    #     """
+    #     def update():
+    #         # chosen_file = filedialog.askopenfilename(title="Select a File", filetypes=[("gff files", "*.csv")])
+    #         chosen_file = filedialog.askopenfilename(title="Select a File")
+    #         if chosen_file:
+    #             keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
+    #             no_validate_update(self.gff_var, self.config_path, keys_path)
+    #             self.gff = chosen_file
+    #             self.gff_value_label.config(text=self.gff) 
 
-        self.render_gff_text = "Please provide the genome annotation in a gff-like format:"
-        self.gff_var = tk.StringVar(value=self.gff)
-        self.gff_label = ttk.Label(self.control_frame, text=self.render_gff_text, style = "Bold.TLabel")
+    #     self.render_gff_text = "Please provide the genome annotation in a gff-like format:"
+    #     self.gff_var = tk.StringVar(value=self.gff)
+    #     self.gff_label = ttk.Label(self.control_frame, text=self.render_gff_text, style = "Bold.TLabel")
 
-        if self.gff == "":
-            self.gff_value_label = ttk.Label(self.control_frame, text = "None selected", foreground="black")
-        else:
-            self.gff_value_label = ttk.Label(self.control_frame, text = self.gff, foreground="black")
+    #     if self.gff == "":
+    #         self.gff_value_label = ttk.Label(self.control_frame, text = "None selected", foreground="black")
+    #     else:
+    #         self.gff_value_label = ttk.Label(self.control_frame, text = self.gff, foreground="black")
 
-        self.gff_button = tk.Button(self.control_frame, text="Choose File", command=update)
+    #     self.gff_button = tk.Button(self.control_frame, text="Choose File", command=update)
 
-        # self.gff_label.grid(row = 12, column = 1, sticky = 'w', pady = 5)
-        # self.gff_value_label.grid(row=13, column=1, sticky='w', pady=5)
-        # self.gff_button.grid(row=14, column=1, sticky='e', pady=5)
-        self.gff_label.grid()
-        self.gff_value_label.grid()
-        self.gff_button.grid()
+    #     # self.gff_label.grid(row = 12, column = 1, sticky = 'w', pady = 5)
+    #     # self.gff_value_label.grid(row=13, column=1, sticky='w', pady=5)
+    #     # self.gff_button.grid(row=14, column=1, sticky='e', pady=5)
+    #     self.gff_label.grid()
+    #     self.gff_value_label.grid()
+    #     self.gff_button.grid()
 
 
-        components.add(self.gff_label)
-        components.add(self.gff_value_label)
-        components.add(self.gff_button)
+    #     components.add(self.gff_label)
+    #     components.add(self.gff_value_label)
+    #     components.add(self.gff_button)
 
 
     def render_generate_genetic_architecture_method(self):
@@ -211,6 +266,7 @@ class GenomeElement:
         self.render_effsize_max(randomly_generate_components)
         self.render_normalize(randomly_generate_components)
         return randomly_generate_components
+    
     def update_use_genetic_model(self):
         # self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
         self.hide_elements_update_methods()
@@ -356,11 +412,11 @@ class GenomeElement:
         self.effsize_min_entry.grid()
         components.add(self.effsize_min_label)
         components.add(self.effsize_min_entry)
+        
     def render_effsize_max(self, components):
         self.effsize_max_label = ttk.Label(self.control_frame, text="effsize_max:")
         self.effsize_max_entry = ttk.Entry(self.control_frame, foreground="black")
         self.effsize_max_entry.insert(0, str(self.effsize_max))  
-
         self.effsize_max_label.grid()
         self.effsize_max_entry.grid()
         components.add(self.effsize_max_label)
@@ -379,9 +435,7 @@ class GenomeElement:
         return
     def update_method(self):
         return
-    
-    def render_number_of_traits(self):
-        return
+
     
     def render_path_eff_size_table(self):
         def choose_and_update_path():
