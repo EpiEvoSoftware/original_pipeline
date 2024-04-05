@@ -13,10 +13,7 @@ class EvolutionaryModel:
         # update = self.initial_renderrt()
         # render_next_button(self.tab_index, self.tab_parent, self.parent, self.updatert())
 
-        self.error_messages = []
-
         render_next_button(self.tab_index, self.tab_parent, self.parent, self.update)
-        
 
 
     def initial_render(self):
@@ -24,11 +21,8 @@ class EvolutionaryModel:
         self.render_mut_rate()
         self.render_trans_type() 
         self.render_dr_type() 
-        self.render_within_host_reproduction()
-        if self.within_host_reproduction:
-            self.render_within_host_reproduction_rate(False)
-        else:
-            self.render_within_host_reproduction_rate(True)
+        self.render_within_host_reproduction()        
+        self.render_within_host_reproduction_rate(True)
         self.render_cap_withinhost() 
 
     # def initial_renderrt(self):
@@ -103,15 +97,9 @@ class EvolutionaryModel:
         self.dr_type_combobox.grid(row = 6, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)      
 
     def render_within_host_reproduction(self):
+        
         def update():
-            input_value = self.within_host_reproduction_var.get()
-            # config = load_config_as_dict(self.config_path)
-            # config['EvolutionModel']['within_host_reproduction'] = input_value
-            # save_config(self.config_path, config)
-            if input_value:
-                self.render_within_host_reproduction_rate(False)
-            else:
-                self.render_within_host_reproduction_rate(True)
+            return
         self.within_host_reproduction_var = tk.BooleanVar(value=self.within_host_reproduction)
         self.within_host_reproduction_label = ttk.Label(self.control_frame, text="Within-host Reproduction", style = "Bold.TLabel")
         self.rb_true = ttk.Radiobutton(self.control_frame, text="Yes", variable=self.within_host_reproduction_var, value=True, command = update)
