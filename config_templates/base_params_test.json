@@ -40,12 +40,9 @@
         }
     },
     "GenomeElement": {
-        "use_genetic_model": true,
+        "use_genetic_model": false,
         "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
-        "traits_num": {
-            "transmissibility": 0,
-            "drug_resistance": 0
-        },
+        "traits_num": [],
         "effect_size": {
             "method": "randomly_generate",
             "user_input": {
@@ -56,19 +53,19 @@
                 "genes_num": [],
                 "effsize_min": [],
                 "effsize_max": [],
-                "normalize": true
+                "normalize": false
             }
         }
     },
     "NetworkModelParameters": {
         "use_network_model": true,
         "method": "",
-        "host_size": 0,
+        "host_size": 1000,
         "user_input": {
             "path_network": ""
         },
         "randomly_generate": {
-            "network_model": "",
+            "network_model": "RP",
             "ER": {
                 "p_ER": 0
             },
@@ -78,7 +75,7 @@
                 "p_between": 0
             },
             "BA": {
-                "ba_m": 0
+                "ba_m": 1
             }
         }
     },

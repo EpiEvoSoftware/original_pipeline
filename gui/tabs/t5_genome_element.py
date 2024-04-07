@@ -414,6 +414,9 @@ class GenomeElement:
                 return
             
             run_effsize_generation(method, wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, n_gen=n_gen, mut_rate=mut_rate)
+            # err = run_effsize_generation(method, wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, n_gen=n_gen, mut_rate=mut_rate)
+            # if err:
+            #     messagebox.showerror("Generation Error", "Generation Error: " + str(err))
 
             
         self.run_effect_size_generation_button = tk.Button(self.control_frame, text="run_effect_size_generation_button", command=effect_size_generation)
