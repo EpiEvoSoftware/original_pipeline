@@ -2,6 +2,7 @@ import sys
 import os
 import json
 from tools import *
+from tkinter import messagebox 
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
@@ -253,7 +254,13 @@ class NetworkGraphApp:
         num_seed = len(self.table.get_children())
 
         match_methods, match_params = self.collect_matching_criteria()
-        match_dict = run_seed_host_match("Randomly_generate", wkdir, num_seed, match_scheme=match_methods, match_scheme_param=match_params)
+        match_dict = run_seed_host_match("randomly_generate", wkdir, num_seed, match_scheme=match_methods, match_scheme_param=match_params)
+        
+        if match_dict[0] is not None:
+            match_dict = match_dict[0]
+        else:
+            messagebox.showerror("Matching Error", "Matching Error: " + str(match_dict[1]))
+            return
 
 
         for child in self.table.get_children():
