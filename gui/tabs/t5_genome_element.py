@@ -47,8 +47,9 @@ class GenomeElement:
         render_text = "Please provide the genome annotation in a gff-like format:"
         control_frame = self.control_frame
         column, frow = None, None
-        path_select_controls = render_path_select(keys_path, config_path, render_text, control_frame, column, frow)
-        return path_select_controls
+        return EasyPathSelector(keys_path, config_path, render_text, control_frame, column, frow)
+        # path_select_controls = render_path_select(keys_path, config_path, render_text, control_frame, column, frow)
+        # return path_select_controls
 
     def render_number_of_traits(self):
         return
@@ -60,7 +61,9 @@ class GenomeElement:
         # components.add(self.number_of_traits_label)
 # 
     def render_transmissibility(self):
+        keys_path = ['GenomeElement', 'traits_num', 'transmissibility']
         self.render_transmissibility_text = "Transmissibility"
+        return EasyEntry(keys_path, self.config_path, self.render_transmissibility_text, 'transmissibility', self.control_frame, None, None, 'integer')
         self.transmissibility_label = ttk.Label(self.control_frame, text=self.render_transmissibility_text, style = "Bold.TLabel")
         self.transmissibility_entry = ttk.Entry(self.control_frame, foreground="black")
         self.transmissibility_entry.insert(0, self.transmissibility)
@@ -70,6 +73,7 @@ class GenomeElement:
         # components.add(self.transmissibility, self.transmissibility_entry)
 
     def render_drug_resistance(self):
+        keys_path = ['GenomeElement', 'traits_num', 'drug_resistance']
         self.render_drug_resistance_text = "Drug-Resistance"
         self.drug_resistance_label = ttk.Label(self.control_frame, text=self.render_drug_resistance_text, style = "Bold.TLabel")
         self.drug_resistance_entry = ttk.Entry(self.control_frame, foreground="black")
@@ -129,11 +133,10 @@ class GenomeElement:
         return None
 
     def render_randomly_generate(self):
-        self.render_gff()
-        self.render_effsize_min()
-        self.render_effsize_max()
-        self.render_normalize()
-        return 
+        gff_component = self.render_gff()
+        effsize_min_component = self.render_effsize_min()
+        effsize_max_component = self.render_effsize_max()
+        normalize_component = self.render_normalize() 
     
     def update_use_genetic_model(self):
         self.hide_elements_update_methods()
@@ -234,7 +237,7 @@ class GenomeElement:
         keys_path = ['GenomeElement','effect_size','randomly_generate','effsize_min']
         render_text = "Minimum Effect Size of each region for each trait (list numerical)"
         frow, column = None, None
-        effsize_min = EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list")
+        return EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list")
         # render_effsize_min_controls = render_numerical_input(keys_path, self.config_path, render_text, self.control_frame, column, frow, "list")
         # self.effsize_min_label = ttk.Label(self.control_frame, text="effsize_min:")
         # self.effsize_min_label.grid()
@@ -247,20 +250,29 @@ class GenomeElement:
         # components.add(self.effsize_min_entry)
         
     def render_effsize_max(self):
-        self.effsize_max_label = ttk.Label(self.control_frame, text="effsize_max:")
-        self.effsize_max_entry = ttk.Entry(self.control_frame, foreground="black")
-        self.effsize_max_entry.insert(0, str(self.effsize_max))  
-        self.effsize_max_label.grid()
-        self.effsize_max_entry.grid()
+        # self.effsize_max_label = ttk.Label(self.control_frame, text="effsize_max:")
+        # self.effsize_max_entry = ttk.Entry(self.control_frame, foreground="black")
+        # self.effsize_max_entry.insert(0, str(self.effsize_max))  
+        # self.effsize_max_label.grid()
+        # self.effsize_max_entry.grid()
+        keys_path = ['GenomeElement','effect_size','randomly_generate','effsize_max']
+        render_text = "Maximum Effect Size of each region for each trait (list numerical)"
+        column, frow = None, None
+        effsize_max = EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list")
         # components.add(self.effsize_max_label)
         # components.add(self.effsize_max_entry)
 
     def render_normalize(self):
-        self.normalize_label = ttk.Label(self.control_frame, text="normalize:")
-        self.normalize_label.grid()
-        self.normalize_var = tk.StringVar(value=bool_to_string_mapping[self.normalize])
-        self.normalize_combobox = ttk.Combobox(self.control_frame, textvariable=self.normalize_var, values=["Yes", "No"], state="readonly")
-        self.normalize_combobox.grid() 
+        render_text = "Maximum Effect Size of each region for each trait (list numerical)"
+        keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', 'normalize']
+        column, frow, to_rerender, to_derender = None, None, None, None
+        normalize = EasyRadioButton(keys_path, self.config_path, render_text, "normalize", self.control_frame, column, frow, to_rerender, to_derender)
+
+        # self.normalize_label = ttk.Label(self.control_frame, text="normalize:")
+        # self.normalize_label.grid()
+        # self.normalize_var = tk.StringVar(value=bool_to_string_mapping[self.normalize])
+        # self.normalize_combobox = ttk.Combobox(self.control_frame, textvariable=self.normalize_var, values=["Yes", "No"], state="readonly")
+        # self.normalize_combobox.grid() 
         # components.add(self.normalize_label)
         # components.add(self.normalize_combobox)
         
@@ -269,7 +281,6 @@ class GenomeElement:
     def update_method(self):
         return
 
-    
     def render_path_eff_size_table(self):
         def choose_and_update_path():
             chosen_file = filedialog.askopenfilename(title="Select a path_effsize_table")
@@ -420,6 +431,8 @@ class GenomeElement:
         self.control_frame.pack(fill='both', expand=True)
 
     def initial_load(self):
+        self.render_randomly_generate()
+        return
         # render_user_input_controls = self.render_user_input()
         # feed render_user_input controls into render_genetic_architecture_group
         # render + derender everything, feed renderers/derenderers
@@ -429,7 +442,7 @@ class GenomeElement:
         
         self.render_generate_genetic_architecture_method()
         
-        self.render_randomly_generate()
+        # self.render_randomly_generate()
 
     def global_update(self):
         users_validation_messages = []
@@ -469,10 +482,20 @@ class GenomeElement:
         self.config_path = config_path
         self.config_dict = load_config_as_dict(self.config_path)
         self.use_genetic_model = self.config_dict['GenomeElement']['use_genetic_model']
-        self.traits_num = self.config_dict['GenomeElement']['traits_num']
-        if len(self.traits_num) > 0:
-            self.transmissibility = self.traits_num[0]
-            self.drug_resistance = self.traits_num[1]
+        self.transmissibility = self.config_dict['GenomeElement']['traits_num']['transmissibility']
+        self.drug_resistance = self.config_dict['GenomeElement']['traits_num']['drug_resistance']
+
+        # if len(self.config_dict['GenomeElement']['traits_num']) == 0:
+        #     self.traits_num = [0, 0]
+        #     self.transmissibility = 0
+        #     self.drug_resistance = 0
+        # elif len(self.config_dict['GenomeElement']['traits_num']) == 2:
+        #     self.traits_num = self.config_dict['GenomeElement']['traits_num']
+        #     self.transmissibility = self.traits_num[0]
+        #     self.drug_resistance = self.traits_num[1]
+        # else:
+        #     raise ValueError("Error: traits_num should have only 2 values.")
+
         self.generate_genetic_architecture_method = self.config_dict['GenomeElement']['effect_size']['method']
         self.path_effsize_table = self.config_dict['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
         self.gff = self.config_dict['GenomeElement']['effect_size']['randomly_generate']["gff"]

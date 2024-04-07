@@ -14,12 +14,15 @@
   },
   "SeedsConfiguration": {
     "seed_size": 1,
-    "use_reference": false,
+    "use_reference": false
   },
   "GenomeElement": {
     "use_genetic_model": true,
     "ref_path": "",
-    "traits_num": [1, 2]
+    "traits_num": {
+      "transmissibility": 1,
+      "drug_resistance": 2
+    }
   },
   "NetworkModelParameters": {
     "use_network_model": true,

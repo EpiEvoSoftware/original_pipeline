@@ -42,7 +42,10 @@
   "GenomeElement": {
       "use_genetic_model": true,
       "ref_path": "",
-      "traits_num": [],
+      "traits_num": {
+        "transmissibility": 0,
+        "drug_resistance": 0
+      },
       "effect_size": {
           "method": "",
           "user_input": {

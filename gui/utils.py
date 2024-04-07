@@ -363,6 +363,7 @@ generate_genetic_architecture_method_values = list(val_to_render_generate_geneti
 def render_path_select(keys_path, config_path, render_text, control_frame, column, frow):
     """
     Renders a path select component in the GUI.
+    depreciated, replace with EasyPathSelect
     """
     def update():
         chosen_file = filedialog.askopenfilename(title="Select a File")
@@ -424,6 +425,9 @@ def update_numerical_input(entry, keys_path, config_path, error_messages, render
         error_messages.append(f"{render_text_short + ": Update Error, " + str(e)}")
 
 def render_numerical_input(keys_path, config_path, render_text, control_frame, column, frow, internal_type):
+    """
+    depreciated
+    """
     dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
     label = tk.ttk.Label(control_frame, text=render_text, style = "Bold.TLabel")
     entry = tk.ttk.Entry(control_frame, foreground="black")
@@ -469,7 +473,7 @@ def render_numerical_input(keys_path, config_path, render_text, control_frame, c
 
 def render_rb(keys_path, config_path, render_text, control_frame, column, frow, rerenderer, derenderer):
     """
-    self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
+    depreciated
     """
     def update():
         no_validate_update(var, config_path, keys_path)
@@ -615,3 +619,45 @@ class EasyRadioButton:
                 if self.to_derender is not None:
                     self.to_derender()
 
+class EasyPathSelector:
+    def __init__(self, keys_path, config_path, render_text, control_frame, column, frow):
+        """
+        Replaces render_path_select
+        """
+        self.keys_path = keys_path
+        self.config_path = config_path
+
+        dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
+        label = tk.ttk.Label(control_frame, text=render_text, style = "Bold.TLabel")
+
+        if dict_var == "":
+            self.value_label = tk.ttk.Label(control_frame, text = "None selected", foreground="black")
+        else:
+            self.value_label = tk.ttk.Label(control_frame, text = dict_var, foreground="black")
+
+        button = tk.Button(control_frame, text="Choose File", command=self._update)
+
+        if frow is None or column is None:
+            label.grid()
+            self.value_label.grid()
+            button.grid()
+        else:
+            label.grid(row = frow, column = column, sticky = 'w', pady = 5)
+            self.value_label.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
+            button.grid(row = frow+2, column = column, sticky = 'e', pady = 5)
+
+        self.local_components = {label, self.value_label, button}
+        self.local_grid_layout = derender_components(self.local_components)
+        rerender_components(self.local_components, self.local_grid_layout)
+
+    def rerender_itself(self):
+        rerender_components(self.local_components, self.local_grid_layout)
+        
+    def derender_itself(self):
+        derender_components(self.local_components)
+        
+    def _update(self):
+        chosen_file = filedialog.askopenfilename(title="Select a File")
+        if chosen_file:
+            no_validate_update_val(chosen_file, self.config_path, self.keys_path)
+            self.value_label.config(text=chosen_file) 
