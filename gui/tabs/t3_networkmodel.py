@@ -59,20 +59,34 @@ class NetworkModelConfigurations:
         self.tab_index = tab_index
 
         # User Configurations
-        self.use_network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['use_network_model']
-        self.host_size = load_config_as_dict(self.config_path)['NetworkModelParameters']['host_size']
+        self.config_dict = load_config_as_dict(self.config_path)
+        self.use_network_model = self.config_dict['NetworkModelParameters']['use_network_model']
+        self.host_size = self.config_dict['NetworkModelParameters']['host_size']
 
-        self.path_network = load_config_as_dict(self.config_path)['NetworkModelParameters']['user_input']["path_network"]
+        self.path_network = self.config_dict['NetworkModelParameters']['user_input']["path_network"]
 
-        self.network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']["network_model"]
+        self.network_model = self.config_dict['NetworkModelParameters']['randomly_generate']["network_model"]
 
-        self.p_ER = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['ER']['p_ER']
+        self.p_ER = self.config_dict['NetworkModelParameters']['randomly_generate']['ER']['p_ER']
 
-        self.rp_size = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['RP']['rp_size']
-        self.p_within = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['RP']['p_within']
-        self.p_between = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['RP']['p_between']
+        temp_rp_size = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['rp_size']
+        if len(temp_rp_size) == 0:
+            self.rp_size = [0, 0]
+        elif len(temp_rp_size) == 2:
+            self.rp_size = temp_rp_size
+        else:
+            raise ValueError("Invalid rp_size value in the config file.")
+        temp_p_within = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['p_within']
+        if len(temp_p_within) == 0:
+            self.p_within = [0, 0]
+        elif len(temp_p_within) == 2:
+            self.p_within = temp_p_within
+        else:
+            raise ValueError("Invalid p_within value in the config file.")
+        self.p_between = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['p_between']
 
-        self.ba_m = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']['BA']['ba_m']
+
+        self.ba_m = self.config_dict['NetworkModelParameters']['randomly_generate']['BA']['ba_m']
         # 
 
         self.parent = parent
