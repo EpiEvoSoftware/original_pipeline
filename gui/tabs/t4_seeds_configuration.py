@@ -898,35 +898,43 @@ class SeedsConfiguration:
             method = config["SeedsConfiguration"]["method"]
             ref_path = "/Users/vivianzhao/Desktop/TB_software/TB_software_new/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.fna"
             
-            if method == "SLiM_burnin_WF":
-                Ne = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_Ne"]
-                n_gen = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_generations"]
-                mu = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_mutrate"]
-                run_seed_generation(method=method, wk_dir=cwdir, seed_size=seed_size, Ne=Ne,
-                                    mu=mu, n_gen=n_gen, ref_path=ref_path)
-            elif method == "SLiM_burnin_epi":
-                n_gen = config["SeedsConfiguration"]["SLiM_burnin_epi"]["burn_in_generations"]
-                mu = config["SeedsConfiguration"]["SLiM_burnin_epi"]["burn_in_mutrate"]
-                seeded_host_id = config["SeedsConfiguration"]["SLiM_burnin_epi"]["seeded_host_id"]
-                S_IE_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["S_IE_rate"]
-                E_I_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["E_I_rate"]
-                E_R_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["E_R_rate"]
-                latency_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"]["latency_prob"]
-                I_R_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["I_R_rate"]
-                I_E_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["I_E_rate"]
-                R_S_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["R_S_rate"]
-                host_size = config["NetworkModelParameters"]["host_size"]
-                
-                run_seed_generation(method=method, wk_dir=cwdir, seed_size=seed_size, mu=mu, n_gen=n_gen, 
-                            seeded_host_id=seeded_host_id, S_IE_rate=S_IE_rate, E_I_rate=E_I_rate,
-                            E_R_rate=E_R_rate, latency_prob=latency_prob, I_R_rate=I_R_rate, 
-                            I_E_rate=I_E_rate, R_S_rate=R_S_rate, host_size=host_size, ref_path=ref_path)
+            try: 
+                if method == "SLiM_burnin_WF":
+                    Ne = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_Ne"]
+                    n_gen = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_generations"]
+                    mu = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_mutrate"]
+                    error = run_seed_generation(method=method, wk_dir=cwdir, seed_size=seed_size, Ne=Ne,
+                                        mu=mu, n_gen=n_gen, ref_path=ref_path)
+                elif method == "SLiM_burnin_epi":
+                    n_gen = config["SeedsConfiguration"]["SLiM_burnin_epi"]["burn_in_generations"]
+                    mu = config["SeedsConfiguration"]["SLiM_burnin_epi"]["burn_in_mutrate"]
+                    seeded_host_id = config["SeedsConfiguration"]["SLiM_burnin_epi"]["seeded_host_id"]
+                    S_IE_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["S_IE_rate"]
+                    E_I_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["E_I_rate"]
+                    E_R_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["E_R_rate"]
+                    latency_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"]["latency_prob"]
+                    I_R_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["I_R_rate"]
+                    I_E_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["I_E_rate"]
+                    R_S_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"]["R_S_rate"]
+                    host_size = config["NetworkModelParameters"]["host_size"]
+                    
+                    error = run_seed_generation(method=method, wk_dir=cwdir, seed_size=seed_size, mu=mu, n_gen=n_gen, 
+                                seeded_host_id=seeded_host_id, S_IE_rate=S_IE_rate, E_I_rate=E_I_rate,
+                                E_R_rate=E_R_rate, latency_prob=latency_prob, I_R_rate=I_R_rate, 
+                                I_E_rate=I_E_rate, R_S_rate=R_S_rate, host_size=host_size, ref_path=ref_path)
 
-            elif method == "user_input":
-                path_seeds_vcf = config["SeedsConfiguration"]["user_input"]["path_seeds_vcf"]
-                path_seeds_phylogeny = config["SeedsConfiguration"]["user_input"]["path_seeds_phylogeny"]
-                run_seed_generation(method=method, wk_dir=cwdir, seed_size=seed_size, seed_vcf=path_seeds_vcf, 
-                                    path_seeds_phylogeny=path_seeds_phylogeny)
+                elif method == "user_input":
+                    path_seeds_vcf = config["SeedsConfiguration"]["user_input"]["path_seeds_vcf"]
+                    path_seeds_phylogeny = config["SeedsConfiguration"]["user_input"]["path_seeds_phylogeny"]
+                    error = run_seed_generation(method=method, wk_dir=cwdir, seed_size=seed_size, seed_vcf=path_seeds_vcf, 
+                                        path_seeds_phylogeny=path_seeds_phylogeny)
+                
+                if error is not None:
+                    raise Exception(error)
+                
+            except Exception as e:
+                    messagebox.showerror("Network Generation Error", str(e))
+                    
 
         self.run_seed_generation_button = tk.Button(self.control_frame, text="Run Seed Generation", command=seed_generation)
         self.run_seed_generation_button.grid()

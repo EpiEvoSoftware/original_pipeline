@@ -348,9 +348,9 @@ class NetworkModelConfigurations:
                         try:
                             rp_size_value = int(float(self.rp_size_entry.get()))
                             rp_size_value_2 = int(float(self.rp_size_entry_2.get()))
-                            p_within_value = int(float(self.p_within_entry.get()))
-                            p_within_value_2 = int(float(self.p_within_entry_2.get()))
-                            p_between_value = int(float(self.p_between_entry.get()))
+                            p_within_value = float(self.p_within_entry.get())
+                            p_within_value_2 = float(self.p_within_entry_2.get())
+                            p_between_value = float(self.p_between_entry.get())
 
                             config = load_config_as_dict(self.config_path)
                             config['NetworkModelParameters']['randomly_generate']['RP']['rp_size'] = [rp_size_value, rp_size_value_2]
@@ -440,24 +440,28 @@ class NetworkModelConfigurations:
 
     
     def render_run_network_generation(self):
-        config = load_config_as_dict(self.config_path) 
-        wk_dir = config["BasicRunConfiguration"]["cwdir"]
         def run_network_generate():
-            print('here')
+            self.config_dict = load_config_as_dict(self.config_path)
+            wk_dir = self.config_dict["BasicRunConfiguration"]["cwdir"]
             try:
-                pop_size = int(float(self.host_size_entry.get()))
+                pop_size = self.config_dict['NetworkModelParameters']['host_size']
                 graph_type = self.network_model_var.get()
                 
+
+
+                self.network_model = self.config_dict['NetworkModelParameters']['randomly_generate']["network_model"]
+                
                 if graph_type == "Erdős–Rényi":
-                    p_ER = float(self.p_ER_entry.get())
+                    p_ER = self.config_dict['NetworkModelParameters']['randomly_generate']['ER']['p_ER']
                     network, error = run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="ER", p_ER=p_ER)
                 elif graph_type == "Barabási-Albert":
-                    m = int(float(self.ba_m_entry.get()))
+                    m = self.config_dict['NetworkModelParameters']['randomly_generate']['BA']['ba_m']
                     network, error = run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="BA", m=m)
                 elif graph_type == "Random Partition":
-                    rp_size = [int(float(part)) for part in self.rp_size_entry.get().split(',')]
-                    p_within = [float(p) for p in self.p_within_entry.get().split(',')]
-                    p_between = float(self.p_between_entry.get())
+                    rp_size = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['rp_size']
+                    p_within = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['p_within']
+                    p_between = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['p_between']
+                    print(p_between, "pbetween")
                     network, error = run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="RP", rp_size=rp_size, p_within=p_within, p_between=p_between)
                 else:
                     raise ValueError("Unsupported model.")

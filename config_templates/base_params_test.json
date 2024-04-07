@@ -73,9 +73,15 @@
                 "p_ER": 0
             },
             "RP": {
-                "rp_size": [],
-                "p_within": [],
-                "p_between": 0
+                "rp_size": [
+                    400,
+                    600
+                ],
+                "p_within": [
+                    0.1,
+                    0.3
+                ],
+                "p_between": 0.2
             },
             "BA": {
                 "ba_m": 1

@@ -129,7 +129,7 @@ def run_network_generation(pop_size, wk_dir, method, model="", path_network="", 
             ntwk = copy_input_network(wk_dir, path_network, pop_size)
 
         elif method == "randomly_generate":
-            if not model in ["ER", "BP", "BA"]: 
+            if not model in ["ER", "RP", "BA"]: 
                 raise CustomizedError("Please specify a legit random graph model (-model) in random "
                                       "generate mode. (Supported model: ER/RP/BA)")
             
