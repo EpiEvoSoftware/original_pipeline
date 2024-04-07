@@ -36,7 +36,7 @@ class GenomeElement:
     def init_user_input_group(self):
         path_eff_size_table = self.render_path_eff_size_table()
         self.user_input_group_control = path_eff_size_table
-        self.user_input_group_control.derender_itself()
+        # self.user_input_group_control.derender_itself()
 
     def init_num_traits_group(self):
         number_of_traits_title = self.render_number_of_traits_title()
