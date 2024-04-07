@@ -196,6 +196,33 @@ def update_list_int_params(entry, keys_path, config_path, prev_val = None, insta
     except Exception as e: # General error handling (e.g., file operation failures)
         tk.messagebox.showerror("Update Error", str(e))
 
+def update_list_int_params_v2(entry, keys_path, config_path, error_messages, render_text_short):
+    try:
+        stripped_entry = entry.get().strip()
+        cleaned_input = stripped_entry.strip("[]").strip()
+        
+        if cleaned_input == "":
+            new_parsed = []
+        elif cleaned_input.isdigit():
+            new_parsed = [int(float(cleaned_input))]
+        elif "," in stripped_entry:
+            new_parsed = [int(float(item.strip())) for item in cleaned_input.split(',')]
+        else:
+            new_parsed = []
+            error_messages.append(f"{render_text_short}: Invalid input format.")
+        
+        config = load_config_as_dict(config_path)
+        update_nested_dict(config, keys_path, new_parsed)
+        save_config(config_path, config)
+
+        # if new_parsed != prev_val:
+            # setattr(self, keys_path[-1], new_parsed)
+            # messagebox.showinfo("Success", "Updated successfully") 
+    except ValueError: # This catches cases where conversion to integer fails
+        error_messages.append(f"{render_text_short}: Please enter a valid list of numbers, separated by commas.")
+    except Exception as e: # General error handling (e.g., file operation failures)
+        error_messages.append(f"{render_text_short + ": Update Error, " + str(e)}")
+
 
 string_to_bool_mapping = {
     "yes": True,
@@ -333,7 +360,7 @@ generate_genetic_architecture_method_values = list(val_to_render_generate_geneti
 
 
 
-def render_path_select(components, keys_path, config_path, render_text, control_frame, column, frow):
+def render_path_select(keys_path, config_path, render_text, control_frame, column, frow):
     """
     Renders a path select component in the GUI.
     """
@@ -352,6 +379,7 @@ def render_path_select(components, keys_path, config_path, render_text, control_
         value_label = tk.ttk.Label(control_frame, text = dict_var, foreground="black")
 
     button = tk.Button(control_frame, text="Choose File", command=update)
+
     if frow is None or column is None:
         label.grid()
         value_label.grid()
@@ -361,8 +389,141 @@ def render_path_select(components, keys_path, config_path, render_text, control_
         value_label.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
         button.grid(row = frow+2, column = column, sticky = 'e', pady = 5)
 
-    components.add(label)
-    components.add(value_label)
-    components.add(button)
+    local_components = {label, value_label, button}
+    local_grid_layout = derender_components(local_components)
+    rerender_components(local_components, local_grid_layout)
+
+    def updater():
+        return None
+    def rerenderer():
+        rerender_components(local_components, local_grid_layout)
+    def derenderer():
+        derender_components(local_components)
+    
+    controls = {
+        "updater": updater,
+        "rerenderer": rerenderer,
+        "derenderer": derenderer
+    }
+
+    return controls
+    
+def update_numerical_input(entry, keys_path, config_path, error_messages, render_text_short, is_int):
+    try:
+        new_val = int(float(entry.get()))  
+        config = load_config_as_dict(config_path) 
+        update_nested_dict(config, keys_path, new_val) 
+        save_config(config_path, config)  
+    except ValueError: # This catches cases where conversion to integer fails
+        if is_int:
+            valtype = "integer"
+        else:
+            valtype = "numerical"
+        error_messages.append(f"{render_text_short}: Please enter a valid {valtype} value.")
+    except Exception as e: # General error handling (e.g., file operation failures)
+        error_messages.append(f"{render_text_short + ": Update Error, " + str(e)}")
+
+def render_numerical_input(keys_path, config_path, render_text, control_frame, column, frow, internal_type):
+    
+    dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
+    label = tk.ttk.Label(control_frame, text=render_text, style = "Bold.TLabel")
+    entry = tk.ttk.Entry(control_frame, foreground="black")
+    entry.insert(0, str(dict_var))  
+
+    if frow is None or column is None:
+        label.grid()
+        entry.grid()
+    else:
+        label.grid(row = frow, column = column, sticky = 'w', pady = 5)
+        entry.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
+
+    local_components = {entry, label}
+    grid_layout = derender_components(local_components)
+    rerender_components(local_components, grid_layout)
+
+    if internal_type == "list":
+        def updater(error_messages, render_text_short):
+            update_list_int_params_v2(entry, keys_path, config_path, error_messages, render_text_short)
+    elif internal_type == "integer":
+        def updater(error_messages, render_text_short):
+            update_numerical_input(entry, keys_path, config_path, error_messages, render_text_short, True)
+    elif internal_type == "numerical":
+        def updater(error_messages, render_text_short):
+            update_numerical_input(entry, keys_path, config_path, error_messages, render_text_short, False)
+    else:
+        raise ValueError("Invalid internal type.")
 
 
+    def rerenderer():
+        rerender_components(local_components, grid_layout)
+    
+    def derenderer():
+        derender_components(local_components)
+
+    controls = {
+        "updater": updater,
+        "rerenderer": rerenderer,
+        "derenderer": derenderer
+    }
+
+    return controls
+
+def render_rb(keys_path, config_path, render_text, control_frame, column, frow, rerenderer, derenderer):
+    """
+    self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
+    """
+    def update():
+        no_validate_update(var, config_path, keys_path)
+        if var.get():
+            rerenderer()
+            # print("use_genetic_model_local: ", dict_var)
+            # self.use_method_grid_configs = derender_components(self.use_method_components)
+            # self.user_input_grid_configs = derender_components(self.user_input_components)
+            # self.wf_grid_configs = derender_components(self.wf_components)
+            # self.epi_grid_configs = derender_components(self.epi_components)
+        else:
+            derenderer()
+            # print("use_genetic_model_local: ", dict_var)
+            # rerender_components(self.use_method_components, self.use_method_grid_configs)
+            # rerender_components(self.user_input_components, self.user_input_grid_configs)  
+            # keys_path = ['SeedsConfiguration', 'method']
+            # use_method_local = get_dict_val(load_config_as_dict(self.config_path), keys_path)
+            # match use_method_local:
+            #     case "user_input":
+            #         rerender_components(self.user_input_components, self.user_input_grid_configs)  
+            #     case "SLiM_burnin_WF":
+            #         rerender_components(self.wf_components, self.wf_grid_configs)    
+            #     case "SLiM_burnin_epi":
+            #         rerender_components(self.epi_components, self.epi_grid_configs)
+        
+    dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
+    var = tk.BooleanVar(value=dict_var)
+    label = tk.ttk.Label(control_frame, text=render_text, style = "Bold.TLabel")
+    rb_true = tk.ttk.Radiobutton(control_frame, text="Yes", variable=var, value=True, command = update)
+    rb_false = tk.ttk.Radiobutton(control_frame, text="No", variable=var, value=False, command = update)
+    if frow is None or column is None:
+        label.grid()
+        rb_true.grid()
+        rb_false.grid()
+    else:
+        label.grid(row = frow, column = column, sticky = 'w', pady = 5)
+        rb_true.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
+        rb_false.grid(row = frow+2, column = column, sticky = 'w', pady = 5)
+
+    local_components = {label, rb_true, rb_false}
+    grid_layout = derender_components(local_components)
+    rerender_components(local_components, grid_layout)
+
+    def local_rerenderer():
+        rerender_components(local_components, grid_layout)
+    
+    def local_derenderer():
+        derender_components(local_components)
+
+    controls = {
+        "updater": None,
+        "rerenderer": local_rerenderer,
+        "derenderer": local_derenderer
+    }
+    
+    return controls

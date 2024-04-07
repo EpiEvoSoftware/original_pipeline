@@ -132,6 +132,16 @@ class NetworkModelConfigurations:
 
     def update(self):
         return
+    
+    def update(self):
+        error_messages = []
+        self.update_n_replicates(error_messages)
+        if len(error_messages) == 0:
+            messagebox.showinfo("Update Successful", "Parameters Updated.")
+            return 0
+        else:
+            error_message_str = "\n".join(error_messages)
+            messagebox.showerror("Update Error", error_message_str) 
 
     def update_host_size(self):
         try:

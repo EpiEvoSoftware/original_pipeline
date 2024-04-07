@@ -14,136 +14,70 @@ from genetic_effect_generator import *
 
 class GenomeElement:
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
-        
+        self.updaters = {}
+        self.rerenderers = {}
+        self.derenderers = {}
+        self.component_id = [
+            "genetic_model",
+            "gff",
+            "number_of_traits",
+            "transmissibility",
+            "drug_resistance",
+            "generate_genetic_architecture_method",
+            "genes_num",
+            "randomly_generate",
+            "genetic_model",
+            "effsize_min",
+            "effsize_max",
+            "path_effsize_table",
+            "rg_options"
+        ]
         self.init_val(config_path)
         self.init_tab(parent, tab_parent, tab_title, tab_index, hide)
         self.initial_load()
 
-        render_next_button(self.tab_index, self.tab_parent, self.parent)
-
-
-    def initial_load(self):
-        self.render_use_genetic_model()
-        self.render_generate_genetic_architecture_method()
-        self.render_user_input()
-        
-        self.randomly_generate_components = self.render_randomly_generate()
-        # self.randomly_generate_grid_configs = derender_components(self.randomly_generate_components)
+        render_next_button(self.tab_index, self.tab_parent, self.parent, self.global_update)
+    
 
     def init_val(self, config_path):
-        # testingrp
-    # User Configurations
-        # bool
         self.config_path = config_path
         self.config_dict = load_config_as_dict(self.config_path)
         self.use_genetic_model = self.config_dict['GenomeElement']['use_genetic_model']
-        # list
         self.traits_num = self.config_dict['GenomeElement']['traits_num']
-
         if len(self.traits_num) > 0:
             self.transmissibility = self.traits_num[0]
             self.drug_resistance = self.traits_num[1]
-
-        # str
         self.generate_genetic_architecture_method = self.config_dict['GenomeElement']['effect_size']['method']
         self.path_effsize_table = self.config_dict['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
-
-        # str
         self.gff = self.config_dict['GenomeElement']['effect_size']['randomly_generate']["gff"]
-        # list
         self.genes_num = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['genes_num']
-        # list
         self.effsize_min = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['effsize_min']
-        # list
         self.effsize_max = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
-        # bool
         self.normalize = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['normalize']
-        # self.config_dict = load_config_as_dict(self.config_path)
-        # self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
-        # # list
-        # self.traits_num = load_config_as_dict(self.config_path)['GenomeElement']['traits_num']
 
-        # self.transmissibility = self.traits_num[0]
-        # self.drug_resistance = self.traits_num[1]
-
-        # # str
-        # self.generate_genetic_architecture_method = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['method']
-        # self.path_effsize_table = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
-
-        # # str
-        # self.gff = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']["gff"]
-        # # list
-        # self.genes_num = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']['genes_num']
-        # # list
-        # self.effsize_min = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']['effsize_min']
-        # # list
-        # self.effsize_max = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
-        # # bool
-        # self.normalize = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']['normalize']
-    # 
-# 
     def render_user_input(self):
-        user_input_components = set()
-        # self.render_gff(user_input_components)
-        # self.render_effsize_min(user_input_components)
-        # self.render_effsize_max(user_input_components)
-        # self.render_normalize(user_input_components)
-        return user_input_components
+        user_input_group_controls = {} 
+        return user_input_group_controls
     
-    # def render_path_select(components, keys_path, update_var, config_path, render_text, label, var)
-    def render_gff(self, components):
+    def render_gff(self):
         keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
         config_path = self.config_path
         render_text = "Please provide the genome annotation in a gff-like format:"
         control_frame = self.control_frame
         column, frow = None, None
-        render_path_select(components, keys_path, config_path, render_text, control_frame, column, frow)
-        # """
-        # self.gff = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']["gff"]
-        # keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
-        # """
-        # def update():
-        #     # chosen_file = filedialog.askopenfilename(title="Select a File", filetypes=[("gff files", "*.csv")])
-        #     chosen_file = filedialog.askopenfilename(title="Select a File")
-        #     if chosen_file:
-        #         keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
-        #         no_validate_update(self.gff_var, self.config_path, keys_path)
-        #         self.gff = chosen_file
-        #         self.gff_value_label.config(text=self.gff) 
+        path_select_controls = render_path_select(keys_path, config_path, render_text, control_frame, column, frow)
+        return path_select_controls
 
-        # self.render_gff_text = "Please provide the genome annotation in a gff-like format:"
-        # self.gff_var = tk.StringVar(value=self.gff)
-        # self.gff_label = ttk.Label(self.control_frame, text=self.render_gff_text, style = "Bold.TLabel")
-
-        # if self.gff == "":
-        #     self.gff_value_label = ttk.Label(self.control_frame, text = "None selected", foreground="black")
-        # else:
-        #     self.gff_value_label = ttk.Label(self.control_frame, text = self.gff, foreground="black")
-
-        # self.gff_button = tk.Button(self.control_frame, text="Choose File", command=update)
-
-        # # self.gff_label.grid(row = 12, column = 1, sticky = 'w', pady = 5)
-        # # self.gff_value_label.grid(row=13, column=1, sticky='w', pady=5)
-        # # self.gff_button.grid(row=14, column=1, sticky='e', pady=5)
-        # self.gff_label.grid()
-        # self.gff_value_label.grid()
-        # self.gff_button.grid()
-
-
-        # components.add(self.gff_label)
-        # components.add(self.gff_value_label)
-        # components.add(self.gff_button)
-
-    def render_number_of_traits(self, components):
+    def render_number_of_traits(self):
         return
 
-    def render_number_of_traits_title(self, components):
-        self.render_number_of_traits_text = "Number of traits (integer):"
+    def render_number_of_traits_title(self):
+        self.render_number_of_traits_text = "Number of traits (Integer):"
         self.number_of_traits_label = ttk.Label(self.control_frame, text=self.render_number_of_traits_text, style = "Bold.TLabel")
         self.number_of_traits_label.grid()
-        components.add(self.number_of_traits_label)
-
-    def render_transmissibility(self, components):
+        # components.add(self.number_of_traits_label)
+# 
+    def render_transmissibility(self):
         self.render_transmissibility_text = "Transmissibility"
         self.transmissibility_label = ttk.Label(self.control_frame, text=self.render_transmissibility_text, style = "Bold.TLabel")
         self.transmissibility_entry = ttk.Entry(self.control_frame, foreground="black")
@@ -151,9 +85,9 @@ class GenomeElement:
 
         self.transmissibility_entry.grid()
         self.transmissibility_label.grid()
-        components.add(self.transmissibility, self.transmissibility_entry)
+        # components.add(self.transmissibility, self.transmissibility_entry)
 
-    def render_drug_resistance(self, components):
+    def render_drug_resistance(self):
         self.render_drug_resistance_text = "Drug-Resistance"
         self.drug_resistance_label = ttk.Label(self.control_frame, text=self.render_drug_resistance_text, style = "Bold.TLabel")
         self.drug_resistance_entry = ttk.Entry(self.control_frame, foreground="black")
@@ -161,45 +95,6 @@ class GenomeElement:
 
         self.drug_resistance_entry.grid()
         self.drug_resistance_label.grid()
-        components.add(self.drug_resistance, self.drug_resistance_entry)
-
-
-    # def render_gff(self, components):
-    #     """
-    #     self.gff = load_config_as_dict(self.config_path)['GenomeElement']['effect_size']['randomly_generate']["gff"]
-    #     keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
-    #     """
-    #     def update():
-    #         # chosen_file = filedialog.askopenfilename(title="Select a File", filetypes=[("gff files", "*.csv")])
-    #         chosen_file = filedialog.askopenfilename(title="Select a File")
-    #         if chosen_file:
-    #             keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
-    #             no_validate_update(self.gff_var, self.config_path, keys_path)
-    #             self.gff = chosen_file
-    #             self.gff_value_label.config(text=self.gff) 
-
-    #     self.render_gff_text = "Please provide the genome annotation in a gff-like format:"
-    #     self.gff_var = tk.StringVar(value=self.gff)
-    #     self.gff_label = ttk.Label(self.control_frame, text=self.render_gff_text, style = "Bold.TLabel")
-
-    #     if self.gff == "":
-    #         self.gff_value_label = ttk.Label(self.control_frame, text = "None selected", foreground="black")
-    #     else:
-    #         self.gff_value_label = ttk.Label(self.control_frame, text = self.gff, foreground="black")
-
-    #     self.gff_button = tk.Button(self.control_frame, text="Choose File", command=update)
-
-    #     # self.gff_label.grid(row = 12, column = 1, sticky = 'w', pady = 5)
-    #     # self.gff_value_label.grid(row=13, column=1, sticky='w', pady=5)
-    #     # self.gff_button.grid(row=14, column=1, sticky='e', pady=5)
-    #     self.gff_label.grid()
-    #     self.gff_value_label.grid()
-    #     self.gff_button.grid()
-
-
-    #     components.add(self.gff_label)
-    #     components.add(self.gff_value_label)
-    #     components.add(self.gff_button)
 
 
     def render_generate_genetic_architecture_method(self):
@@ -244,31 +139,21 @@ class GenomeElement:
         self.generate_genetic_architecture_method_label.grid()
         self.generate_genetic_architecture_method_combobox.grid()
 
+    def render_genes_num(self):
+        keys_path = ['GenomeElement','effect_size','randomly_generate','genes_num']
+        render_text = "Number of Genomic Regions for each trait (list integer)"
+        column, frow = None, None
+        controls = render_numerical_input(keys_path, self.config_path, render_text, self.control_frame, column, frow, "list")
+        return controls
 
-    def render_genes_num(self, components):
-        """
-        # self.genes_num = ['GenomeElement']['effect_size']['randomly_generate']['genes_num']
-        """
-        self.render_genes_num_text = "Number of Genomic Regions for each trait (list integer)"
-        self.genes_num_label = ttk.Label(self.control_frame, text=self.render_genes_num_text, style = "Bold.TLabel")
-        self.genes_num_entry = ttk.Entry(self.control_frame, foreground="black")
-        self.genes_num_entry.insert(0, str(self.genes_num))  
-
-        self.genes_num_label.grid()
-        self.genes_num_entry.grid()
-
-        components.add(self.genes_num_label)
-        components.add(self.genes_num_entry)
     def render_randomly_generate(self):
-        randomly_generate_components = set()
-        self.render_gff(randomly_generate_components)
-        self.render_effsize_min(randomly_generate_components)
-        self.render_effsize_max(randomly_generate_components)
-        self.render_normalize(randomly_generate_components)
-        return randomly_generate_components
+        self.render_gff()
+        self.render_effsize_min()
+        self.render_effsize_max()
+        self.render_normalize()
+        return 
     
     def update_use_genetic_model(self):
-        # self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
         self.hide_elements_update_methods()
         new_use_network_model = self.use_genetic_model_var.get()
         if new_use_network_model in ["Yes", "No"]: 
@@ -276,8 +161,6 @@ class GenomeElement:
             config['GenomeElement']['use_genetic_model'] = string_to_bool_mapping[new_use_network_model]
             save_config(self.config_path, config)
             
-
-            # break
             if new_use_network_model == "Yes":
                 if not hasattr(self, "RP"):
                     def update_traits_num():
@@ -320,14 +203,6 @@ class GenomeElement:
                             if new_effect_size_method == "user_input":
                                 self.hide_elements_update_methods()
                                 self.render_path_eff_size_table()
-                                # if not hasattr(self, 'path_network_label'):  
-                                #     self.render_path_eff_size_table()
-                                # else:
-                                #     # break, show the label if it was previously created
-                                #     self.path_network_label.grid()
-                                #     self.choose_path_network_button.grid()
-                                #     self.chosen_path_network_label.grid()
-
                             elif new_effect_size_method == "randomly_generate":
                                 self.hide_elements_update_methods()
                                 self.render_rg_options()
@@ -363,73 +238,44 @@ class GenomeElement:
         else:
             messagebox.showerror("Update Error", "Please enter 'Yes' or 'No' for use_network_model.")
 
-    def render_use_genetic_model(self):
-        """
-        self.use_genetic_model = load_config_as_dict(self.config_path)['GenomeElement']['use_genetic_model']
-        """
-        def update():
-            keys_path = ['GenomeElement', 'use_genetic_model']
-            no_validate_update(self.use_genetic_model_var, self.config_path, keys_path)
-            use_genetic_model_local = get_dict_val(load_config_as_dict(self.config_path), keys_path)
-            if use_genetic_model_local:
-                print("use_genetic_model_local: ", use_genetic_model_local)
-                # self.use_method_grid_configs = derender_components(self.use_method_components)
-                # self.user_input_grid_configs = derender_components(self.user_input_components)
-                # self.wf_grid_configs = derender_components(self.wf_components)
-                # self.epi_grid_configs = derender_components(self.epi_components)
-            else:
-                print("use_genetic_model_local: ", use_genetic_model_local)
-                # rerender_components(self.use_method_components, self.use_method_grid_configs)
-                # rerender_components(self.user_input_components, self.user_input_grid_configs)  
-                # keys_path = ['SeedsConfiguration', 'method']
-                # use_method_local = get_dict_val(load_config_as_dict(self.config_path), keys_path)
-                # match use_method_local:
-                #     case "user_input":
-                #         rerender_components(self.user_input_components, self.user_input_grid_configs)  
-                #     case "SLiM_burnin_WF":
-                #         rerender_components(self.wf_components, self.wf_grid_configs)    
-                #     case "SLiM_burnin_epi":
-                #         rerender_components(self.epi_components, self.epi_grid_configs)
-            
 
-        self.render_use_genetic_model_text = "Do you want to use genetic architecture for traits (transmissibility and/or Drug-resistance)?"
-        self.use_genetic_model_var = tk.BooleanVar(value=self.use_genetic_model)
-        self.use_genetic_model_label = ttk.Label(self.control_frame, text=self.render_use_genetic_model_text, style = "Bold.TLabel")
-        self.use_genetic_true = ttk.Radiobutton(self.control_frame, text="Yes", variable=self.use_genetic_model_var, value=True, command = update)
-        self.use_genetic_false = ttk.Radiobutton(self.control_frame, text="No", variable=self.use_genetic_model_var, value=False, command = update)
-
-        self.use_genetic_model_label.grid()
-        self.use_genetic_true.grid()
-        self.use_genetic_false.grid()
-        # self.use_genetic_model_label.grid(row = 3, column = 1, sticky = 'w', pady = 5)
-        # self.use_genetic_true.grid(row = 4, column = 1, columnspan= 3, sticky='w', pady=5)
-        # self.use_genetic_false.grid(row = 5, column = 1, columnspan= 3, sticky='w', pady=5)
-    def render_effsize_min(self, components):
+    
+    def render_use_genetic_model(self, rerenderer, derenderer):
+        keys_path = ['GenomeElement', 'use_genetic_model']
+        render_use_genetic_model_text = "Do you want to use genetic architecture for traits (transmissibility and/or Drug-resistance)?"
+        column, frow = None, None
+        render_rb(keys_path, self.config_path, render_use_genetic_model_text, self.control_frame, column, frow, rerenderer, derenderer)
+    
+    def render_effsize_min(self):
+        keys_path = ['GenomeElement','effect_size','randomly_generate','effsize_min']
+        render_text = "Minimum Effect Size of each region for each trait (list numerical)"
+        frow, column = None, None
+        render_effsize_min_controls = render_numerical_input(keys_path, self.config_path, render_text, self.control_frame, column, frow, "list")
         self.effsize_min_label = ttk.Label(self.control_frame, text="effsize_min:")
         self.effsize_min_label.grid()
         self.effsize_min_entry = ttk.Entry(self.control_frame, foreground="black")
         self.effsize_min_entry.insert(0, str(self.effsize_min))  
         self.effsize_min_entry.grid()
-        components.add(self.effsize_min_label)
-        components.add(self.effsize_min_entry)
+        # components.add(self.effsize_min_label)
+        # components.add(self.effsize_min_entry)
         
-    def render_effsize_max(self, components):
+    def render_effsize_max(self):
         self.effsize_max_label = ttk.Label(self.control_frame, text="effsize_max:")
         self.effsize_max_entry = ttk.Entry(self.control_frame, foreground="black")
         self.effsize_max_entry.insert(0, str(self.effsize_max))  
         self.effsize_max_label.grid()
         self.effsize_max_entry.grid()
-        components.add(self.effsize_max_label)
-        components.add(self.effsize_max_entry)
+        # components.add(self.effsize_max_label)
+        # components.add(self.effsize_max_entry)
 
-    def render_normalize(self, components):
+    def render_normalize(self):
         self.normalize_label = ttk.Label(self.control_frame, text="normalize:")
         self.normalize_label.grid()
         self.normalize_var = tk.StringVar(value=bool_to_string_mapping[self.normalize])
         self.normalize_combobox = ttk.Combobox(self.control_frame, textvariable=self.normalize_var, values=["Yes", "No"], state="readonly")
         self.normalize_combobox.grid() 
-        components.add(self.normalize_label)
-        components.add(self.normalize_combobox)
+        # components.add(self.normalize_label)
+        # components.add(self.normalize_combobox)
         
     def hide_elements_update_methods(self):
         return
@@ -544,11 +390,7 @@ class GenomeElement:
             self.normalize_label.grid()
             self.normalize_combobox.grid() 
             self.update_all_rg_values_button.grid()
-            
-    def parse_list_input(input_str):
-        if input_str.startswith('[') and input_str.endswith(']'):
-            input_str = input_str[1:-1]  
-        return [int(float(item.strip())) for item in input_str.split(',') if item.strip().isdigit()]
+        
 
     def render_run_button(self):
         def effect_size_generation():
@@ -589,3 +431,27 @@ class GenomeElement:
             self.tab_parent.tab(self.tab_index, state="disabled")
         self.control_frame = ttk.Frame(self.parent, width=300)
         self.control_frame.pack(fill='both', expand=True)
+
+    def initial_load(self):
+        # render + derender everything, feed renderers/derenderers
+        self.render_use_genetic_model(None, None)
+        return
+        
+        self.render_generate_genetic_architecture_method()
+        self.render_user_input()
+        self.render_randomly_generate()
+
+    def global_update(self):
+        users_validation_messages = []
+
+        for id, updater in zip(self.component_id, self.updaters.values()):
+            updater(users_validation_messages, id)
+
+        match len(users_validation_messages):
+            case 0:
+                messagebox.showinfo("Update Successful", "Parameters Updated.")
+                return 0
+            case _:
+                error_message_str = "\n\n".join(users_validation_messages)
+                messagebox.showerror("Update Error", error_message_str)
+                return 1
