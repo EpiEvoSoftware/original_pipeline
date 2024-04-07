@@ -263,7 +263,7 @@ class NetworkModelConfigurations:
                 # self.network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['randomly_generate']["network_model"]
                     self.network_model_label = ttk.Label(self.scrollable_frame, text="network_model:")
                     self.network_model_label.pack()
-                    self.network_model_var = tk.StringVar(value = self.string_to_network_mode[self.network_model])
+                    self.network_model_var = tk.StringVar(value = self.string_to_network_mode.get(self.network_model, ""))
                     self.network_model_combobox = ttk.Combobox(
                         self.scrollable_frame,
                         textvariable=self.network_model_var,

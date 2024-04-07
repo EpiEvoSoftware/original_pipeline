@@ -43,11 +43,11 @@
         "use_genetic_model": true,
         "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
         "traits_num": {
-            "transmissibility": 0,
-            "drug_resistance": 0
+            "transmissibility": 2,
+            "drug_resistance": 2
         },
         "effect_size": {
-            "method": "randomly_generate",
+            "method": "user_input",
             "user_input": {
                 "path_effsize_table": ""
             },
@@ -68,7 +68,7 @@
             "path_network": ""
         },
         "randomly_generate": {
-            "network_model": "",
+            "network_model": "BA",
             "ER": {
                 "p_ER": 0
             },
