@@ -235,6 +235,7 @@ class GenomeElement:
                         to_derender()
                 case _:
                     raise ValueError("Invalid method specified")
+        print("val_to_render_generate_genetic_architecture_method", val_to_render_generate_genetic_architecture_method)
         component =  EasyCombobox(keys_path, self.config_path, render_generate_genetic_architecture_method_text, 
                      self.control_frame, column, frow, 
                      generate_genetic_architecture_method_values, 

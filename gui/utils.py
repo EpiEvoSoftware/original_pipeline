@@ -727,14 +727,13 @@ class EasyCombobox(EasyWidgetBase):
         dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
         
         if val_to_ui_mapping is None:
-            var_val = val_to_ui_mapping.get(dict_var, "")
-        else:
             var_val = dict_var
+        else:
+            var_val = val_to_ui_mapping.get(dict_var, "")
 
         self.var = tk.StringVar(value=var_val)
         self.combobox = tk.ttk.Combobox(self.control_frame, textvariable=self.var, values=combobox_values, state="readonly")
         self.combobox.bind("<<ComboboxSelected>>", self.updater)
-
 
         if frow is None or column is None:
             self.label.grid()
