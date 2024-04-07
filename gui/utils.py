@@ -636,11 +636,12 @@ class EasyRadioButton(EasyWidgetBase):
                     self.to_derender()
 
 class EasyPathSelector(EasyWidgetBase):
-    def __init__(self, keys_path, config_path, render_text, control_frame, column, frow):
+    def __init__(self, keys_path, config_path, render_text, control_frame, column, frow, filetype = None):
         """
         Replaces render_path_select
         """
         super().__init__()
+        self.filetype = filetype
         self.keys_path = keys_path
         self.config_path = config_path
 
@@ -674,7 +675,11 @@ class EasyPathSelector(EasyWidgetBase):
     #     derender_components(self.local_components)
         
     def _update(self):
-        chosen_file = filedialog.askopenfilename(title="Select a File")
+        if self.filetype is None:
+            chosen_file = filedialog.askopenfilename(title="Select a File")
+        else:
+            chosen_file = filedialog.askopenfilename(title="Select a File", filetypes=self.filetype)
+        
         if chosen_file:
             no_validate_update_val(chosen_file, self.config_path, self.keys_path)
             self.value_label.config(text=chosen_file) 

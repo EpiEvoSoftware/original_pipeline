@@ -22,6 +22,9 @@ class GenomeElement:
         render_next_button(self.tab_index, self.tab_parent, self.parent, self.global_update)
 
     def initial_load(self):
+        self.render_all()
+        # self.render_use_genetic_model(None, None)
+        
         return
         self.render_genetic_architecture_group()
         self.render_num_traits_group(self.use_genetic_model)
@@ -35,6 +38,22 @@ class GenomeElement:
         self.render_genes_num()
         self.render_randomly_generate()
         self.render_run_button()
+    
+    def render_all(self):
+        self.render_simulation_settings_title()
+        self.render_use_genetic_model(None, None)
+        self.render_number_of_traits_title()
+        self.render_transmissibility()
+        self.render_drug_resistance()
+        self.render_generate_genetic_architecture_method()
+        self.render_path_eff_size_table()
+        self.render_gff()
+        self.render_genes_num()
+        self.render_effsize_min()
+        self.render_effsize_max()
+        self.render_normalize()
+
+        return
     
     def render_genetic_architecture_group(self):
         """
@@ -84,22 +103,33 @@ class GenomeElement:
         control_frame = self.control_frame
         column, frow = None, None
         component = EasyPathSelector(keys_path, config_path, render_text, control_frame, column, frow)
-        self.components.add(component)
+        self.to_update_components.add(component)
         return component
 
     def render_number_of_traits(self):
         return
 
+    def render_simulation_settings_title(self):
+        self.render_simulation_settings_title_text = "Simulation Settings"
+        self.number_of_traits_label = ttk.Label(self.control_frame, text=self.render_simulation_settings_title_text, style="Title.TLabel")
+        self.number_of_traits_label.grid()
+        
+        self.to_update_components.add(self.number_of_traits_label)
+
     def render_number_of_traits_title(self):
         self.render_number_of_traits_text = "Number of traits (Integer):"
         self.number_of_traits_label = ttk.Label(self.control_frame, text=self.render_number_of_traits_text, style = "Bold.TLabel")
         self.number_of_traits_label.grid()
-        # components.add(self.number_of_traits_label)
+
+        self.to_update_components.add(self.number_of_traits_label)
 # 
     def render_transmissibility(self):
         keys_path = ['GenomeElement', 'traits_num', 'transmissibility']
         self.render_transmissibility_text = "Transmissibility"
-        return EasyEntry(keys_path, self.config_path, self.render_transmissibility_text, 'transmissibility', self.control_frame, None, None, 'integer')
+        component = EasyEntry(keys_path, self.config_path, self.render_transmissibility_text, 'transmissibility', self.control_frame, None, None, 'integer')
+        self.to_update_components.add(component)
+        return component
+        # self.transmissibility_label = ttk.Label(self.control_frame, text=self.render_transmissibility_text, style = "Bold.TLabel")
         self.transmissibility_label = ttk.Label(self.control_frame, text=self.render_transmissibility_text, style = "Bold.TLabel")
         self.transmissibility_entry = ttk.Entry(self.control_frame, foreground="black")
         self.transmissibility_entry.insert(0, self.transmissibility)
@@ -113,7 +143,7 @@ class GenomeElement:
         self.render_drug_resistance_text = "Drug-Resistance"
         column, frow = None, None
         component = EasyEntry(keys_path, self.config_path, self.render_drug_resistance_text, 'drug-resistance', self.control_frame, column, frow, 'integer')
-        self.components.add(component)
+        self.to_update_components.add(component)
         return component
     
         self.drug_resistance_label = ttk.Label(self.control_frame, text=self.render_drug_resistance_text, style = "Bold.TLabel")
@@ -122,7 +152,17 @@ class GenomeElement:
 
         self.drug_resistance_entry.grid()
         self.drug_resistance_label.grid()
-
+    
+    def render_generate_genetic_architecture_file(self):
+        render_generate_genetic_architecture_file_text = "Please provide the Genetic Architecture File in csv format:"
+        keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
+        config_path = self.config_path
+        render_text = "Please provide the genome annotation in a gff-like format:"
+        control_frame = self.control_frame
+        column, frow = None, None
+        component = EasyPathSelector(keys_path, config_path, render_text, control_frame, column, frow)
+        self.to_update_components.add(component)
+        return component
 
     def render_generate_genetic_architecture_method(self):
         """
@@ -133,13 +173,15 @@ class GenomeElement:
         column, frow = None, None
         to_rerender = None
         to_derender = None
-        return EasyCombobox(keys_path, self.config_path, "Method to Generate the Genetic Architecture", 
+        render_generate_genetic_architecture_method_text = "Method to Generate the Genetic Architecture"
+        component =  EasyCombobox(keys_path, self.config_path, render_generate_genetic_architecture_method_text, 
                      self.control_frame, column, frow, 
                      generate_genetic_architecture_method_values, 
                      to_rerender, to_derender,
                      val_to_render_generate_genetic_architecture_method, 
                      render_to_val_generate_genetic_architecture_method)
-        
+        self.to_update_components.add(component)
+        return component
         def update(event):
             """
             Updates the self.traits_num value in the params file
@@ -181,7 +223,9 @@ class GenomeElement:
         keys_path = ['GenomeElement','effect_size','randomly_generate','genes_num']
         render_text = "Number of Genomic Regions for each trait (list integer)"
         column, frow = None, None
-        return EasyEntry(keys_path, self.config_path, render_text, "genes_num", self.control_frame, column, frow, "list")
+        component =  EasyEntry(keys_path, self.config_path, render_text, "genes_num", self.control_frame, column, frow, "list")
+        self.to_update_components.add(component)
+        return component
         # controls = render_numerical_input(keys_path, self.config_path, render_text, self.control_frame, column, frow, "list")
 
     def render_randomly_generate(self):
@@ -287,7 +331,7 @@ class GenomeElement:
         render_text = "Minimum Effect Size of each region for each trait (list numerical)"
         frow, column = None, None
         component = EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list")
-        self.components.add(component)
+        self.to_update_components.add(component)
         return component
         # return EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list")
         # render_effsize_min_controls = render_numerical_input(keys_path, self.config_path, render_text, self.control_frame, column, frow, "list")
@@ -310,16 +354,19 @@ class GenomeElement:
         keys_path = ['GenomeElement','effect_size','randomly_generate','effsize_max']
         render_text = "Maximum Effect Size of each region for each trait (list numerical)"
         column, frow = None, None
-        return EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list")
+        component = EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list")
+        self.to_update_components.add(component)
         # components.add(self.effsize_max_label)
         # components.add(self.effsize_max_entry)
 
-    def render_normalize(self, to_rerender, to_derender):
-        render_text = "Maximum Effect Size of each region for each trait (list numerical)"
+    def render_normalize(self):
+        render_text = "Whether to Normalize randomly-selected effect sizes by the expected number of mutations?"
         keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', 'normalize']
         column, frow, = None, None
-        return EasyRadioButton(keys_path, self.config_path, render_text, "normalize", self.control_frame, column, frow, to_rerender, to_derender)
-
+        # to_rerender, to_derender = None, None
+        component =  EasyRadioButton(keys_path, self.config_path, render_text, "normalize", self.control_frame, column, frow)
+        self.to_update_components.add(component)
+        
         # self.normalize_label = ttk.Label(self.control_frame, text="normalize:")
         # self.normalize_label.grid()
         # self.normalize_var = tk.StringVar(value=bool_to_string_mapping[self.normalize])
@@ -334,10 +381,24 @@ class GenomeElement:
         return
 
     def render_path_eff_size_table(self):
+        render_generate_genetic_architecture_file_text = "Please provide the Genetic Architecture File in csv format:"
+        keys_path = ['GenomeElement', 'effect_size', 'randomly_generate', "gff"]
+        config_path = self.config_path
+        control_frame = self.control_frame
+        column, frow = None, None
+        filetype = (
+            ("CSV files", "*.csv"),
+            ("All files", "*.*")
+            )
+        component = EasyPathSelector(keys_path, config_path, render_generate_genetic_architecture_file_text, control_frame, column, frow, filetype)
+        self.to_update_components.add(component)
+        return component
         keys_path = ['GenomeElement', 'effect_size', 'user_input', "path_effsize_table"]
         render_text = "Please provide the path to the effect size table:"
         column, frow = None, None
-        return EasyPathSelector(keys_path, self.config_path, render_text, self.control_frame, column, frow)
+        component =  EasyPathSelector(keys_path, self.config_path, render_text, self.control_frame, column, frow)
+        self.to_update_components.add(component)
+        return component
         def choose_and_update_path():
             chosen_file = filedialog.askopenfilename(title="Select a path_effsize_table")
             if chosen_file:  
@@ -492,7 +553,7 @@ class GenomeElement:
     def global_update(self):
         users_validation_messages = []
 
-        for component in self.components:
+        for component in self.to_update_components:
             component.update(users_validation_messages)
 
         match len(users_validation_messages):
@@ -506,7 +567,7 @@ class GenomeElement:
             
 
     def init_val(self, config_path):
-        self.components = set()
+        self.to_update_components = set()
         self.numtraits_group = set()
         self.random_generate_group = set()
 
