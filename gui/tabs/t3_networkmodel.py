@@ -12,7 +12,6 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 from network_generator import *
-# from seed_host_match_func import *
 from tabs.t6_networkgraph import NetworkGraphApp
 
 
@@ -430,29 +429,35 @@ class NetworkModelConfigurations:
         config = load_config_as_dict(self.config_path) 
         wk_dir = config["BasicRunConfiguration"]["cwdir"]
         def run_network_generate():
-            pop_size = int(float(self.host_size_entry.get()))
-            graph_type = self.network_model_var.get()
-            if graph_type == "Erdős–Rényi":
-                p_ER = float(self.p_ER_entry.get())
-                run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="ER", p_ER=p_ER)
-            elif graph_type == "Barabási-Albert":
-                m = int(float(self.ba_m_entry.get()))  # Assuming ba_m_entry is an input field in your GUI
-                run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="BA", m=m)
-            elif graph_type == "Random Partition":
-                # Assuming rp_size_entry, p_within_entry, p_between_entry are input fields in your GUI
-                rp_size = [int(float(part)) for part in self.rp_size_entry.get().split(',')]  # User inputs comma-separated sizes
-                p_within = [float(p) for p in self.p_within_entry.get().split(',')]  # User inputs comma-separated probabilities
-                p_between = float(self.p_between_entry.get())
-                run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="RP", rp_size=rp_size, p_within=p_within, p_between=p_between)
-            else:
-                print("Unsupported model.")
-                return
-            
-            
+            print('here')
+            try:
+                pop_size = int(float(self.host_size_entry.get()))
+                graph_type = self.network_model_var.get()
+                
+                if graph_type == "Erdős–Rényi":
+                    p_ER = float(self.p_ER_entry.get())
+                    network, error = run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="ER", p_ER=p_ER)
+                elif graph_type == "Barabási-Albert":
+                    m = int(float(self.ba_m_entry.get()))
+                    network, error = run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="BA", m=m)
+                elif graph_type == "Random Partition":
+                    rp_size = [int(float(part)) for part in self.rp_size_entry.get().split(',')]
+                    p_within = [float(p) for p in self.p_within_entry.get().split(',')]
+                    p_between = float(self.p_between_entry.get())
+                    network, error = run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="RP", rp_size=rp_size, p_within=p_within, p_between=p_between)
+                else:
+                    raise ValueError("Unsupported model.")
 
-            G = nx.read_adjlist(os.path.join(wk_dir, "contact_network.adjlist"))
-            degrees = [G.degree(n) for n in G.nodes()]
-            self.graph.plot_degree_distribution(degrees)
+                if error is not None:
+                    raise Exception(error)
+
+                G = nx.read_adjlist(os.path.join(wk_dir, "contact_network.adjlist"))
+                degrees = [G.degree(n) for n in G.nodes()]
+                self.graph.plot_degree_distribution(degrees)
+
+            except Exception as e:
+                messagebox.showerror("Network Generation Error", str(e))
+
         
             
         if not hasattr(self, 'run_network_generate_button'):

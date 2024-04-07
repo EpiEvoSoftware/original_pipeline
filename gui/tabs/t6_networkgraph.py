@@ -11,7 +11,7 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 from seed_host_matcher import *
-from network_generator import *
+# from network_generator import *
 from base_func import read_params
 
 
