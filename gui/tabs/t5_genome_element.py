@@ -42,18 +42,72 @@ class GenomeElement:
     def render_all(self):
         self.render_simulation_settings_title()
         self.render_use_genetic_model(None, None)
-        self.render_number_of_traits_title()
-        self.render_transmissibility()
-        self.render_drug_resistance()
-        self.render_generate_genetic_architecture_method()
-        self.render_path_eff_size_table()
-        self.render_gff()
-        self.render_genes_num()
-        self.render_effsize_min()
-        self.render_effsize_max()
-        self.render_normalize()
 
-        return
+        self.init_user_input_group()
+        self.init_num_traits_group()
+        self.init_random_generate_group()
+        self.init_global_group()
+
+        # to_derender_generate_genetic_architecture_method = GroupControls()
+        # to_derender_generate_genetic_architecture_method.add(self.user_input_group_control)
+        # to_derender_generate_genetic_architecture_method.add(self.random_generate_group_control)
+        # generate_genetic_architecture_method_comp = self.render_generate_genetic_architecture_method(
+        #     to_rerender=to_derender_generate_genetic_architecture_method.rerender_itself, 
+        #     to_derender=to_derender_generate_genetic_architecture_method.derender_itself
+        #     )
+        # generate_genetic_architecture_method_comp.derender_itself()
+
+
+    def init_user_input_group(self):
+        path_eff_size_table = self.render_path_eff_size_table()
+        self.user_input_group_control = path_eff_size_table
+        self.user_input_group_control.derender_itself()
+
+    def init_num_traits_group(self):
+        number_of_traits_title = self.render_number_of_traits_title()
+        transmissibility = self.render_transmissibility()
+        drug_resistance = self.render_drug_resistance()
+        generate_genetic_architecture_method = self.render_generate_genetic_architecture_method()
+
+        num_traits_group_control = [
+            number_of_traits_title,
+            transmissibility,
+            drug_resistance,
+            generate_genetic_architecture_method
+        ]
+
+        self.num_traits_group_control = GroupControls()
+        for control in num_traits_group_control:
+            self.num_traits_group_control.add(control)
+        # self.num_traits_group_control.derender_itself()
+
+    def init_random_generate_group(self):
+        gff = self.render_gff()
+        genes_num = self.render_genes_num()
+        effsize_min = self.render_effsize_min()
+        effsize_max = self.render_effsize_max()
+        normalize = self.render_normalize()
+        run_button = self.render_run_button()
+
+        random_generate_group_control = [
+            gff,
+            genes_num,
+            effsize_min,
+            effsize_max,
+            normalize,
+            run_button
+        ]    
+        self.random_generate_group_control = GroupControls()
+        for control in random_generate_group_control:
+            self.random_generate_group_control.add(control)
+        # self.random_generate_group_control.derender_itself()
+
+    def init_global_group(self):
+        self.global_group_control = GroupControls()
+        self.global_group_control.add(self.random_generate_group_control)
+        self.global_group_control.add(self.num_traits_group_control)
+        self.global_group_control.add(self.user_input_group_control)
+        # self.global_group_control.derender_itself()
     
     def render_genetic_architecture_group(self):
         """
@@ -106,8 +160,6 @@ class GenomeElement:
         self.to_update_components.add(component)
         return component
 
-    def render_number_of_traits(self):
-        return
 
     def render_simulation_settings_title(self):
         self.render_simulation_settings_title_text = "Simulation Settings"
@@ -117,11 +169,11 @@ class GenomeElement:
         self.to_update_components.add(self.number_of_traits_label)
 
     def render_number_of_traits_title(self):
+        column, frow = None, None
         self.render_number_of_traits_text = "Number of traits (Integer):"
-        self.number_of_traits_label = ttk.Label(self.control_frame, text=self.render_number_of_traits_text, style = "Bold.TLabel")
-        self.number_of_traits_label.grid()
-
-        self.to_update_components.add(self.number_of_traits_label)
+        component = EasyLabel(self.render_number_of_traits_text, self.control_frame, column, frow)
+        self.to_update_components.add(component)
+        return component
 # 
     def render_transmissibility(self):
         keys_path = ['GenomeElement', 'traits_num', 'transmissibility']
@@ -164,23 +216,35 @@ class GenomeElement:
         self.to_update_components.add(component)
         return component
 
-    def render_generate_genetic_architecture_method(self):
+    def render_generate_genetic_architecture_method(self, column = None, frow = None, to_rerender = None, to_derender = None):
         """
         generate_genetic_architecture_method
         self.generate_genetic_architecture_method = ['GenomeElement']['effect_size']['method']
         """
-        keys_path = ["GenomeElement", "effect_size", "method"]
-        column, frow = None, None
-        to_rerender = None
-        to_derender = None
+        keys_path = ["GenomeElement", "effect_size", "method"]                
         render_generate_genetic_architecture_method_text = "Method to Generate the Genetic Architecture"
+        def comboboxselected(var):
+            converted_var = render_to_val_generate_genetic_architecture_method.get(var.get(), "")
+            no_validate_update_val(converted_var, self.config_path, keys_path)
+            match converted_var:
+                case "user_input":
+                    if to_rerender is not None:
+                        to_rerender()
+                case "randomly_generate":
+                    if to_derender is not None:
+                        to_derender()
+                case _:
+                    raise ValueError("Invalid method specified")
         component =  EasyCombobox(keys_path, self.config_path, render_generate_genetic_architecture_method_text, 
                      self.control_frame, column, frow, 
                      generate_genetic_architecture_method_values, 
                      to_rerender, to_derender,
-                     val_to_render_generate_genetic_architecture_method, 
-                     render_to_val_generate_genetic_architecture_method)
+                     comboboxselected,
+                     val_to_render_generate_genetic_architecture_method
+                     )
         self.to_update_components.add(component)
+                # self.generate_genetic_architecture_method_combobox = ttk.Combobox(self.control_frame, textvariable=self.generate_genetic_architecture_method_var, values=generate_genetic_architecture_method_values, state="readonly")
+
         return component
         def update(event):
             """
@@ -324,7 +388,9 @@ class GenomeElement:
         keys_path = ['GenomeElement', 'use_genetic_model']
         render_use_genetic_model_text = "Do you want to use genetic architecture for traits (transmissibility and/or Drug-resistance)?"
         column, frow = None, None
-        return EasyRadioButton(keys_path, self.config_path, render_use_genetic_model_text, "use_genetic_model", self.control_frame, column, frow, to_rerender, to_derender)
+        component = EasyRadioButton(keys_path, self.config_path, render_use_genetic_model_text, "use_genetic_model", self.control_frame, column, frow, to_rerender, to_derender)
+        self.to_update_components.add(component)
+        return component
     
     def render_effsize_min(self):
         keys_path = ['GenomeElement','effect_size','randomly_generate','effsize_min']
@@ -356,6 +422,7 @@ class GenomeElement:
         column, frow = None, None
         component = EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list")
         self.to_update_components.add(component)
+        return component
         # components.add(self.effsize_max_label)
         # components.add(self.effsize_max_entry)
 
@@ -366,6 +433,7 @@ class GenomeElement:
         # to_rerender, to_derender = None, None
         component =  EasyRadioButton(keys_path, self.config_path, render_text, "normalize", self.control_frame, column, frow)
         self.to_update_components.add(component)
+        return component
         
         # self.normalize_label = ttk.Label(self.control_frame, text="normalize:")
         # self.normalize_label.grid()
@@ -527,17 +595,20 @@ class GenomeElement:
                 es_highs = config['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
                 norm_or_not = config['GenomeElement']['effect_size']['randomly_generate']['normalize']
             else:
-                print("Invalid method specified")
-                return
+                raise ValueError("Invalid method specified")
             
             run_effsize_generation(method, wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, n_gen=n_gen, mut_rate=mut_rate)
+            
+            # run_effsize_generation(method, wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, n_gen=n_gen, mut_rate=mut_rate)
+            
             # err = run_effsize_generation(method, wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, n_gen=n_gen, mut_rate=mut_rate)
             # if err:
             #     messagebox.showerror("Generation Error", "Generation Error: " + str(err))
-
-            
-        self.run_effect_size_generation_button = tk.Button(self.control_frame, text="run_effect_size_generation_button", command=effect_size_generation)
-        self.run_effect_size_generation_button.grid()
+        column, frow = None, None
+        button_text = "Run Effect Size Generation"
+        run_button_component = EasyButton(button_text, self.control_frame, column, frow, effect_size_generation)
+        self.to_update_components.add(run_button_component)
+        return run_button_component
 
 
     def init_tab(self, parent, tab_parent, tab_title, tab_index, hide):

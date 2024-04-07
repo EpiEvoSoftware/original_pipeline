@@ -85,26 +85,22 @@ def launch_gui(config_path, hide = False):
     if 'aqua' in style.theme_names():
         style.theme_use('aqua')
     root.title("EnivolCrossing: Simulation Framework for Genetic Epidemiology")
-    vcmd = (root.register(validate_input), '%P')
 
     tab_parent = ttk.Notebook(root)
      
     style = ttk.Style()
     default_font = tkFont.nametofont("TkDefaultFont")
 
-    # Extract font details
     font_family = default_font.cget("family")
     font_size = default_font.cget("size")
-    font_weight = default_font.cget("weight")
-    # print(str(font_weight))
     style.configure("Bold.TLabel", font=(font_family, font_size, 'bold'))
-
-    # Extract font details
-    font_family = default_font.cget("family")
-    font_size = default_font.cget("size")
-    font_weight = default_font.cget("weight")
-    # print(str(font_weight))
     style.configure("Title.TLabel", font=(font_family, font_size+4, 'bold'))
+
+    if tk.Tcl().eval('set tcl_platform(threaded)'):
+        print('Threading is enabled')
+    else:
+        print('Threading is disabled, application might not run as expected. Please enable threading in your python installation.')
+        
 
 
     tab1 = ttk.Frame(tab_parent)

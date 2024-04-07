@@ -545,6 +545,34 @@ class EasyWidgetBase:
     def update(self, error_messages):
         pass
 
+class EasyLabel(EasyWidgetBase):
+    def __init__(self, render_text, control_frame, column, frow) -> None:
+        super().__init__()
+        self.render_text = render_text
+        self.label = tk.ttk.Label(control_frame, text=self.render_text, style = "Bold.TLabel")
+        if frow is None or column is None:
+            self.label.grid()
+        else:
+            self.label.grid(row = frow, column = column, sticky = 'w', pady = 5)
+
+        self.local_components = {self.label}
+        self.grid_layout = derender_components(self.local_components)
+        rerender_components(self.local_components, self.grid_layout)
+
+class EasyButton(EasyWidgetBase):
+    def __init__(self, render_text, control_frame, column, frow, command) -> None:
+        super().__init__()
+        self.render_text = render_text
+        self.button = tk.Button(control_frame, text=self.render_text, command=command)
+        if frow is None or column is None:
+            self.button.grid()
+        else:
+            self.button.grid(row = frow, column = column, sticky = 'w', pady = 5)
+
+        self.local_components = {self.button}
+        self.grid_layout = derender_components(self.local_components)
+        rerender_components(self.local_components, self.grid_layout)
+
 
 class EasyEntry(EasyWidgetBase):
     """
@@ -686,33 +714,27 @@ class EasyPathSelector(EasyWidgetBase):
 
 
 class EasyCombobox(EasyWidgetBase):
-    def __init__(self, keys_path, config_path, render_text, control_frame, column, frow, combobox_values, to_rerender = None, to_derender = None, val_to_ui_mapping = None, ui_to_val_mapping = None):
+    def __init__(self, keys_path, config_path, render_text, control_frame, column, frow, combobox_values, to_rerender, to_derender, comboboxselected, val_to_ui_mapping = None):
         super().__init__()
         self.keys_path = keys_path
         self.config_path = config_path
         self.control_frame = control_frame
         self.to_derender = to_derender
         self.to_rerender = to_rerender
-
-        if val_to_ui_mapping is None or ui_to_val_mapping is None:
-            self.is_mapping = False
-        else:
-            self.is_mapping = True
-            self.val_to_ui_mapping = val_to_ui_mapping
-            self.ui_to_val_mapping = ui_to_val_mapping
-
+        self.comboboxselected = comboboxselected
 
         self.label = tk.ttk.Label(self.control_frame, text=render_text, style = "Bold.TLabel")
         dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
         
-        if self.is_mapping:
-            var_val = self.val_to_ui_mapping.get(dict_var, "")
+        if val_to_ui_mapping is None:
+            var_val = val_to_ui_mapping.get(dict_var, "")
         else:
             var_val = dict_var
 
         self.var = tk.StringVar(value=var_val)
         self.combobox = tk.ttk.Combobox(self.control_frame, textvariable=self.var, values=combobox_values, state="readonly")
-        self.combobox.bind("<<ComboboxSelected>>", self._update)
+        self.combobox.bind("<<ComboboxSelected>>", self.update)
+
 
         if frow is None or column is None:
             self.label.grid()
@@ -724,77 +746,29 @@ class EasyCombobox(EasyWidgetBase):
         self.local_components = {self.label, self.combobox}
         self.grid_layout = derender_components(self.local_components)
         rerender_components(self.local_components, self.grid_layout)
-
-    # def rerender_itself(self):
-    #     rerender_components(self.local_components, self.grid_layout)
-
-    # def derender_itself(self):
-    #     derender_components(self.local_components)
-
-    # def update(self, error_messages):
-    #     match self.validate_for:
-    #         case "list":
-    #             update_list_int_params_v2(self.entry, self.keys_path, self.config_path, error_messages, self.render_text_short)
-    #         case "integer":
-    #             update_numerical_input(self.entry, self.keys_path, self.config_path, error_messages, self.render_text_short, True)
-    #         case "numerical":
-    #             update_numerical_input(self.entry, self.keys_path, self.config_path, error_messages, self.render_text_short, False)
-    #         case _:
-    #             raise ValueError("Invalid internal type.")
-
-    def _update(self, event):
-        if self.is_mapping:
-            converted_var = self.ui_to_val_mapping.get(self.var.get(), "")
-        else:
-            converted_var = self.var.get()
-        no_validate_update_val(converted_var, self.config_path, self.keys_path)
-        match converted_var:
-            case "":
-                if self.to_rerender is not None:
-                    self.to_rerender()
-            case _:
-                if self.to_derender is not None:
-                    self.to_derender()
-
-        # return
-        # try:
-        #     if new_generate_genetic_architecture_method == "user_input":
-        #         self.hide_elements_update_methods()
-        #         self.render_path_eff_size_table()
-        #         # if not hasattr(self, 'path_network_label'):  
-        #         #     self.render_path_eff_size_table()
-        #         # else:
-        #         #     # break, show the label if it was previously created
-        #         #     self.path_network_label.grid()
-        #         #     self.choose_path_network_button.grid()
-        #         #     self.chosen_path_network_label.grid()
-
-        #     elif new_generate_genetic_architecture_method == "randomly_generate":
-        #         self.hide_elements_update_methods()
-        #         self.render_rg_options()
-        # except ValueError:
-        #     messagebox.showerror("Update Error", "Invalid Input.") 
-
-
+        
+    def update(self, event):
+        self.comboboxselected(self.var)
 
 
 class GroupControls:
-    def __init__(self, widgets=None):
-        self.widgets = widgets if widgets is not None else []
+    def __init__(self, items=None):
+        self.items = items if items is not None else []
 
-    def add_widget(self, widget):
-        if isinstance(widget, EasyWidgetBase):
-            self.widgets.append(widget)
+    def add(self, item):
+        if isinstance(item, EasyWidgetBase) or isinstance(item, GroupControls):
+            self.items.append(item)
         else:
-            raise ValueError("widget must be an instance of EasyWidgetBase or its subclasses")
+            raise ValueError("Item must be an instance of EasyWidgetBase or GroupControls")
 
     def rerender_itself(self):
-        for widget in self.widgets:
-            widget.rerender_itself()
+        for item in self.items:
+            item.rerender_itself()
 
     def derender_itself(self):
-        for widget in self.widgets:
-            widget.derender_itself()
+        for item in self.items:
+            item.derender_itself()
+
 
     # def global_update(self):
     #     users_validation_messages = []
