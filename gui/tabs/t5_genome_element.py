@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox, filedialog
 import json
 import os
 import sys
-from tools import *
+from utils import *
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
 if parent_dir not in sys.path:
@@ -125,8 +125,8 @@ class GenomeElement:
         keys_path = ['GenomeElement','effect_size','randomly_generate','genes_num']
         render_text = "Number of Genomic Regions for each trait (list integer)"
         column, frow = None, None
-        controls = render_numerical_input(keys_path, self.config_path, render_text, self.control_frame, column, frow, "list")
-        return controls
+        # controls = render_numerical_input(keys_path, self.config_path, render_text, self.control_frame, column, frow, "list")
+        return None
 
     def render_randomly_generate(self):
         self.render_gff()
@@ -221,23 +221,28 @@ class GenomeElement:
             messagebox.showerror("Update Error", "Please enter 'Yes' or 'No' for use_network_model.")
 
 
-    
-    def render_use_genetic_model(self, rerenderer, derenderer):
+    def render_use_genetic_model(self, to_rerender, to_derender):
         keys_path = ['GenomeElement', 'use_genetic_model']
         render_use_genetic_model_text = "Do you want to use genetic architecture for traits (transmissibility and/or Drug-resistance)?"
         column, frow = None, None
-        render_rb(keys_path, self.config_path, render_use_genetic_model_text, self.control_frame, column, frow, rerenderer, derenderer)
+        # EasyWidget
+        use_genetic_model_rb = EasyRadioButton(keys_path, self.config_path, render_use_genetic_model_text, "use_genetic_model", self.control_frame, column, frow, to_rerender, to_derender)
+        use_genetic_model_rb.derender_itself()
+        use_genetic_model_rb.rerender_itself()
     
     def render_effsize_min(self):
         keys_path = ['GenomeElement','effect_size','randomly_generate','effsize_min']
         render_text = "Minimum Effect Size of each region for each trait (list numerical)"
         frow, column = None, None
-        render_effsize_min_controls = render_numerical_input(keys_path, self.config_path, render_text, self.control_frame, column, frow, "list")
-        self.effsize_min_label = ttk.Label(self.control_frame, text="effsize_min:")
-        self.effsize_min_label.grid()
-        self.effsize_min_entry = ttk.Entry(self.control_frame, foreground="black")
-        self.effsize_min_entry.insert(0, str(self.effsize_min))  
-        self.effsize_min_entry.grid()
+        effsize_min = EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list")
+        # render_effsize_min_controls = render_numerical_input(keys_path, self.config_path, render_text, self.control_frame, column, frow, "list")
+        # self.effsize_min_label = ttk.Label(self.control_frame, text="effsize_min:")
+        # self.effsize_min_label.grid()
+        # self.effsize_min_entry = ttk.Entry(self.control_frame, foreground="black")
+        # self.effsize_min_entry.insert(0, str(self.effsize_min))  
+        # self.effsize_min_entry.grid()
+
+
         # components.add(self.effsize_min_label)
         # components.add(self.effsize_min_entry)
         

@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk, messagebox
 import json
-from tools import *
+from utils import *
 class EvolutionaryModel:
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
         self.init_val(config_path)

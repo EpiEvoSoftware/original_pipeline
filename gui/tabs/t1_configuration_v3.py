@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import json
-from tools import *
+from utils import *
 
 
 # TODO add line breaks to path rendering if too long, add None selected if path is empty

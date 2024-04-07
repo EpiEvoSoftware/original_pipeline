@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import json
-from tools import *
+from utils import *
 
 
 # TODO: generate config file, put it in the working directory

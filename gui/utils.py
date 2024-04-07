@@ -424,7 +424,6 @@ def update_numerical_input(entry, keys_path, config_path, error_messages, render
         error_messages.append(f"{render_text_short + ": Update Error, " + str(e)}")
 
 def render_numerical_input(keys_path, config_path, render_text, control_frame, column, frow, internal_type):
-    
     dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
     label = tk.ttk.Label(control_frame, text=render_text, style = "Bold.TLabel")
     entry = tk.ttk.Entry(control_frame, foreground="black")
@@ -527,3 +526,92 @@ def render_rb(keys_path, config_path, render_text, control_frame, column, frow, 
     }
     
     return controls
+
+
+class EasyEntry:
+    """
+    replaces render_numerical_input
+    """
+    def __init__(self, keys_path, config_path, render_text, render_text_short, control_frame, column, frow, validate_for) -> None:
+        self.keys_path = keys_path
+        self.config_path = config_path
+        self.render_text_short = render_text_short
+        self.validate_for = validate_for 
+        dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
+        label = tk.ttk.Label(control_frame, text=render_text, style = "Bold.TLabel")
+        self.entry = tk.ttk.Entry(control_frame, foreground="black")
+        self.entry.insert(0, str(dict_var))  
+
+        if frow is None or column is None:
+            label.grid()
+            self.entry.grid()
+        else:
+            label.grid(row = frow, column = column, sticky = 'w', pady = 5)
+            self.entry.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
+
+        self.local_components = {self.entry, label}
+        self.grid_layout = derender_components(self.local_components)
+        rerender_components(self.local_components, self.grid_layout)
+
+    def rerender_itself(self):
+        rerender_components(self.local_components, self.grid_layout)
+
+    def derender_itself(self):
+        derender_components(self.local_components)
+
+    def update(self, error_messages):
+        match self.validate_for:
+            case "list":
+                update_list_int_params_v2(self.entry, self.keys_path, self.config_path, error_messages, self.render_text_short)
+            case "integer":
+                update_numerical_input(self.entry, self.keys_path, self.config_path, error_messages, self.render_text_short, True)
+            case "numerical":
+                update_numerical_input(self.entry, self.keys_path, self.config_path, error_messages, self.render_text_short, False)
+            case _:
+                raise ValueError("Invalid internal type.")
+
+class EasyRadioButton:
+    """
+    replaces render_rb
+    """
+    def __init__(self, keys_path, config_path, render_text, render_text_short, control_frame, column, frow, to_rerender = None, to_derender = None) -> None:
+        self.keys_path = keys_path
+        self.config_path = config_path
+        self.render_text_short = render_text_short
+        self.to_rerender = to_rerender
+        self.to_derender = to_derender
+
+        dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
+        self.var = tk.BooleanVar(value=dict_var)
+        label = tk.ttk.Label(control_frame, text=render_text, style = "Bold.TLabel")
+        rb_true = tk.ttk.Radiobutton(control_frame, text="Yes", variable=self.var, value=True, command = self._update)
+        rb_false = tk.ttk.Radiobutton(control_frame, text="No", variable=self.var, value=False, command = self._update)
+        if frow is None or column is None:
+            label.grid()
+            rb_true.grid()
+            rb_false.grid()
+        else:
+            label.grid(row = frow, column = column, sticky = 'w', pady = 5)
+            rb_true.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
+            rb_false.grid(row = frow+2, column = column, sticky = 'w', pady = 5)
+
+        self.local_components = {label, rb_true, rb_false}
+        self.grid_layout = derender_components(self.local_components)
+        rerender_components(self.local_components, self.grid_layout)
+
+    def rerender_itself(self):
+        rerender_components(self.local_components, self.grid_layout)
+
+    def derender_itself(self):
+        derender_components(self.local_components)
+
+    def _update(self):
+        no_validate_update(self.var, self.config_path, self.keys_path)
+        match self.var.get():
+            case True:
+                if self.to_rerender is not None:
+                    self.to_rerender()
+            case False:
+                if self.to_derender is not None:
+                    self.to_derender()
+

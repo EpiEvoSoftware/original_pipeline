@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import json
 import os
-from tools import *
+from utils import *
 
 class EpidemiologyModelv3:
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):

@@ -5,7 +5,7 @@ import json
 import os
 import sys
 from PIL import Image, ImageTk
-from tools import *
+from utils import *
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
 if parent_dir not in sys.path:

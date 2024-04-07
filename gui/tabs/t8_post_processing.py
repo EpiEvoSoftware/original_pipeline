@@ -5,7 +5,7 @@ import json
 import os
 import shutil
 import sys
-from tools import *
+from utils import *
 current_dir = os.path.dirname(os.path.abspath(__file__))
 # parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
 if current_dir not in sys.path:
