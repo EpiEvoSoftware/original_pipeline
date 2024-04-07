@@ -1,6 +1,6 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "",
+        "cwdir": "/Users/vivianzhao/Desktop/TB_software/wkdir",
         "n_replicates": 3,
         "random_number_seed": 1
     },
@@ -41,7 +41,7 @@
     },
     "GenomeElement": {
         "use_genetic_model": true,
-        "ref_path": "",
+        "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
         "traits_num": {
             "transmissibility": 0,
             "drug_resistance": 0
