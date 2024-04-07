@@ -161,91 +161,6 @@ class GenomeElement:
         self.to_update_components.add(component)
         return component
         
-    
-    
-    
-    
-    
-    
-    
-    
-            
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
 
 
     def render_use_genetic_model(self, to_rerender, to_derender):
@@ -265,22 +180,7 @@ class GenomeElement:
         return component
         
         
-        
-        
-        
-        
-        
-
-
-        
-        
-        
     def render_effsize_max(self):
-        
-        
-        
-        
-        
         keys_path = ['GenomeElement','effect_size','randomly_generate','effsize_max']
         render_text = "Maximum Effect Size of each region for each trait (list numerical)"
         column, frow = None, None
@@ -311,118 +211,6 @@ class GenomeElement:
         component = EasyPathSelector(keys_path, config_path, render_generate_genetic_architecture_file_text, control_frame, column, frow, filetype)
         self.to_update_components.add(component)
         return component
-        keys_path = ['GenomeElement', 'effect_size', 'user_input', "path_effsize_table"]
-        render_text = "Please provide the path to the effect size table:"
-        column, frow = None, None
-        component =  EasyPathSelector(keys_path, self.config_path, render_text, self.control_frame, column, frow)
-        self.to_update_components.add(component)
-        return component
-        def choose_and_update_path():
-            chosen_file = filedialog.askopenfilename(title="Select a path_effsize_table")
-            if chosen_file:  
-                
-                self.path_effsize_table = chosen_file
-                self.chosen_path_network_label.config(text=f"path_effsize_table: {self.path_effsize_table}") 
-                config = load_config_as_dict(self.config_path)
-                config['GenomeElement']['effect_size']['user_input']["path_effsize_table"] = self.path_effsize_table
-                save_config(self.config_path, config)
-
-
-        self.path_network_label = ttk.Label(self.control_frame, text="Choose path_effsize_table")
-        self.path_network_label.grid()
-        self.choose_path_network_button = tk.Button(self.control_frame, text="path_effsize_table:", command = choose_and_update_path)
-        self.choose_path_network_button.grid()
-        self.chosen_path_network_label = ttk.Label(self.control_frame, text="Current path_effsize_table: " + self.path_effsize_table)
-        self.chosen_path_network_label.grid()
-
-        self.render_run_button()
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-                
-    
-            
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-            
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
         
 
     def render_run_button(self):
@@ -448,10 +236,6 @@ class GenomeElement:
                 raise ValueError("Invalid method specified")
             
             run_effsize_generation(method, wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, n_gen=n_gen, mut_rate=mut_rate)
-            
-            
-            
-            
             
             
         column, frow = None, None
@@ -498,16 +282,6 @@ class GenomeElement:
         self.transmissibility = self.config_dict['GenomeElement']['traits_num']['transmissibility']
         self.drug_resistance = self.config_dict['GenomeElement']['traits_num']['drug_resistance']
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
 
         self.generate_genetic_architecture_method = self.config_dict['GenomeElement']['effect_size']['method']
         self.path_effsize_table = self.config_dict['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
