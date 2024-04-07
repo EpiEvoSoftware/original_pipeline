@@ -14,48 +14,30 @@ from genetic_effect_generator import *
 
 class GenomeElement:
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
-        self.updaters = {}
-        self.rerenderers = {}
-        self.derenderers = {}
-        self.component_id = [
-            "genetic_model",
-            "gff",
-            "number_of_traits",
-            "transmissibility",
-            "drug_resistance",
-            "generate_genetic_architecture_method",
-            "genes_num",
-            "randomly_generate",
-            "genetic_model",
-            "effsize_min",
-            "effsize_max",
-            "path_effsize_table",
-            "rg_options"
-        ]
+
         self.init_val(config_path)
         self.init_tab(parent, tab_parent, tab_title, tab_index, hide)
         self.initial_load()
 
         render_next_button(self.tab_index, self.tab_parent, self.parent, self.global_update)
     
+    def render_genetic_architecture_group(self):
+        """
+        first render group for yes/no forms
+        """
+        return
 
-    def init_val(self, config_path):
-        self.config_path = config_path
-        self.config_dict = load_config_as_dict(self.config_path)
-        self.use_genetic_model = self.config_dict['GenomeElement']['use_genetic_model']
-        self.traits_num = self.config_dict['GenomeElement']['traits_num']
-        if len(self.traits_num) > 0:
-            self.transmissibility = self.traits_num[0]
-            self.drug_resistance = self.traits_num[1]
-        self.generate_genetic_architecture_method = self.config_dict['GenomeElement']['effect_size']['method']
-        self.path_effsize_table = self.config_dict['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
-        self.gff = self.config_dict['GenomeElement']['effect_size']['randomly_generate']["gff"]
-        self.genes_num = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['genes_num']
-        self.effsize_min = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['effsize_min']
-        self.effsize_max = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
-        self.normalize = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['normalize']
-
-    def render_user_input(self):
+    def render_user_input(self, hide):
+        """
+        second render group, answered yes to method & 'user input' to genetic arch
+        """
+        # render all, derender, collect controls
+        if hide:
+            # controls rerender all
+            return
+        else:
+            # controls dereneder all 
+            return
         user_input_group_controls = {} 
         return user_input_group_controls
     
@@ -433,12 +415,15 @@ class GenomeElement:
         self.control_frame.pack(fill='both', expand=True)
 
     def initial_load(self):
+        # render_user_input_controls = self.render_user_input()
+        # feed render_user_input controls into render_genetic_architecture_group
         # render + derender everything, feed renderers/derenderers
+        self.render_genetic_architecture_group()
         self.render_use_genetic_model(None, None)
         return
         
         self.render_generate_genetic_architecture_method()
-        self.render_user_input()
+        
         self.render_randomly_generate()
 
     def global_update(self):
@@ -455,3 +440,38 @@ class GenomeElement:
                 error_message_str = "\n\n".join(users_validation_messages)
                 messagebox.showerror("Update Error", error_message_str)
                 return 1
+            
+
+    def init_val(self, config_path):
+        self.updaters = {}
+        self.rerenderers = {}
+        self.derenderers = {}
+        self.component_id = [
+            "genetic_model",
+            "gff",
+            "number_of_traits",
+            "transmissibility",
+            "drug_resistance",
+            "generate_genetic_architecture_method",
+            "genes_num",
+            "randomly_generate",
+            "genetic_model",
+            "effsize_min",
+            "effsize_max",
+            "path_effsize_table",
+            "rg_options"
+        ]
+        self.config_path = config_path
+        self.config_dict = load_config_as_dict(self.config_path)
+        self.use_genetic_model = self.config_dict['GenomeElement']['use_genetic_model']
+        self.traits_num = self.config_dict['GenomeElement']['traits_num']
+        if len(self.traits_num) > 0:
+            self.transmissibility = self.traits_num[0]
+            self.drug_resistance = self.traits_num[1]
+        self.generate_genetic_architecture_method = self.config_dict['GenomeElement']['effect_size']['method']
+        self.path_effsize_table = self.config_dict['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
+        self.gff = self.config_dict['GenomeElement']['effect_size']['randomly_generate']["gff"]
+        self.genes_num = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['genes_num']
+        self.effsize_min = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['effsize_min']
+        self.effsize_max = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
+        self.normalize = self.config_dict['GenomeElement']['effect_size']['randomly_generate']['normalize']
