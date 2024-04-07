@@ -43,8 +43,8 @@
         "use_genetic_model": false,
         "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
         "traits_num": {
-            "transmissibility": 2,
-            "drug_resistance": 2
+            "transmissibility": 1,
+            "drug_resistance": 4
         },
         "effect_size": {
             "method": "user_input",
@@ -52,10 +52,18 @@
                 "path_effsize_table": "/System/iOSSupport/System/Library/AppleMediaServices/DynamicUI/PlugIns/CoreDynamicUIPlugin.bundle"
             },
             "randomly_generate": {
-                "gff": "/Users/andrewhahn/original_pipeline/test/one_dict_to_csv.csv",
-                "genes_num": [],
-                "effsize_min": [],
-                "effsize_max": [],
+                "gff": "/Users/andrewhahn/original_pipeline/test/two_dict_to_csv.csv",
+                "genes_num": [
+                    3
+                ],
+                "effsize_min": [
+                    3,
+                    4
+                ],
+                "effsize_max": [
+                    3,
+                    3
+                ],
                 "normalize": false
             }
         }

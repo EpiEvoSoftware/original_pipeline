@@ -166,7 +166,7 @@ class GenomeElement:
         self.number_of_traits_label = ttk.Label(self.control_frame, text=self.render_simulation_settings_title_text, style="Title.TLabel")
         self.number_of_traits_label.grid()
         
-        self.to_update_components.add(self.number_of_traits_label)
+        # self.to_update_components.add(self.number_of_traits_label)
 
     def render_number_of_traits_title(self):
         column, frow = None, None

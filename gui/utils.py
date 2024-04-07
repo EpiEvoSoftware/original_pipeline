@@ -733,7 +733,7 @@ class EasyCombobox(EasyWidgetBase):
 
         self.var = tk.StringVar(value=var_val)
         self.combobox = tk.ttk.Combobox(self.control_frame, textvariable=self.var, values=combobox_values, state="readonly")
-        self.combobox.bind("<<ComboboxSelected>>", self.update)
+        self.combobox.bind("<<ComboboxSelected>>", self.updater)
 
 
         if frow is None or column is None:
@@ -747,7 +747,7 @@ class EasyCombobox(EasyWidgetBase):
         self.grid_layout = derender_components(self.local_components)
         rerender_components(self.local_components, self.grid_layout)
         
-    def update(self, event):
+    def updater(self, event):
         self.comboboxselected(self.var)
 
 
