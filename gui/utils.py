@@ -782,5 +782,55 @@ class GroupControls:
             item.derender_itself()
 
 
+class TabBase:
+    def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
+        self.init_val(config_path)
+        self.init_tab(parent, tab_parent, tab_title, tab_index, hide)
+        self.load_page()
+        render_next_button(self.tab_index, self.tab_parent, self.parent, self.global_update)
+    
+    def init_val(self, config_path):
+        pass
+
+    def load_page(self):
+        pass 
+
+    def global_update(self):
+        users_validation_messages = []
+
+        for component in self.visible_components:
+            component.update(users_validation_messages)
+
+        match len(users_validation_messages):
+            case 0:
+                tk.messagebox.showinfo("Update Successful", "Parameters Updated.")
+                return 0
+            case _:
+                error_message_str = "\n\n".join(users_validation_messages)
+                tk.messagebox.showerror("Update Error", error_message_str)
+                return 1
         
-        
+    def global_update_no_success_message(self):
+        users_validation_messages = []
+
+        for component in self.visible_components:
+            component.update(users_validation_messages)
+
+        match len(users_validation_messages):
+            case 0:
+                return 0
+            case _:
+                error_message_str = "\n\n".join(users_validation_messages)
+                tk.messagebox.showerror("Update Error", error_message_str)
+                return 1   
+
+    def init_tab(self, parent, tab_parent, tab_title, tab_index, hide):
+        self.parent = parent
+        self.tab_parent = tab_parent
+        self.tab_index = tab_index
+        self.tab_parent.add(parent, text=tab_title)
+        if hide:
+            self.tab_parent.tab(self.tab_index, state="disabled")
+        self.control_frame = tk.ttk.Frame(self.parent, width=300)
+        self.control_frame.pack(padx=10, pady=10)
+    

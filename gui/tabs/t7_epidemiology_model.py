@@ -5,15 +5,13 @@ import json
 import os
 from utils import *
 
-class EpidemiologyModel:
+class EpidemiologyModel(TabBase):
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
-        self.init_val(config_path)
-        self.init_tab(parent, tab_parent, tab_title, tab_index, hide)
+        super().__init__(parent, tab_parent, config_path, tab_title, tab_index, hide)
 
-        self.render_all()
-        render_next_button(self.tab_index, self.tab_parent, self.parent, self.update)
     def update(self):
         return
+    
     def init_tab(self, parent, tab_parent, tab_title, tab_index, hide):
         self.parent = parent
         self.tab_parent = tab_parent
@@ -24,7 +22,8 @@ class EpidemiologyModel:
         
         self.control_frame = ttk.Frame(self.parent)
         self.control_frame.pack(padx=10, pady=10)
-    def render_all(self):
+
+    def load_page(self):
         self.render_model()
         self.render_n_epoch()
         self.render_epoch_changing_generation(disabled = True)
@@ -46,40 +45,40 @@ class EpidemiologyModel:
         self.render_super_infection()
 
     def init_val(self, config_path):
+        self.visible_components = set()
 
         self.config_path = config_path
-    # Epidemiology Model Configurations
-        self.config_dict = load_config_as_dict(self.config_path) 
+        self.config_dict = load_config_as_dict(self.config_path)
 
 
-        self.model = load_config_as_dict(self.config_path)['EpidemiologyModel']['model']
+        self.model = self.config_dict['EpidemiologyModel']['model']
     # epoch changing
-        self.n_epoch = load_config_as_dict(self.config_path)['EpidemiologyModel']['epoch_changing']['n_epoch']
-        self.epoch_changing_generation = load_config_as_dict(self.config_path)['EpidemiologyModel']['epoch_changing']['epoch_changing_generation']
+        self.n_epoch = self.config_dict['EpidemiologyModel']['epoch_changing']['n_epoch']
+        self.epoch_changing_generation = self.config_dict['EpidemiologyModel']['epoch_changing']['epoch_changing_generation']
     # genetic_architecture
-        self.transmissibility = load_config_as_dict(self.config_path)['EpidemiologyModel']['genetic_architecture']['transmissibility']
-        self.cap_transmissibility = load_config_as_dict(self.config_path)['EpidemiologyModel']['genetic_architecture']['cap_transmissibility']
-        self.drug_resistance = load_config_as_dict(self.config_path)['EpidemiologyModel']['genetic_architecture']['drug_resistance']
-        self.cap_drugresist = load_config_as_dict(self.config_path)['EpidemiologyModel']['genetic_architecture']['cap_drugresist']
+        self.transmissibility = self.config_dict['EpidemiologyModel']['genetic_architecture']['transmissibility']
+        self.cap_transmissibility = self.config_dict['EpidemiologyModel']['genetic_architecture']['cap_transmissibility']
+        self.drug_resistance = self.config_dict['EpidemiologyModel']['genetic_architecture']['drug_resistance']
+        self.cap_drugresist = self.config_dict['EpidemiologyModel']['genetic_architecture']['cap_drugresist']
 
     # transition_rate
-        self.S_IE_rate = load_config_as_dict(self.config_path)['EpidemiologyModel']['transiton_rate']['S_IE_rate']
-        self.I_R_rate = load_config_as_dict(self.config_path)['EpidemiologyModel']['transiton_rate']['I_R_rate']
-        self.R_S_rate = load_config_as_dict(self.config_path)['EpidemiologyModel']['transiton_rate']['R_S_rate']
-        self.latency_prob = load_config_as_dict(self.config_path)['EpidemiologyModel']['transiton_rate']['latency_prob']
-        self.E_I_rate = load_config_as_dict(self.config_path)['EpidemiologyModel']['transiton_rate']['E_I_rate']
-        self.I_E_rate = load_config_as_dict(self.config_path)['EpidemiologyModel']['transiton_rate']['I_E_rate']
-        self.E_R_rate = load_config_as_dict(self.config_path)['EpidemiologyModel']['transiton_rate']['E_R_rate']
-        self.sample_rate = load_config_as_dict(self.config_path)['EpidemiologyModel']['transiton_rate']['sample_rate']
-        self.transition_rate_recovery_prob_after_sampling = load_config_as_dict(self.config_path)['EpidemiologyModel']['transiton_rate']['recovery_prob_after_sampling']
+        self.S_IE_rate = self.config_dict['EpidemiologyModel']['transiton_rate']['S_IE_rate']
+        self.I_R_rate = self.config_dict['EpidemiologyModel']['transiton_rate']['I_R_rate']
+        self.R_S_rate = self.config_dict['EpidemiologyModel']['transiton_rate']['R_S_rate']
+        self.latency_prob = self.config_dict['EpidemiologyModel']['transiton_rate']['latency_prob']
+        self.E_I_rate = self.config_dict['EpidemiologyModel']['transiton_rate']['E_I_rate']
+        self.I_E_rate = self.config_dict['EpidemiologyModel']['transiton_rate']['I_E_rate']
+        self.E_R_rate = self.config_dict['EpidemiologyModel']['transiton_rate']['E_R_rate']
+        self.sample_rate = self.config_dict['EpidemiologyModel']['transiton_rate']['sample_rate']
+        self.transition_rate_recovery_prob_after_sampling = self.config_dict['EpidemiologyModel']['transiton_rate']['recovery_prob_after_sampling']
 
     # massive_sampling
-        self.event_num = load_config_as_dict(self.config_path)['EpidemiologyModel']['massive_sampling']['event_num']
-        self.generation = load_config_as_dict(self.config_path)['EpidemiologyModel']['massive_sampling']['generation']
-        self.sampling_prob = load_config_as_dict(self.config_path)['EpidemiologyModel']['massive_sampling']['sampling_prob']
-        self.massive_sampling_recovery_prob_after_sampling = load_config_as_dict(self.config_path)['EpidemiologyModel']['massive_sampling']['recovery_prob_after_sampling']
+        self.event_num = self.config_dict['EpidemiologyModel']['massive_sampling']['event_num']
+        self.generation = self.config_dict['EpidemiologyModel']['massive_sampling']['generation']
+        self.sampling_prob = self.config_dict['EpidemiologyModel']['massive_sampling']['sampling_prob']
+        self.massive_sampling_recovery_prob_after_sampling = self.config_dict['EpidemiologyModel']['massive_sampling']['recovery_prob_after_sampling']
 
-        self.super_infection = load_config_as_dict(self.config_path)['EpidemiologyModel']['super_infection']
+        self.super_infection = self.config_dict['EpidemiologyModel']['super_infection']
 
 
     def render_model(self):
