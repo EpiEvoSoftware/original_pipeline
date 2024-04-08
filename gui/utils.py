@@ -542,6 +542,12 @@ class EasyWidgetBase:
     def derender_itself(self):
         derender_components(self.local_components)
 
+    def set_to_rerender(self, to_rerender):
+        self.to_rerender = to_rerender
+    
+    def set_to_derender(self, to_derender):
+        self.to_derender = to_derender
+
     def update(self, error_messages):
         pass
 
@@ -634,19 +640,20 @@ class EasyRadioButton(EasyWidgetBase):
     """
     replaces render_rb
     """
-    def __init__(self, keys_path, config_path, render_text, render_text_short, control_frame, column, frow, hide, to_rerender, to_derender, columnspan) -> None:
+    def __init__(self, keys_path, config_path, render_text, render_text_short, control_frame, column, frow, hide, to_rerender, to_derender, columnspan, radiobuttonselected) -> None:
         super().__init__()
         self.keys_path = keys_path
         self.config_path = config_path
         self.render_text_short = render_text_short
         self.to_rerender = to_rerender
         self.to_derender = to_derender
+        self.radiobuttonselected = radiobuttonselected
 
         dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
         self.var = tk.BooleanVar(value=dict_var)
         label = tk.ttk.Label(control_frame, text=render_text, style = "Bold.TLabel")
-        rb_true = tk.ttk.Radiobutton(control_frame, text="Yes", variable=self.var, value=True, command = self._update)
-        rb_false = tk.ttk.Radiobutton(control_frame, text="No", variable=self.var, value=False, command = self._update)
+        rb_true = tk.ttk.Radiobutton(control_frame, text="Yes", variable=self.var, value=True, command = self._updater)
+        rb_false = tk.ttk.Radiobutton(control_frame, text="No", variable=self.var, value=False, command = self._updater)
         if frow is None or column is None:
             label.grid()
             rb_true.grid()
@@ -661,21 +668,12 @@ class EasyRadioButton(EasyWidgetBase):
         if not hide:
             rerender_components(self.local_components, self.grid_layout)
 
-    def set_to_rerender(self, to_rerender):
-        self.to_rerender = to_rerender
-    
-    def set_to_derender(self, to_derender):
-        self.to_derender = to_derender
-
-    def _update(self):
-        no_validate_update(self.var, self.config_path, self.keys_path)
-        match self.var.get():
-            case True:
-                if self.to_rerender is not None:
-                    self.to_rerender()
-            case False:
-                if self.to_derender is not None:
-                    self.to_derender()
+    def _updater(self):
+        self.radiobuttonselected(self.var, self.to_rerender, self.to_derender)
+        if self.to_derender is not None:
+            self.to_derender()
+        if self.to_rerender is not None:
+            self.to_rerender()
 
 class EasyPathSelector(EasyWidgetBase):
     def __init__(self, keys_path, config_path, render_text, control_frame, column, hide, frow, columnspan, filetype = None):
@@ -743,7 +741,7 @@ class EasyCombobox(EasyWidgetBase):
 
         self.var = tk.StringVar(value=var_val)
         self.combobox = tk.ttk.Combobox(self.control_frame, textvariable=self.var, values=combobox_values, state="readonly", width=width)
-        self.combobox.bind("<<ComboboxSelected>>", self.updater)
+        self.combobox.bind("<<ComboboxSelected>>", self._updater)
 
         if frow is None or column is None:
             self.label.grid()
@@ -757,8 +755,10 @@ class EasyCombobox(EasyWidgetBase):
         if not hide:
             rerender_components(self.local_components, self.grid_layout)
         
-    def updater(self, event):
-        self.comboboxselected(self.var)
+    def _updater(self, event):
+        self.comboboxselected(self.var, self.to_rerender, self.to_derender)
+        self.to_rerender()
+        self.to_derender()
 
 
 class GroupControls:

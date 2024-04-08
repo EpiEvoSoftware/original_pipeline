@@ -40,14 +40,14 @@
         }
     },
     "GenomeElement": {
-        "use_genetic_model": false,
+        "use_genetic_model": true,
         "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
         "traits_num": {
             "transmissibility": 1,
             "drug_resistance": 4
         },
         "effect_size": {
-            "method": "user_input",
+            "method": "randomly_generate",
             "user_input": {
                 "path_effsize_table": "/System/iOSSupport/System/Library/AppleMediaServices/DynamicUI/PlugIns/CoreDynamicUIPlugin.bundle"
             },
