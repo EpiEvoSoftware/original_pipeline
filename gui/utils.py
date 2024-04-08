@@ -757,8 +757,10 @@ class EasyCombobox(EasyWidgetBase):
         
     def _updater(self, event):
         self.comboboxselected(self.var, self.to_rerender, self.to_derender)
-        self.to_rerender()
-        self.to_derender()
+        if self.to_derender is not None:
+            self.to_derender()
+        if self.to_rerender is not None:
+            self.to_rerender()
 
 
 class GroupControls:
