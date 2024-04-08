@@ -933,7 +933,7 @@ class SeedsConfiguration:
                     raise Exception(error)
                 
             except Exception as e:
-                    messagebox.showerror("Network Generation Error", str(e))
+                    messagebox.showerror("Seed Generation Error", str(e))
                     
 
         self.run_seed_generation_button = tk.Button(self.control_frame, text="Run Seed Generation", command=seed_generation)

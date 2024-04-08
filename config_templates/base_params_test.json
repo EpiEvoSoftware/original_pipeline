@@ -5,8 +5,8 @@
         "random_number_seed": 1
     },
     "EvolutionModel": {
-        "n_generation": 1,
-        "mut_rate": 1,
+        "n_generation": 1000,
+        "mut_rate": 0,
         "trans_type": "Bi-Allelic",
         "dr_type": "Additive",
         "within_host_reproduction": true,
@@ -16,7 +16,7 @@
     "SeedsConfiguration": {
         "seed_size": 1,
         "use_reference": false,
-        "method": "user_input",
+        "method": "SLiM_burnin_WF",
         "user_input": {
             "path_seeds_vcf": "",
             "path_seeds_phylogeny": ""
@@ -44,25 +44,26 @@
         "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
         "traits_num": {
             "transmissibility": 1,
-            "drug_resistance": 4
+            "drug_resistance": 1
         },
         "effect_size": {
-            "method": "user_input",
+            "method": "randomly_generate",
             "user_input": {
                 "path_effsize_table": "/System/iOSSupport/System/Library/AppleMediaServices/DynamicUI/PlugIns/CoreDynamicUIPlugin.bundle"
             },
             "randomly_generate": {
-                "gff": "/Users/andrewhahn/original_pipeline/test/two_dict_to_csv.csv",
+                "gff": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
                 "genes_num": [
-                    3
+                    1,
+                    1
                 ],
                 "effsize_min": [
-                    3,
+                    4,
                     4
                 ],
                 "effsize_max": [
-                    3,
-                    3
+                    5,
+                    5
                 ],
                 "normalize": false
             }
