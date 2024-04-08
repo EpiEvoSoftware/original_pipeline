@@ -784,6 +784,7 @@ class GroupControls:
 
 class TabBase:
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
+        self.visible_components = set()
         self.init_val(config_path)
         self.init_tab(parent, tab_parent, tab_title, tab_index, hide)
         self.load_page()

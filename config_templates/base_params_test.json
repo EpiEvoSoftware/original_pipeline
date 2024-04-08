@@ -16,7 +16,7 @@
     "SeedsConfiguration": {
         "seed_size": 1,
         "use_reference": false,
-        "method": "SLiM_burnin_WF",
+        "method": "user_input",
         "user_input": {
             "path_seeds_vcf": "",
             "path_seeds_phylogeny": ""
@@ -43,8 +43,8 @@
         "use_genetic_model": true,
         "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
         "traits_num": {
-            "transmissibility": 1,
-            "drug_resistance": 1
+            "transmissibility": 13,
+            "drug_resistance": 13
         },
         "effect_size": {
             "method": "randomly_generate",
@@ -52,10 +52,10 @@
                 "path_effsize_table": "/System/iOSSupport/System/Library/AppleMediaServices/DynamicUI/PlugIns/CoreDynamicUIPlugin.bundle"
             },
             "randomly_generate": {
-                "gff": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
+                "gff": "/Users/andrewhahn/original_pipeline/test/seeds_trait_values.csv",
                 "genes_num": [
                     1,
-                    1
+                    4
                 ],
                 "effsize_min": [
                     4,

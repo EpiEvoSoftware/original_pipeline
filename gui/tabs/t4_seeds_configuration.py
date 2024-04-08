@@ -14,60 +14,12 @@ from seed_generator import *
 
 
 # TODO: seed_size = len(seeded_host_id), validate
-class SeedsConfiguration:
+class SeedsConfiguration(TabBase):
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
-
-        self.init_val(config_path)
-        self.init_tab(parent, tab_parent, tab_title, tab_index, hide)
-        self.initial_load()
-
+        super().__init__(parent, tab_parent, config_path, tab_title, tab_index, hide)
         self.render_run_button()
-        render_next_button(self.tab_index, self.tab_parent, self.parent, self.update)
 
-    def update(self):
-        return
-    
-    def init_val(self, config_path):
-        self.config_path = config_path
-
-        # SeedsConfiguration
-        self.seed_size = load_config_as_dict(self.config_path)['SeedsConfiguration']['seed_size']
-        self.method = load_config_as_dict(self.config_path)['SeedsConfiguration']['method']
-        self.use_reference: bool = load_config_as_dict(self.config_path)['SeedsConfiguration']['use_reference']
-
-        # user_input
-        self.path_seeds_vcf = load_config_as_dict(self.config_path)['SeedsConfiguration']['user_input']['path_seeds_vcf']
-        self.path_seeds_phylogeny = load_config_as_dict(self.config_path)['SeedsConfiguration']['user_input']["path_seeds_phylogeny"]
-
-        # SLiM_burnin_WF
-        self.burn_in_Ne = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_Ne']
-        self.burn_in_generations_wf = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_generations']
-        self.burn_in_mutrate_wf = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_mutrate']
-
-        # SLiM_burnin_epi
-        self.burn_in_generations_epi = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_generations']
-        self.burn_in_mutrate_epi = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_mutrate']
-        self.seeded_host_id = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["seeded_host_id"]
-        self.S_IE_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["S_IE_rate"]
-        self.E_I_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["E_I_rate"]
-        self.E_R_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["E_R_rate"]
-        self.latency_prob = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']["latency_prob"]
-        self.I_R_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['I_R_rate']
-        self.I_E_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['I_E_rate']
-        self.R_S_rate = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_epi']['R_S_rate']
-    
-    def init_tab(self, parent, tab_parent, tab_title, tab_index, hide = False):
-        self.parent = parent
-        self.tab_parent = tab_parent
-        self.tab_parent.add(self.parent, text=tab_title)
-        self.tab_index = tab_index
-        if hide:
-            self.tab_parent.tab(self.tab_index, state="disabled")
-        
-        self.control_frame = ttk.Frame(self.parent)
-        self.control_frame.pack(padx=10, pady=10)
-
-    def initial_load(self):
+    def load_page(self):
         self.render_seeds_size()
         self.render_use_reference()
         self.use_method_components = self.render_use_method()
@@ -94,6 +46,44 @@ class SeedsConfiguration:
                 rerender_components(self.epi_components, self.epi_grid_configs)
 
 
+
+    
+    def init_val(self, config_path):
+        self.config_path = config_path
+
+        self.visible_components = set()
+
+        self.frow_val = 0
+
+        self.config_dict = load_config_as_dict(self.config_path)
+
+        # SeedsConfiguration
+        self.seed_size = self.config_dict['SeedsConfiguration']['seed_size']
+        self.method = self.config_dict['SeedsConfiguration']['method']
+        self.use_reference: bool = self.config_dict['SeedsConfiguration']['use_reference']
+
+        # user_input
+        self.path_seeds_vcf = self.config_dict['SeedsConfiguration']['user_input']['path_seeds_vcf']
+        self.path_seeds_phylogeny = self.config_dict['SeedsConfiguration']['user_input']["path_seeds_phylogeny"]
+
+        # SLiM_burnin_WF
+        self.burn_in_Ne = self.config_dict['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_Ne']
+        self.burn_in_generations_wf = self.config_dict['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_generations']
+        self.burn_in_mutrate_wf = self.config_dict['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_mutrate']
+
+        # SLiM_burnin_epi
+        self.burn_in_generations_epi = self.config_dict['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_generations']
+        self.burn_in_mutrate_epi = self.config_dict['SeedsConfiguration']['SLiM_burnin_epi']['burn_in_mutrate']
+        self.seeded_host_id = self.config_dict['SeedsConfiguration']['SLiM_burnin_epi']["seeded_host_id"]
+        self.S_IE_rate = self.config_dict['SeedsConfiguration']['SLiM_burnin_epi']["S_IE_rate"]
+        self.E_I_rate = self.config_dict['SeedsConfiguration']['SLiM_burnin_epi']["E_I_rate"]
+        self.E_R_rate = self.config_dict['SeedsConfiguration']['SLiM_burnin_epi']["E_R_rate"]
+        self.latency_prob = self.config_dict['SeedsConfiguration']['SLiM_burnin_epi']["latency_prob"]
+        self.I_R_rate = self.config_dict['SeedsConfiguration']['SLiM_burnin_epi']['I_R_rate']
+        self.I_E_rate = self.config_dict['SeedsConfiguration']['SLiM_burnin_epi']['I_E_rate']
+        self.R_S_rate = self.config_dict['SeedsConfiguration']['SLiM_burnin_epi']['R_S_rate']
+    
+        
     def render_user_input(self):
         user_input_components = set()
         self.render_tab_title(user_input_components, 5+3, 0, 3)
@@ -103,7 +93,7 @@ class SeedsConfiguration:
     
     def render_wf(self):
         """
-        self.burn_in_Ne = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_Ne']
+        self.burn_in_Ne = self.config_dict['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_Ne']
         self.burn_in_generations_wf = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_generations']
         self.burn_in_mutrate_wf = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_mutrate']
         """
@@ -890,6 +880,8 @@ class SeedsConfiguration:
             self.R_S_rate_label.pack_forget()
             self.R_S_rate_entry.pack_forget()
             self.update_R_S_rate_button.pack_forget()
+
+            
     def render_run_button(self):
         def seed_generation():
             config = load_config_as_dict(self.config_path)
