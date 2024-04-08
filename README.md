@@ -14,3 +14,5 @@ deployment: https://github.com/TomSchimansky/CustomTkinter/issues/2322
 distributing for macos:
 pip install pyinstaller
 pyinstaller --onefile --windowed --icon=__icon__.ico __script__.py
+
+https://www.pythonguis.com/tutorials/packaging-tkinter-applications-windows-pyinstaller/
