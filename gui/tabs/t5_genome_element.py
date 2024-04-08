@@ -17,42 +17,19 @@ class GenomeElement:
 
         self.init_val(config_path)
         self.init_tab(parent, tab_parent, tab_title, tab_index, hide)
-        self.initial_load()
         self.load_page()
 
         render_next_button(self.tab_index, self.tab_parent, self.parent, self.global_update)
 
     def load_page(self):
-        return
-        self.use_genetic_model_component.rerender_itself()
-        self.use_genetic_model_component.set_to_derender(self.num_traits_group_control.derender_itself)
-        self.use_genetic_model_component.set_to_rerender(self.num_traits_group_control.rerender_itself)
-        # self.render_use_genetic_model(self.num_traits_group_control.rerender_itself, self.num_traits_group_control.derender_itself, False)
-        
-
-    def initial_load(self):
         ui_selected = self.generate_genetic_architecture_method == "user_input"
         hide = not self.use_genetic_model
+        self.global_group_control = GroupControls()
         self.init_landing_group(hide=False)
         self.init_num_traits_group(hide=hide) 
         self.init_user_input_group(ui_selected,hide=hide) 
         self.init_random_generate_group(ui_selected,hide=hide) 
 
-        # if ui_selected:
-        #     self.generate_genetic_architecture_method.set_to_rerender(self.user_input_group_control.rerender_itself)
-        #     self.generate_genetic_architecture_method.set_to_derender(self.random_generate_group_control.derender_itself)
-        # else:
-        #     self.generate_genetic_architecture_method.set_to_rerender(self.random_generate_group_control.rerender_itself)
-        #     self.generate_genetic_architecture_method.set_to_derender(self.user_input_group_control.derender_itself)
-
-        # if self.use_genetic_model:
-        #     self.use_genetic_model_component.set_to_rerender(self.num_traits_group_control.rerender_itself)
-        #     self.use_genetic_model_component.set_to_derender(self.num_traits_group_control.derender_itself)
-        # else:
-        #     self.use_genetic_model_component.set_to_rerender(self.num_traits_group_control.derender_itself)
-        #     self.use_genetic_model_component.set_to_derender(self.num_traits_group_control.rerender_itself)
-
-        self.init_global_group()
 
     def init_landing_group(self, hide = False):
         self.render_simulation_settings_title(False, 0, self.frow_val, 1)
@@ -71,6 +48,7 @@ class GenomeElement:
         self.user_input_group_control = self.render_path_eff_size_table(
             hide, 0, self.frow_val + 9, 2
         )
+        self.global_group_control.add(self.user_input_group_control)
 
     def init_num_traits_group(self, hide=False):
         number_of_traits_title = self.render_number_of_traits_title(
@@ -98,6 +76,7 @@ class GenomeElement:
         self.num_traits_group_control = GroupControls()
         for control in num_traits_group_control:
             self.num_traits_group_control.add(control)
+        self.global_group_control.add(self.num_traits_group_control)
         
 
     def init_random_generate_group(self, ui_selected, hide=False):
@@ -143,16 +122,8 @@ class GenomeElement:
         self.random_generate_group_control = GroupControls()
         for control in random_generate_group_control:
             self.random_generate_group_control.add(control)
-        
-        
-
-        
-
-    def init_global_group(self):
-        self.global_group_control = GroupControls()
         self.global_group_control.add(self.random_generate_group_control)
-        self.global_group_control.add(self.num_traits_group_control)
-        self.global_group_control.add(self.user_input_group_control)
+        
         
         
     
@@ -250,14 +221,11 @@ class GenomeElement:
             if var.get():
                 self.use_genetic_model = True
                 self.global_group_control.rerender_itself()
-                # self.global_group_control.derender_itself()
-                # self.num_traits_group_control.rerender_itself()
-                # self.num_traits_group_control.derender_itself()
+
             else:
                 self.use_genetic_model = False
                 self.global_group_control.derender_itself()
-                # self.num_traits_group_control.derender_itself()
-                # self.num_traits_group_control.rerender_itself()
+
         component = EasyRadioButton(
             keys_path, self.config_path, 
             render_use_genetic_model_text, "use_genetic_model", 

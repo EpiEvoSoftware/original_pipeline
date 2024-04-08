@@ -47,7 +47,7 @@
             "drug_resistance": 4
         },
         "effect_size": {
-            "method": "randomly_generate",
+            "method": "user_input",
             "user_input": {
                 "path_effsize_table": "/System/iOSSupport/System/Library/AppleMediaServices/DynamicUI/PlugIns/CoreDynamicUIPlugin.bundle"
             },
