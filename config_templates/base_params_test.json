@@ -43,7 +43,7 @@
         "use_genetic_model": false,
         "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
         "traits_num": {
-            "transmissibility": 2,
+            "transmissibility": 1,
             "drug_resistance": 4
         },
         "effect_size": {

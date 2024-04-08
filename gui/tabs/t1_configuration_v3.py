@@ -18,14 +18,12 @@ class Configurationv3:
 
         self.tab_parent.add(self.parent, text=tab_title)
 
-
         self.control_frame = ttk.Frame(self.parent, width=300)
 
         self.control_frame.pack(padx=10, pady=10)
 
         self.render_working_directory()
         self.render_ref_path_label()
-
         self.render_n_replicates()
 
         render_next_button(self.tab_index, self.tab_parent, self.parent, self.update)

@@ -17,6 +17,7 @@ from tabs.t2_evolutionarymodel import EvolutionaryModel
 from tabs.t3_networkmodel import NetworkModel
 from tabs.t4_seeds_configuration import SeedsConfiguration
 from tabs.t5_genome_element import GenomeElement
+# from tabs.t5_genome_element_v2 import GenomeElementv2
 from tabs.t6_networkgraph import NetworkGraphApp
 from tabs.t7_epidemiology_model import EpidemiologyModel
 from tabs.t7_epidemiology_model_v2 import EpidemiologyModelv2

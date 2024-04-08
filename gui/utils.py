@@ -545,40 +545,57 @@ class EasyWidgetBase:
     def update(self, error_messages):
         pass
 
+class EasyTitle(EasyWidgetBase):
+    def __init__(self, render_text, control_frame, column, frow, hide, columnspan = 1, sticky = "we") -> None:
+        super().__init__()
+        self.render_text = render_text
+        self.label = tk.ttk.Label(control_frame, text=self.render_text, style="Title.TLabel")
+        if frow is None or column is None:
+            self.label.grid()
+        else:
+            self.label.grid(row = frow, column = column, columnspan = columnspan, sticky = sticky, pady = 5)
+
+        self.local_components = {self.label}
+        self.grid_layout = derender_components(self.local_components)
+        if not hide:
+            rerender_components(self.local_components, self.grid_layout)
+
 class EasyLabel(EasyWidgetBase):
-    def __init__(self, render_text, control_frame, column, frow) -> None:
+    def __init__(self, render_text, control_frame, column, frow, hide, columnspan = 1, sticky = 'w') -> None:
         super().__init__()
         self.render_text = render_text
         self.label = tk.ttk.Label(control_frame, text=self.render_text, style = "Bold.TLabel")
         if frow is None or column is None:
             self.label.grid()
         else:
-            self.label.grid(row = frow, column = column, sticky = 'w', pady = 5)
+            self.label.grid(row = frow, column = column, columnspan = columnspan, sticky = sticky, pady = 5)
 
         self.local_components = {self.label}
         self.grid_layout = derender_components(self.local_components)
-        rerender_components(self.local_components, self.grid_layout)
+        if not hide:
+            rerender_components(self.local_components, self.grid_layout)
 
 class EasyButton(EasyWidgetBase):
-    def __init__(self, render_text, control_frame, column, frow, command) -> None:
+    def __init__(self, render_text, control_frame, column, frow, command, hide, sticky="e") -> None:
         super().__init__()
         self.render_text = render_text
         self.button = tk.Button(control_frame, text=self.render_text, command=command)
         if frow is None or column is None:
             self.button.grid()
         else:
-            self.button.grid(row = frow, column = column, sticky = 'w', pady = 5)
+            self.button.grid(row = frow, column = column, sticky = sticky, pady = 5)
 
         self.local_components = {self.button}
         self.grid_layout = derender_components(self.local_components)
-        rerender_components(self.local_components, self.grid_layout)
+        if not hide:
+            rerender_components(self.local_components, self.grid_layout)
 
 
 class EasyEntry(EasyWidgetBase):
     """
     replaces render_numerical_input
     """
-    def __init__(self, keys_path, config_path, render_text, render_text_short, control_frame, column, frow, validate_for) -> None:
+    def __init__(self, keys_path, config_path, render_text, render_text_short, control_frame, column, frow, validate_for, hide) -> None:
         super().__init__()
         self.keys_path = keys_path
         self.config_path = config_path
@@ -598,13 +615,9 @@ class EasyEntry(EasyWidgetBase):
 
         self.local_components = {self.entry, label}
         self.grid_layout = derender_components(self.local_components)
-        rerender_components(self.local_components, self.grid_layout)
+        if not hide:
+            rerender_components(self.local_components, self.grid_layout)
 
-    # def rerender_itself(self):
-    #     rerender_components(self.local_components, self.grid_layout)
-
-    # def derender_itself(self):
-    #     derender_components(self.local_components)
 
     def update(self, error_messages):
         match self.validate_for:
@@ -621,7 +634,7 @@ class EasyRadioButton(EasyWidgetBase):
     """
     replaces render_rb
     """
-    def __init__(self, keys_path, config_path, render_text, render_text_short, control_frame, column, frow, to_rerender = None, to_derender = None) -> None:
+    def __init__(self, keys_path, config_path, render_text, render_text_short, control_frame, column, frow, hide, to_rerender, to_derender, columnspan) -> None:
         super().__init__()
         self.keys_path = keys_path
         self.config_path = config_path
@@ -639,19 +652,20 @@ class EasyRadioButton(EasyWidgetBase):
             rb_true.grid()
             rb_false.grid()
         else:
-            label.grid(row = frow, column = column, sticky = 'w', pady = 5)
+            label.grid(row = frow, column = column, columnspan=columnspan, sticky = 'w', pady = 5)
             rb_true.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
             rb_false.grid(row = frow+2, column = column, sticky = 'w', pady = 5)
 
         self.local_components = {label, rb_true, rb_false}
         self.grid_layout = derender_components(self.local_components)
-        rerender_components(self.local_components, self.grid_layout)
+        if not hide:
+            rerender_components(self.local_components, self.grid_layout)
 
-    # def rerender_itself(self):
-    #     rerender_components(self.local_components, self.grid_layout)
-
-    # def derender_itself(self):
-    #     derender_components(self.local_components)
+    def set_to_rerender(self, to_rerender):
+        self.to_rerender = to_rerender
+    
+    def set_to_derender(self, to_derender):
+        self.to_derender = to_derender
 
     def _update(self):
         no_validate_update(self.var, self.config_path, self.keys_path)
@@ -664,7 +678,7 @@ class EasyRadioButton(EasyWidgetBase):
                     self.to_derender()
 
 class EasyPathSelector(EasyWidgetBase):
-    def __init__(self, keys_path, config_path, render_text, control_frame, column, frow, filetype = None):
+    def __init__(self, keys_path, config_path, render_text, control_frame, column, hide, frow, columnspan, filetype = None):
         """
         Replaces render_path_select
         """
@@ -688,20 +702,16 @@ class EasyPathSelector(EasyWidgetBase):
             self.value_label.grid()
             button.grid()
         else:
-            label.grid(row = frow, column = column, sticky = 'w', pady = 5)
-            self.value_label.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
-            button.grid(row = frow+2, column = column, sticky = 'e', pady = 5)
+            label.grid(row = frow, column = column, columnspan=columnspan, sticky = 'w', pady = 5)
+            self.value_label.grid(row = frow+1, column = column,columnspan=columnspan, sticky = 'w', pady = 5)
+            button.grid(row = frow+2, column = column, columnspan=columnspan, sticky = 'e', pady = 5)
 
         self.local_components = {label, self.value_label, button}
         self.grid_layout = derender_components(self.local_components)
-        rerender_components(self.local_components, self.grid_layout)
-# rerender_components(self.local_components, self.grid_layout)
-    # def rerender_itself(self):
-    #     rerender_components(self.local_components, self.grid_layout)
-        
-    # def derender_itself(self):
-    #     derender_components(self.local_components)
-        
+        if not hide:
+            rerender_components(self.local_components, self.grid_layout)
+                
+                
     def _update(self):
         if self.filetype is None:
             chosen_file = filedialog.askopenfilename(title="Select a File")
@@ -714,7 +724,7 @@ class EasyPathSelector(EasyWidgetBase):
 
 
 class EasyCombobox(EasyWidgetBase):
-    def __init__(self, keys_path, config_path, render_text, control_frame, column, frow, combobox_values, to_rerender, to_derender, comboboxselected, val_to_ui_mapping = None):
+    def __init__(self, keys_path, config_path, render_text, control_frame, column, frow, combobox_values, to_rerender, to_derender, comboboxselected, hide, width, val_to_ui_mapping = None):
         super().__init__()
         self.keys_path = keys_path
         self.config_path = config_path
@@ -732,7 +742,7 @@ class EasyCombobox(EasyWidgetBase):
             var_val = val_to_ui_mapping.get(dict_var, "")
 
         self.var = tk.StringVar(value=var_val)
-        self.combobox = tk.ttk.Combobox(self.control_frame, textvariable=self.var, values=combobox_values, state="readonly")
+        self.combobox = tk.ttk.Combobox(self.control_frame, textvariable=self.var, values=combobox_values, state="readonly", width=width)
         self.combobox.bind("<<ComboboxSelected>>", self.updater)
 
         if frow is None or column is None:
@@ -744,7 +754,8 @@ class EasyCombobox(EasyWidgetBase):
 
         self.local_components = {self.label, self.combobox}
         self.grid_layout = derender_components(self.local_components)
-        rerender_components(self.local_components, self.grid_layout)
+        if not hide:
+            rerender_components(self.local_components, self.grid_layout)
         
     def updater(self, event):
         self.comboboxselected(self.var)
@@ -769,16 +780,5 @@ class GroupControls:
             item.derender_itself()
 
 
-    # def global_update(self):
-    #     users_validation_messages = []
-
-    #     for widget in self.widgets:
-    #         widget.update(users_validation_messages)
-
-    #     if len(users_validation_messages) == 0:
-    #         tk.messagebox.showinfo("Update Successful", "Parameters Updated.")
-    #         return 0
-    #     else:
-    #         error_message_str = "\n\n".join(users_validation_messages)
-    #         tk.messagebox.showerror("Update Error", error_message_str)
-    #         return 1
+        
+        
