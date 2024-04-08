@@ -275,7 +275,10 @@ class GenomeElement(TabBase):
 
     def render_run_button(self, hide = True, column = None, frow = None):
         def effect_size_generation():
-            self.global_update_no_success_message()
+
+            if self.global_update_no_success_message() == 1:
+                return
+            
             config = load_config_as_dict(self.config_path) 
 
             method = config['GenomeElement']['effect_size']['method']
@@ -313,8 +316,6 @@ class GenomeElement(TabBase):
             
 
     def init_val(self, config_path):
-
-        self.visible_components = set()
 
         self.frow_val = 0
 
