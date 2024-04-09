@@ -318,6 +318,8 @@ val_to_render_ui_wf_epi_mapping = {
 
 render_to_val_ui_wf_epi_mapping = {value: key for key, value in val_to_render_ui_wf_epi_mapping.items()}
 
+ui_wf_epi_values = list(val_to_render_ui_wf_epi_mapping.values())
+# ui_wf_epi_values = list(val_to_render_ui_wf_epi_mapping.keys())
 
 def derender_components(components: set):
     grid_configs = {}
@@ -413,7 +415,7 @@ def render_path_select(keys_path, config_path, render_text, control_frame, colum
     
 def update_numerical_input(entry, keys_path, config_path, error_messages, render_text_short, is_int):
     try:
-        print("entry.get()", entry.get())
+        # print("entry.get()",  entry.get())
         new_val = int(float(entry.get()))  
         config = load_config_as_dict(config_path) 
         update_nested_dict(config, keys_path, new_val) 
@@ -673,10 +675,10 @@ class EasyRadioButton(EasyWidgetBase):
 
     def _updater(self):
         self.radiobuttonselected(self.var, self.to_rerender, self.to_derender)
-        if self.to_derender is not None:
-            self.to_derender()
-        if self.to_rerender is not None:
-            self.to_rerender()
+        # if self.to_derender is not None:
+        #     self.to_derender()
+        # if self.to_rerender is not None:
+        #     self.to_rerender()
 
 class EasyPathSelector(EasyWidgetBase):
     def __init__(self, keys_path, config_path, render_text, control_frame, column, hide, frow, columnspan, filetype = None):
@@ -732,6 +734,7 @@ class EasyCombobox(EasyWidgetBase):
         self.control_frame = control_frame
         self.to_derender = to_derender
         self.to_rerender = to_rerender
+        self.val_to_ui_mapping = val_to_ui_mapping
         self.comboboxselected = comboboxselected
 
         self.label = tk.ttk.Label(self.control_frame, text=render_text, style = "Bold.TLabel")
@@ -741,8 +744,10 @@ class EasyCombobox(EasyWidgetBase):
             var_val = dict_var
         else:
             var_val = val_to_ui_mapping.get(dict_var, "")
+            # print("var_val", var_val)
 
         self.var = tk.StringVar(value=var_val)
+        print("self.var", self.var.get())
         self.combobox = tk.ttk.Combobox(self.control_frame, textvariable=self.var, values=combobox_values, state="readonly", width=width)
         self.combobox.bind("<<ComboboxSelected>>", self._updater)
 
@@ -760,10 +765,7 @@ class EasyCombobox(EasyWidgetBase):
         
     def _updater(self, event):
         self.comboboxselected(self.var, self.to_rerender, self.to_derender)
-        if self.to_derender is not None:
-            self.to_derender()
-        if self.to_rerender is not None:
-            self.to_rerender()
+        self.comboboxselected(self.var, self.to_rerender, self.to_derender)
 
 
 class GroupControls:
@@ -773,6 +775,9 @@ class GroupControls:
     def add(self, item):
         if isinstance(item, EasyWidgetBase) or isinstance(item, GroupControls):
             self.items.append(item)
+        # elif isinstance(item, list):
+        #     for subitem in item:
+        #         self.add(subitem)
         else:
             raise ValueError("Item must be an instance of EasyWidgetBase or GroupControls")
 
@@ -783,6 +788,16 @@ class GroupControls:
     def derender_itself(self):
         for item in self.items:
             item.derender_itself()
+    
+    def to_rerender(self):
+        for item in self.items:
+            item.to_rerender()
+
+    def to_derender(self):
+        for item in self.items:
+            # print("group control derending", item)
+            item.to_derender()
+
 
 
 class TabBase:

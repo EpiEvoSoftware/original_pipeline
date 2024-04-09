@@ -461,7 +461,7 @@ class NetworkModelConfigurations:
                     rp_size = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['rp_size']
                     p_within = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['p_within']
                     p_between = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['p_between']
-                    print(p_between, "pbetween")
+                    # print(p_between, "pbetween")
                     network, error = run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="RP", rp_size=rp_size, p_within=p_within, p_between=p_between)
                 else:
                     raise ValueError("Unsupported model.")

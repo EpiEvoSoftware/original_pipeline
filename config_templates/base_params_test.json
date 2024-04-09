@@ -1,7 +1,7 @@
 {
     "BasicRunConfiguration": {
         "cwdir": "/Users/vivianzhao/Desktop/TB_software/wkdir",
-        "n_replicates": 3,
+        "n_replicates": 34325,
         "random_number_seed": 1
     },
     "EvolutionModel": {
@@ -14,12 +14,12 @@
         "cap_withinhost": 11
     },
     "SeedsConfiguration": {
-        "seed_size": 1,
-        "use_reference": true,
+        "seed_size": 312341,
+        "use_reference": false,
         "method": "SLiM_burnin_WF",
         "user_input": {
-            "path_seeds_vcf": "",
-            "path_seeds_phylogeny": ""
+            "path_seeds_vcf": "/Users/andrewhahn/original_pipeline/test/two_dict_to_csv.csv",
+            "path_seeds_phylogeny": "/Users/andrewhahn/original_pipeline/test/seeds_trait_values.csv"
         },
         "SLiM_burnin_WF": {
             "burn_in_Ne": 0,
@@ -27,7 +27,7 @@
             "burn_in_mutrate": 0
         },
         "SLiM_burnin_epi": {
-            "burn_in_generations": 221,
+            "burn_in_generations": 22133,
             "burn_in_mutrate": 0,
             "seeded_host_id": [],
             "S_IE_rate": 0,
@@ -47,7 +47,7 @@
             "drug_resistance": 13
         },
         "effect_size": {
-            "method": "user_input",
+            "method": "randomly_generate",
             "user_input": {
                 "path_effsize_table": "/System/iOSSupport/System/Library/AppleMediaServices/DynamicUI/PlugIns/CoreDynamicUIPlugin.bundle"
             },

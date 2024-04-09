@@ -17,7 +17,6 @@ from seed_generator import *
 class SeedsConfiguration(TabBase):
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
         super().__init__(parent, tab_parent, config_path, tab_title, tab_index, hide)
-        self.render_run_button()
 
     # def global_update(self):
 
@@ -59,13 +58,13 @@ class SeedsConfiguration(TabBase):
     
         
     def init_user_input_group(self, hide):
-        tab_t = self.render_tab_title(hide, 5+3, 0, 3)
-        path_seeds_vfc = self.render_path_seeds_vcf(hide, 5+3, 1, 1)
-        path_seeds_phyl = self.render_path_seeds_phylogeny(hide, 12, 1, 1)
+        # tab_t = self.render_tab_title(hide, 5+3, 0, 3)
+        # path_seeds_vfc = self.render_path_seeds_vcf(hide, 5+3, 1, 1)
+        # path_seeds_phyl = self.render_path_seeds_phylogeny(hide, 12, 1, 1)
         grpctrs = GroupControls()
-        grpctrs.add(tab_t)
-        grpctrs.add(path_seeds_vfc)
-        grpctrs.add(path_seeds_phyl)
+        # grpctrs.add(tab_t)
+        grpctrs.add(self.render_path_seeds_vcf(hide, 1, 6+3 , 1))
+        grpctrs.add(self.render_path_seeds_phylogeny(hide, 1, 12, 1))
         return grpctrs
     
     def init_wf_group(self, hide):
@@ -74,16 +73,16 @@ class SeedsConfiguration(TabBase):
         self.burn_in_generations_wf = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_generations']
         self.burn_in_mutrate_wf = load_config_as_dict(self.config_path)['SeedsConfiguration']['SLiM_burnin_WF']['burn_in_mutrate']
         """
-        wf_grpctrls = set()
-        wf_grpctrls.add(self.render_tab_title(hide, 5+3, 0, 3))
+        wf_grpctrls = GroupControls()
+        # wf_grpctrls.add(self.render_tab_title(hide, 5+3, 0, 3))
         wf_grpctrls.add(self.render_burn_in_ne(hide, 1, 9))
         wf_grpctrls.add(self.render_burn_in_generations_wf(hide, 1, 11))
         wf_grpctrls.add(self.render_burn_in_mutrate_wf(hide, 1, 13))
         return wf_grpctrls
     
     def init_epi_group(self, hide):
-        epi_grpctrls = set()
-        epi_grpctrls.add(self.render_tab_title(False, 5+3, 0, 3))
+        epi_grpctrls = GroupControls()
+        # epi_grpctrls.add(self.render_tab_title(hide, 5+3, 0, 3))
         epi_grpctrls.add(self.render_burn_in_generations_epi(hide, 0, 6+3))
         epi_grpctrls.add(self.render_burn_in_mutrate_epi(hide, 1, 6+3))
         epi_grpctrls.add(self.render_seeded_host_id(hide, 2, 6+3))
@@ -109,8 +108,7 @@ class SeedsConfiguration(TabBase):
             self.render_t4_title_text,
             self.control_frame, column, frow, hide, columnspan
         )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
     
     def render_seeds_size(self, hide, column, columnspan, frow):
@@ -122,8 +120,7 @@ class SeedsConfiguration(TabBase):
             text, 'seeding_pathogens', 
             self.control_frame, column, frow, 'integer', hide, columnspan)
 
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
         self.seed_size_label = ttk.Label(self.control_frame, text=self.render_seeds_size_title, style="Bold.TLabel")
@@ -150,8 +147,7 @@ class SeedsConfiguration(TabBase):
             column, hide, frow, columnspan
             )
         
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
     
 
@@ -194,7 +190,7 @@ class SeedsConfiguration(TabBase):
         """
 
         text = "The phylogeny of the seeding sequences (nwk format, optional)"
-        keys_path = ['SeedsConfiguration', 'user_input', 'path_seeds_vcf']
+        keys_path = ['SeedsConfiguration', 'user_input', 'path_seeds_phylogeny']
         component = EasyPathSelector(
             keys_path,
             self.config_path,
@@ -202,8 +198,7 @@ class SeedsConfiguration(TabBase):
             self.control_frame, 
             column, hide, frow, columnspan
             )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
     
         def update():
@@ -243,12 +238,9 @@ class SeedsConfiguration(TabBase):
         def radiobuttonselected(var, to_rerender, to_derender):
             no_validate_update(var, self.config_path, keys_path)
             if var.get():
-                self.use_genetic_model = True
-                self.global_group_control.rerender_itself()
-
+                to_derender()
             else:
-                self.use_genetic_model = False
-                self.global_group_control.derender_itself()
+                to_rerender()
 
         component = EasyRadioButton(
             keys_path, self.config_path, 
@@ -259,9 +251,9 @@ class SeedsConfiguration(TabBase):
             columnspan, radiobuttonselected
             )
         
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
+    
         def update():
             keys_path = ['SeedsConfiguration', 'use_reference']
             no_validate_update(self.within_host_reproduction_var, self.config_path, keys_path)
@@ -300,33 +292,76 @@ class SeedsConfiguration(TabBase):
         text = 'Method to Generate Sequences of the Seeding Pathogens'
         keys_path = ['SeedsConfiguration', 'method']
         def comboboxselected(var, to_rerender, to_derender):
-            converted_var = render_to_val_generate_genetic_architecture_method.get(var.get(), "")
+            local_var = var.get()
+            converted_var = render_to_val_ui_wf_epi_mapping.get(local_var, "")
+            # self.set_var(converted_var)
             no_validate_update_val(converted_var, self.config_path, keys_path)
+            renders = [
+            self.use_method_controls,
+            self.run_button_control
+            ]
+        
             match converted_var:
                 case "user_input":
-                    self.wf_grid_configs = derender_components(self.wf_components)
-                    self.epi_grid_configs = derender_components(self.epi_components)
-                    rerender_components(self.user_input_components, self.user_input_grid_configs)  
+                    renders.append(self.user_input_group_controls)
                 case "SLiM_burnin_WF":
-                    self.epi_grid_configs = derender_components(self.epi_components)
-                    self.user_input_grid_configs = derender_components(self.user_input_components)
-                    rerender_components(self.wf_components, self.wf_grid_configs)    
+                    renders.append(self.wf_group_controls)
                 case "SLiM_burnin_epi":
-                    self.wf_grid_configs = derender_components(self.wf_components)
-                    self.user_input_grid_configs = derender_components(self.user_input_components)
-                    rerender_components(self.epi_components, self.epi_grid_configs)
+                    renders.append(self.epi_group_controls)
                 case _:
-                    raise ValueError("Invalid method specified")
+                    raise ValueError("Invalid method")
+            
+            use_reference_to_rerender = GroupControls(renders).rerender_itself
+            use_reference_to_derender = GroupControls(renders).derender_itself
+            self.use_reference_control.set_to_rerender(use_reference_to_rerender)
+            self.use_reference_control.set_to_derender(use_reference_to_derender)
+            match converted_var:
+                case "user_input":
+                    derender = [
+                        self.wf_group_controls,
+                        self.epi_group_controls
+                    ]
+                    self.use_method_controls.set_to_derender(GroupControls(derender).derender_itself)
+                    self.use_method_controls.set_to_rerender(self.user_input_group_controls.rerender_itself)
+                    
+                    # renders.append(self.user_input_group_controls)
+                case "SLiM_burnin_WF":
+                    derender = [
+                        self.user_input_group_controls,
+                        self.epi_group_controls
+                    ]
+                    self.use_method_controls.set_to_derender(GroupControls(derender).derender_itself)
+                    self.use_method_controls.set_to_rerender(self.wf_group_controls.rerender_itself)
+                case "SLiM_burnin_epi":
+                    derender = [
+                        self.user_input_group_controls,
+                        self.wf_group_controls
+                    ]
+                    self.use_method_controls.set_to_derender(GroupControls(derender).derender_itself)
+                    self.use_method_controls.set_to_rerender(self.epi_group_controls.rerender_itself)
+                case _:
+                    raise ValueError("Invalid method")
+            
+            to_derender()
+            to_rerender()
+
+            # to_derender()
+            # to_rerender()
+
+            print("comboboxselected", converted_var)
+            
+            
         component = EasyCombobox(keys_path, self.config_path, text, 
                     self.control_frame, column, frow, 
-                    generate_genetic_architecture_method_values, 
+                    ui_wf_epi_values, 
                     to_rerender, to_derender,
                     comboboxselected,
                     hide,width, 
                     column_span,
-                    val_to_render_generate_genetic_architecture_method)
-        if not hide:
-            self.visible_components.add(component)
+                    val_to_render_ui_wf_epi_mapping)
+                    # render_to_val_generate_genetic_architecture_method)
+
+        self.visible_components.add(component)
     
         return component
         def update(event):
@@ -377,8 +412,7 @@ class SeedsConfiguration(TabBase):
             columnspan
             )
         
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
         self.burn_in_Ne_label = ttk.Label(self.control_frame, text=self.render_burn_in_ne_text, style = "Bold.TLabel")
@@ -398,8 +432,7 @@ class SeedsConfiguration(TabBase):
         self.render_burn_in_generations_wf_text = "Number of Burn-in Generations (Integer)"
         keys_path = ['SeedsConfiguration', 'SLiM_burnin_WF', 'burn_in_generations']
         component = EasyEntry(keys_path, self.config_path, self.render_burn_in_generations_wf_text, 'burn_in_generations_wf', self.control_frame, column, frow, 'integer', hide, columnspan)
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
     def render_burn_in_mutrate_wf(self, hide = True, column = None, frow = None):
@@ -411,8 +444,7 @@ class SeedsConfiguration(TabBase):
                               'burn_in_mutrate', self.control_frame, column, 
                               frow, 'integer', hide, columnspan=columnspan
                               )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
         self.burn_in_mutrate_wf_label = ttk.Label(self.control_frame, text=self.render_burn_in_mutrate_wf_text, style = "Bold.TLabel")
@@ -433,8 +465,7 @@ class SeedsConfiguration(TabBase):
         keys_path = ['SeedsConfiguration', 'SLiM_burnin_epi', 'burn_in_generations']
         
         component = EasyEntry(keys_path, self.config_path, self.render_burn_in_generations_epi_text, 'burn_in_generations_epi', self.control_frame, column, frow, 'integer', hide, 1)
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
         self.burn_in_generations_epi_label = ttk.Label(self.control_frame, text=self.render_burn_in_generations_epi_text, style="Bold.TLabel")
@@ -458,8 +489,7 @@ class SeedsConfiguration(TabBase):
         self.render_burn_in_mutrate_epi_text = "Burn-in Mutation Rate (Numerical)"
         keys_path = ['SeedsConfiguration', 'SLiM_burnin_epi', 'burn_in_mutrate']
         component = EasyEntry(keys_path, self.config_path, self.render_burn_in_mutrate_epi_text, 'burn_in_mutrate', self.control_frame, column, frow, 'integer', hide, 1)
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
         self.burn_in_mutrate_epi_label = ttk.Label(self.control_frame, text=self.render_burn_in_mutrate_epi_text, style="Bold.TLabel")
@@ -479,8 +509,7 @@ class SeedsConfiguration(TabBase):
         self.render_seeded_host_id_text = "Seeded Host (Patient 0) ID(s) (integer)"
         keys_path = ['SeedsConfiguration', 'SLiM_burnin_epi', "seeded_host_id"]
         component = EasyEntry(keys_path, self.config_path, self.render_seeded_host_id_text, 'seeded_host_id', self.control_frame, column, frow, 'list', hide, columnspan=1)
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
 
@@ -502,8 +531,7 @@ class SeedsConfiguration(TabBase):
         self.render_S_IE_rate_text = "Transmission Rate \u03B2 (Numerical)"
         keys_path = ['SeedsConfiguration', 'SLiM_burnin_epi', "S_IE_rate"]
         component = EasyEntry(keys_path, self.config_path, self.render_S_IE_rate_text,'S_IE_rate', self.control_frame, column, frow, 'integer', hide, 1)
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
         self.S_IE_rate_label = ttk.Label(self.control_frame, text=self.render_S_IE_rate_text, style="Bold.TLabel")
@@ -522,8 +550,7 @@ class SeedsConfiguration(TabBase):
         self.render_E_R_rate_text = "Latent Recovery Rate \u03C4 (Numerical)"
         keys_path = ['SeedsConfiguration', 'SLiM_burnin_epi', "E_R_rate"]
         component = EasyEntry(keys_path, self.config_path, self.render_E_R_rate_text, 'E_R_rate', self.control_frame, column, frow, 'integer', hide, 1)
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
         self.E_R_rate_label = ttk.Label(self.control_frame, text=self.render_E_R_rate_text, style="Bold.TLabel")
@@ -541,8 +568,7 @@ class SeedsConfiguration(TabBase):
         self.render_latency_prob_text = "Latency Probability p (Numerical)"
         keys_path = ['SeedsConfiguration', 'SLiM_burnin_epi', "latency_prob"]
         component = EasyEntry(keys_path, self.config_path, self.render_latency_prob_text, 'latency_prob', self.control_frame, column, frow, 'integer', hide, 1)
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
         self.latency_prob_label = ttk.Label(self.control_frame, text=self.render_latency_prob_text, style="Bold.TLabel")
@@ -562,8 +588,7 @@ class SeedsConfiguration(TabBase):
         self.render_E_I_rate_text = "Activation Rate v (Numerical)"
         keys_path = ['SeedsConfiguration', 'SLiM_burnin_epi', "E_I_rate"]
         component = EasyEntry(keys_path, self.config_path, self.render_E_I_rate_text, 'E_I_rate', self.control_frame, column, frow, 'integer', hide, 1)
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
         self.E_I_rate_label = ttk.Label(self.control_frame, text=self.render_E_I_rate_text, style="Bold.TLabel")
@@ -583,9 +608,9 @@ class SeedsConfiguration(TabBase):
         component = EasyEntry(
             keys_path, self.config_path, self.render_I_E_rate_text, 'I_E_rate', self.control_frame, column, frow, 'integer', hide, 
             columnspan=1)
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
+    
         self.I_E_rate_label = ttk.Label(self.control_frame, text=self.render_I_E_rate_text, style="Bold.TLabel")
 
 
@@ -607,15 +632,13 @@ class SeedsConfiguration(TabBase):
             keys_path, self.config_path, self.render_R_S_rate_text, 'R_S_rate', self.control_frame, column, frow, 'integer', hide,
             columnspan=1
             )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
         keys_path = []
         component = EasyEntry(
             keys_path, self.config_path, self.render_burn_in_mutrate_epi_text, 'burn_in_generations', self.control_frame, column, frow, 'integer', hide
             )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         self.R_S_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.R_S_rate_entry.insert(0, self.R_S_rate)  
         
@@ -633,8 +656,7 @@ class SeedsConfiguration(TabBase):
             keys_path, self.config_path, self.render_I_R_rate_text, 'burn_in_generations', self.control_frame, column, frow, 'integer', hide,
             columnspan=1
         )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
         self.I_R_rate_label = ttk.Label(self.control_frame, text=self.render_I_R_rate_text, style="Bold.TLabel")
 
@@ -649,6 +671,15 @@ class SeedsConfiguration(TabBase):
         epi_components.add(self.I_R_rate_entry)
 
     def render_image(self, image_path, desired_width, desired_height, hide, control_frame, frow, column, columnspan, rowspan):
+
+        # with Image.open(image_path) as img:
+        #     img = img.resize((desired_width, desired_height))    
+        #     photo = ImageTk.PhotoImage(img)    
+        #     self.photo = photo
+        #     image_label = tk.Label(self.control_frame, image=photo)
+        #     image_label.grid(column=1, row=10+3, columnspan=2, rowspan=8, sticky="nsew")
+            
+            
         component = EasyImage(
             image_path, desired_width, 
             desired_height, hide, 
@@ -656,8 +687,11 @@ class SeedsConfiguration(TabBase):
             column, columnspan, 
             rowspan
             )
-        if not hide:
-            self.visible_components.add(component)       
+        
+        # print('rendering image')
+        return component
+        # if not hide:
+        #     self.visible_components.add(component)    
             # image_label.grid(column=1, row=10+3, columnspan=2, rowspan=8, sticky="nsew")
             # if not hide:
             #     self.visible_components.add(image_label)                    
@@ -1056,7 +1090,7 @@ class SeedsConfiguration(TabBase):
     #         self.update_R_S_rate_button.pack_forget()
 
             
-    def render_run_button(self):
+    def render_run_button(self, hide):
         def seed_generation():
             config = load_config_as_dict(self.config_path)
             cwdir = config["BasicRunConfiguration"]["cwdir"]
@@ -1100,23 +1134,122 @@ class SeedsConfiguration(TabBase):
                 
             except Exception as e:
                     messagebox.showerror("Seed Generation Error", str(e))
-                    
-
-        self.run_seed_generation_button = tk.Button(self.control_frame, text="Run Seed Generation", command=seed_generation)
-        self.run_seed_generation_button.grid()
+        column, frow = 1, 100
+        component = EasyButton("Run Seed Generation", self.control_frame, 
+                               column, frow,
+                               seed_generation, hide, 'we')
+        self.visible_components.add(component)
+        return component
 
 
 
     def load_page(self):
-        hide = False
+        # print(ui_wf_epi_values)
+        # hide = False
         to_renderer, to_derenderer = None, None
-        self.render_seeds_size(hide, column=1, columnspan= 3, frow = 1)
+        # self.render_seeds_size(hide, column=1, columnspan= 3, frow = 1)
 
-        self.render_use_reference(to_renderer, to_derenderer, hide, column = 1, frow = 4, columnspan= 3)
-        self.render_use_method(column=1, frow=6, to_rerender=to_renderer, to_derender=to_derenderer, hide=hide, column_span= 3 )
-        self.user_input_group_controls = self.init_user_input_group(hide)
-        self.wf_group_controls = self.init_wf_group(hide)
-        self.epi_group_controls = self.init_epi_group(hide)
+        # self.render_use_reference(to_renderer, to_derenderer, hide, column = 1, frow = 4, columnspan= 3)
+        # self.render_use_method(column=1, frow=6, to_rerender=to_renderer, to_derender=to_derenderer, hide=hide, column_span= 3 )
+        # self.user_input_group_controls = self.init_user_input_group(hide)
+        # self.wf_group_controls = self.init_wf_group(hide)
+        # self.epi_group_controls = self.init_epi_group(hide)
+
+
+        self.render_seeds_size(False, column=1, columnspan= 3, frow = 1)
+        self.use_reference_control = self.render_use_reference(to_renderer, to_derenderer, False, column = 1, frow = 4, columnspan= 3)
+
+        if self.use_reference:
+            hide = True
+            self.use_method_controls = self.render_use_method(column=1, frow=7, 
+                        to_rerender=to_renderer, 
+                        to_derender=to_derenderer, 
+                        hide=hide, width=20, column_span= 3)
+            self.user_input_group_controls = self.init_user_input_group(hide)
+            self.wf_group_controls = self.init_wf_group(hide)
+            self.epi_group_controls = self.init_epi_group(hide)
+            self.run_button_control = self.render_run_button(hide)
+            
+        else:
+            hide = False
+            self.use_method_controls = self.render_use_method(column=1, frow=7, 
+                        to_rerender=to_renderer, 
+                        to_derender=to_derenderer, 
+                        hide=hide, width=20, column_span= 3)
+            self.run_button_control = self.render_run_button(hide)
+
+            match self.method:
+                case "user_input":
+                    self.user_input_group_controls = self.init_user_input_group(hide)
+                    self.wf_group_controls = self.init_wf_group(not hide)
+                    self.epi_group_controls = self.init_epi_group(not hide)
+                case "SLiM_burnin_WF":
+                    self.wf_group_controls = self.init_wf_group(hide)
+                    self.user_input_group_controls = self.init_user_input_group(not hide)
+                    self.epi_group_controls = self.init_epi_group(not hide)
+                case "SLiM_burnin_epi":
+                    self.epi_group_controls = self.init_epi_group(hide)
+                    self.user_input_group_controls = self.init_user_input_group(not hide)
+                    self.wf_group_controls = self.init_wf_group(not hide)
+                case _:
+                    raise ValueError("Invalid method")
+
+        match self.method:
+            case "user_input":
+                derender = [
+                    self.wf_group_controls,
+                    self.epi_group_controls
+                ]
+                self.use_method_controls.set_to_derender(GroupControls(derender).derender_itself)
+                self.use_method_controls.set_to_rerender(self.user_input_group_controls.rerender_itself)
+            case "SLiM_burnin_WF":
+                derender = [
+                    self.user_input_group_controls,
+                    self.epi_group_controls
+                ]
+                self.use_method_controls.set_to_derender(GroupControls(derender).derender_itself)
+                self.use_method_controls.set_to_rerender(self.wf_group_controls.rerender_itself)
+            case "SLiM_burnin_epi":
+                derender = [
+                    self.user_input_group_controls,
+                    self.wf_group_controls
+                ]
+                self.use_method_controls.set_to_derender(GroupControls(derender).derender_itself)
+                self.use_method_controls.set_to_rerender(self.epi_group_controls.rerender_itself)
+            case _:
+                raise ValueError("Invalid method")
+            
+        renders = [
+            self.use_method_controls,
+            self.run_button_control
+        ]
+        
+        match self.method:
+            case "user_input":
+                renders.append(self.user_input_group_controls)
+            case "SLiM_burnin_WF":
+                renders.append(self.wf_group_controls)
+            case "SLiM_burnin_epi":
+                renders.append(self.epi_group_controls)
+            case _:
+                raise ValueError("Invalid method")
+        
+        use_reference_to_rerender = GroupControls(renders).rerender_itself
+        use_reference_to_derender = GroupControls(renders).derender_itself
+        self.use_reference_control.set_to_rerender(use_reference_to_rerender)
+        self.use_reference_control.set_to_derender(use_reference_to_derender)
+
+        # use_references = [
+        #     self.wf_group_controls,
+        #     self.epi_group_controls,
+        #     self.user_input_group_controls
+        # ]
+        # use_reference_to_derender = GroupControls(use_references).derender_itself
+#       
+        # return
+
+
+
              
         # if not self.use_reference:
         #     rerender_components(self.use_method_components, self.use_method_grid_configs)

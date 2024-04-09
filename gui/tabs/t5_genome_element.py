@@ -170,10 +170,13 @@ class GenomeElement(TabBase):
         generate_genetic_architecture_method
         self.generate_genetic_architecture_method = ['GenomeElement']['effect_size']['method']
         """
-        keys_path = ["GenomeElement", "effect_size", "method"]                
+        keys_path = ["GenomeElement", "effect_size", "method"]   
+                # keys_path = ["GenomeElement",  "method"]                
+             
         render_generate_genetic_architecture_method_text = "Method to Generate the Genetic Architecture"
         def comboboxselected(var, to_rerender, to_derender):
             converted_var = render_to_val_generate_genetic_architecture_method.get(var.get(), "")
+            # print("converted_var")
             no_validate_update_val(converted_var, self.config_path, keys_path)
             match converted_var:
                 case "user_input":
@@ -184,6 +187,8 @@ class GenomeElement(TabBase):
                     self.generate_genetic_architecture_method.set_to_derender(self.user_input_group_control.derender_itself)
                 case _:
                     raise ValueError("Invalid method specified")
+            to_rerender()
+            to_derender()
         component = EasyCombobox(keys_path, self.config_path, render_generate_genetic_architecture_method_text, 
                     self.control_frame, column, frow, 
                     generate_genetic_architecture_method_values, 
@@ -215,7 +220,6 @@ class GenomeElement(TabBase):
             if var.get():
                 self.use_genetic_model = True
                 self.global_group_control.rerender_itself()
-
             else:
                 self.use_genetic_model = False
                 self.global_group_control.derender_itself()
