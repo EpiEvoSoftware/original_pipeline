@@ -21,16 +21,19 @@ See the manual at (https://github.com/EpiEvoSoftware/original_pipeline/blob/main
   ```sh
   git clone https://github.com/EpiEvoSoftware/original_pipeline
   ```
+  
   2. Create a conda enviornment by our configuration file. For MacOS users, change `YOUR_YML` to `mac_env_w_builds.yml`. For Linux users, change `YOUR_YML` to `linux_env_w_builds.yml`.
   ```sh
   cd original_pipeline
   conda env update --name enivol --file YOUR_YML
   ```
   If environment solving failed or you encounter any error message about importing packages in testing (step 4). Please do `conda deactivate` to leave the environment and delete it by `conda remove --name enivol --all`, then restart from step 3 by using the no-builds options of the yml file (`mac_env_wo_builds.yml` for MacOS or `linux_env_w_builds.yml` for Linux).
+  
   3. Activate the conda environment
   ```sh
   conda activate enivol
   ```
+  
   4. Test whether the software is installed correctly by running a minimal model
   ```sh
   cd enivol_packaging/enivol
