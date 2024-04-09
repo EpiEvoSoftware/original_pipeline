@@ -1,6 +1,8 @@
 """
 This module is where we put the helpers that are used by multiple other modules.
 """
+
+from PIL import Image, ImageTk
 import traceback
 import os, sys
 import tkinter as tk
@@ -411,6 +413,7 @@ def render_path_select(keys_path, config_path, render_text, control_frame, colum
     
 def update_numerical_input(entry, keys_path, config_path, error_messages, render_text_short, is_int):
     try:
+        print("entry.get()", entry.get())
         new_val = int(float(entry.get()))  
         config = load_config_as_dict(config_path) 
         update_nested_dict(config, keys_path, new_val) 
@@ -601,7 +604,7 @@ class EasyEntry(EasyWidgetBase):
     """
     replaces render_numerical_input
     """
-    def __init__(self, keys_path, config_path, render_text, render_text_short, control_frame, column, frow, validate_for, hide) -> None:
+    def __init__(self, keys_path, config_path, render_text, render_text_short, control_frame, column, frow, validate_for, hide, columnspan) -> None:
         super().__init__()
         self.keys_path = keys_path
         self.config_path = config_path
@@ -616,8 +619,8 @@ class EasyEntry(EasyWidgetBase):
             label.grid()
             self.entry.grid()
         else:
-            label.grid(row = frow, column = column, sticky = 'w', pady = 5)
-            self.entry.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
+            label.grid(row = frow, column = column, columnspan = columnspan,sticky = 'w', pady = 5)
+            self.entry.grid(row = frow+1, column = column, columnspan = columnspan,sticky = 'w', pady = 5)
 
         self.local_components = {self.entry, label}
         self.grid_layout = derender_components(self.local_components)
@@ -722,7 +725,7 @@ class EasyPathSelector(EasyWidgetBase):
 
 
 class EasyCombobox(EasyWidgetBase):
-    def __init__(self, keys_path, config_path, render_text, control_frame, column, frow, combobox_values, to_rerender, to_derender, comboboxselected, hide, width, val_to_ui_mapping = None):
+    def __init__(self, keys_path, config_path, render_text, control_frame, column, frow, combobox_values, to_rerender, to_derender, comboboxselected, hide, width, columnnspan, val_to_ui_mapping = None):
         super().__init__()
         self.keys_path = keys_path
         self.config_path = config_path
@@ -747,8 +750,8 @@ class EasyCombobox(EasyWidgetBase):
             self.label.grid()
             self.combobox.grid()
         else:
-            self.label.grid(row = frow, column = column, sticky = 'w', pady = 5)
-            self.combobox.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
+            self.label.grid(row = frow, column = column, columnspan = columnnspan, sticky = 'w', pady = 5)
+            self.combobox.grid(row = frow+1, column = column, columnspan = columnnspan, sticky = 'w', pady = 5)
 
         self.local_components = {self.label, self.combobox}
         self.grid_layout = derender_components(self.local_components)
@@ -834,4 +837,22 @@ class TabBase:
             self.tab_parent.tab(self.tab_index, state="disabled")
         self.control_frame = tk.ttk.Frame(self.parent, width=300)
         self.control_frame.pack(padx=10, pady=10)
+    
+class EasyImage(EasyWidgetBase):
+    def __init__(self, image_path, desired_width, desired_height, hide, control_frame, frow, column, columnspan, rowspan):
+        with Image.open(image_path) as img:
+            img = img.resize((desired_width, desired_height))
+            photo = ImageTk.PhotoImage(img)
+            image_label = tk.Label(control_frame, image=photo)
+            
+            if frow is None or column is None:
+                image_label.grid()
+            else:
+                image_label.grid(column=column, row=frow, columnspan=columnspan, rowspan=rowspan, sticky="nsew")
+
+            self.local_components = {image_label}
+            self.grid_layout = derender_components(self.local_components)
+            if not hide:
+                rerender_components(self.local_components, self.grid_layout)
+
     

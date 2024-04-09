@@ -15,8 +15,8 @@
     },
     "SeedsConfiguration": {
         "seed_size": 1,
-        "use_reference": false,
-        "method": "user_input",
+        "use_reference": true,
+        "method": "SLiM_burnin_WF",
         "user_input": {
             "path_seeds_vcf": "",
             "path_seeds_phylogeny": ""
@@ -27,7 +27,7 @@
             "burn_in_mutrate": 0
         },
         "SLiM_burnin_epi": {
-            "burn_in_generations": 0,
+            "burn_in_generations": 221,
             "burn_in_mutrate": 0,
             "seeded_host_id": [],
             "S_IE_rate": 0,
@@ -47,7 +47,7 @@
             "drug_resistance": 13
         },
         "effect_size": {
-            "method": "randomly_generate",
+            "method": "user_input",
             "user_input": {
                 "path_effsize_table": "/System/iOSSupport/System/Library/AppleMediaServices/DynamicUI/PlugIns/CoreDynamicUIPlugin.bundle"
             },

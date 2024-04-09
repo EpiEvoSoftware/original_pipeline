@@ -57,7 +57,7 @@ class GenomeElement(TabBase):
 
 
         self.generate_genetic_architecture_method = self.render_generate_genetic_architecture_method(
-            0, self.frow_val + 7, None, None, hide, 30
+            50, 0, self.frow_val + 7, None, None, hide, 30
         )
 
         num_traits_group_control = [
@@ -150,7 +150,7 @@ class GenomeElement(TabBase):
     def render_transmissibility(self, hide = True, column = None, frow = None):
         keys_path = ['GenomeElement', 'traits_num', 'transmissibility']
         self.render_transmissibility_text = "Transmissibility"
-        component = EasyEntry(keys_path, self.config_path, self.render_transmissibility_text, 'transmissibility', self.control_frame, column, frow, 'integer', hide)
+        component = EasyEntry(keys_path, self.config_path, self.render_transmissibility_text, 'transmissibility', self.control_frame, column, frow, 'integer', hide,columnspan=1)
         if not hide:
             self.visible_components.add(component)
         return component
@@ -159,13 +159,13 @@ class GenomeElement(TabBase):
         keys_path = ['GenomeElement', 'traits_num', 'drug_resistance']
         self.render_drug_resistance_text = "Drug-Resistance"
         
-        component = EasyEntry(keys_path, self.config_path, self.render_drug_resistance_text, 'drug-resistance', self.control_frame, column, frow, 'integer', hide)
+        component = EasyEntry(keys_path, self.config_path, self.render_drug_resistance_text, 'drug-resistance', self.control_frame, column, frow, 'integer', hide,columnspan=1)
         if not hide:
             self.visible_components.add(component)
         return component
 
 
-    def render_generate_genetic_architecture_method(self, column = None, frow = None, to_rerender = None, to_derender = None, hide = True, width = 20):
+    def render_generate_genetic_architecture_method(self, columnspan, column = None, frow = None, to_rerender = None, to_derender = None, hide = True, width = 20):
         """
         generate_genetic_architecture_method
         self.generate_genetic_architecture_method = ['GenomeElement']['effect_size']['method']
@@ -189,7 +189,7 @@ class GenomeElement(TabBase):
                     generate_genetic_architecture_method_values, 
                     to_rerender, to_derender,
                     comboboxselected,
-                    hide,width, 
+                    hide,width, columnspan, 
                     val_to_render_generate_genetic_architecture_method)
         if not hide:
             self.visible_components.add(component)
@@ -200,7 +200,7 @@ class GenomeElement(TabBase):
         keys_path = ['GenomeElement','effect_size','randomly_generate','genes_num']
         render_text = "Number of Genomic Regions for each trait (list integer)"
         
-        component =  EasyEntry(keys_path, self.config_path, render_text, "genes_num", self.control_frame, column, frow, "list", hide)
+        component =  EasyEntry(keys_path, self.config_path, render_text, "genes_num", self.control_frame, column, frow, "list", hide, columnspan=1)
         if not hide:
             self.visible_components.add(component)
         return component
@@ -236,7 +236,7 @@ class GenomeElement(TabBase):
     def render_effsize_min(self, hide = True, column = None, frow = None):
         keys_path = ['GenomeElement','effect_size','randomly_generate','effsize_min']
         render_text = "Minimum Effect Size of each region for each trait (list numerical)"
-        component = EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list", hide)
+        component = EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list", hide, columnspan=1)
         if not hide:
             self.visible_components.add(component)
         return component
@@ -244,7 +244,7 @@ class GenomeElement(TabBase):
     def render_effsize_max(self, hide = True, column = None, frow = None):
         keys_path = ['GenomeElement','effect_size','randomly_generate','effsize_max']
         render_text = "Maximum Effect Size of each region for each trait (list numerical)"
-        component = EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list", hide)
+        component = EasyEntry(keys_path, self.config_path, render_text, "effsize_min", self.control_frame, column, frow, "list", hide, columnspan=1)
         if not hide:
             self.visible_components.add(component)
         return component
