@@ -176,7 +176,7 @@ def network_generation_byconfig(all_config):
     ba_m=ntwk_config["randomly_generate"]["BA"]["ba_m"]
 
     # Random Number generator
-    random_number_seed = all_config["BasicRunConfiguration"]["random_number_seed"]
+    random_number_seed = all_config["BasicRunConfiguration"].get("random_number_seed", None)
 
     _, error = run_network_generation(pop_size = pop_size, wk_dir = wk_dir, method = ntwk_method, 
                            path_network = path_network, model = model, p_ER = p_ER, 

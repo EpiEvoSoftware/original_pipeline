@@ -1,7 +1,0 @@
-[console_scripts]
-enivol = enivol.main
-genetic_effect_generator = enivol.genetic_effect_generator:main
-network_generator = enivol.network_generator:main
-outbreak_simulator = enivol.outbreak_simulator:main
-seed_generator = enivol.seed_generator:main
-seed_host_matcher = enviol.seed_host_matcher:main

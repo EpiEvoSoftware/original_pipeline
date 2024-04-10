@@ -517,7 +517,7 @@ def seeds_generation_byconfig(all_config):
 	I_R_rate = seeds_config["SLiM_burnin_epi"]["I_R_rate"]
 	I_E_rate = seeds_config["SLiM_burnin_epi"]["I_E_rate"]
 	R_S_rate = seeds_config["SLiM_burnin_epi"]["R_S_rate"]
-	random_number_seed = all_config["BasicRunConfiguration"]["random_number_seed"]
+	random_number_seed = all_config["BasicRunConfiguration"].get("random_number_seed", None)
 
 	# Run simulation for seed generation
 	error = run_seed_generation(method=method, wk_dir=wk_dir, seed_size=seed_size, seed_vcf=seed_vcf, Ne=Ne, \

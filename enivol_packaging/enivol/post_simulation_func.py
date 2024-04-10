@@ -93,7 +93,7 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
 	eff_size["end"] += 1
 	
 	# Compute the total number of traits for both transmissibility and drug resistance.
-	num_trait = sum(n_trait)
+	num_trait = sum(n_trait.values())
 	search_intvls = np.ravel(eff_size[["start", "end"]])
 
 	# seem unncessary
@@ -270,14 +270,14 @@ def write_metadata(mtdata, each_wk_dir_, n_trait, color_trait):
 
 	with open(os.path.join(each_wk_dir_, "transmission_tree_metadata.csv"), "w") as csv:
 		# Write header
-		if color_trait <= n_trait[0]:
+		if color_trait <= n_trait["transmissibility"]:
 			color_trait_id = color_trait
 		else:
-			color_trait_id = color_trait - n_trait[0]
+			color_trait_id = color_trait - n_trait["transmissibility"]
 		header = "node_id,name,node_time,subpop_id,parent_id,color_trait_" + str(color_trait_id)
-		for i in range(n_trait[0]):
+		for i in range(n_trait["transmissibility"]):
 			header += f",transmissibility_{i + 1}"
-		for i in range(n_trait[1]):
+		for i in range(n_trait["drug_resistance"]):
 			header += f",drug_resistance_{i + 1}"
 		csv.write(header + "\n")
 		# Write node data
@@ -382,7 +382,7 @@ def plot_per_transmission_tree(each_wk_dir_, seed_size, slim_config_path, n_trai
 	"""
 	rscript_path = os.path.join(os.path.dirname(__file__), "plot_tree.r")
 	subprocess.run(["Rscript", rscript_path, each_wk_dir_, str(seed_size), slim_config_path, \
-				 str(n_traits[TRANS_INDEX]), str(n_traits[DRUG_RES_INDEX]), seed_phylo_path])
+				 str(n_traits["transmissibility"]), str(n_traits["drug_resistance"]), seed_phylo_path])
 
 
 def plot_strain_distribution_trajectory(each_wk_dir_, seed_size, n_generation):

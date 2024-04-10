@@ -19,13 +19,17 @@
   "GenomeElement": {
     "use_genetic_model": true,
     "ref_path": "",
-    "traits_num": [1, 2]
+    "traits_num": {
+      "transmissibility": 0,
+      "drug_resistance": 0
+    }
   },
   "NetworkModelParameters": {
     "use_network_model": true,
     "host_size": 0
   },
   "EpidemiologyModel": {
+    "slim_replicate_seed_file_path": "",
     "model": "",
     "epoch_changing": {
       "n_epoch": 1,
