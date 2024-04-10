@@ -54,12 +54,15 @@ WORKDIR=YOUR_WORKING_DIRECTORY
 
 2. Generate a configuration file and all prerequisites for the current simulation.
    * By GUI
+     
    We provide an interative option for the pre-simulation settings.
   ```sh
   python gui
   ```
   A GUI will pop up and you will be asked to navigate to your working directory in the first tab. By going through all the tabs, all the simulation presettings will be finished, and a configuation file called `simulation_config.json` will be generated in the working directory as well. For further information on how to use the GUI, please refer to the manual Chapter X.
+  
    * By command line
+     
   Command line options for the pre-simulatuion programs includes NetworkGenerator, SeedGenerator and SeedHostMatcher. Please refer to the manual chapter Y-Z as for how to run them sequentially and consistently. Note that `${WORKDIR}` should be provided for each program in option `-wkdir` to ensure that they are consistent. After these programs, you need to create a configuration file by changing the options listed in the config file template. For explanations of the config file, please refer to Manual chapter T.
 ```sh
 cp ${CODESDIR}/config_template/slim_only_template.json ${WORKDIR}/simulation.config
