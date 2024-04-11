@@ -681,7 +681,7 @@ class EasyRadioButton(EasyWidgetBase):
         #     self.to_rerender()
 
 class EasyPathSelector(EasyWidgetBase):
-    def __init__(self, keys_path, config_path, render_text, control_frame, column, hide, frow, columnspan, filetype = None):
+    def __init__(self, keys_path, config_path, render_text, control_frame, column, hide, frow, columnspan, filetype = None, tooltip = ""):
         """
         Replaces render_path_select
         """
@@ -692,6 +692,7 @@ class EasyPathSelector(EasyWidgetBase):
 
         dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
         label = tk.ttk.Label(control_frame, text=render_text, style = "Bold.TLabel")
+        CreateToolTip(label, tooltip)
 
         if dict_var == "":
             self.value_label = tk.ttk.Label(control_frame, text = "None selected", foreground="black")

@@ -1,22 +1,22 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "/Users/vivianzhao/Desktop/TB_software/wkdir",
-        "n_replicates": 34325,
+        "cwdir": "/Applications",
+        "n_replicates": 320000,
         "random_number_seed": 1
     },
     "EvolutionModel": {
         "n_generation": 1000,
         "mut_rate": 0,
         "trans_type": "Bi-Allelic",
-        "dr_type": "Additive",
+        "dr_type": "Bi-Allelic",
         "within_host_reproduction": true,
-        "within_host_reproduction_rate": 0,
+        "within_host_reproduction_rate": 1,
         "cap_withinhost": 11
     },
     "SeedsConfiguration": {
         "seed_size": 312341,
         "use_reference": false,
-        "method": "SLiM_burnin_WF",
+        "method": "user_input",
         "user_input": {
             "path_seeds_vcf": "/Users/andrewhahn/original_pipeline/test/two_dict_to_csv.csv",
             "path_seeds_phylogeny": "/Users/andrewhahn/original_pipeline/test/seeds_trait_values.csv"
@@ -41,7 +41,7 @@
     },
     "GenomeElement": {
         "use_genetic_model": true,
-        "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
+        "ref_path": "/System/Applications/App Store.app",
         "traits_num": {
             "transmissibility": 13,
             "drug_resistance": 13
@@ -124,7 +124,9 @@
             "S_IE_rate": [],
             "I_R_rate": [],
             "R_S_rate": [],
-            "latency_prob": [],
+            "latency_prob": [
+                123
+            ],
             "E_I_rate": [],
             "I_E_rate": [],
             "E_R_rate": [],
@@ -132,7 +134,9 @@
             "recovery_prob_after_sampling": []
         },
         "massive_sampling": {
-            "event_num": 0,
+            "event_num": [
+                0
+            ],
             "generation": [],
             "sampling_prob": [],
             "recovery_prob_after_sampling": []

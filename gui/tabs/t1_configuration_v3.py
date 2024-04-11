@@ -50,7 +50,7 @@ class Configurationv3:
         error_messages = []
         self.update_n_replicates(error_messages)
         if len(error_messages) == 0:
-            #messagebox.showinfo("Update Successful", "Parameters Updated.")
+            messagebox.showinfo("Update Successful", "Parameters Updated.")
             return 0
         else:
             error_message_str = "\n".join(error_messages)
@@ -73,7 +73,7 @@ class Configurationv3:
 
         self.working_directory_label = ttk.Label(self.control_frame, text="Working Directory:", style="Bold.TLabel")
         self.working_directory_label.grid(row=0, column=0, pady=5, sticky='w')
-        
+        CreateToolTip(self.working_directory_label, "hello world")
         if self.cwd == "":
             self.user_working_directory_label = ttk.Label(self.control_frame, text = "None Selected", foreground="black", width = minwidth)
         else:
