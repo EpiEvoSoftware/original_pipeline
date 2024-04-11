@@ -66,7 +66,7 @@ class EvolutionaryModel:
         self.update_within_host_reproduction_rate(error_messages)
         self.update_within_host_reproduction(error_messages)
         if len(error_messages) == 0:
-            messagebox.showinfo("Update Successful", "Parameters Updated.")
+            #messagebox.showinfo("Update Successful", "Parameters Updated.")
             return 0
         else:
             error_message_str = "\n\n".join(error_messages)
