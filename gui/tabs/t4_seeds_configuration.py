@@ -63,8 +63,10 @@ class SeedsConfiguration(TabBase):
         # path_seeds_phyl = self.render_path_seeds_phylogeny(hide, 12, 1, 1)
         grpctrs = GroupControls()
         # grpctrs.add(tab_t)
-        grpctrs.add(self.render_path_seeds_vcf(hide, 1, 6+3 , 1))
-        grpctrs.add(self.render_path_seeds_phylogeny(hide, 1, 12, 1))
+        #todo
+        grpctrs.add(self.display_burn_in_settings_label(hide, 1, 9))
+        grpctrs.add(self.render_path_seeds_vcf(hide, 1, 11, 1))
+        grpctrs.add(self.render_path_seeds_phylogeny(hide, 1, 14, 1))
         return grpctrs
     
     def init_wf_group(self, hide):
@@ -75,26 +77,28 @@ class SeedsConfiguration(TabBase):
         """
         wf_grpctrls = GroupControls()
         # wf_grpctrls.add(self.render_tab_title(hide, 5+3, 0, 3))
-        wf_grpctrls.add(self.render_burn_in_ne(hide, 1, 9))
-        wf_grpctrls.add(self.render_burn_in_generations_wf(hide, 1, 11))
+        wf_grpctrls.add(self.display_burn_in_settings_label(hide, 1, 9))
+        wf_grpctrls.add(self.render_burn_in_ne(hide, 1, 11))
+        wf_grpctrls.add(self.render_burn_in_generations_wf(hide, 2, 11))
         wf_grpctrls.add(self.render_burn_in_mutrate_wf(hide, 1, 13))
         return wf_grpctrls
     
     def init_epi_group(self, hide):
         epi_grpctrls = GroupControls()
         # epi_grpctrls.add(self.render_tab_title(hide, 5+3, 0, 3))
-        epi_grpctrls.add(self.render_burn_in_generations_epi(hide, 0, 6+3))
-        epi_grpctrls.add(self.render_burn_in_mutrate_epi(hide, 1, 6+3))
-        epi_grpctrls.add(self.render_seeded_host_id(hide, 2, 6+3))
-        epi_grpctrls.add(self.render_S_IE_rate(hide, 0, 8+3))
-        epi_grpctrls.add(self.render_E_I_rate(hide, 0, 10+3))
-        epi_grpctrls.add(self.render_E_R_rate(hide, 2, 8+3))
-        epi_grpctrls.add(self.render_latency_prob(hide, 1, 8+3))
-        epi_grpctrls.add(self.render_I_R_rate(hide, 0, 16+3))
-        epi_grpctrls.add(self.render_I_E_rate(hide, 0, 12+3))
-        epi_grpctrls.add(self.render_R_S_rate(hide, 0, 14+3))
+        epi_grpctrls.add(self.display_burn_in_settings_label(hide, 0, 9))
+        epi_grpctrls.add(self.render_burn_in_generations_epi(hide, 0, 6+5))
+        epi_grpctrls.add(self.render_burn_in_mutrate_epi(hide, 1, 6+5))
+        epi_grpctrls.add(self.render_seeded_host_id(hide, 2, 6+5))
+        epi_grpctrls.add(self.render_S_IE_rate(hide, 0, 8+5))
+        epi_grpctrls.add(self.render_E_I_rate(hide, 0, 10+5))
+        epi_grpctrls.add(self.render_E_R_rate(hide, 2, 8+5))
+        epi_grpctrls.add(self.render_latency_prob(hide, 1, 8+5))
+        epi_grpctrls.add(self.render_I_R_rate(hide, 0, 16+5))
+        epi_grpctrls.add(self.render_I_E_rate(hide, 0, 12+5))
+        epi_grpctrls.add(self.render_R_S_rate(hide, 0, 14+5))
         epi_grpctrls.add(self.render_image("assets/t4.png", 700, 255, hide,
-                          self.control_frame, frow=10+3,column=1,  
+                          self.control_frame, frow=10+5,column=1,  
                           columnspan=2, rowspan=8))
         
         return epi_grpctrls
@@ -241,6 +245,7 @@ class SeedsConfiguration(TabBase):
                 to_derender()
             else:
                 to_rerender()
+                
 
         component = EasyRadioButton(
             keys_path, self.config_path, 
@@ -250,6 +255,8 @@ class SeedsConfiguration(TabBase):
             to_rerender, to_derender,
             columnspan, radiobuttonselected
             )
+        
+        component.update_rb_false_text("No (Run the burn-in process or provide seeding sequences)")
         
         self.visible_components.add(component)
         return component
@@ -399,7 +406,12 @@ class SeedsConfiguration(TabBase):
         use_method_components.add(self.use_method_label)
         use_method_components.add(self.use_method_combobox)
         return use_method_components
-
+    
+    def display_burn_in_settings_label(self, hide=True, column = None, frow = None):
+        component = EasyTitle("Burn-in Settings: ", self.control_frame, column, frow, hide, 1)
+        self.visible_components.add(component)
+        return component
+        
     def render_burn_in_ne(self, hide = True, column = None, frow = None):
         columnspan = 1
         self.render_burn_in_ne_text= "Effective Population Size (Integer)"
@@ -1135,11 +1147,13 @@ class SeedsConfiguration(TabBase):
             except Exception as e:
                     messagebox.showerror("Seed Generation Error", str(e))
         column, frow = 1, 100
-        component = EasyButton("Run Seed Generation", self.control_frame, 
-                               column, frow,
-                               seed_generation, hide, 'we')
-        self.visible_components.add(component)
-        return component
+        # component = EasyButton("Run Seed Generation", self.control_frame, 
+        #                        column, frow,
+        #                        seed_generation, hide, 'ew')
+        generation_button = tk.ttk.Button(self.parent, text="Run Seed Generation", command=seed_generation)
+        generation_button.pack()
+        # self.visible_components.add(generation_button)
+        return generation_button
 
 
 
@@ -1172,22 +1186,29 @@ class SeedsConfiguration(TabBase):
             
         else:
             hide = False
+            
             self.use_method_controls = self.render_use_method(column=1, frow=7, 
                         to_rerender=to_renderer, 
                         to_derender=to_derenderer, 
                         hide=hide, width=20, column_span= 3)
             self.run_button_control = self.render_run_button(hide)
+            
+        
+
 
             match self.method:
                 case "user_input":
+                    # self.burn_in_settings_label = self.display_burn_in_settings_label(hide, column=1, frow=9)
                     self.user_input_group_controls = self.init_user_input_group(hide)
                     self.wf_group_controls = self.init_wf_group(not hide)
                     self.epi_group_controls = self.init_epi_group(not hide)
                 case "SLiM_burnin_WF":
+                    # self.burn_in_settings_label = self.display_burn_in_settings_label(hide, column=1, frow=9)
                     self.wf_group_controls = self.init_wf_group(hide)
                     self.user_input_group_controls = self.init_user_input_group(not hide)
                     self.epi_group_controls = self.init_epi_group(not hide)
                 case "SLiM_burnin_epi":
+                    # self.burn_in_settings_label = self.display_burn_in_settings_label(hide, column=0, frow=9)
                     self.epi_group_controls = self.init_epi_group(hide)
                     self.user_input_group_controls = self.init_user_input_group(not hide)
                     self.wf_group_controls = self.init_wf_group(not hide)
@@ -1198,6 +1219,7 @@ class SeedsConfiguration(TabBase):
             case "user_input":
                 derender = [
                     self.wf_group_controls,
+                    self.epi_group_controls,
                     self.epi_group_controls
                 ]
                 self.use_method_controls.set_to_derender(GroupControls(derender).derender_itself)
@@ -1205,6 +1227,7 @@ class SeedsConfiguration(TabBase):
             case "SLiM_burnin_WF":
                 derender = [
                     self.user_input_group_controls,
+                    self.epi_group_controls,
                     self.epi_group_controls
                 ]
                 self.use_method_controls.set_to_derender(GroupControls(derender).derender_itself)
@@ -1212,7 +1235,8 @@ class SeedsConfiguration(TabBase):
             case "SLiM_burnin_epi":
                 derender = [
                     self.user_input_group_controls,
-                    self.wf_group_controls
+                    self.wf_group_controls,
+                    self.epi_group_controls
                 ]
                 self.use_method_controls.set_to_derender(GroupControls(derender).derender_itself)
                 self.use_method_controls.set_to_rerender(self.epi_group_controls.rerender_itself)
@@ -1221,7 +1245,7 @@ class SeedsConfiguration(TabBase):
             
         renders = [
             self.use_method_controls,
-            self.run_button_control
+            self.run_button_control,
         ]
         
         match self.method:

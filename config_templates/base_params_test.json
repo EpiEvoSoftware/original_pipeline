@@ -1,25 +1,25 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "/Applications",
-        "n_replicates": 320000,
+        "cwdir": "/Users/vivianzhao/Desktop/TB_software/wkdir",
+        "n_replicates": 3,
         "random_number_seed": 1
     },
     "EvolutionModel": {
         "n_generation": 1000,
         "mut_rate": 0,
         "trans_type": "Bi-Allelic",
-        "dr_type": "Bi-Allelic",
+        "dr_type": "Additive",
         "within_host_reproduction": true,
-        "within_host_reproduction_rate": 1,
+        "within_host_reproduction_rate": 0,
         "cap_withinhost": 11
     },
     "SeedsConfiguration": {
-        "seed_size": 312341,
+        "seed_size": 1,
         "use_reference": false,
-        "method": "user_input",
+        "method": "SLiM_burnin_epi",
         "user_input": {
-            "path_seeds_vcf": "/Users/andrewhahn/original_pipeline/test/two_dict_to_csv.csv",
-            "path_seeds_phylogeny": "/Users/andrewhahn/original_pipeline/test/seeds_trait_values.csv"
+            "path_seeds_vcf": "/Users/vivianzhao/Desktop/TB_software/wkdir/base_params.json",
+            "path_seeds_phylogeny": ""
         },
         "SLiM_burnin_WF": {
             "burn_in_Ne": 0,
@@ -27,7 +27,7 @@
             "burn_in_mutrate": 0
         },
         "SLiM_burnin_epi": {
-            "burn_in_generations": 22133,
+            "burn_in_generations": 0,
             "burn_in_mutrate": 0,
             "seeded_host_id": [],
             "S_IE_rate": 0,
@@ -41,10 +41,10 @@
     },
     "GenomeElement": {
         "use_genetic_model": true,
-        "ref_path": "/System/Applications/App Store.app",
+        "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
         "traits_num": {
-            "transmissibility": 13,
-            "drug_resistance": 13
+            "transmissibility": 1,
+            "drug_resistance": 1
         },
         "effect_size": {
             "method": "randomly_generate",
@@ -52,10 +52,10 @@
                 "path_effsize_table": "/System/iOSSupport/System/Library/AppleMediaServices/DynamicUI/PlugIns/CoreDynamicUIPlugin.bundle"
             },
             "randomly_generate": {
-                "gff": "/Users/andrewhahn/original_pipeline/test/seeds_trait_values.csv",
+                "gff": "/Users/vivianzhao/Desktop/TB_software/wkdir/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
                 "genes_num": [
                     1,
-                    4
+                    1
                 ],
                 "effsize_min": [
                     4,
@@ -124,9 +124,7 @@
             "S_IE_rate": [],
             "I_R_rate": [],
             "R_S_rate": [],
-            "latency_prob": [
-                123
-            ],
+            "latency_prob": [],
             "E_I_rate": [],
             "I_E_rate": [],
             "E_R_rate": [],
@@ -134,9 +132,7 @@
             "recovery_prob_after_sampling": []
         },
         "massive_sampling": {
-            "event_num": [
-                0
-            ],
+            "event_num": 0,
             "generation": [],
             "sampling_prob": [],
             "recovery_prob_after_sampling": []
