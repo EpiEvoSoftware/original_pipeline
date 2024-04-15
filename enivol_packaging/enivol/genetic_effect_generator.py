@@ -2,7 +2,7 @@ from base_func import *
 from error_handling import CustomizedError
 import numpy as np
 import pandas as pd
-import argparse, statistics, os
+import argparse, statistics, os, json
 
 START_IDX = 0
 END_IDX = 1
@@ -320,11 +320,7 @@ def read_effvals(wk_dir, effsize_path, traits_num):
 	num_cols = len(eff_df.columns)
 	num_df_traits = num_cols - 3 # 0: gene_name, 1: start, 2: end
 
-	print("error here")
 	traits_num_sum = traits_num["transmissibility"] + traits_num["drug_resistance"]
-	print(type(traits_num["transmissibility"]))
-	print(type(traits_num["drug_resistance"]))
-	print("where is string and int")
 	if traits_num_sum != num_df_traits:
 		raise ValueError(f"The sum of traits specified ({traits_num_sum}) does not match the number "
 				   f"of traits in the file ({num_df_traits}).")
@@ -420,7 +416,7 @@ def main():
 	parser.add_argument('-method', action='store',dest='method', type=str, required=True, help="Method of the genetic element file generation")
 	parser.add_argument('-wkdir', action='store',dest='wkdir', type=str, required=True, help="Working directory")
 	parser.add_argument('-effsize_path', action='store',dest='effsize_path', type=str, required=False, help="Path to the user-provided effect size genetic element csv file", default="")
-	parser.add_argument('-trait_n', action='store', nargs='+', dest='trait_n', type=int, required=False, help="Number of traits that user want to generate a genetic architecture for, 1st number for transmissibility, 2nd number for drug resistance", default=[0,0])
+	parser.add_argument('-trait_n', action='store', dest='trait_n', type=str, required=False, help="Number of traits that user want to generate a genetic architecture for, 1st number for transmissibility, 2nd number for drug resistance", default="")
 	parser.add_argument('-causal_size_each','--causal_size_each', nargs='+', help='Size of causal genes for each trait', required=False, type=int, default=[])
 	parser.add_argument('-es_low','--es_low', nargs='+', help='Lower bounds of effect size for each trait', required=False, type=float, default=[])
 	parser.add_argument('-es_high','--es_high', nargs='+', help='Higher bounds of effect size for each trait', required=False, type=float, default=[])
@@ -436,6 +432,7 @@ def main():
 	effsize_path = args.effsize_path
 	gff_in = args.gff
 	trait_n = args.trait_n
+	trait_n = json.loads(trait_n)
 	causal_sizes = args.causal_size_each
 	es_lows = args.es_low
 	es_highs = args.es_high

@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/local/workdir/sl984/epievosoftware/original_pipeline/demo/../enivol_packaging/enivol/genetic_effect_generator.py", line 455, in <module>
+    main()
+  File "/local/workdir/sl984/epievosoftware/original_pipeline/demo/../enivol_packaging/enivol/genetic_effect_generator.py", line 439, in main
+    trait_n = json.load(trait_n)
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/sl984/miniconda3/envs/trans_slim/lib/python3.12/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+                 ^^^^^^^
+AttributeError: 'str' object has no attribute 'read'
