@@ -13,16 +13,15 @@ eval "$(conda shell.bash hook)"
 conda activate trans_slim
 
 SCRIPT_DIR=../enivol_packaging/enivol
-WORK_DIR=/workdir/sl984/epievosoftware/original_pipeline/demo/data
+WORK_DIR=/workdir/sl984/epievosoftware/original_pipeline/demo/data_COVID_step_by_step
 EFFSIZE_PATH=/workdir/sl984/epievosoftware/original_pipeline/test/test_drugresist/causal_gene_info.csv
 
-mkdir -p $WORK_DIR # Create the working directory for this specific simulation
-
-# Scale free graph host population structure for COVID
-python $SCRIPT_DIR/genetic_effect_generator.py \
-    -wkdir ${WORK_DIR} \
+# Generate the genetic effects of genomic elements
+python -u $SCRIPT_DIR/genetic_effect_generator.py \
+    -wkdir $WORK_DIR \
     -method user_input \
-    -effsize_path  ${EFFSIZE_PATH} \
-    -trait_n '{"transmissibility": 1, "drug_resistance": 2}'
+    -effsize_path  $EFFSIZE_PATH \
+    -trait_n '{"transmissibility": 1, "drug_resistance": 2}' \
+    -n_seed 1
 
 conda deactivate

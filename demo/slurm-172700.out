@@ -1,5 +1,0 @@
-error here
-<class 'int'>
-<class 'int'>
-where is string and int
-Genetic effects generation - An error occured: seed_generator.py hasn't been run. If you want to use seed sequence different than reference genome, you must run seed_generator first.

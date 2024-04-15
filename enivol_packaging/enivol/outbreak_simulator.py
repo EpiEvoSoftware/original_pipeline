@@ -154,9 +154,6 @@ def create_slim_config(all_config):
 
 	if (not isinstance(all_config["GenomeElement"]["traits_num"], dict)) or len(all_config["GenomeElement"]["traits_num"].keys()) != 2 \
 													or any(not isinstance(i, int) for i in all_config["GenomeElement"]["traits_num"].values()):
-		# # debug
-		# print(all_config["GenomeElement"]["traits_num"].keys())
-		# print(all_config["GenomeElement"]["traits_num"].values())
 		raise CustomizedError("Number of traits (\"traits_num\") has to be a dictionary ({}) of length 2, containing integers, showing "
 						"number of effect size sets (traits) for transmissibility and drug-resistance")
 	print("\"GenomeElement\" Checked.")

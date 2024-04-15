@@ -71,7 +71,7 @@ assign_color <- function(meta_df, id_value, g1) {
 
 # Function to assign drug resistance
 assign_dr <- function(meta_df, id_value, dr_id, n_trans, g1) {
-  col_id <- dr_id + NUM_META_COLS + n_trans # Get the position of the column of wanted drug resistance
+  col_id <- dr_id + NUM_META_COLS_A + n_trans # Get the position of the column of wanted drug resistance
   nodes_num <- length(nodeId(g1)) # Get the size of the tree
   # Construct a table of #rows = nodes_num, |col| = NA
   dr_df <- data.frame(dr = rep(NA, nodes_num))
@@ -145,14 +145,14 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
   # If drug resistance is enabled
   if (n_dr > 0) {
     for (i in 1:n_dr) { # Assign drug resistance values
-      color_value_df <- assign_dr(meta_df, color_value_df, i, n_trans)
+      color_value_df <- assign_dr(meta_df, color_value_df, i, n_trans, g1)
       dr_df <- data.frame(dr = color_value_df[start_id:nodes_num, ncol(color_value_df)])
       colnames(dr_df) <- paste0("dr", i)
       rNodeData <- cbind(rNodeData, dr_df)
       rTipData <- cbind(rTipData, color_value_df[1:nTips(g1), ncol(color_value_df)])
     }
     # Prepare heatmap dataframe if we have processed >= 1 drug resistance
-    df_heatmap <- prepare_heatmap_data(color_value_df, g1, n_dr, n_trans)
+    df_heatmap <- prepare_drug_resist_heatmap_data(color_value_df, g1, n_dr, n_trans)
   }
 
   # Convert to phylo4d object      

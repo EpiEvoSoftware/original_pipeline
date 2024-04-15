@@ -496,6 +496,11 @@ def seeds_generation_byconfig(all_config):
 	# Read parameters
 	# all_config = read_params(file_path, "base_params.json")
 	seeds_config = all_config["SeedsConfiguration"]
+
+	# reference then pass the function
+	refer = seeds_config["use_reference"]
+	if refer: # do nothing
+		pass
 	wk_dir = all_config["BasicRunConfiguration"]["cwdir"]
 	method = seeds_config["method"]
 	seed_size = seeds_config["seed_size"]

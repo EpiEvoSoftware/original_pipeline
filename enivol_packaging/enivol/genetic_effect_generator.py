@@ -31,7 +31,7 @@ def _count_gff_genes(gff_path):
 
 	return n_genes
 
-def seeds_trait_calc(wk_dir, dict_c_g):
+def seeds_trait_calc(wk_dir, dict_c_g, num_seed = 0):
 	"""
 	Calculate trait values (sum of all mutation's effect sizes) of all seeds.
 	Must be run after seed_generator.
@@ -51,24 +51,27 @@ def seeds_trait_calc(wk_dir, dict_c_g):
 
 	# raise exception if we do not have access to VCF of individual seeds
 	if not os.path.exists(seeds_vcf_dir):
-		raise CustomizedError("seed_generator.py hasn't been run. "
-						"If you want to use seed sequence different than reference genome, "
-						"you must run seed_generator first")
-
-	seeds = ["seed." + str(i) + ".vcf" for i in range(len(os.listdir(seeds_vcf_dir)))]
-	for seed in seeds:
-		# iterate through all seeds
-		sum_trait = 0
-		with open(os.path.join(seeds_vcf_dir, seed), "r") as seed_vcf:
-			for line in seed_vcf:
-				if not line.startswith("#"):
-					fields = line.rstrip("\n").split("\t")
-					mut_pos = int(fields[1])
-					for _ , trait_info in dict_c_g.items():
-						# iterate through all causal genes
-						if trait_info[START_IDX] <= mut_pos <= trait_info[END_IDX]:
-							sum_trait += trait_info[E_SIZE]
-		seed_vals.append(sum_trait)
+		print("WARNING: seed_generator.py hasn't been run. "
+					"If you want to use seed sequence different than reference genome, "
+					"you must run seed_generator first")
+		if num_seed == 0:
+			raise CustomizedError("Please provide the number of seed when seeding with one reference genome.")
+		return [0]*num_seed
+	else:
+		seeds = ["seed." + str(i) + ".vcf" for i in range(len(os.listdir(seeds_vcf_dir)))]
+		for seed in seeds:
+			# iterate through all seeds
+			sum_trait = 0
+			with open(os.path.join(seeds_vcf_dir, seed), "r") as seed_vcf:
+				for line in seed_vcf:
+					if not line.startswith("#"):
+						fields = line.rstrip("\n").split("\t")
+						mut_pos = int(fields[1])
+						for _ , trait_info in dict_c_g.items():
+							# iterate through all causal genes
+							if trait_info[START_IDX] <= mut_pos <= trait_info[END_IDX]:
+								sum_trait += trait_info[E_SIZE]
+			seed_vals.append(sum_trait)
 
 	return seed_vals
 
@@ -294,7 +297,7 @@ def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir,
 	write_eff_size_csv(trait_n, traits_dict, wk_dir)
 
 
-def read_effvals(wk_dir, effsize_path, traits_num):
+def read_effvals(wk_dir, effsize_path, traits_num, num_seed = 0):
 	"""
     Read a user-specified CSV file of effect size and return the seeds' trait values accordingly.
 
@@ -335,7 +338,7 @@ def read_effvals(wk_dir, effsize_path, traits_num):
 		trait_col_idx = 3 + idx # The first three columns are meta information.
 		trait_vals = eff_df.iloc[:, trait_col_idx].tolist()
 		dict_gene_trait = {gene_names[j]: [start_pos[j], end_pos[j], trait_vals[j]] for j in range(len(gene_names))}
-		seeds_trait_vals.append(seeds_trait_calc(wk_dir, dict_gene_trait))
+		seeds_trait_vals.append(seeds_trait_calc(wk_dir, dict_gene_trait, num_seed))
 		traits.append(dict_gene_trait)
 	# Question: I am a little confused by why we would want to write the CSV again; for column names?
 	write_eff_size_csv(traits_num, traits, wk_dir)
@@ -343,7 +346,7 @@ def read_effvals(wk_dir, effsize_path, traits_num):
 
 
 def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n={}, causal_sizes=[], es_lows=[], es_highs=[], 
-						   norm_or_not=False, n_gen=0, mut_rate=0, rand_seed = None):
+						   norm_or_not=False, n_gen=0, mut_rate=0, rand_seed = None, num_seed = 0):
 	"""
 	Generate effect sizes for genes and computes trait values for seeds' sequences.
 
@@ -372,7 +375,7 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n={
 		if sum(trait_n.values()) < 1:
 			raise CustomizedError("Please provide a list of trait quantities (-trait_n) that sums up to at least 1")
 		if method == "user_input":
-			write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path, trait_n), trait_n)
+			write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path, trait_n, num_seed), trait_n)
 		elif method == "randomly_generate":
 			generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, norm_or_not)
 		else:
@@ -399,7 +402,7 @@ def effsize_generation_byconfig(all_config):
 	wk_dir = all_config["BasicRunConfiguration"]["cwdir"]
 	effsize_method = genetic_config["effect_size"]["method"]
 	random_seed = all_config["BasicRunConfiguration"].get("random_number_seed", None)
-
+	num_seed = all_config["SeedsConfiguration"]["seed_size"]
 
 	eff_params_config = genetic_config["effect_size"]["randomly_generate"]
 	error = run_effsize_generation(method=effsize_method, wk_dir=wk_dir, trait_n=genetic_config["traits_num"], 
@@ -407,7 +410,7 @@ def effsize_generation_byconfig(all_config):
 						 causal_sizes=eff_params_config["genes_num"], es_lows=eff_params_config["effsize_min"], 
 						 es_highs=eff_params_config["effsize_max"], gff_in=eff_params_config["gff"], 
 						 n_gen=all_config["EvolutionModel"]["n_generation"], mut_rate=all_config["EvolutionModel"]["mut_rate"], 
-						 norm_or_not=eff_params_config["normalize"], rand_seed = random_seed)
+						 norm_or_not=eff_params_config["normalize"], rand_seed = random_seed, num_seed=num_seed)
 	return error
 
 
@@ -426,6 +429,8 @@ def main():
 	parser.add_argument('-mut_rate', action='store',dest='mut_rate', required=False, type=float, default=0)
 	parser.add_argument('-random_seed', action = 'store', dest = 'random_seed', required = False, type = int, default = None)
 
+	parser.add_argument('-n_seed', action='store', dest = 'num_seed', required = False, type = int, default = None)
+
 
 	args = parser.parse_args()
 	method = args.method
@@ -441,10 +446,11 @@ def main():
 	mut_rate = args.mut_rate
 	norm_or_not = args.normalize
 	rand_seed = args.random_seed
+	num_seed = args.num_seed
 
 	run_effsize_generation(method=method, wk_dir=wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, 
 						causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, 
-						n_gen=n_gen, mut_rate=mut_rate, rand_seed = rand_seed)
+						n_gen=n_gen, mut_rate=mut_rate, rand_seed = rand_seed, num_seed = num_seed)
 
 
 if __name__ == "__main__":
