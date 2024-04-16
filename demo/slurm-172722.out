@@ -1,0 +1,69 @@
+
+
+	 _______ .__   __.  __  ____    ____  ______    __      
+	|   ____||  \ |  | |  | \   \  /   / /  __  \  |  |     
+	|  |__   |   \|  | |  |  \   \/   / |  |  |  | |  |     
+	|   __|  |  . `  | |  |   \      /  |  |  |  | |  |     
+	|  |____ |  |\   | |  |    \    /   |  `--'  | |  `----.
+	|_______||__| \__| |__|     \__/     \______/  |_______|
+                                                        
+
+******************************************************************** 
+                   CONTACT NETWORK GENERATED                         
+********************************************************************
+Contact network: /workdir/sl984/epievosoftware/original_pipeline/demo/data_TB_complete/contact_network.adjlist
+******************************************************************** 
+                   	    SEEDS GENERATED		                        
+******************************************************************** 
+
+******************************************************************** 
+                  GENETIC ARCHITECTURES GENERATED		            
+******************************************************************** 
+
+******************************************************************** 
+                         SEEDS AND HOSTS MATCHED                     
+********************************************************************
+Seed host matching: /workdir/sl984/epievosoftware/original_pipeline/demo/data_TB_complete/seed_host_match.csv
+********************************************************************
+                    CHECKING THE CONFIGURATION
+********************************************************************
+Checking "BasicRunConfiguration"...... 
+"BasicRunConfiguration" checked.
+Checking "EvolutionModel"...... 
+"EvolutionModel" Checked. 
+Checking "SeedsConfiguration"...... 
+"SeedsConfiguration" Checked. 
+Checking "GenomeElement"...... 
+"GenomeElement" Checked.
+Checking "NetworkModelParameters"...... 
+"NetworkModelParameters" Checked. 
+Checking "EpidemiologyModel"...... 
+"EpidemiologyModel" Checked. 
+Checking "Postprocessing_options"...... 
+Post-simulation data processing starts.
+The tree will be colored by seed.
+"Postprocessing_options" Checked. 
+********************************************************************
+                       CREATING SLIM SCRIPT
+********************************************************************
+SLiM script: /workdir/sl984/epievosoftware/original_pipeline/demo/data_TB_complete/simulation.slim
+********************************************************************
+                     RUNNING THE SIMULATION
+********************************************************************
+Running simulation for replication 1......
+Replication 1 simulation finished.
+Processing replication 1 treesequence file...
+Plotting transmission tree for replication 1...
+Plotting seed 0's transmission tree...
+No samples for this seed's progeny.
+Plotting seed 1's transmission tree...
+No samples for this seed's progeny.
+Plotting seed 2's transmission tree...
+Plotting seed 3's transmission tree...
+Plotting seed 4's transmission tree...
+No samples for this seed's progeny.
+Plotting strain distribution trajectory for replication 1...
+Plotting SEIR trajectory for replication 1...
+
+
+Running simulation for replication 2......
