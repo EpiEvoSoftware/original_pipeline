@@ -1147,18 +1147,15 @@ class SeedsConfiguration(TabBase):
             except Exception as e:
                     messagebox.showerror("Seed Generation Error", str(e))
         column, frow = 1, 100
-        # component = EasyButton("Run Seed Generation", self.control_frame, 
-        #                        column, frow,
-        #                        seed_generation, hide, 'ew')
-        generation_button = tk.ttk.Button(self.parent, text="Run Seed Generation", command=seed_generation)
-        generation_button.pack()
-        # self.visible_components.add(generation_button)
-        return generation_button
+        component = EasyButton("Run Seed Generation", self.control_frame, 
+                               column, frow,
+                               seed_generation, hide, 'ew')
+        self.visible_components.add(component)
+        return component
 
 
 
     def load_page(self):
-        # print(ui_wf_epi_values)
         # hide = False
         to_renderer, to_derenderer = None, None
         # self.render_seeds_size(hide, column=1, columnspan= 3, frow = 1)
@@ -1245,7 +1242,7 @@ class SeedsConfiguration(TabBase):
             
         renders = [
             self.use_method_controls,
-            self.run_button_control,
+            self.run_button_control
         ]
         
         match self.method:
