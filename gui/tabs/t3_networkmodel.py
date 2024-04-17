@@ -21,11 +21,11 @@ from tabs.t6_networkgraph import NetworkGraphApp
 
 class NetworkModel:
     def __init__(self, parent, tab_parent, network_graph_app, config_path, tab_title, tab_index, hide = False):
-        self.top_frame = ttk.Frame(parent)
+        self.top_frame = ttk.Frame(parent, width=200)
         self.bottom_frame = ttk.Frame(parent)
         
-        self.top_frame.pack(side="top", fill="both", expand=True)
-        self.bottom_frame.pack(side="bottom", fill="both", expand=True)
+        self.top_frame.pack(side="right", fill="y", expand=False)
+        self.bottom_frame.pack(side="left", fill="both", expand=True)
         
         self.graph = NetworkModelGraph(self.bottom_frame, tab_parent, network_graph_app, config_path, tab_index, tab_title)
         self.sidebar = NetworkModelConfigurations(self.top_frame, tab_parent, config_path, self.graph, tab_index, tab_title)
@@ -559,16 +559,22 @@ class NetworkModelGraph:
     def create_graph_frame(self):
         self.graph_frame = ttk.Frame(self.parent)
         self.graph_frame.pack(fill='both', expand=True)
+        self.plot_degree_distribution([])
         
     def plot_degree_distribution(self, degrees):
         for widget in self.graph_frame.winfo_children():
             widget.destroy()
 
-        fig, ax = plt.subplots(figsize=(6, 4))
-        ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+        fig, ax = plt.subplots(figsize=(6, 4), constrained_layout=True)
+        if degrees:
+            ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+        else:
+            ax.hist([], bins=[])
         ax.set_title("Degree Distribution")
         ax.set_xlabel("Degree")
         ax.set_ylabel("Number of Nodes")
+        ax.set_xlim(0, 10) 
+        ax.set_ylim(0, 1)
 
         canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
         canvas.draw()

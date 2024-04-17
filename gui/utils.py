@@ -751,7 +751,6 @@ class EasyCombobox(EasyWidgetBase):
             # print("var_val", var_val)
 
         self.var = tk.StringVar(value=var_val)
-        print("self.var", self.var.get())
         self.combobox = tk.ttk.Combobox(self.control_frame, textvariable=self.var, values=combobox_values, state="readonly", width=width)
         self.combobox.bind("<<ComboboxSelected>>", self._updater)
 
@@ -913,8 +912,8 @@ class EasyImage(EasyWidgetBase):
     def __init__(self, image_path, desired_width, desired_height, hide, control_frame, frow, column, columnspan, rowspan):
         with Image.open(image_path) as img:
             img = img.resize((desired_width, desired_height))
-            photo = ImageTk.PhotoImage(img)
-            image_label = tk.Label(control_frame, image=photo)
+            self.photo = ImageTk.PhotoImage(img)
+            image_label = tk.Label(control_frame, image=self.photo)
             
             if frow is None or column is None:
                 image_label.grid()

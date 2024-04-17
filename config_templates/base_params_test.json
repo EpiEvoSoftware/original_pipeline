@@ -77,9 +77,9 @@
             "path_network": ""
         },
         "randomly_generate": {
-            "network_model": "RP",
+            "network_model": "ER",
             "ER": {
-                "p_ER": 0
+                "p_ER": 0.5
             },
             "RP": {
                 "rp_size": [

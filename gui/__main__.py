@@ -97,10 +97,10 @@ def launch_gui(config_path, hide = False):
     style.configure("Bold.TLabel", font=(font_family, font_size, 'bold'))
     style.configure("Title.TLabel", font=(font_family, font_size+4, 'bold'))
 
-    if tk.Tcl().eval('set tcl_platform(threaded)'):
-        print('Threading is enabled')
-    else:
-        print('Threading is disabled, application might not run as expected. Please enable threading in your python installation.')
+    # if tk.Tcl().eval('set tcl_platform(threaded)'):
+    #     print('Threading is enabled')
+    # else:
+    #     print('Threading is disabled, application might not run as expected. Please enable threading in your python installation.')
         
 
 
