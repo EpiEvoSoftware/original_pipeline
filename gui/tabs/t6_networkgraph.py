@@ -2,21 +2,7 @@ import sys
 import os
 import json
 from utils import *
-
 from tkinter import messagebox 
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-
-from seed_host_matcher import *
-# from network_generator import *
-from base_func import read_params
-
-
-
-
 import tkinter as tk
 from tkinter import ttk, messagebox
 import networkx as nx
@@ -25,6 +11,15 @@ import json
 import csv
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.lines import Line2D
+
+from seed_host_matcher import *
+from base_func import read_params
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 
 def read_json_config(file_path):
@@ -51,7 +46,6 @@ class NetworkGraphApp:
         if isinstance(parent, tk.Tk):
             self.parent.title("Network Graph Visualization")
 
-        self.parent = parent
         self.tab_parent = tab_parent
         self.tab_parent.add(parent, text=tab_title)
         self.tab_index = tab_index
@@ -63,8 +57,8 @@ class NetworkGraphApp:
         
         self.config = load_config_as_dict(self.config_path)
         # fix loadings
-        wk_dir = self.config["BasicRunConfiguration"]["cwdir"]
-        self.network_file_path = os.path.join(wk_dir, "contact_network.adjlist")
+        self.wk_dir = self.config["BasicRunConfiguration"]["cwdir"]
+        self.network_file_path = os.path.join(self.wk_dir, "contact_network.adjlist")
         
 
         self.pop_size = int(self.config['NetworkModelParameters']['host_size'])
@@ -90,16 +84,14 @@ class NetworkGraphApp:
         style.configure('Large.TLabel', font=(
             'Helvetica', 12))
 
-        self.control_frame = ttk.Frame(self.parent, width=300)
-        self.control_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
-
         self.graph_frame = ttk.Frame(self.parent)
         self.graph_frame.pack(side=tk.TOP, fill=tk.X, expand=False)
 
         self.parameter_entries = {}
         self.parameter_labels = []
 
-        self.fig, self.ax = plt.subplots(figsize=(5, 3))
+        self.fig, self.ax = plt.subplots(figsize=(5, 3), constrained_layout=True)
+
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
         
@@ -112,7 +104,7 @@ class NetworkGraphApp:
         self.table_frame.pack(side=tk.BOTTOM, fill=tk.X,
                               padx=10, pady=10, expand=False)
 
-        columns = ("seed_id", "transmissibility", "drugresist_1", "drugresist_2", "match_method", "method_parameter", "method_parameter_2", "host_id")
+        columns = ("seed_id", "transmissibility_1", "drugresist_1", "drugresist_2", "match_method", "method_parameter", "method_parameter_2", "host_id")
         self.table = ttk.Treeview(
             self.table_frame, columns=columns, show='headings')
         
@@ -124,7 +116,8 @@ class NetworkGraphApp:
                 self.table.column(col, width=150, anchor=tk.CENTER)  
         self.table.pack(side=tk.LEFT, fill=tk.X)
 
-        self.populate_table_from_csv('test/test_drugresist/seeds_trait_values.csv') 
+        seed_csv = os.path.join(self.wk_dir, 'seeds_trait_values.csv')
+        self.populate_table_from_csv(seed_csv) 
 
         self.table.bind("<Double-1>", self.on_double_click)
 
@@ -136,9 +129,9 @@ class NetworkGraphApp:
         with open(csv_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                self.table.insert("", "end", values=(
-                    row['seed_id'], row['transmissibility'], row['drugresist_1'], row['drugresist_2'], "", ""))
-
+                values = tuple(row[col] for col in reader.fieldnames)
+                extended_values = values + ("", "")
+                self.table.insert("", "end", values=extended_values)
 
 
 
@@ -181,6 +174,7 @@ class NetworkGraphApp:
     def on_double_click(self, event):
         item = self.table.identify('item', event.x, event.y)
         column = self.table.identify_column(event.x)
+        print(self.table.item(item, 'values'))
         match_method = self.table.item(item, 'values')[4]
         if column in ("#6", "#7") and match_method == "Percentile":  # Columns for "method_parameter" and "method_parameter_2"
             self.edit_percentage_parameter(item, column)
@@ -247,14 +241,12 @@ class NetworkGraphApp:
         return [""]
 
     def match_hosts(self):
-        wkdir = load_config_as_dict(self.config_path)["BasicRunConfiguration"]["cwdir"]
-        ntwk_path = os.path.join(wkdir, "contact_network.adjlist")
-        ntwk = read_network(ntwk_path)
+        ntwk = read_network(self.network_file_path)
         
         num_seed = len(self.table.get_children())
 
         match_methods, match_params = self.collect_matching_criteria()
-        match_dict = run_seed_host_match("randomly_generate", wkdir, num_seed, match_scheme=match_methods, match_scheme_param=match_params)
+        match_dict = run_seed_host_match("randomly_generate", self.wk_dir, num_seed, match_scheme=match_methods, match_scheme_param=match_params)
         
         if match_dict[0] is not None:
             match_dict = match_dict[0]
@@ -307,27 +299,20 @@ class NetworkGraphApp:
         self.ax.set_xlabel("Degree")
         self.ax.set_ylabel("Number of Nodes")
 
-        # Determine the y-position for annotations based on the histogram
         max_count = np.max(degree_counts)
-        annotation_height = max_count + max_count * 0.1  # Slightly above the highest bar
+        annotation_height = max_count + max_count * 0.1  
 
         # Highlight the matched hosts and label them
         for seed_id, host_id in match_dict.items():
             host_degree = ntwk.degree(host_id)
-            # Draw a vertical line for the matched host
             self.ax.axvline(x=host_degree, color='r', linestyle='--', lw=1)
-            # Annotate the line with seed_id
             self.ax.text(host_degree, annotation_height, f'{seed_id}', rotation=45, color='blue', fontsize=8, ha='right', va='bottom')
 
-        # Since the annotation might go beyond the current y-limit, adjust the limit
         self.ax.set_ylim(top=annotation_height + max_count * 0.2)
 
-        # Add a legend entry for matched hosts
-        from matplotlib.lines import Line2D
         legend_elements = [Line2D([0], [0], color='r', linestyle='--', lw=1, label='Matched Hosts')]
         self.ax.legend(handles=legend_elements, loc='upper right')
 
-        # Redraw the canvas
         self.canvas.draw()
 
     def collect_matching_criteria(self):
