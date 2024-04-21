@@ -9,6 +9,11 @@ import tkinter as tk
 from tkinter import ttk
 import json
 import tkinter.font as tkFont
+import sys
+
+enivol_dir = os.path.join(os.path.dirname(__file__), '../enivol_packaging/enivol')
+if enivol_dir not in sys.path:
+    sys.path.insert(0, enivol_dir)
 
 from tabs.t1_configuration import Configuration
 from tabs.t1_configuration_v2 import Configurationv2

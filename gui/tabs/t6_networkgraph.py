@@ -12,15 +12,7 @@ import csv
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.lines import Line2D
-
 from seed_host_matcher import *
-from base_func import read_params
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-
 
 def read_json_config(file_path):
     with open(file_path, 'r') as file:
@@ -174,7 +166,6 @@ class NetworkGraphApp:
     def on_double_click(self, event):
         item = self.table.identify('item', event.x, event.y)
         column = self.table.identify_column(event.x)
-        print(self.table.item(item, 'values'))
         match_method = self.table.item(item, 'values')[4]
         if column in ("#6", "#7") and match_method == "Percentile":  # Columns for "method_parameter" and "method_parameter_2"
             self.edit_percentage_parameter(item, column)

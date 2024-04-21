@@ -6,11 +6,6 @@ import os
 import sys
 from PIL import Image, ImageTk
 from utils import *
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-from seed_generator import *
 
 
 # TODO: seed_size = len(seeded_host_id), validate
@@ -351,11 +346,6 @@ class SeedsConfiguration(TabBase):
             
             to_derender()
             to_rerender()
-
-            # to_derender()
-            # to_rerender()
-
-            print("comboboxselected", converted_var)
             
             
         component = EasyCombobox(keys_path, self.config_path, text, 
@@ -700,7 +690,6 @@ class SeedsConfiguration(TabBase):
             rowspan
             )
         
-        # print('rendering image')
         return component
         # if not hide:
         #     self.visible_components.add(component)    

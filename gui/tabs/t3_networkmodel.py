@@ -6,18 +6,7 @@ import os
 from utils import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-
 from network_generator import *
-from tabs.t6_networkgraph import NetworkGraphApp
-
-
-# from seed_generator import *
-
-
 
 class NetworkModel:
     def __init__(self, parent, tab_parent, network_graph_app, config_path, tab_title, tab_index, hide = False):
@@ -461,7 +450,6 @@ class NetworkModelConfigurations:
                     rp_size = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['rp_size']
                     p_within = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['p_within']
                     p_between = self.config_dict['NetworkModelParameters']['randomly_generate']['RP']['p_between']
-                    # print(p_between, "pbetween")
                     network, error = run_network_generation(pop_size=pop_size, wk_dir=wk_dir, method="randomly_generate", model="RP", rp_size=rp_size, p_within=p_within, p_between=p_between)
                 else:
                     raise ValueError("Unsupported model.")
@@ -570,11 +558,12 @@ class NetworkModelGraph:
             ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
         else:
             ax.hist([], bins=[])
+            ax.set_xlim(0, 10) 
+            ax.set_ylim(0, 1)
         ax.set_title("Degree Distribution")
         ax.set_xlabel("Degree")
         ax.set_ylabel("Number of Nodes")
-        ax.set_xlim(0, 10) 
-        ax.set_ylim(0, 1)
+        
 
         canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
         canvas.draw()

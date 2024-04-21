@@ -4,11 +4,6 @@ import json
 import os
 import sys
 from utils import *
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-    
 from genetic_effect_generator import *
 
 class GenomeElement(TabBase):
@@ -176,7 +171,6 @@ class GenomeElement(TabBase):
         render_generate_genetic_architecture_method_text = "Method to Generate the Genetic Architecture"
         def comboboxselected(var, to_rerender, to_derender):
             converted_var = render_to_val_generate_genetic_architecture_method.get(var.get(), "")
-            # print("converted_var")
             no_validate_update_val(converted_var, self.config_path, keys_path)
             match converted_var:
                 case "user_input":

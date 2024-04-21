@@ -4,11 +4,6 @@ import json
 import os
 import sys
 from utils import *
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-    
 from genetic_effect_generator import *
 
 # TODO: add global context for the group controls for yes/no rendering/derending
