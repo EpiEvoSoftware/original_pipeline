@@ -9,6 +9,11 @@ import tkinter as tk
 from tkinter import ttk
 import json
 import tkinter.font as tkFont
+import sys
+
+enivol_dir = os.path.join(os.path.dirname(__file__), '../enivol_packaging/enivol')
+if enivol_dir not in sys.path:
+    sys.path.insert(0, enivol_dir)
 
 from tabs.t1_configuration import Configuration
 from tabs.t1_configuration_v2 import Configurationv2
@@ -97,10 +102,10 @@ def launch_gui(config_path, hide = False):
     style.configure("Bold.TLabel", font=(font_family, font_size, 'bold'))
     style.configure("Title.TLabel", font=(font_family, font_size+4, 'bold'))
 
-    if tk.Tcl().eval('set tcl_platform(threaded)'):
-        print('Threading is enabled')
-    else:
-        print('Threading is disabled, application might not run as expected. Please enable threading in your python installation.')
+    # if tk.Tcl().eval('set tcl_platform(threaded)'):
+    #     print('Threading is enabled')
+    # else:
+    #     print('Threading is disabled, application might not run as expected. Please enable threading in your python installation.')
         
 
 

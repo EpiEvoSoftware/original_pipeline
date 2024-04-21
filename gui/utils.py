@@ -8,7 +8,6 @@ import os, sys
 import tkinter as tk
 import json
 from tkinter import filedialog
-
 class CreateToolTip(object):
     """
     create a tooltip for a given widget
@@ -657,18 +656,18 @@ class EasyRadioButton(EasyWidgetBase):
         dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
         self.var = tk.BooleanVar(value=dict_var)
         label = tk.ttk.Label(control_frame, text=render_text, style = "Bold.TLabel")
-        rb_true = tk.ttk.Radiobutton(control_frame, text="Yes", variable=self.var, value=True, command = self._updater)
-        rb_false = tk.ttk.Radiobutton(control_frame, text="No", variable=self.var, value=False, command = self._updater)
+        self.rb_true = tk.ttk.Radiobutton(control_frame, text="Yes", variable=self.var, value=True, command = self._updater)
+        self.rb_false = tk.ttk.Radiobutton(control_frame, text="No", variable=self.var, value=False, command = self._updater)
         if frow is None or column is None:
             label.grid()
-            rb_true.grid()
-            rb_false.grid()
+            self.rb_true.grid()
+            self.rb_false.grid()
         else:
             label.grid(row = frow, column = column, columnspan=columnspan, sticky = 'w', pady = 5)
-            rb_true.grid(row = frow+1, column = column, sticky = 'w', pady = 5)
-            rb_false.grid(row = frow+2, column = column, sticky = 'w', pady = 5)
+            self.rb_true.grid(row=frow+1, column=column, sticky='w', pady=5)
+            self.rb_false.grid(row=frow+2, column=column, sticky='w', pady=5)
 
-        self.local_components = {label, rb_true, rb_false}
+        self.local_components = {label, self.rb_true, self.rb_false}
         self.grid_layout = derender_components(self.local_components)
         if not hide:
             rerender_components(self.local_components, self.grid_layout)
@@ -679,6 +678,10 @@ class EasyRadioButton(EasyWidgetBase):
         #     self.to_derender()
         # if self.to_rerender is not None:
         #     self.to_rerender()
+    
+    def update_rb_false_text(self, new_text):
+        """Updates the text of the rb_false radiobutton."""
+        self.rb_false.config(text=new_text)
 
 class EasyPathSelector(EasyWidgetBase):
     def __init__(self, keys_path, config_path, render_text, control_frame, column, hide, frow, columnspan, filetype = None, tooltip = ""):
@@ -748,7 +751,6 @@ class EasyCombobox(EasyWidgetBase):
             # print("var_val", var_val)
 
         self.var = tk.StringVar(value=var_val)
-        print("self.var", self.var.get())
         self.combobox = tk.ttk.Combobox(self.control_frame, textvariable=self.var, values=combobox_values, state="readonly", width=width)
         self.combobox.bind("<<ComboboxSelected>>", self._updater)
 
@@ -910,8 +912,8 @@ class EasyImage(EasyWidgetBase):
     def __init__(self, image_path, desired_width, desired_height, hide, control_frame, frow, column, columnspan, rowspan):
         with Image.open(image_path) as img:
             img = img.resize((desired_width, desired_height))
-            photo = ImageTk.PhotoImage(img)
-            image_label = tk.Label(control_frame, image=photo)
+            self.photo = ImageTk.PhotoImage(img)
+            image_label = tk.Label(control_frame, image=self.photo)
             
             if frow is None or column is None:
                 image_label.grid()

@@ -1,4 +1,4 @@
-name: trans_slim_test_v2
+name: trans_slim_test_v3
 channels:
   - bioconda
   - anaconda
