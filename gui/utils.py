@@ -8,6 +8,7 @@ import os, sys
 import tkinter as tk
 import json
 from tkinter import filedialog
+    
 class CreateToolTip(object):
     """
     create a tooltip for a given widget
