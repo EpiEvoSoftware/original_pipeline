@@ -38,11 +38,13 @@ class PostProcessing:
         generate_config_file_button.pack()
 
     def generate_config_file(self):
-        source = 'config_templates/base_params_test.json'
-        target = os.path.join(self.cwdir, 'base_params.json')
+        source = self.config_path
+        cwdir = load_config_as_dict(self.config_path)['BasicRunConfiguration']['cwdir']
+        target = os.path.join(cwdir, 'config_file.json')
         
         try:
             shutil.copy(source, target)
+            tk.messagebox.showinfo("Success", "Config file saved successfully") 
         except IOError as e:
             print("Unable to copy file. %s" % e)
         

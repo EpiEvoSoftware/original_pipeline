@@ -118,12 +118,13 @@ class NetworkGraphApp:
         self.degree_button.pack()
     
     def populate_table_from_csv(self, csv_path):
-        with open(csv_path, newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                values = tuple(row[col] for col in reader.fieldnames)
-                extended_values = values + ("", "")
-                self.table.insert("", "end", values=extended_values)
+        if os.path.exists(csv_path):
+            with open(csv_path, newline='') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    values = tuple(row[col] for col in reader.fieldnames)
+                    extended_values = values + ("", "")
+                    self.table.insert("", "end", values=extended_values)
 
 
 
@@ -260,25 +261,25 @@ class NetworkGraphApp:
         self.highlight_matched_hosts(ntwk, match_dict)
     
     def plot_degree_distribution(self):
-        
-        try:
-            G = nx.read_adjlist(self.network_file_path)
-            degrees = [G.degree(n) for n in G.nodes()]
-            self.ax.clear()
-        
-            degrees = [G.degree(n) for n in G.nodes()]
-            self.ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
-            self.ax.set_title("Degree Distribution")
-            self.ax.set_xlabel("Degree")
-            self.ax.set_ylabel("Number of Nodes")
+        if os.path.exists(self.network_file_path):
+            try:
+                G = nx.read_adjlist(self.network_file_path)
+                degrees = [G.degree(n) for n in G.nodes()]
+                self.ax.clear()
             
-            # self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
-            self.canvas.draw()
-            # self.canvas_widget = self.canvas.get_tk_widget()
-            # self.canvas_widget.pack(fill=tk.BOTH, expand=True)
-        except FileNotFoundError:
-            messagebox.showerror("Error", f"Network file not found at {self.network_file_path}")
-            return
+                degrees = [G.degree(n) for n in G.nodes()]
+                self.ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+                self.ax.set_title("Degree Distribution")
+                self.ax.set_xlabel("Degree")
+                self.ax.set_ylabel("Number of Nodes")
+                
+                # self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
+                self.canvas.draw()
+                # self.canvas_widget = self.canvas.get_tk_widget()
+                # self.canvas_widget.pack(fill=tk.BOTH, expand=True)
+            except FileNotFoundError:
+                messagebox.showerror("Error", f"Network file not found at {self.network_file_path}")
+                return
 
     def highlight_matched_hosts(self, ntwk, match_dict):
         

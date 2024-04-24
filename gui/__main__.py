@@ -5,6 +5,7 @@ This file is the main entry-point for the GUI application.
 """
 import argparse
 import os.path
+import shutil
 import tkinter as tk
 from tkinter import ttk
 import json
@@ -59,6 +60,9 @@ def load_config_as_dict(config_file):
         print(f"Configuration file {config_file} not found.")
         return None
 
+def initialize_configuration(default_config_path, user_config_path):
+    shutil.copy(default_config_path, user_config_path)
+    return user_config_path
 
 def parse_args():
     """
@@ -70,7 +74,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         prog='cluster', description='Application to view GUI')
     parser.add_argument('--config_path', type=str,
-                        help='path to the configuration JSON file', default="config_templates/base_params_test.json")
+                        help='path to the configuration JSON file', default="enivol_packaging/enivol/config_template/user_config.json")
     parser.add_argument('-v', '--view', action='store_true',
                         help='visualize network graph')
     parser.add_argument('--hide', action='store_true', help='Set hide to False, default is True')
@@ -81,7 +85,7 @@ def validate_input(P):
     if P.strip() in ["e", ".", ""]:
             return True
     return P.isdigit()
-def launch_gui(config_path, hide = False):
+def launch_gui(default_config_path, user_config_path, hide=False):
     """
     Launches the gui application
     """
@@ -91,6 +95,8 @@ def launch_gui(config_path, hide = False):
     if 'aqua' in style.theme_names():
         style.theme_use('aqua')
     root.title("EnivolCrossing: Simulation Framework for Genetic Epidemiology")
+    
+    config_path = initialize_configuration(default_config_path, user_config_path)
 
     tab_parent = ttk.Notebook(root)
      
@@ -137,10 +143,9 @@ def execute():
     Executes the application, according to the command line arguments specified.
     """
     args = parse_args()
-    if args.config_path:
-        launch_gui(args.config_path, args.hide)
-    else:
-        print("A valid configuration file is required to run the application.")
+    default_config_path = "enivol_packaging/enivol/config_template/default_config.json"
+    launch_gui(default_config_path, args.config_path, args.hide)
+
 
 
 execute()
