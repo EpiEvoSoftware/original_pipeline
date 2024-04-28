@@ -203,7 +203,7 @@ def check_seedsvcf_input(vcf_path, seeds_size):
 			else:
 				line_stp = line.rstrip("\n").split("\t")
 				if len(line_stp) != NUM_VCF_FORMAT_COLUMNS + seeds_size:
-					raise CustomizedError("The vcf provided doesn't "
+					raise CustomizedError(f"The vcf provided ({len(line_stp)-NUM_VCF_FORMAT_COLUMNS}) doesn't "
 						   f"have the correct number of individuals ({seeds_size}) in it.")
 	
 	return True
