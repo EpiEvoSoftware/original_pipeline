@@ -556,7 +556,8 @@ def main():
 
 	config_path = args.config
 
-	all_slim_simulation_by_config(read_params(config_path, "base_params.json"))
+	# quick fix
+	all_slim_simulation_by_config(read_params(config_path, "default_config.json"))
 
 
 if __name__ == "__main__":
