@@ -127,7 +127,7 @@ def run_network_generation(pop_size, wk_dir, method, model = "", path_network = 
     try: 
         if method == "user_input":
             # change function name
-            ntwk = read_input_network(wk_dir, path_network, pop_size)
+            ntwk = read_input_network(path_network, pop_size)
 
         elif method == "randomly_generate":
             if not model in ["ER", "RP", "BA"]: 
