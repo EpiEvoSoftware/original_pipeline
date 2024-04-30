@@ -377,6 +377,7 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n={
 		if method == "user_input":
 			write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path, trait_n, num_seed), trait_n)
 		elif method == "randomly_generate":
+			
 			generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, norm_or_not)
 		else:
 			raise CustomizedError(f"{method} isn't a valid method. Please provide a permitted method. "

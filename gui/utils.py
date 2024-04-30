@@ -416,7 +416,10 @@ def render_path_select(keys_path, config_path, render_text, control_frame, colum
 def update_numerical_input(entry, keys_path, config_path, error_messages, render_text_short, is_int):
     try:
         # print("entry.get()",  entry.get())
-        new_val = int(float(entry.get()))  
+        if is_int:
+            new_val = int(float(entry.get()))  
+        else:
+            new_val = float(entry.get())
         config = load_config_as_dict(config_path) 
         update_nested_dict(config, keys_path, new_val) 
         save_config(config_path, config)  
@@ -873,6 +876,7 @@ class TabBase:
     def global_update(self):
         users_validation_messages = []
 
+        print(self.visible_components)
         for component in self.visible_components:
             component.update(users_validation_messages)
 

@@ -61,8 +61,7 @@ def load_config_as_dict(config_file):
         return None
 
 def initialize_configuration(default_config_path, user_config_path):
-    if not os.path.exists(user_config_path):
-        shutil.copy(default_config_path, user_config_path)
+    shutil.copy(default_config_path, user_config_path)
     return user_config_path
 
 def parse_args():
@@ -97,7 +96,10 @@ def launch_gui(default_config_path, user_config_path, hide=False):
         style.theme_use('aqua')
     root.title("EnivolCrossing: Simulation Framework for Genetic Epidemiology")
     
-    config_path = initialize_configuration(default_config_path, user_config_path)
+    if user_config_path == "enivol_packaging/enivol/config_template/user_config.json":
+        config_path = initialize_configuration(default_config_path, user_config_path)
+    else:
+        config_path = user_config_path
 
     tab_parent = ttk.Notebook(root)
      

@@ -6,7 +6,7 @@ import os
 import sys
 from PIL import Image, ImageTk
 from utils import *
-
+from seed_generator import *
 
 # TODO: seed_size = len(seeded_host_id), validate
 class SeedsConfiguration(TabBase):
@@ -442,9 +442,9 @@ class SeedsConfiguration(TabBase):
         self.render_burn_in_mutrate_wf_text = "Burn-in Mutation Rate (Numerical)"
         keys_path = ['SeedsConfiguration', 'SLiM_burnin_WF', 'burn_in_mutrate']
         component = EasyEntry(keys_path, self.config_path, 
-                              self.render_burn_in_generations_wf_text, 
+                              self.render_burn_in_mutrate_wf_text, 
                               'burn_in_mutrate', self.control_frame, column, 
-                              frow, 'integer', hide, columnspan=columnspan
+                              frow, 'numerical', hide, columnspan=columnspan
                               )
         self.visible_components.add(component)
         return component
@@ -490,7 +490,7 @@ class SeedsConfiguration(TabBase):
 
         self.render_burn_in_mutrate_epi_text = "Burn-in Mutation Rate (Numerical)"
         keys_path = ['SeedsConfiguration', 'SLiM_burnin_epi', 'burn_in_mutrate']
-        component = EasyEntry(keys_path, self.config_path, self.render_burn_in_mutrate_epi_text, 'burn_in_mutrate', self.control_frame, column, frow, 'integer', hide, 1)
+        component = EasyEntry(keys_path, self.config_path, self.render_burn_in_mutrate_epi_text, 'burn_in_mutrate', self.control_frame, column, frow, 'numerical', hide, 1)
         self.visible_components.add(component)
         return component
 

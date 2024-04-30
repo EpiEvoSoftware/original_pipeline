@@ -549,12 +549,14 @@ class NetworkModelGraph:
         self.create_graph_frame()
     def update_graph(self, graph):
         self.network_graph_app = graph
+        self.network_graph_app.plot_degree_distribution()
         
 
     def create_graph_frame(self):
         self.graph_frame = ttk.Frame(self.parent)
         self.graph_frame.pack(fill='both', expand=True)
         self.plot_degree_distribution([])
+        
         
     def plot_degree_distribution(self, degrees):
         for widget in self.graph_frame.winfo_children():
