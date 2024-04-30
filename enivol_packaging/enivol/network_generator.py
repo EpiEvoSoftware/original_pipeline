@@ -54,7 +54,7 @@ def rp_generate(pop_size, rp_size, p_within, p_between):
                               f"probabilities ({prob_size})")
     if p_between == 0: 
         print("WARNING: You didn't specify a between partition connection probability (-p_between) "
-              "or have set it to 0. This will lead to two completely isolated partitions.")
+              "or have set it to 0. This will lead to two completely isolated partitions.", flush = True)
     
     # Construct contact probability matrix
     p = [[p_between for _ in range(block_size)] for _ in range(block_size)]
@@ -146,10 +146,10 @@ def run_network_generation(pop_size, wk_dir, method, model = "", path_network = 
         ntwk_path = write_network(ntwk, wk_dir)
         print("******************************************************************** \n" +
               "                   CONTACT NETWORK GENERATED                         \n" +
-              "********************************************************************")
-        print("Contact network:", ntwk_path)  
+              "********************************************************************", flush = True)
+        print("Contact network:", ntwk_path, flush = True)  
     except Exception as e:
-        print(f"Contact network generation - An error occured: {e}.")
+        print(f"Contact network generation - An error occured: {e}.", flush = True)
         error_message = e
 
 

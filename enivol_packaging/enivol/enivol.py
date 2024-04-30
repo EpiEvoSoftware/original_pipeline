@@ -31,7 +31,7 @@ def main():
 	## Read the parameters and store them into a dictionary
 	param_dict = read_params(config_path, "base_params.json")
 
-	print(header)
+	print(header, flush = True)
 
 	def _exit(error_m):
 		if error_m != None:
