@@ -261,10 +261,14 @@ class NetworkGraphApp:
         self.highlight_matched_hosts(ntwk, match_dict)
     
     def plot_degree_distribution(self):
-        if os.path.exists(self.network_file_path):
+        if os.path.exists(self.network_file_path) and self.wk_dir!="":
+            print(self.network_file_path)
             try:
                 G = nx.read_adjlist(self.network_file_path)
                 degrees = [G.degree(n) for n in G.nodes()]
+                # if degrees == []:
+                #     messagebox.showerror("Error", f"Network file path is empty")
+                #     return
                 self.ax.clear()
             
                 degrees = [G.degree(n) for n in G.nodes()]
