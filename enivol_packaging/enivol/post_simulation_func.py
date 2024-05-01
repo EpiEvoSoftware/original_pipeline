@@ -119,7 +119,7 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
 	if len(which_m2) == 0:
 		# for _ in range(num_trait):
 		trait_val_now = { i: 0 for i in range(node_size)}
-		print("WARNING: There's no mutations related to any trait in samples from this replication.")
+		print("WARNING: There's no mutations related to any trait in samples from this replication.", flush = True)
 		return [trait_val_now for _ in range(num_trait)], trvs_order
 	
 	for trait_idx in range(num_trait):

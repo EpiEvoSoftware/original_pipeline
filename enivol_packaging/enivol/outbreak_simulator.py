@@ -54,13 +54,13 @@ def create_slim_config(all_config):
 	"""
 	slim_pars = {}
 	post_processing_config = {}
-	print("********************************************************************")
-	print("                    CHECKING THE CONFIGURATION")
-	print("********************************************************************")
+	print("******************************************************************** \n" + 
+	"                    CHECKING THE CONFIGURATION                      \n" +
+	"********************************************************************", flush = True)
 	cwdir = all_config["BasicRunConfiguration"]["cwdir"]
 	slim_pars["cwdir"] = cwdir
 
-	print("Checking \"BasicRunConfiguration\"...... ")
+	print("Checking \"BasicRunConfiguration\"...... ", flush = True)
 	if not os.path.exists(cwdir):
 		raise CustomizedError(f"The working directory specified {cwdir} doesn't exist")
 	
@@ -70,9 +70,9 @@ def create_slim_config(all_config):
 	slim_pars["n_replicates"] = all_config["BasicRunConfiguration"]["n_replicates"]
 	_check_integer(slim_pars["n_replicates"], "Number of replicates")
 	out_config.write(f"n_replicates:{slim_pars['n_replicates']}\n")
-	print("\"BasicRunConfiguration\" checked.")
+	print("\"BasicRunConfiguration\" checked.", flush = True)
 
-	print("Checking \"EvolutionModel\"...... ")
+	print("Checking \"EvolutionModel\"...... ", flush = True)
 	slim_pars["n_generation"] = all_config["EvolutionModel"]["n_generation"]
 	_check_integer(slim_pars["n_generation"], "Number of ticks")
 	out_config.write(f"n_generation:{slim_pars['n_generation']}\n")
@@ -104,7 +104,7 @@ def create_slim_config(all_config):
 		if slim_pars["cap_withinhost"] < 1:
 			raise CustomizedError("Capacity within host has to be at least 1")
 		elif slim_pars["cap_withinhost"] == 1:
-			print("WARNING: Within-host reproduction is turned on, but the capacity within-host is 1, which will be no different from within-host evolution being turned off.")
+			print("WARNING: Within-host reproduction is turned on, but the capacity within-host is 1, which will be no different from within-host evolution being turned off.", flush = True)
 
 		slim_pars["within_host_reproduction_rate"] = all_config["EvolutionModel"]["within_host_reproduction_rate"]
 		_check_float(slim_pars["within_host_reproduction_rate"], "Within-host reproduction probability")
@@ -112,9 +112,9 @@ def create_slim_config(all_config):
 			raise CustomizedError("Within-host reproduction probability should be between 0 and 1")
 		out_config.write(f"within_host_reproduction_rate:{slim_pars['within_host_reproduction_rate']}\n")
 	out_config.write(f"cap_withinhost:{slim_pars["cap_withinhost"]}\n")
-	print("\"EvolutionModel\" Checked. ")
+	print("\"EvolutionModel\" Checked. ", flush = True)
 	
-	print("Checking \"SeedsConfiguration\"...... ")
+	print("Checking \"SeedsConfiguration\"...... ", flush = True)
 	slim_pars["seed_size"] = all_config["SeedsConfiguration"]["seed_size"]
 	_check_integer(slim_pars["seed_size"], "Number of seeds")
 	out_config.write(f"seed_size:{slim_pars["seed_size"]}\n")
@@ -132,9 +132,9 @@ def create_slim_config(all_config):
 	else:
 		slim_pars["seed_host_matching_path"] = os.path.join(slim_pars["cwdir"], "seed_host_match.csv")
 		out_config.write(f"seed_host_matching_path:{slim_pars["seed_host_matching_path"]}\n")
-	print("\"SeedsConfiguration\" Checked. ")
+	print("\"SeedsConfiguration\" Checked. ", flush = True)
 
-	print("Checking \"GenomeElement\"...... ")
+	print("Checking \"GenomeElement\"...... ", flush = True)
 	slim_pars["ref_path"] = all_config["GenomeElement"]["ref_path"]
 	if not os.path.exists(slim_pars["ref_path"]):
 		raise CustomizedError(f"The provided reference genome path {slim_pars["ref_path"]} doesn't exist")
@@ -156,9 +156,9 @@ def create_slim_config(all_config):
 													or any(not isinstance(i, int) for i in all_config["GenomeElement"]["traits_num"].values()):
 		raise CustomizedError("Number of traits (\"traits_num\") has to be a dictionary ({}) of length 2, containing integers, showing "
 						"number of effect size sets (traits) for transmissibility and drug-resistance")
-	print("\"GenomeElement\" Checked.")
+	print("\"GenomeElement\" Checked.", flush = True)
 
-	print("Checking \"NetworkModelParameters\"...... ")
+	print("Checking \"NetworkModelParameters\"...... ", flush = True)
 	slim_pars["use_network_model"] = all_config["NetworkModelParameters"]["use_network_model"]
 	_check_boolean(slim_pars["use_network_model"], "Whether to use network model as contact network")
 	if not slim_pars["use_network_model"]:
@@ -173,9 +173,9 @@ def create_slim_config(all_config):
 	_check_integer(slim_pars["host_size"], "Number of hosts")
 	out_config.write(f"host_size:{slim_pars["host_size"]}\n")
 
-	print("\"NetworkModelParameters\" Checked. ")
+	print("\"NetworkModelParameters\" Checked. ", flush = True)
 
-	print("Checking \"EpidemiologyModel\"...... ")
+	print("Checking \"EpidemiologyModel\"...... ", flush = True)
 	slim_pars["epi_model"] = all_config["EpidemiologyModel"]["model"]
 	if slim_pars["epi_model"] not in ["SIR", "SEIR"]:
 		raise CustomizedError("Compartmental model (\"model\") has to be SIR or SEIR")
@@ -270,7 +270,7 @@ def create_slim_config(all_config):
 	_check_boolean(slim_pars["super_infection"], "Whether to enable super infection")
 	out_config.write(f"super_infection: {_writebinary(slim_pars["n_massive_sample"])}\n")
 	if slim_pars["super_infection"] and slim_pars["cap_withinhost"]==1:
-		print("WARNING: Though super-infection is activated, you specified the capacity within-host being only 1, thus super-infection actually cannot happen.")
+		print("WARNING: Though super-infection is activated, you specified the capacity within-host being only 1, thus super-infection actually cannot happen.", flush = True)
 	# slim_pars["slim_replicate_seed_file_path"] = all_config["EpidemiologyModel"]["slim_replicate_seed_file_path"]
 	slim_seeds_path = all_config["EpidemiologyModel"].get("slim_replicate_seed_file_path", None)
 	if slim_seeds_path == "" or slim_seeds_path == None:
@@ -278,27 +278,27 @@ def create_slim_config(all_config):
 	else:
 		slim_pars["slim_replicate_seed_file_path"] = slim_seeds_path
 
-	print("\"EpidemiologyModel\" Checked. ")
+	print("\"EpidemiologyModel\" Checked. ", flush = True)
 		
-	print("Checking \"Postprocessing_options\"...... ")
+	print("Checking \"Postprocessing_options\"...... ", flush = True)
 	_check_boolean(all_config["Postprocessing_options"]["do_postprocess"], "Whether to postprocess results")
 	if all_config["Postprocessing_options"]["do_postprocess"]:
 		post_processing_config = all_config["Postprocessing_options"]
 		post_processing_config["n_trait"] = all_config["GenomeElement"]["traits_num"]
-		print("Post-simulation data processing starts.")
+		print("Post-simulation data processing starts.", flush = True)
 
 		branch_color_trait = post_processing_config["tree_plotting"]["branch_color_trait"]
 		if not isinstance(branch_color_trait, int) or branch_color_trait < 0 or branch_color_trait > sum(post_processing_config["n_trait"].values()):
 			raise CustomizedError(f"How to color the branches of the tree (branch_color_trait) should "
 						f"be an integer chosen from (0: color by seed, 1..{sum(post_processing_config["n_trait"].values())}: trait id")
 		if post_processing_config["tree_plotting"]["branch_color_trait"]==0:
-			print("The tree will be colored by seed.")
+			print("The tree will be colored by seed.", flush = True)
 		else:
-			print(f"The tree will be colored by its trait {post_processing_config["tree_plotting"]["branch_color_trait"]}")
+			print(f"The tree will be colored by its trait {post_processing_config["tree_plotting"]["branch_color_trait"]}", flush = True)
 	else:
-		print("Post-simulation data processing is not enabled.")
+		print("Post-simulation data processing is not enabled.", flush = True)
 		post_processing_config = {}
-	print("\"Postprocessing_options\" Checked. ")
+	print("\"Postprocessing_options\" Checked. ", flush = True)
 
 	return slim_pars, post_processing_config
 
@@ -310,9 +310,9 @@ def create_slim_script(slim_pars):
 	Parameters:
 		slim_pars (dict): SLiM parameters.
 	"""
-	print("********************************************************************")
-	print("                       CREATING SLIM SCRIPT")
-	print("********************************************************************")
+	print("******************************************************************** \n" + 
+	"                       CREATING SLIM SCRIPT						   \n" + 
+	"********************************************************************", flush = True)
 
 	code_path = os.path.join(os.path.dirname(__file__), "slim_scripts")
 	mainslim_path = os.path.join(slim_pars["cwdir"], "simulation.slim")
@@ -409,7 +409,7 @@ def create_slim_script(slim_pars):
 
 	# Finish simulation
 	append_files(os.path.join(code_path, "finish_simulation.slim"), mainslim_path)
-	print("SLiM script:", mainslim_path)
+	print("SLiM script:", mainslim_path, flush = True)
 
 
 def run_per_slim_simulation(slim_config_path, wk_dir, runid, slim_replicate_seed = None):
@@ -456,9 +456,9 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 	if slim_config_path == "":
 		slim_config_path = os.path.join(slim_pars["cwdir"], "slim.params")
 
-	print("********************************************************************")
-	print("                     RUNNING THE SIMULATION")
-	print("********************************************************************")
+	print("******************************************************************** \n" + 
+		  "                     RUNNING THE SIMULATION						    \n" + 
+		  "********************************************************************", flush = True)
 
 	# List to store successful run ids
 	run_success = []
@@ -468,14 +468,14 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 		num_seed = slim_replicate_seeds.shape[0]
 	# Iterate over replicates
 	for runid in range(1,slim_pars["n_replicates"] + 1):
-		print(f"Running simulation for replication {runid}......")
+		print(f"Running simulation for replication {runid}......", flush = True)
 		# Run SLiM simulation
 		if slim_pars["slim_replicate_seed_file_path"] != None and runid <= num_seed:
 			slim_replicate_seed = slim_replicate_seeds.loc[runid - 1, "random_number_seed"]
 		else:
 			slim_replicate_seed = None
 		run_per_slim_simulation(slim_config_path, slim_pars["cwdir"], runid, slim_replicate_seed)
-		print(f"Replication {runid} simulation finished.")
+		print(f"Replication {runid} simulation finished.", flush = True)
 
 		# Extract the seed number for the current
 		# Check if sampled genomes exits
@@ -483,7 +483,7 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 		if os.path.exists(sampled_genomes_path):
 			if len(dataprocess_pars) > 0:
 				each_wkdir = os.path.join(slim_pars["cwdir"], str(runid))
-				print(f"Processing replication {runid} treesequence file...")
+				print(f"Processing replication {runid} treesequence file...", flush = True)
 				# Run data processing for each replicate
 				run_per_data_processing(
 					slim_pars["cwdir"], slim_pars["use_genetic_model"], runid, dataprocess_pars["n_trait"], 
@@ -493,27 +493,27 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 				else:
 					seed_phylo = os.path.join(slim_pars["cwdir"], "seeds.nwk")
 				# Plot transmission tree, strain distribution trajectory, and SEIR trajectory
-				print(f"Plotting transmission tree for replication {runid}...")
+				print(f"Plotting transmission tree for replication {runid}...", flush = True)
 				plot_per_transmission_tree(each_wkdir, slim_pars["seed_size"], slim_config_path, dataprocess_pars["n_trait"], seed_phylo)
-				print(f"Plotting strain distribution trajectory for replication {runid}...")
+				print(f"Plotting strain distribution trajectory for replication {runid}...", flush = True)
 				plot_strain_distribution_trajectory(each_wkdir, slim_pars["seed_size"], slim_pars["n_generation"])
-				print(f"Plotting SEIR trajectory for replication {runid}...")
+				print(f"Plotting SEIR trajectory for replication {runid}...", flush = True)
 				if os.path.exists(os.path.join(each_wkdir, "SEIR_trajectory.csv.gz")):
 					plot_SEIR_trajectory(each_wkdir, slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"])
 					run_success.append(runid)
 		else:
 			print(f"There's no sampled genome in replicate {runid}. Either the simulation failed or the sampling rate is too low. \
-		Please check your config file and confirm those are your desired simulation parameters.")
-		print("\n")
+		Please check your config file and confirm those are your desired simulation parameters.", flush = True)
+		print("\n", flush = True)
 	# Plot aggregated SEIR and strain distribution trajectories
-	print(f"Plotting the aggregated SEIR trajectory...")
+	print(f"Plotting the aggregated SEIR trajectory...", flush = True)
 	plot_all_SEIR_trajectory(slim_pars["cwdir"], slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"], run_success)
-	print(f"Plotting the aggregated strain distribution trajectory...")
+	print(f"Plotting the aggregated strain distribution trajectory...", flush = True)
 	plot_all_strain_trajectory(slim_pars["cwdir"], slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"], run_success)
 
-	print("********************************************************************")
-	print("                FINISHED. THANK YOU FOR USING.")
-	print("********************************************************************")
+	print("******************************************************************** \n" + 
+		  "                FINISHED. THANK YOU FOR USING.					    \n" + 
+		  "********************************************************************", flush = True)
 	# except Exception as e:
 		# print(f"Outbreak Simulaion - An occured: {e}.")
 		# error_message = e
@@ -556,7 +556,8 @@ def main():
 
 	config_path = args.config
 
-	all_slim_simulation_by_config(read_params(config_path, "base_params.json"))
+	# quick fix
+	all_slim_simulation_by_config(read_params(config_path, "default_config.json"))
 
 
 if __name__ == "__main__":

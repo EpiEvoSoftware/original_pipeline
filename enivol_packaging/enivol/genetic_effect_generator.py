@@ -53,7 +53,7 @@ def seeds_trait_calc(wk_dir, dict_c_g, num_seed = 0):
 	if not os.path.exists(seeds_vcf_dir):
 		print("WARNING: seed_generator.py hasn't been run. "
 					"If you want to use seed sequence different than reference genome, "
-					"you must run seed_generator first")
+					"you must run seed_generator first", flush = True)
 		if num_seed == 0:
 			raise CustomizedError("Please provide the number of seed when seeding with one reference genome.")
 		return [0]*num_seed
@@ -384,9 +384,9 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n={
 							"(user_input/randomly_generate)")
 		print("******************************************************************** \n" +
 				"                  GENETIC ARCHITECTURES GENERATED		            \n" +
-				"******************************************************************** \n")
+				"******************************************************************** \n", flush = True)
 	except Exception as e:
-		print(f"Genetic effects generation - An error occured: {e}.")
+		print(f"Genetic effects generation - An error occured: {e}.", flush = True)
 		error_message = e
 
 	return error_message

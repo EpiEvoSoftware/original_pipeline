@@ -1,0 +1,1 @@
+change seeds conf tab last two labels to match figma

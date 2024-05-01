@@ -203,7 +203,7 @@ def check_seedsvcf_input(vcf_path, seeds_size):
 			else:
 				line_stp = line.rstrip("\n").split("\t")
 				if len(line_stp) != NUM_VCF_FORMAT_COLUMNS + seeds_size:
-					raise CustomizedError("The vcf provided doesn't "
+					raise CustomizedError(f"The vcf provided ({len(line_stp)-NUM_VCF_FORMAT_COLUMNS}) doesn't "
 						   f"have the correct number of individuals ({seeds_size}) in it.")
 	
 	return True
@@ -352,16 +352,16 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
 		print("WARNING: You activated an SEIR model, in which exposed compartment exists, "
 			"but you doesn't specify any transition from exposed compartment, which will lead "
 			"to exposed hosts being locked (never recovered and cannot infect others). Please "
-			"make sure this is what you want.")
+			"make sure this is what you want.", flush = True)
 	elif I_R_rate == 0:
 		print("WARNING: You activated a S(E)I model by setting I>R rate = 0, where recovered "
 		"component doesn't exists, meaning that all infected hosts never recovered. Please make sure "
-		"this is what you want.")
+		"this is what you want.", flush = True)
 	elif R_S_rate == 0:
 		print("WARNING: You activated a S(E)IR model with Recovered individuals are fully immune, "
 		"they don't go back to recovered state. This can probably lead to the outbreak ending before "
 		"the specified burn-in generation and makes the seeds' sampling fail. Please make sure this "
-		"is what you want.")	
+		"is what you want.", flush = True)	
 	# Remove the trajectory file if it already exists
 	trajectory = os.path.join(wk_dir, TRAJ)
 	if os.path.exists(trajectory): os.remove(trajectory)
@@ -478,7 +478,7 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 							"(user_input/SLiM_burnin_WF/SLiM_burnin_epi)")
 		print("******************************************************************** \n" +
 				"                   	    SEEDS GENERATED		                        \n" +
-				"******************************************************************** \n")
+				"******************************************************************** \n", flush = True)
 	except Exception as e:
 		print(f"Seed sequences generation - A error occured: {e}.")
 		error_message = e
