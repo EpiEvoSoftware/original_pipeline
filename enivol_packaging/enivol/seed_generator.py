@@ -449,7 +449,7 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 	error_message = None
 	try:	
 		if not os.path.exists(wk_dir):
-			raise CustomizedError(f"The provided working ({wk_dir}) doesn't exist")
+			raise CustomizedError(f"The provided working directory ({wk_dir}) doesn't exist")
 		# User input
 		if method == "user_input":
 			seed_userinput(seed_vcf, seed_size, wk_dir, path_seeds_phylogeny)

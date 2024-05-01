@@ -16,6 +16,8 @@ class NetworkModel:
         self.top_frame.pack(side="right", fill="y", expand=False)
         self.bottom_frame.pack(side="left", fill="both", expand=True)
         
+        self.tab_title = tab_title
+        self.config_path = config_path
         self.graph = NetworkModelGraph(self.bottom_frame, tab_parent, network_graph_app, config_path, tab_index, tab_title)
         self.sidebar = NetworkModelConfigurations(self.top_frame, tab_parent, config_path, self.graph, tab_index, tab_title)
         self.tab_parent = tab_parent
@@ -24,6 +26,8 @@ class NetworkModel:
         if hide:
             self.tab_parent.tab(tab_index, state="disabled")
         self.tab_index = tab_index
+    def update_graph(self, graph):
+        self.graph.update_graph(graph)
 
         
 class NetworkModelConfigurations:
@@ -543,11 +547,16 @@ class NetworkModelGraph:
         self.network_graph_app = network_graph_app
         self.tab_index = tab_index
         self.create_graph_frame()
+    def update_graph(self, graph):
+        self.network_graph_app = graph
+        self.network_graph_app.plot_degree_distribution()
+        
 
     def create_graph_frame(self):
         self.graph_frame = ttk.Frame(self.parent)
         self.graph_frame.pack(fill='both', expand=True)
         self.plot_degree_distribution([])
+        
         
     def plot_degree_distribution(self, degrees):
         for widget in self.graph_frame.winfo_children():
@@ -570,5 +579,5 @@ class NetworkModelGraph:
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.pack(fill=tk.BOTH, expand=True)
         
-
-        self.network_graph_app.plot_degree_distribution()
+        if self.network_graph_app is not None:
+            self.network_graph_app.plot_degree_distribution()

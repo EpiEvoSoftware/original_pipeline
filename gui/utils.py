@@ -449,12 +449,14 @@ def update_numerical_input(
     entry, keys_path, config_path, error_messages, render_text_short, is_int
 ):
     try:
-        # print("entry.get()",  entry.get())
-        new_val = int(float(entry.get()))
-        config = load_config_as_dict(config_path)
-        update_nested_dict(config, keys_path, new_val)
-        save_config(config_path, config)
-    except ValueError:  # This catches cases where conversion to integer fails
+        if is_int:
+            new_val = int(float(entry.get()))  
+        else:
+            new_val = float(entry.get())
+        config = load_config_as_dict(config_path) 
+        update_nested_dict(config, keys_path, new_val) 
+        save_config(config_path, config)  
+    except ValueError: # This catches cases where conversion to integer fails
         if is_int:
             valtype = "integer"
         else:
@@ -538,14 +540,12 @@ def render_rb(
         no_validate_update(var, config_path, keys_path)
         if var.get():
             rerenderer()
-            # print("use_genetic_model_local: ", dict_var)
             # self.use_method_grid_configs = derender_components(self.use_method_components)
             # self.user_input_grid_configs = derender_components(self.user_input_components)
             # self.wf_grid_configs = derender_components(self.wf_components)
             # self.epi_grid_configs = derender_components(self.epi_components)
         else:
             derenderer()
-            # print("use_genetic_model_local: ", dict_var)
             # rerender_components(self.use_method_components, self.use_method_grid_configs)
             # rerender_components(self.user_input_components, self.user_input_grid_configs)
             # keys_path = ['SeedsConfiguration', 'method']
@@ -933,7 +933,6 @@ class EasyCombobox(EasyWidgetBase):
             var_val = dict_var
         else:
             var_val = val_to_ui_mapping.get(dict_var, "")
-            # print("var_val", var_val)
 
         self.var = tk.StringVar(value=var_val)
         self.combobox = tk.ttk.Combobox(
@@ -1087,6 +1086,7 @@ class TabBase:
     def global_update(self):
         users_validation_messages = []
 
+        print(self.visible_components)
         for component in self.visible_components:
             component.update(users_validation_messages)
 

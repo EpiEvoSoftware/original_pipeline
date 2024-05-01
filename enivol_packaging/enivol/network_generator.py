@@ -148,10 +148,10 @@ def run_network_generation(pop_size, wk_dir, method, model = "", path_network = 
               "                   CONTACT NETWORK GENERATED                         \n" +
               "********************************************************************", flush = True)
         print("Contact network:", ntwk_path, flush = True)  
+              "********************************************************************")
     except Exception as e:
         print(f"Contact network generation - An error occured: {e}.", flush = True)
         error_message = e
-
 
     return ntwk, error_message
 

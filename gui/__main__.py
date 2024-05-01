@@ -96,7 +96,10 @@ def launch_gui(default_config_path, user_config_path, hide=False):
         style.theme_use('aqua')
     root.title("EnivolCrossing: Simulation Framework for Genetic Epidemiology")
     
-    config_path = initialize_configuration(default_config_path, user_config_path)
+    if user_config_path == "enivol_packaging/enivol/config_template/user_config.json":
+        config_path = initialize_configuration(default_config_path, user_config_path)
+    else:
+        config_path = user_config_path
 
     tab_parent = ttk.Notebook(root)
      
@@ -126,10 +129,12 @@ def launch_gui(default_config_path, user_config_path, hide=False):
 
     network_app = Configurationv3(tab1, tab_parent, config_path, "Basic Configuration", 0, hide)
     network_app = EvolutionaryModel(tab2, tab_parent, config_path, "Evolutionary Model", 1, hide)
-    network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path, "Network Graph", 2, hide )
+    network_graph_app = None
     network_model_app = NetworkModel(tab3, tab_parent, network_graph_app, config_path, "Network Model Parameters", 3, hide )
     network_app = SeedsConfiguration(tab4, tab_parent, config_path, "Seeds Configuration", 4, hide )
     network_app = GenomeElement(tab5, tab_parent, config_path, "Genome Element", 5, hide )
+    network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path, "Network Graph", 2, hide )
+    network_model_app.update_graph(network_graph_app)
     network_app = EpidemiologyModel(tab7, tab_parent, config_path, "Epidemiology Model", 6, hide )
     network_app = PostProcessing(tab8, tab_parent, config_path, "Post Processing Options", 7, hide)
 

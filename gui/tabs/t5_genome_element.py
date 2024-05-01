@@ -283,7 +283,7 @@ class GenomeElement(TabBase):
             wk_dir = config["BasicRunConfiguration"]["cwdir"]
             n_gen = config["EvolutionModel"]["n_generation"]
             mut_rate = config["EvolutionModel"]["mut_rate"]
-            trait_n = list(config['GenomeElement']['traits_num'].values())
+            trait_n = config['GenomeElement']['traits_num']
 
             if method == "user_input":
                 effsize_path = config['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
@@ -297,7 +297,6 @@ class GenomeElement(TabBase):
             else:
                 raise ValueError("Invalid method specified")
             
-            run_effsize_generation(method, wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, n_gen=n_gen, mut_rate=mut_rate)
             err = run_effsize_generation(method, wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, n_gen=n_gen, mut_rate=mut_rate)
             if err:
                 messagebox.showerror("Generation Error", "Generation Error: " + str(err))

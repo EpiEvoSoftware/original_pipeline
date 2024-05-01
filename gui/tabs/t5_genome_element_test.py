@@ -37,7 +37,6 @@ class GenomeElement:
                 
                 self.use_genetic_model_component.set_to_rerender(set_to_rerender.rerender_itself)
                 self.use_genetic_model_component.set_to_derender(set_to_derender.derender_itself)
-                # print(1)
             else:
                 set_to_rerender = GroupControls()
                 set_to_rerender.add(self.random_generate_group_control)
@@ -48,8 +47,6 @@ class GenomeElement:
 
                 self.use_genetic_model_component.set_to_rerender(set_to_rerender.rerender_itself)
                 self.use_genetic_model_component.set_to_derender(set_to_derender.derender_itself)
-                # print(2)
-            # print(self.use_genetic_model, ui_selected)
         else:
             if ui_selected:
                 set_to_rerender = GroupControls()
@@ -62,8 +59,6 @@ class GenomeElement:
                 self.use_genetic_model_component.set_to_rerender(set_to_rerender.rerender_itself)
                 self.use_genetic_model_component.set_to_derender(set_to_rerender.derender_itself)
                 set_to_rerender.derender_itself()
-
-                # print(3)
             else:
                 set_to_rerender = GroupControls()
                 set_to_rerender.add(self.random_generate_group_control)
@@ -74,9 +69,7 @@ class GenomeElement:
 
                 self.use_genetic_model_component.set_to_rerender(set_to_rerender.rerender_itself)
                 self.use_genetic_model_component.set_to_derender(set_to_derender.derender_itself)
-                # print(4)
-            # print(self.use_genetic_model, ui_selected)
-        
+
 
     def init_landing_group(self, hide = False):
         self.render_simulation_settings_title(False, 0, self.frow_val, 1)
