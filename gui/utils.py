@@ -450,13 +450,13 @@ def update_numerical_input(
 ):
     try:
         if is_int:
-            new_val = int(float(entry.get()))  
+            new_val = int(float(entry.get()))
         else:
             new_val = float(entry.get())
-        config = load_config_as_dict(config_path) 
-        update_nested_dict(config, keys_path, new_val) 
-        save_config(config_path, config)  
-    except ValueError: # This catches cases where conversion to integer fails
+        config = load_config_as_dict(config_path)
+        update_nested_dict(config, keys_path, new_val)
+        save_config(config_path, config)
+    except ValueError:  # This catches cases where conversion to integer fails
         if is_int:
             valtype = "integer"
         else:
@@ -1086,7 +1086,6 @@ class TabBase:
     def global_update(self):
         users_validation_messages = []
 
-        print(self.visible_components)
         for component in self.visible_components:
             component.update(users_validation_messages)
 
