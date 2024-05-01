@@ -151,7 +151,6 @@ def run_network_generation(pop_size, wk_dir, method, model = "", path_network = 
         print(f"Contact network generation - An error occured: {e}.")
         error_message = e
 
-    print(ntwk)
     return ntwk, error_message
 
 def network_generation_byconfig(all_config):

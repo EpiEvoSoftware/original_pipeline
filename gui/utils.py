@@ -415,7 +415,6 @@ def render_path_select(keys_path, config_path, render_text, control_frame, colum
     
 def update_numerical_input(entry, keys_path, config_path, error_messages, render_text_short, is_int):
     try:
-        # print("entry.get()",  entry.get())
         if is_int:
             new_val = int(float(entry.get()))  
         else:
@@ -487,14 +486,12 @@ def render_rb(keys_path, config_path, render_text, control_frame, column, frow, 
         no_validate_update(var, config_path, keys_path)
         if var.get():
             rerenderer()
-            # print("use_genetic_model_local: ", dict_var)
             # self.use_method_grid_configs = derender_components(self.use_method_components)
             # self.user_input_grid_configs = derender_components(self.user_input_components)
             # self.wf_grid_configs = derender_components(self.wf_components)
             # self.epi_grid_configs = derender_components(self.epi_components)
         else:
             derenderer()
-            # print("use_genetic_model_local: ", dict_var)
             # rerender_components(self.use_method_components, self.use_method_grid_configs)
             # rerender_components(self.user_input_components, self.user_input_grid_configs)  
             # keys_path = ['SeedsConfiguration', 'method']
@@ -752,7 +749,6 @@ class EasyCombobox(EasyWidgetBase):
             var_val = dict_var
         else:
             var_val = val_to_ui_mapping.get(dict_var, "")
-            # print("var_val", var_val)
 
         self.var = tk.StringVar(value=var_val)
         self.combobox = tk.ttk.Combobox(self.control_frame, textvariable=self.var, values=combobox_values, state="readonly", width=width)

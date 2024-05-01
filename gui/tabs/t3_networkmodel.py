@@ -564,7 +564,6 @@ class NetworkModelGraph:
 
         fig, ax = plt.subplots(figsize=(6, 4), constrained_layout=True)
         if degrees:
-            print(degrees)
             ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
         else:
             ax.hist([], bins=[])
