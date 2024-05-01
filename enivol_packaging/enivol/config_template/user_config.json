@@ -16,7 +16,7 @@
     "SeedsConfiguration": {
         "seed_size": 1,
         "use_reference": false,
-        "method": "SLiM_burnin_epi",
+        "method": "user_input",
         "user_input": {
             "path_seeds_vcf": "",
             "path_seeds_phylogeny": ""
@@ -125,7 +125,7 @@
         "super_infection": false
     },
     "Postprocessing_options": {
-        "do_postprocess": true,
+        "do_postprocess": false,
         "tree_plotting": {
             "branch_color_trait": 1,
             "drug_resistance_heatmap": true

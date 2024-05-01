@@ -41,8 +41,8 @@ class PostProcessing(TabBase):
         hide = False
         self.global_group_control = GroupControls()
         self.render_do_postprocess(None, None, hide, 0, 1)
-        self.render_branch_color_trait(hide, 0, 1, 3)
-        self.render_drug_resistance_heatmap(None, None, hide, 0, 5)
+        self.render_branch_color_trait(hide, 0, 1, 4)
+        self.render_drug_resistance_heatmap(None, None, hide, 0, 6)
 
     def render_do_postprocess(
         self, to_rerender, to_derender, hide=True, column=None, frow=None, columnspan=1
