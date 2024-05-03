@@ -123,7 +123,7 @@ class NetworkGraphApp:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
                     values = tuple(row[col] for col in reader.fieldnames)
-                    extended_values = values + ("", "")
+                    extended_values = values + ("Random", "")
                     self.table.insert("", "end", values=extended_values)
 
 
@@ -322,17 +322,18 @@ class NetworkGraphApp:
 
             seed_id = int(row[0])
 
-            match_method = row[4]
+            match_method = (row[4]).lower()
 
             method_parameter = row[5]
+            print(method_parameter)
             
             
 
             match_methods[seed_id] = match_method
 
-            if match_method == "Ranking":
+            if match_method == "ranking":
                 match_params[seed_id] = int(method_parameter)
-            elif match_method == "Percentile":
+            elif match_method == "percentile":
                 method_parameter_2 = row[6]
                 percentages = [int(method_parameter), int(method_parameter_2)]
                 match_params[seed_id] = percentages

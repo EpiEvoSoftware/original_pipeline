@@ -324,7 +324,7 @@ class EpidemiologyModel(TabBase):
  
 
     def render_E_R_rate(self, hide, column, columnspan, frow):
-        text = "Latent Recovery Rate \tau (list numerical)"
+        text = "Latent Recovery Rate τ (list numerical)"
         keys_path = self.E_R_rate_keys_path
         component = EasyEntry(
             keys_path, self.config_path, 
