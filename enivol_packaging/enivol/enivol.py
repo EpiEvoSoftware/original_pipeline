@@ -29,7 +29,7 @@ def main():
 	config_path = args.path_config
 
 	## Read the parameters and store them into a dictionary
-	param_dict = read_params(config_path, "base_params.json")
+	param_dict = read_params(config_path, "user_config.json")
 
 	print(header, flush = True)
 
