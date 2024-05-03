@@ -75,7 +75,7 @@ dependencies:
   - ruamel.yaml.clib=0.2.7
   - setuptools=68.2.2
   - six=1.16.0
-  - slim=4.2
+  - slim=4.0.1
   - svgwrite=1.4.3
   - tk=8.6.13
   - tornado=6.3.3
