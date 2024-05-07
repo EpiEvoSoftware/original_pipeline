@@ -17,6 +17,7 @@ class EpidemiologyModel(TabBase):
         self.tab_parent = tab_parent
         self.tab_index = tab_index
         self.tab_parent.add(parent, text=tab_title)
+        
         if hide:
             self.tab_parent.tab(self.tab_index, state="disabled")
         self.control_frame = ttk.Frame(self.parent, width=300)
@@ -60,10 +61,12 @@ class EpidemiologyModel(TabBase):
         self.frow = 1
         hide = False
         to_renderer, to_derenderer = None, None
+        
+        self.render_slim_path_label(hide, column=1, columnspan=2, frow = self.increment_frow(increment = False))
         self.render_model(hide, column=0, columnspan=1, frow = self.increment_frow(increment = False))
-        self.render_n_epoch(hide, column=1, columnspan= 1, frow = self.increment_frow(increment = False))
+        self.render_n_epoch(hide, column=1, columnspan= 1, frow = self.increment_frow())
         # self.render_epoch_changing_generation(disabled = True)
-        self.render_epoch_changing_generation(hide, column=0, columnspan= 3, frow = self.increment_frow())
+        self.render_epoch_changing_generation(hide, column=0, columnspan= 3, frow = self.increment_frow(increment = False))
         self.render_title("Evolutionary Components Setting", hide, 0, frow = self.increment_frow(), columnspan=3)
         self.render_transmissibility(hide, column=0, columnspan=1, frow = self.increment_frow(by = 1))
         self.render_cap_transmissibility(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
@@ -96,10 +99,9 @@ class EpidemiologyModel(TabBase):
     def init_val(self, config_path):
         self.config_path = config_path
         self.config_dict = load_config_as_dict(self.config_path)
-
+        self.slim_path = self.config_dict['EpidemiologyModel']['slim_replicate_seed_file_path']
         self.model = self.config_dict['EpidemiologyModel']['model']
         self.model_keys_path = ['EpidemiologyModel','model']
-    
         self.n_epoch = self.config_dict['EpidemiologyModel']['epoch_changing']['n_epoch']
         self.n_epoch_keys_path = ['EpidemiologyModel','epoch_changing','n_epoch']
         self.epoch_changing_generation = self.config_dict['EpidemiologyModel']['epoch_changing']['epoch_changing_generation']
@@ -177,7 +179,20 @@ class EpidemiologyModel(TabBase):
 
         self.visible_components.add(component)
         return component
-
+    
+    def render_slim_path_label(self, hide = True, column = None, frow = None, columnspan = 1):
+        self.render_slim_path_text = "Slim Replicate Seed File Path"
+        keys_path = ['EpidemiologyModel', 'slim_replicate_seed_file_path']
+        component = EasyPathSelector(
+            keys_path,
+            self.config_path, 
+            self.render_slim_path_text, 
+            self.scrollable_frame, 
+            column, hide, frow, columnspan
+            )
+        
+        self.visible_components.add(component)
+        return component
     
     def render_epoch_changing_generation(self, hide, column, columnspan, frow):
         text = "On which generation(s) should the simulation go to the next epoch (List integer)"
