@@ -89,7 +89,8 @@ class NetworkGraphApp:
         
         self.plot_degree_distribution()
 
-        self.create_table()
+        seed_csv = os.path.join(self.wk_dir, 'seeds_trait_values.csv')
+        self.populate_table_from_csv(seed_csv)
 
     def create_table(self):
         self.table_frame = ttk.Frame(self.parent)
@@ -116,15 +117,72 @@ class NetworkGraphApp:
         self.degree_button = ttk.Button(
             self.table_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')
         self.degree_button.pack()
-    
     def populate_table_from_csv(self, csv_path):
-        if os.path.exists(csv_path):
-            with open(csv_path, newline='') as csvfile:
-                reader = csv.DictReader(csvfile)
-                for row in reader:
-                    values = tuple(row[col] for col in reader.fieldnames)
-                    extended_values = values + ("Random", "")
-                    self.table.insert("", "end", values=extended_values)
+        if not os.path.exists(csv_path):
+            return 
+        
+        if not hasattr(self, 'table'):
+            self.setup_table_ui()
+
+        with open(csv_path, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            columns = reader.fieldnames + ["match_method", "method_parameter", "method_parameter_2", "host_id"]
+            
+            if not self.table["columns"]: 
+                self.table["columns"] = columns
+                for col in columns:
+                    self.table.heading(col, text=col.replace('_', ' ').title())
+                    self.table.column(col, width=150, anchor='center')
+            
+            for row in reader:
+                values = tuple(row[col] for col in reader.fieldnames)
+                extended_values = values + ("Random", "", "", "") 
+                self.table.insert("", "end", values=extended_values)
+
+    def setup_table_ui(self):
+        self.table_frame = ttk.Frame(self.parent)
+        self.table_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=10, expand=False)
+        self.table = ttk.Treeview(self.table_frame, show='headings')
+        self.table.pack(side=tk.LEFT, fill=tk.X)
+        self.degree_button = ttk.Button(self.table_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')
+        self.degree_button.pack(side=tk.RIGHT, padx=10)
+        self.table.bind("<Double-1>", self.on_double_click)
+
+    
+    # def populate_table_from_csv(self, csv_path):
+    #     if os.path.exists(csv_path):
+    #         with open(csv_path, newline='') as csvfile:
+    #             reader = csv.DictReader(csvfile)
+    #             dict_from_csv = dict(list(reader)[0])
+    #             columns = list(dict_from_csv.keys())
+    #             columns.extend(["match_method", "method_parameter", "method_parameter_2", "host_id"])
+    #             for row in reader:
+    #                 print(row)
+    #                 values = tuple(row[col] for col in reader.fieldnames)
+    #                 extended_values = values + ("Random", "")
+    #                 self.table.insert("", "end", values=extended_values)
+                    
+    #             self.table_frame = ttk.Frame(self.parent)
+    #             self.table_frame.pack(side=tk.BOTTOM, fill=tk.X,
+    #                                 padx=10, pady=10, expand=False)
+    #             self.table = ttk.Treeview(
+    #                 self.table_frame, columns=columns, show='headings')
+                
+    #             for col in columns:
+    #                 self.table.heading(col, text=col.replace('_', ' ').title())
+    #                 self.table.column(col, width=150, anchor=tk.CENTER)  
+    #             self.table.pack(side=tk.LEFT, fill=tk.X)
+
+    #             # seed_csv = os.path.join(self.wk_dir, 'seeds_trait_values.csv')
+    #             # self.populate_table_from_csv(seed_csv) 
+
+    #             self.table.bind("<Double-1>", self.on_double_click)
+
+    #             self.degree_button = ttk.Button(
+    #                 self.table_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')
+    #             self.degree_button.pack()
+
+
 
 
 
@@ -168,16 +226,16 @@ class NetworkGraphApp:
         item = self.table.identify('item', event.x, event.y)
         column = self.table.identify_column(event.x)
         match_method = self.table.item(item, 'values')[4]
-        if column in ("#6", "#7") and match_method == "Percentile":  # Columns for "method_parameter" and "method_parameter_2"
-            self.edit_percentage_parameter(item, column)
-        elif column == "#6" and match_method != "" and match_method != "Random":  # column number for "method_parameter"
-            self.edit_method_parameter(item, column)
+        if column == "#6" and match_method != "Random":  # Columns for "method_parameter" and "method_parameter_2"
+            self.type_in_parameter(item, column)
+        elif column == "#7" and match_method == "Percentile":  # column number for "method_parameter 2"
+            self.type_in_parameter(item, column)
         elif column == "#5":  # Column for "match_method"
             self.choose_match_method(item, column)
     
-    def edit_percentage_parameter(self, item, column):
+    def type_in_parameter(self, item, column):
         entry = tk.Entry(self.table)
-        entry.insert(0, self.table.item(item, 'values')[int(column[1]) - 1])  # Pre-fill with current value
+        entry.insert(0, self.table.item(item, 'values')[int(column[1]) - 1]) 
 
         x, y, width, height = self.table.bbox(item, column)
         entry.place(x=x, y=y, width=width, height=height)
@@ -325,7 +383,6 @@ class NetworkGraphApp:
             match_method = (row[4]).lower()
 
             method_parameter = row[5]
-            print(method_parameter)
             
             
 
