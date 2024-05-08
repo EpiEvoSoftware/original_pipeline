@@ -1033,6 +1033,9 @@ class SeedsConfiguration(TabBase):
 
     def render_run_button(self, hide):
         def seed_generation():
+            if self.global_update() == 1:
+                return
+            
             config = load_config_as_dict(self.config_path)
             cwdir = config["BasicRunConfiguration"]["cwdir"]
             seed_size = config["SeedsConfiguration"]["seed_size"]
@@ -1130,7 +1133,7 @@ class SeedsConfiguration(TabBase):
                 messagebox.showerror("Seed Generation Error", str(e))
 
         column, frow = 1, 100
-        self.global_update()
+        # self.global_update()
         component = EasyButton(
             "Run Seed Generation",
             self.control_frame,
