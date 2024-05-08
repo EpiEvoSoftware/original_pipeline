@@ -270,7 +270,7 @@ def render_next_button(tab_index, tab_parent, parent, update=None):
         match update():
             case 1:
                 return
-
+    
         go_to_next_tab(tab_index, tab_parent)
 
     next_button = tk.ttk.Button(parent, text="Next", command=next_tab)

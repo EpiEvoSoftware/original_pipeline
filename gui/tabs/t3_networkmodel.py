@@ -134,10 +134,8 @@ class NetworkModelConfigurations:
         self.update_use_network_model_button = tk.Button(self.scrollable_frame, text="Update use_network_model", command=self.update_use_network_model)
         self.update_use_network_model_button.pack()
 
-        render_next_button(self.tab_index, self.tab_parent, self.parent)
-
-    def update(self):
-        return
+        config = load_config_as_dict(self.config_path) 
+        render_next_button(self.tab_index, self.tab_parent, self.parent, lambda: 0)
     
     def update(self):
         error_messages = []

@@ -46,8 +46,8 @@ class EpidemiologyModel(TabBase):
         
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.scrollbar.pack(side=tk.RIGHT, fill="y")
-            # Testing End
-        # 
+
+        
 
 
  

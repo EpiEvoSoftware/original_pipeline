@@ -91,32 +91,8 @@ class NetworkGraphApp:
 
         seed_csv = os.path.join(self.wk_dir, 'seeds_trait_values.csv')
         self.populate_table_from_csv(seed_csv)
-
-    def create_table(self):
-        self.table_frame = ttk.Frame(self.parent)
-        self.table_frame.pack(side=tk.BOTTOM, fill=tk.X,
-                              padx=10, pady=10, expand=False)
-
-        columns = ("seed_id", "transmissibility_1", "drugresist_1", "drugresist_2", "match_method", "method_parameter", "method_parameter_2", "host_id")
-        self.table = ttk.Treeview(
-            self.table_frame, columns=columns, show='headings')
         
-        for col in columns:
-            self.table.heading(col, text=col.replace('_', ' ').title())
-            if col in ["seed_id", "transmissibility", "drugresist_1", "drugresist_2"]:
-                self.table.column(col, width=100, anchor=tk.CENTER)  
-            else:
-                self.table.column(col, width=150, anchor=tk.CENTER)  
-        self.table.pack(side=tk.LEFT, fill=tk.X)
-
-        seed_csv = os.path.join(self.wk_dir, 'seeds_trait_values.csv')
-        self.populate_table_from_csv(seed_csv) 
-
-        self.table.bind("<Double-1>", self.on_double_click)
-
-        self.degree_button = ttk.Button(
-            self.table_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')
-        self.degree_button.pack()
+        
     def populate_table_from_csv(self, csv_path):
         if not os.path.exists(csv_path):
             return 
@@ -139,52 +115,49 @@ class NetworkGraphApp:
                 extended_values = values + ("Random", "", "", "") 
                 self.table.insert("", "end", values=extended_values)
 
-    def setup_table_ui(self):
-        self.table_frame = ttk.Frame(self.parent)
-        self.table_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=10, expand=False)
-        self.table = ttk.Treeview(self.table_frame, show='headings')
-        self.table.pack(side=tk.LEFT, fill=tk.X)
-        self.degree_button = ttk.Button(self.table_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')
-        self.degree_button.pack(side=tk.RIGHT, padx=10)
-        self.table.bind("<Double-1>", self.on_double_click)
-
+    # def setup_table_ui(self):
+    #     def render_next_button(tab_index, tab_parent, parent):
+    #         def next_tab():
+    #             current_tab_index = tab_index
+    #             next_tab_index = (current_tab_index + 1) % tab_parent.index("end")
+    #             tab_parent.tab(next_tab_index, state="normal")
+    #             tab_parent.select(next_tab_index)
+    #         next_button = tk.ttk.Button(self.table_frame, text="Next", command=next_tab, style='Large.TButton')
+    #         next_button.pack(side=tk.RIGHT, padx=2, expand=True)
+    #     self.table_frame = ttk.Frame(self.parent)
+    #     self.table_frame.pack(side=tk.BOTTOM, fill="both", padx=10, pady=10, expand=True)
+    #     self.table = ttk.Treeview(self.table_frame, show='headings')
+    #     self.table.pack(side=tk.LEFT, fill=tk.X)
+    #     self.degree_button = ttk.Button(self.table_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')
+    #     self.degree_button.pack(side=tk.RIGHT, padx=2)
+    #     self.table.bind("<Double-1>", self.on_double_click)
+    #     render_next_button(self.tab_index, self.tab_parent, self.parent)
     
-    # def populate_table_from_csv(self, csv_path):
-    #     if os.path.exists(csv_path):
-    #         with open(csv_path, newline='') as csvfile:
-    #             reader = csv.DictReader(csvfile)
-    #             dict_from_csv = dict(list(reader)[0])
-    #             columns = list(dict_from_csv.keys())
-    #             columns.extend(["match_method", "method_parameter", "method_parameter_2", "host_id"])
-    #             for row in reader:
-    #                 print(row)
-    #                 values = tuple(row[col] for col in reader.fieldnames)
-    #                 extended_values = values + ("Random", "")
-    #                 self.table.insert("", "end", values=extended_values)
-                    
-    #             self.table_frame = ttk.Frame(self.parent)
-    #             self.table_frame.pack(side=tk.BOTTOM, fill=tk.X,
-    #                                 padx=10, pady=10, expand=False)
-    #             self.table = ttk.Treeview(
-    #                 self.table_frame, columns=columns, show='headings')
-                
-    #             for col in columns:
-    #                 self.table.heading(col, text=col.replace('_', ' ').title())
-    #                 self.table.column(col, width=150, anchor=tk.CENTER)  
-    #             self.table.pack(side=tk.LEFT, fill=tk.X)
+    def setup_table_ui(self):
+        def render_next_button(tab_index, tab_parent, parent, button_frame):
+            def next_tab():
+                current_tab_index = tab_index
+                next_tab_index = (current_tab_index + 1) % tab_parent.index("end")
+                tab_parent.tab(next_tab_index, state="normal")
+                tab_parent.select(next_tab_index)
+            next_button = ttk.Button(button_frame, text="Next", command=next_tab, style='Large.TButton')
+            next_button.pack(side=tk.BOTTOM, padx= 5, fill=tk.X)  
 
-    #             # seed_csv = os.path.join(self.wk_dir, 'seeds_trait_values.csv')
-    #             # self.populate_table_from_csv(seed_csv) 
-
-    #             self.table.bind("<Double-1>", self.on_double_click)
-
-    #             self.degree_button = ttk.Button(
-    #                 self.table_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')
-    #             self.degree_button.pack()
-
-
-
-
+        self.table_frame = ttk.Frame(self.parent)
+        self.table_frame.pack(side=tk.BOTTOM, fill="both", padx=10, pady=10, expand=True)
+        
+        self.table = ttk.Treeview(self.table_frame, show='headings')
+        self.table.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        button_frame = ttk.Frame(self.table_frame) 
+        button_frame.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.degree_button = ttk.Button(button_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')
+        self.degree_button.pack(side=tk.TOP, pady = 35, padx= 5, fill=tk.X)  
+        
+        render_next_button(self.tab_index, self.tab_parent, self.parent, button_frame)
+        
+        self.table.bind("<Double-1>", self.on_double_click)
 
     def update_parameters(self, event=None):
         # clear existing parameters
