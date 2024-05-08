@@ -15,6 +15,13 @@ class GenomeElement(TabBase):
         super().__init__(parent, tab_parent, config_path, tab_title, tab_index, hide)
 
     def load_page(self):
+        render_next_button_v2(
+            self.tab_index,
+            self.tab_parent,
+            self.parent,
+            self.effect_size_generation,
+            self.global_update,
+        )
         ui_selected = self.generate_genetic_architecture_method == "user_input"
         hide = not self.use_genetic_model
         self.global_group_control = GroupControls()
@@ -399,60 +406,55 @@ class GenomeElement(TabBase):
             self.visible_components.add(component)
         return component
 
-    def render_run_button(self, hide=True, column=None, frow=None):
-        def effect_size_generation():
-            if self.global_update_no_success_message() == 1:
-                return
+    def effect_size_generation(self):
+        if self.global_update_no_success_message() == 1:
+            return
 
-            config = load_config_as_dict(self.config_path)
+        config = load_config_as_dict(self.config_path)
 
-            method = config["GenomeElement"]["effect_size"]["method"]
-            wk_dir = config["BasicRunConfiguration"]["cwdir"]
-            n_gen = config["EvolutionModel"]["n_generation"]
-            mut_rate = config["EvolutionModel"]["mut_rate"]
-            trait_n = config["GenomeElement"]["traits_num"]
+        method = config["GenomeElement"]["effect_size"]["method"]
+        wk_dir = config["BasicRunConfiguration"]["cwdir"]
+        n_gen = config["EvolutionModel"]["n_generation"]
+        mut_rate = config["EvolutionModel"]["mut_rate"]
+        trait_n = config["GenomeElement"]["traits_num"]
 
-            if method == "user_input":
-                effsize_path = config["GenomeElement"]["effect_size"]["user_input"][
-                    "path_effsize_table"
-                ]
-            elif method == "randomly_generate":
-                effsize_path = ""
-                gff_in = config["GenomeElement"]["effect_size"]["randomly_generate"][
-                    "gff"
-                ]
-                causal_sizes = config["GenomeElement"]["effect_size"][
-                    "randomly_generate"
-                ]["genes_num"]
-                es_lows = config["GenomeElement"]["effect_size"]["randomly_generate"][
-                    "effsize_min"
-                ]
-                es_highs = config["GenomeElement"]["effect_size"]["randomly_generate"][
-                    "effsize_max"
-                ]
-                norm_or_not = config["GenomeElement"]["effect_size"][
-                    "randomly_generate"
-                ]["normalize"]
-            else:
-                raise ValueError("Invalid method specified")
+        if method == "user_input":
+            effsize_path = config["GenomeElement"]["effect_size"]["user_input"][
+                "path_effsize_table"
+            ]
+        elif method == "randomly_generate":
+            effsize_path = ""
+            gff_in = config["GenomeElement"]["effect_size"]["randomly_generate"]["gff"]
+            causal_sizes = config["GenomeElement"]["effect_size"]["randomly_generate"][
+                "genes_num"
+            ]
+            es_lows = config["GenomeElement"]["effect_size"]["randomly_generate"][
+                "effsize_min"
+            ]
+            es_highs = config["GenomeElement"]["effect_size"]["randomly_generate"][
+                "effsize_max"
+            ]
+            norm_or_not = config["GenomeElement"]["effect_size"]["randomly_generate"][
+                "normalize"
+            ]
+        else:
+            raise ValueError("Invalid method specified")
 
-            err = run_effsize_generation(
-                method,
-                wk_dir,
-                effsize_path=effsize_path,
-                gff_in=gff_in,
-                trait_n=trait_n,
-                causal_sizes=causal_sizes,
-                es_lows=es_lows,
-                es_highs=es_highs,
-                norm_or_not=norm_or_not,
-                n_gen=n_gen,
-                mut_rate=mut_rate,
-            )
-            if err:
-                messagebox.showerror(
-                    "Generation Error", "Generation Error: " + str(err)
-                )
+        err = run_effsize_generation(
+            method,
+            wk_dir,
+            effsize_path=effsize_path,
+            gff_in=gff_in,
+            trait_n=trait_n,
+            causal_sizes=causal_sizes,
+            es_lows=es_lows,
+            es_highs=es_highs,
+            norm_or_not=norm_or_not,
+            n_gen=n_gen,
+            mut_rate=mut_rate,
+        )
+        if err:
+            messagebox.showerror("Generation Error", "Generation Error: " + str(err))
 
         button_text = "Run Effect Size Generation"
         run_button_component = EasyButton(
@@ -462,9 +464,78 @@ class GenomeElement(TabBase):
             self.visible_components.add(run_button_component)
         return run_button_component
 
+    def render_run_button(self, hide=True, column=None, frow=None):
+        # def effect_size_generation():
+        #     if self.global_update_no_success_message() == 1:
+        #         return
+        #
+        #     config = load_config_as_dict(self.config_path)
+        #
+        #     method = config["GenomeElement"]["effect_size"]["method"]
+        #     wk_dir = config["BasicRunConfiguration"]["cwdir"]
+        #     n_gen = config["EvolutionModel"]["n_generation"]
+        #     mut_rate = config["EvolutionModel"]["mut_rate"]
+        #     trait_n = config["GenomeElement"]["traits_num"]
+        #
+        #     if method == "user_input":
+        #         effsize_path = config["GenomeElement"]["effect_size"]["user_input"][
+        #             "path_effsize_table"
+        #         ]
+        #     elif method == "randomly_generate":
+        #         effsize_path = ""
+        #         gff_in = config["GenomeElement"]["effect_size"]["randomly_generate"][
+        #             "gff"
+        #         ]
+        #         causal_sizes = config["GenomeElement"]["effect_size"][
+        #             "randomly_generate"
+        #         ]["genes_num"]
+        #         es_lows = config["GenomeElement"]["effect_size"]["randomly_generate"][
+        #             "effsize_min"
+        #         ]
+        #         es_highs = config["GenomeElement"]["effect_size"]["randomly_generate"][
+        #             "effsize_max"
+        #         ]
+        #         norm_or_not = config["GenomeElement"]["effect_size"][
+        #             "randomly_generate"
+        #         ]["normalize"]
+        #     else:
+        #         raise ValueError("Invalid method specified")
+        #
+        #     err = run_effsize_generation(
+        #         method,
+        #         wk_dir,
+        #         effsize_path=effsize_path,
+        #         gff_in=gff_in,
+        #         trait_n=trait_n,
+        #         causal_sizes=causal_sizes,
+        #         es_lows=es_lows,
+        #         es_highs=es_highs,
+        #         norm_or_not=norm_or_not,
+        #         n_gen=n_gen,
+        #         mut_rate=mut_rate,
+        #     )
+        #     if err:
+        #         messagebox.showerror(
+        #             "Generation Error", "Generation Error: " + str(err)
+        #         )
+        #
+        button_text = "Run Effect Size Generation"
+        run_button_component = EasyButton(
+            button_text,
+            self.control_frame,
+            column,
+            frow,
+            self.effect_size_generation,
+            hide,
+        )
+        if not hide:
+            self.visible_components.add(run_button_component)
+        return run_button_component
+
     def init_val(self, config_path):
         self.frow_val = 0
 
+        self.render_nb = False
         self.config_path = config_path
         self.config_dict = load_config_as_dict(self.config_path)
         self.use_genetic_model = self.config_dict["GenomeElement"]["use_genetic_model"]
@@ -496,4 +567,3 @@ class GenomeElement(TabBase):
         self.normalize = self.config_dict["GenomeElement"]["effect_size"][
             "randomly_generate"
         ]["normalize"]
-

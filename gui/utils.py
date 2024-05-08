@@ -265,6 +265,25 @@ def next_button(tab_index, tab_parent, parent, next_tab_fx):
     next_button.pack()
 
 
+def render_next_button_v2(tab_index, tab_parent, parent, function, update=None):
+    def next_tab():
+        match update():
+            case 1:
+                return
+
+        try:
+            function()
+        except Exception as e:
+            pass
+            # print(f"Error occurred: {e}")  # Logging to the console
+            # tk.messagebox.showerror("Error", f"An error occurred: {e}")
+
+        go_to_next_tab(tab_index, tab_parent)
+
+    next_button = tk.ttk.Button(parent, text="Next", command=next_tab)
+    next_button.pack()
+
+
 def render_next_button(tab_index, tab_parent, parent, update=None):
     def next_tab():
         match update():
