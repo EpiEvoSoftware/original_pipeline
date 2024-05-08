@@ -6,6 +6,7 @@ import os
 from utils import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import networkx as nx
 from network_generator import *
 
 class NetworkModel:
@@ -122,7 +123,6 @@ class NetworkModelConfigurations:
         self.host_size_entry.pack()
         update_host_size_button = tk.Button(self.scrollable_frame, text="Update host_size", command=self.update_host_size)
         update_host_size_button.pack()
-        # 
 
     
         # self.use_network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['use_network_model']
@@ -544,6 +544,10 @@ class NetworkModelGraph:
         self.config_path = config_path
         self.network_graph_app = network_graph_app
         self.tab_index = tab_index
+        self.config_dict = load_config_as_dict(self.config_path)
+        self.wk_dir = self.config_dict["BasicRunConfiguration"]["cwdir"]
+        self.network_file_path = os.path.join(self.wk_dir, "contact_network.adjlist")
+
         self.create_graph_frame()
     def update_graph(self, graph):
         self.network_graph_app = graph
@@ -563,6 +567,11 @@ class NetworkModelGraph:
         fig, ax = plt.subplots(figsize=(6, 4), constrained_layout=True)
         if degrees:
             ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+        elif os.path.exists(self.network_file_path) and self.wk_dir!="":
+            G = nx.read_adjlist(self.network_file_path)
+            degrees = [G.degree(n) for n in G.nodes()]
+            ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
+            
         else:
             ax.hist([], bins=[])
             ax.set_xlim(0, 10) 

@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 import json
 from utils import *
 from tkinter import messagebox 
@@ -89,6 +90,11 @@ class NetworkGraphApp:
         
         self.plot_degree_distribution()
 
+        
+        self.last_checked_time = 0  
+        self.seed_csv = os.path.join(self.wk_dir, 'seeds_trait_values.csv')
+        self.poll_for_csv_updates() 
+        
         seed_csv = os.path.join(self.wk_dir, 'seeds_trait_values.csv')
         self.populate_table_from_csv(seed_csv)
         
@@ -97,42 +103,32 @@ class NetworkGraphApp:
         if not os.path.exists(csv_path):
             return 
         
-        if not hasattr(self, 'table'):
-            self.setup_table_ui()
+        mod_time = os.path.getmtime(csv_path)
+        
+        if mod_time != self.last_checked_time:
+            self.last_checked_time = mod_time
+            if not hasattr(self, 'table'):
+                self.setup_table_ui()
 
-        with open(csv_path, newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            columns = reader.fieldnames + ["match_method", "method_parameter", "method_parameter_2", "host_id"]
-            
-            if not self.table["columns"]: 
-                self.table["columns"] = columns
-                for col in columns:
-                    self.table.heading(col, text=col.replace('_', ' ').title())
-                    self.table.column(col, width=150, anchor='center')
-            
-            for row in reader:
-                values = tuple(row[col] for col in reader.fieldnames)
-                extended_values = values + ("Random", "", "", "") 
-                self.table.insert("", "end", values=extended_values)
+            with open(csv_path, newline='') as csvfile:
+                reader = csv.DictReader(csvfile)
+                columns = reader.fieldnames + ["match_method", "method_parameter", "method_parameter_2", "host_id"]
+                
+                if not self.table["columns"]: 
+                    self.table["columns"] = columns
+                    self.table.delete(*self.table.get_children())
+                    for col in columns:
+                        self.table.heading(col, text=col.replace('_', ' ').title())
+                        self.table.column(col, width=150, anchor='center')
+                
+                for row in reader:
+                    # values = tuple(row[col] for col in reader.fieldnames)
+                    # extended_values = values + ("Random", "", "", "") 
+                    # self.table.insert("", "end", values=extended_values)    
+                    values = [row[col] for col in reader.fieldnames]
+                    extended_values = values + ["Random", "", "", ""] 
+                    self.table.insert("", "end", values=extended_values)
 
-    # def setup_table_ui(self):
-    #     def render_next_button(tab_index, tab_parent, parent):
-    #         def next_tab():
-    #             current_tab_index = tab_index
-    #             next_tab_index = (current_tab_index + 1) % tab_parent.index("end")
-    #             tab_parent.tab(next_tab_index, state="normal")
-    #             tab_parent.select(next_tab_index)
-    #         next_button = tk.ttk.Button(self.table_frame, text="Next", command=next_tab, style='Large.TButton')
-    #         next_button.pack(side=tk.RIGHT, padx=2, expand=True)
-    #     self.table_frame = ttk.Frame(self.parent)
-    #     self.table_frame.pack(side=tk.BOTTOM, fill="both", padx=10, pady=10, expand=True)
-    #     self.table = ttk.Treeview(self.table_frame, show='headings')
-    #     self.table.pack(side=tk.LEFT, fill=tk.X)
-    #     self.degree_button = ttk.Button(self.table_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')
-    #     self.degree_button.pack(side=tk.RIGHT, padx=2)
-    #     self.table.bind("<Double-1>", self.on_double_click)
-    #     render_next_button(self.tab_index, self.tab_parent, self.parent)
-    
     def setup_table_ui(self):
         def render_next_button(tab_index, tab_parent, parent, button_frame):
             def next_tab():
@@ -159,6 +155,13 @@ class NetworkGraphApp:
         
         self.table.bind("<Double-1>", self.on_double_click)
 
+    def poll_for_csv_updates(self):
+        try:
+            self.populate_table_from_csv(self.seed_csv)
+        except Exception as e:
+            print(f"Error while updating from CSV: {e}")
+        finally:
+            self.parent.after(1000, self.poll_for_csv_updates)
     def update_parameters(self, event=None):
         # clear existing parameters
         for label in self.parameter_labels:
@@ -198,13 +201,24 @@ class NetworkGraphApp:
     def on_double_click(self, event):
         item = self.table.identify('item', event.x, event.y)
         column = self.table.identify_column(event.x)
-        match_method = self.table.item(item, 'values')[4]
-        if column == "#6" and match_method != "Random":  # Columns for "method_parameter" and "method_parameter_2"
-            self.type_in_parameter(item, column)
-        elif column == "#7" and match_method == "Percentile":  # column number for "method_parameter 2"
-            self.type_in_parameter(item, column)
-        elif column == "#5":  # Column for "match_method"
+        col_name = self.table["columns"][int(column.replace('#', '')) - 1]
+        
+        match_method = self.table.item(item, 'values')[self.table["columns"].index("match_method")]
+                                                       
+        if col_name == "match_method":
             self.choose_match_method(item, column)
+        elif col_name == "method_parameter_2" and match_method == "Percentile":
+            self.type_in_parameter(item, column)
+        elif col_name == "method_parameter" and match_method != "Random":
+            self.type_in_parameter(item, column)
+                                                       
+                                                    
+        # if column == "#6" and match_method != "Random":  # Columns for "method_parameter" and "method_parameter_2"
+        #     self.type_in_parameter(item, column)
+        # elif column == "#7" and match_method == "Percentile":  # column number for "method_parameter 2"
+        #     self.type_in_parameter(item, column)
+        # elif column == "#5":  # Column for "match_method"
+        #     self.choose_match_method(item, column)
     
     def type_in_parameter(self, item, column):
         entry = tk.Entry(self.table)
@@ -244,7 +258,7 @@ class NetworkGraphApp:
         combobox.destroy()
 
     def edit_method_parameter(self, item, column, ):
-        match_method = self.table.item(item, 'values')[4]
+        match_method = self.table.item(item, 'values')[self.table["columns"].index("match_method")]
         options = self.get_method_parameter_options(match_method)
 
         combobox = ttk.Combobox(self.table, values=options)
@@ -353,9 +367,14 @@ class NetworkGraphApp:
 
             seed_id = int(row[0])
 
-            match_method = (row[4]).lower()
+            match_method_col = self.table["columns"].index("match_method")
+            method_parameter_col = self.table["columns"].index("method_parameter")
+            method_parameter_col2 = self.table["columns"].index("method_parameter_2")
+            
+            
+            match_method = (row[match_method_col]).lower()
 
-            method_parameter = row[5]
+            method_parameter = row[method_parameter_col]
             
             
 
@@ -364,7 +383,7 @@ class NetworkGraphApp:
             if match_method == "ranking":
                 match_params[seed_id] = int(method_parameter)
             elif match_method == "percentile":
-                method_parameter_2 = row[6]
+                method_parameter_2 = row[method_parameter_col2]
                 percentages = [int(method_parameter), int(method_parameter_2)]
                 match_params[seed_id] = percentages
             else:  # For "Random", no specific parameter is needed
@@ -377,12 +396,4 @@ class NetworkGraphApp:
     def load_config_as_dict(self):
         with open(self.config_path, 'r') as file:
             return json.load(file)
-
-# if __name__ == "__main__":
-#     root = tk.Tk()
-#     config_path = '../test/params_test.json'  # Replace with the actual path
-#     config_data = read_json_config(config_path)
-#     app = NetworkGraphApp(root, config_data)
-#     root.mainloop()
-
 
