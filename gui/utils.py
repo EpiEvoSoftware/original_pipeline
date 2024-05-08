@@ -270,7 +270,7 @@ def render_next_button(tab_index, tab_parent, parent, update=None):
         match update():
             case 1:
                 return
-    
+
         go_to_next_tab(tab_index, tab_parent)
 
     next_button = tk.ttk.Button(parent, text="Next", command=next_tab)
@@ -695,6 +695,7 @@ class EasyEntry(EasyWidgetBase):
         validate_for,
         hide,
         columnspan,
+        disabled=False,
     ) -> None:
         super().__init__()
         self.keys_path = keys_path
@@ -721,6 +722,13 @@ class EasyEntry(EasyWidgetBase):
         self.grid_layout = derender_components(self.local_components)
         if not hide:
             rerender_components(self.local_components, self.grid_layout)
+
+        if disabled:
+            label.configure(state="disabled")
+            self.entry.configure(foreground="light grey", state="disabled")
+        else:
+            label.configure(state="normal")
+            self.entry.configure(foreground="black", state="normal")
 
     def update(self, error_messages):
         match self.validate_for:
@@ -773,6 +781,7 @@ class EasyRadioButton(EasyWidgetBase):
         to_derender,
         columnspan,
         radiobuttonselected,
+        disabled=False,
     ) -> None:
         super().__init__()
         self.keys_path = keys_path
@@ -815,12 +824,17 @@ class EasyRadioButton(EasyWidgetBase):
         if not hide:
             rerender_components(self.local_components, self.grid_layout)
 
+        if disabled:
+            label.configure(state="disabled")
+            self.rb_true.configure(state="disabled")
+            self.rb_false.configure(state="disabled")
+        else:
+            label.configure(state="normal")
+            self.rb_true.configure(state="normal")
+            self.rb_false.configure(state="normal")
+
     def _updater(self):
         self.radiobuttonselected(self.var, self.to_rerender, self.to_derender)
-        # if self.to_derender is not None:
-        #     self.to_derender()
-        # if self.to_rerender is not None:
-        #     self.to_rerender()
 
     def update_rb_false_text(self, new_text):
         """Updates the text of the rb_false radiobutton."""

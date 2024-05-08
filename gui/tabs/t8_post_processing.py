@@ -54,6 +54,16 @@ class PostProcessing(TabBase):
 
         def radiobuttonselected(var, to_rerender, to_derender):
             no_validate_update(var, self.config_path, keys_path)
+            if var.get():
+                self.render_branch_color_trait(hide, 0, 1, 4, disabled=False)
+                self.render_drug_resistance_heatmap(
+                    None, None, hide, 0, 6, disabled=False
+                )
+            else:
+                self.render_branch_color_trait(hide, 0, 1, 4, disabled=True)
+                self.render_drug_resistance_heatmap(
+                    None, None, hide, 0, 6, disabled=True
+                )
 
         component = EasyRadioButton(
             keys_path,
@@ -73,7 +83,7 @@ class PostProcessing(TabBase):
         self.visible_components.add(component)
         return component
 
-    def render_branch_color_trait(self, hide, column, columnspan, frow):
+    def render_branch_color_trait(self, hide, column, columnspan, frow, disabled=False):
         text = "Which trait do you want to use for coloring the branches in the transmission tree plot (integer)"
         keys_path = self.branch_color_trait_keys_path
         component = EasyEntry(
@@ -87,6 +97,7 @@ class PostProcessing(TabBase):
             "integer",
             hide,
             columnspan,
+            disabled,
         )
 
         self.visible_components.add(component)
@@ -131,7 +142,14 @@ class PostProcessing(TabBase):
         ).grid()
 
     def render_drug_resistance_heatmap(
-        self, to_rerender, to_derender, hide=True, column=None, frow=None, columnspan=1
+        self,
+        to_rerender,
+        to_derender,
+        hide=True,
+        column=None,
+        frow=None,
+        columnspan=1,
+        disabled=False,
     ):
         to_rerender = None
         to_derender = None
@@ -154,6 +172,7 @@ class PostProcessing(TabBase):
             to_derender,
             columnspan,
             radiobuttonselected,
+            disabled,
         )
 
         self.visible_components.add(component)
