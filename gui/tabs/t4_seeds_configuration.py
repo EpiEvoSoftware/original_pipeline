@@ -1147,15 +1147,7 @@ class SeedsConfiguration(TabBase):
         return component
 
     def load_page(self):
-        # hide = False
         to_renderer, to_derenderer = None, None
-        # self.render_seeds_size(hide, column=1, columnspan= 3, frow = 1)
-
-        # self.render_use_reference(to_renderer, to_derenderer, hide, column = 1, frow = 4, columnspan= 3)
-        # self.render_use_method(column=1, frow=6, to_rerender=to_renderer, to_derender=to_derenderer, hide=hide, column_span= 3 )
-        # self.user_input_group_controls = self.init_user_input_group(hide)
-        # self.wf_group_controls = self.init_wf_group(hide)
-        # self.epi_group_controls = self.init_epi_group(hide)
 
         self.render_seeds_size(False, column=1, columnspan=3, frow=1)
         self.use_reference_control = self.render_use_reference(
