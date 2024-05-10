@@ -100,60 +100,59 @@ class NetworkGraphApp:
         
         
     def populate_table_from_csv(self, csv_path):
+        print(f"Checking existence for {csv_path}")
         if not os.path.exists(csv_path):
-            return 
+            print(f"File does not exist: {csv_path}")
+            if hasattr(self, 'table_frame'):
+                self.table_frame.destroy()
+                delattr(self, 'table_frame')
+            return
         
-        mod_time = os.path.getmtime(csv_path)
-        
-        if mod_time != self.last_checked_time:
-            self.last_checked_time = mod_time
-            if not hasattr(self, 'table'):
-                self.setup_table_ui()
+        if not hasattr(self, 'table_frame'):
+            self.setup_table_ui()
 
-            with open(csv_path, newline='') as csvfile:
-                reader = csv.DictReader(csvfile)
-                columns = reader.fieldnames + ["match_method", "method_parameter", "method_parameter_2", "host_id"]
-                
-                if not self.table["columns"]: 
-                    self.table["columns"] = columns
-                    self.table.delete(*self.table.get_children())
-                    for col in columns:
-                        self.table.heading(col, text=col.replace('_', ' ').title())
-                        self.table.column(col, width=150, anchor='center')
-                
-                for row in reader:
-                    # values = tuple(row[col] for col in reader.fieldnames)
-                    # extended_values = values + ("Random", "", "", "") 
-                    # self.table.insert("", "end", values=extended_values)    
-                    values = [row[col] for col in reader.fieldnames]
-                    extended_values = values + ["Random", "", "", ""] 
-                    self.table.insert("", "end", values=extended_values)
+
+        with open(csv_path, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            columns = reader.fieldnames + ["match_method", "method_parameter", "method_parameter_2", "host_id"]
+            
+            if not self.table["columns"]: 
+                self.table["columns"] = columns
+                self.table.delete(*self.table.get_children())
+                for col in columns:
+                    self.table.heading(col, text=col.replace('_', ' ').title())
+                    self.table.column(col, width=150, anchor='center')
+                    
+            self.table.delete(*self.table.get_children())
+            for row in reader:
+                # values = tuple(row[col] for col in reader.fieldnames)
+                values = [row[col] for col in reader.fieldnames]
+                extended_values = values + ["Random", "", "", ""] 
+                self.table.insert("", "end", values=extended_values)
 
     def setup_table_ui(self):
-        def render_next_button(tab_index, tab_parent, parent, button_frame):
-            def next_tab():
-                current_tab_index = tab_index
-                next_tab_index = (current_tab_index + 1) % tab_parent.index("end")
-                tab_parent.tab(next_tab_index, state="normal")
-                tab_parent.select(next_tab_index)
-            next_button = ttk.Button(button_frame, text="Next", command=next_tab, style='Large.TButton')
-            next_button.pack(side=tk.BOTTOM, padx= 5, fill=tk.X)  
-
         self.table_frame = ttk.Frame(self.parent)
         self.table_frame.pack(side=tk.BOTTOM, fill="both", padx=10, pady=10, expand=True)
         
         self.table = ttk.Treeview(self.table_frame, show='headings')
         self.table.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
-        button_frame = ttk.Frame(self.table_frame) 
+        button_frame = ttk.Frame(self.table_frame)
         button_frame.pack(side=tk.RIGHT, fill=tk.Y)
         
         self.degree_button = ttk.Button(button_frame, text="Match All Hosts", command=self.match_hosts, style='Large.TButton')
-        self.degree_button.pack(side=tk.TOP, pady = 35, padx= 5, fill=tk.X)  
+        self.degree_button.pack(side=tk.TOP, pady=35, padx=5, fill=tk.X)
         
-        render_next_button(self.tab_index, self.tab_parent, self.parent, button_frame)
+        next_button = ttk.Button(button_frame, text="Next", command=lambda: self.next_tab(), style='Large.TButton')
+        next_button.pack(side=tk.BOTTOM, padx=5, fill=tk.X)
         
         self.table.bind("<Double-1>", self.on_double_click)
+
+    def next_tab(self):
+        current_tab_index = self.tab_index
+        next_tab_index = (current_tab_index + 1) % self.tab_parent.index("end")
+        self.tab_parent.tab(next_tab_index, state="normal")
+        self.tab_parent.select(next_tab_index)
 
     def poll_for_csv_updates(self):
         try:
@@ -162,6 +161,7 @@ class NetworkGraphApp:
             print(f"Error while updating from CSV: {e}")
         finally:
             self.parent.after(1000, self.poll_for_csv_updates)
+            
     def update_parameters(self, event=None):
         # clear existing parameters
         for label in self.parameter_labels:
