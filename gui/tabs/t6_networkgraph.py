@@ -56,20 +56,12 @@ class NetworkGraphApp:
 
         self.pop_size = int(self.config['NetworkModelParameters']['host_size'])
 
-        # window_width = 800
-        # window_height = 600
-        # self.root.geometry(f"{window_width}x{window_height}")
-        # For controlling GUI height and width
-
         self.network_dict = {
             "Erdős–Rényi": "ER",
             "Barabási-Albert": "BA",
             "Random Partition": "RP"
         }
 
-        # TODO: fix read_txt and list_files so that it reads from the txt file for the table
-        # read_txt("./files/trait_vals_seeds.txt")
-        # list_files("./files")
 
         style = ttk.Style()
         style.configure('Large.TButton', font=(
@@ -100,9 +92,7 @@ class NetworkGraphApp:
         
         
     def populate_table_from_csv(self, csv_path):
-        print(f"Checking existence for {csv_path}")
         if not os.path.exists(csv_path):
-            print(f"File does not exist: {csv_path}")
             if hasattr(self, 'table_frame'):
                 self.table_frame.destroy()
                 delattr(self, 'table_frame')
@@ -313,9 +303,6 @@ class NetworkGraphApp:
             try:
                 G = nx.read_adjlist(self.network_file_path)
                 degrees = [G.degree(n) for n in G.nodes()]
-                # if degrees == []:
-                #     messagebox.showerror("Error", f"Network file path is empty")
-                #     return
                 self.ax.clear()
             
                 degrees = [G.degree(n) for n in G.nodes()]
@@ -324,10 +311,7 @@ class NetworkGraphApp:
                 self.ax.set_xlabel("Degree")
                 self.ax.set_ylabel("Number of Nodes")
                 
-                # self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
                 self.canvas.draw()
-                # self.canvas_widget = self.canvas.get_tk_widget()
-                # self.canvas_widget.pack(fill=tk.BOTH, expand=True)
             except FileNotFoundError:
                 messagebox.showerror("Error", f"Network file not found at {self.network_file_path}")
                 return
