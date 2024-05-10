@@ -1,6 +1,6 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "",
+        "cwdir": "/Users/vivianzhao/Desktop/TB_software/wkdir_test",
         "n_replicates": 1,
         "random_number_seed": 1
     },

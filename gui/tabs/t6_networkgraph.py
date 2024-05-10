@@ -146,6 +146,8 @@ class NetworkGraphApp:
 
     def poll_for_csv_updates(self):
         try:
+            self.wk_dir = self.load_config_as_dict()["BasicRunConfiguration"]["cwdir"]
+            self.seed_csv = os.path.join(self.wk_dir, 'seeds_trait_values.csv')
             self.populate_table_from_csv(self.seed_csv)
         except Exception as e:
             print(f"Error while updating from CSV: {e}")
