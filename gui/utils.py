@@ -947,6 +947,7 @@ class EasyCombobox(EasyWidgetBase):
         width,
         columnnspan,
         val_to_ui_mapping=None,
+        keys_path_none=False,
     ):
         super().__init__()
         self.keys_path = keys_path
@@ -960,13 +961,15 @@ class EasyCombobox(EasyWidgetBase):
         self.label = tk.ttk.Label(
             self.control_frame, text=render_text, style="Bold.TLabel"
         )
-        dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
+        if not keys_path_none:
+            dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
 
-        if val_to_ui_mapping is None:
-            var_val = dict_var
+            if val_to_ui_mapping is None:
+                var_val = dict_var
+            else:
+                var_val = val_to_ui_mapping.get(dict_var, "")
         else:
-            var_val = val_to_ui_mapping.get(dict_var, "")
-
+            var_val = ""
         self.var = tk.StringVar(value=var_val)
         self.combobox = tk.ttk.Combobox(
             self.control_frame,
@@ -1154,6 +1157,26 @@ class TabBase:
             self.tab_parent.tab(self.tab_index, state="disabled")
         self.control_frame = tk.ttk.Frame(self.parent, width=300)
         self.control_frame.pack(padx=10, pady=10)
+
+
+class TabBaseSideBar(TabBase):
+    def __init__(
+        self,
+        parent,
+        tab_parent,
+        config_path,
+        tab_title,
+        tab_index,
+        new_option,
+        hide=False,
+        render_nb=True,
+    ):
+        super().__init__(
+            parent, tab_parent, config_path, tab_title, tab_index, hide, render_nb
+        )
+
+    def init_val(self, config_path):
+        super().init_val(config_path)
 
 
 class EasyImage(EasyWidgetBase):
