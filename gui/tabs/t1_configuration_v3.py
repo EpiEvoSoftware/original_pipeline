@@ -18,6 +18,9 @@ class Configurationv3:
         self.n_replicates = load_config_as_dict(self.config_path)[
             "BasicRunConfiguration"
         ]["n_replicates"]
+        self.random_number_seed = load_config_as_dict(self.config_path)[
+            "BasicRunConfiguration"
+        ]["random_number_seed"]
         self.ref_path = load_config_as_dict(self.config_path)["GenomeElement"][
             "ref_path"
         ]
@@ -34,6 +37,7 @@ class Configurationv3:
         self.render_working_directory()
         self.render_ref_path_label()
         self.render_n_replicates()
+        self.render_random_seed()
 
         render_next_button(self.tab_index, self.tab_parent, self.parent, self.update)
 
@@ -60,14 +64,22 @@ class Configurationv3:
     def update(self):
         error_messages = []
         self.update_n_replicates(error_messages)
+        self.update_random_seed(error_messages)
         if len(error_messages) == 0:
-            # messagebox.showinfo("Update Successful", "Parameters Updated.")
             return 0
         else:
             error_message_str = "\n".join(error_messages)
             messagebox.showerror("Update Error", error_message_str)
             return 1
-
+    def update_random_seed(self, error_messages):
+        try:
+            new_random_seed = int(self.random_seed_entry.get())
+            config = load_config_as_dict(self.config_path)
+            config["BasicRunConfiguration"]["random_number_seed"] = new_random_seed
+            save_config(self.config_path, config)
+        except ValueError:
+            error_messages.append("Please enter a valid integer for the random seed.")
+            
     def update_n_replicates(self, error_messages):
         """
         note: int() doesn't process scientific notation for strings but float() does
@@ -114,6 +126,13 @@ class Configurationv3:
         )
         self.n_replicates_entry.grid(row=8, column=0, sticky="w", pady=5)
         self.n_replicates_entry.insert(0, self.n_replicates)
+        
+    def render_random_seed(self):
+        random_seed_label = ttk.Label(self.control_frame, text="Random Seed (Integer)", style="Bold.TLabel")
+        random_seed_label.grid(row=9, column=0, sticky="w", pady=5)
+        self.random_seed_entry = ttk.Entry(self.control_frame, foreground="black", width=20)
+        self.random_seed_entry.grid(row=10, column=0, sticky="w", pady=5)
+        self.random_seed_entry.insert(0, str(self.random_number_seed))
 
     def render_ref_path_label(self):
         ref_path_label = ttk.Label(
