@@ -324,6 +324,6 @@ def main():
         rand_seed=rand_seed,
     )
 
-
+if __name__ == "__main__":
     main()
 
