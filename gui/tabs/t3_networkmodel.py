@@ -140,10 +140,9 @@ class NetworkModelConfigurations(TabBase):
 
     def init_method_group(self, hide):
         to_rerender, to_derender = None, None
-        method = self.render_method(1, 0, 10, to_rerender, to_derender, hide, 20)
-        print(method)
+        self.method = self.render_method(1, 0, 10, to_rerender, to_derender, hide, 20)
         self.frow = 10
-        method_group_control = [method]
+        method_group_control = [self.method]
 
         self.method_group_control = GroupControls()
         for control in method_group_control:
@@ -155,10 +154,36 @@ class NetworkModelConfigurations(TabBase):
         method = self.render_path_network(hide, 0, self.increment_frow(), 1)
         group_control = [method]
 
-        self.method_path_network_group_control = GroupControls()
+        self.path_network_group_control = GroupControls()
         for control in group_control:
-            self.method_path_network_group_control.add(control)
-        self.global_group_control.add(self.method_path_network_group_control)
+            self.path_network_group_control.add(control)
+        self.global_group_control.add(self.path_network_group_control)
+
+    def init_network_model_group(self, hide):
+        to_rerender, to_derender = None, None
+        method = self.render_network_model(1, 0, self.increment_frow(by=3), to_rerender, to_derender, hide, 20)
+        method_group_control = [method]
+
+        self.network_model_group_control = GroupControls()
+        for control in method_group_control:
+            self.network_model_group_control.add(control)
+        self.global_group_control.add(self.network_model_group_control)
+
+    def init_p_er_group(self, hide):
+        method = self.render_er(hide, 0, 1, self.increment_frow())
+        method_group_control = [method]
+
+        self.p_er_group_control = GroupControls()
+        for control in method_group_control:
+            self.p_er_group_control.add(control)
+        self.global_group_control.add(self.p_er_group_control)
+        self.network_model_group_control.add(self.p_er_group_control)
+
+    def init_rp_group(self, hide):
+        pass
+
+    def init_ba_group(self, hide):
+        pass
 
     def render_method(
         self,
@@ -171,28 +196,24 @@ class NetworkModelConfigurations(TabBase):
         width=20,
     ):
         """
-        generate_genetic_architecture_method
-        self.generate_genetic_architecture_method = ['GenomeElement']['effect_size']['method']
         """
 
         def comboboxselected(var, to_rerender, to_derender):
             match var.get():
                 case "user_input":
-                    pass
-                    # self.generate_genetic_architecture_method.set_to_rerender(
-                    #     self.user_input_group_control.rerender_itself
-                    # )
-                    # self.generate_genetic_architecture_method.set_to_derender(
-                    #     self.random_generate_group_control.derender_itself
-                    # )
-                case "randomly_generate":
-                    pass
-                    # self.generate_genetic_architecture_method.set_to_rerender(
-                    #     self.random_generate_group_control.rerender_itself
-                    # )
-                    # self.generate_genetic_architecture_method.set_to_derender(
-                    #     self.user_input_group_control.derender_itself
-                    # )
+                    self.method.set_to_rerender(
+                        self.path_network_group_control.rerender_itself
+                    )
+                    self.method.set_to_derender(
+                        self.network_model_group_control.derender_itself
+                    )
+                case "randomly generate":
+                    self.method.set_to_rerender(
+                        self.network_model_group_control.rerender_itself
+                    )
+                    self.method.set_to_derender(
+                        self.path_network_group_control.derender_itself
+                    )
                 case _:
                     raise ValueError("Invalid method specified")
             to_rerender()
@@ -222,11 +243,33 @@ class NetworkModelConfigurations(TabBase):
 
         return component
 
+    def render_er(self, hide, column, columnspan, frow):
+        text = "p_ER"
+        keys_path = ['NetworkModelParameters', 'randomly_generate', 'ER', 'p_ER']
+        component = EasyEntry(
+            keys_path, self.config_path, 
+            text, 'p_ER', 
+            self.control_frame, column, frow, 'numerical', hide, columnspan
+            )
+
+        if not hide:
+            self.visible_components.add(component)
+        return component
+
+    def render_rp_size(self):
+        pass
+
+
     def load_page(self):
         self.global_group_control = GroupControls()
         self.init_landing_group(hide=False)
         self.init_method_group(hide=False)
         self.init_path_network_group(hide=False)
+        self.init_network_model_group(hide=False)
+        self.init_p_er_group(hide=False)
+        self.init_rp_group(hide=False)
+        self.init_ba_group(hide=False)
+
         pass
         # self.init_val(config_path)
         # self.parent = parent
@@ -254,6 +297,75 @@ class NetworkModelConfigurations(TabBase):
         # self.use_network_model = load_config_as_dict(self.config_path)['NetworkModelParameters']['use_network_model']
 
         # render_next_button(self.tab_index, self.tab_parent, self.parent, lambda: 0)
+    def render_network_model(
+        self,
+        columnspan,
+        column,
+        frow,
+        to_rerender=None,
+        to_derender=None,
+        hide=True,
+        width=20,
+    ):
+        def comboboxselected(var, to_rerender, to_derender):
+            var_get = var.get()
+            no_validate_update_val(var_get, self.config_path, keys_path)
+
+            match var_get:
+                case "ER":
+                    pass
+                    # self.generate_genetic_architecture_method.set_to_rerender(
+                    #     self.random_generate_group_control.rerender_itself
+                    # )
+                    # self.generate_genetic_architecture_method.set_to_derender(
+                    #     self.user_input_group_control.derender_itself
+                case "RP":
+                    pass
+                    # self.generate_genetic_architecture_method.set_to_rerender(
+                    #     self.user_input_group_control.rerender_itself
+                    # )
+                    # self.generate_genetic_architecture_method.set_to_derender(
+                    #     self.random_generate_group_control.derender_itself
+                    # )
+                case "BA":
+                    pass
+                    # self.generate_genetic_architecture_method.set_to_rerender(
+                    #     self.user_input_group_control.rerender_itself
+                    # )
+                    # self.generate_genetic_architecture_method.set_to_derender(
+                    #     self.random_generate_group_control.derender_itself
+                    # )
+                    # )
+                case _:
+                    pass
+            to_rerender()
+            to_derender()
+
+        text = "Network Model"
+        keys_path = ["NetworkModelParameters", "randomly_generate", "network_model"]
+        comboboxvalues = ["ER", "RP", "BA"]
+        component = EasyCombobox(
+            keys_path,
+            self.config_path,
+            text,
+            self.control_frame,
+            column,
+            frow,
+            comboboxvalues,
+            to_rerender,
+            to_derender,
+            comboboxselected,
+            hide,
+            width,
+            columnspan,
+            None,
+            False,
+        )
+        if not hide:
+            self.visible_components.add(component)
+
+        return component
+
 
     def update(self):
         error_messages = []
