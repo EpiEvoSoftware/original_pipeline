@@ -180,7 +180,15 @@ class NetworkModelConfigurations(TabBase):
         self.network_model_group_control.add(self.p_er_group_control)
 
     def init_rp_group(self, hide):
-        pass
+        method_group_control = [
+            self.render_rp_size(hide, 0, 1, self.increment_frow()),
+                                ]
+
+        self.rp_group_control = GroupControls()
+        for control in method_group_control:
+            self.rp_group_control.add(control)
+        self.global_group_control.add(self.rp_group_control)
+        self.network_model_group_control.add(self.rp_group_control)
 
     def init_ba_group(self, hide):
         pass
@@ -256,8 +264,18 @@ class NetworkModelConfigurations(TabBase):
             self.visible_components.add(component)
         return component
 
-    def render_rp_size(self):
-        pass
+    def render_rp_size(self, hide, column, columnspan, frow):
+        text = "rp_size"
+        keys_path = ['NetworkModelParameters', 'randomly_generate', 'ER', 'p_ER']
+        component = EasyEntry(
+            keys_path, self.config_path, 
+            text, 'p_ER', 
+            self.control_frame, column, frow, 'numerical', hide, columnspan
+            )
+
+        if not hide:
+            self.visible_components.add(component)
+        return component
 
 
     def load_page(self):
