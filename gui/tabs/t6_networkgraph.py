@@ -273,9 +273,10 @@ class NetworkGraphApp:
         ntwk = read_network(self.network_file_path)
         
         num_seed = len(self.table.get_children())
+        rand_seed = self.load_config_as_dict()["BasicRunConfiguration"]["cwdir"]
 
         match_methods, match_params = self.collect_matching_criteria()
-        match_dict = run_seed_host_match("randomly_generate", self.wk_dir, num_seed, match_scheme=match_methods, match_scheme_param=match_params)
+        match_dict = run_seed_host_match("randomly_generate", self.wk_dir, num_seed, match_scheme=match_methods, match_scheme_param=match_params, rand_seed=rand_seed)
         
         if match_dict[0] is not None:
             match_dict = match_dict[0]
@@ -296,6 +297,7 @@ class NetworkGraphApp:
                 self.table.item(child, values=updated_values)
 
         self.highlight_matched_hosts(ntwk, match_dict)
+        
     
     def plot_degree_distribution(self):
         self.config = self.load_config_as_dict()

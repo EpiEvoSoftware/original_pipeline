@@ -669,6 +669,7 @@ class NetworkModelConfigurations(TabBase):
                 self.network_model = self.config_dict["NetworkModelParameters"][
                     "randomly_generate"
                 ]["network_model"]
+                rand_seed = self.config_dict["BasicRunConfiguration"]["random_number_seed"]
 
                 if graph_type == "Erdős–Rényi":
                     p_ER = self.config_dict["NetworkModelParameters"][
@@ -680,6 +681,7 @@ class NetworkModelConfigurations(TabBase):
                         method="randomly_generate",
                         model="ER",
                         p_ER=p_ER,
+                        rand_seed=rand_seed
                     )
                 elif graph_type == "Barabási-Albert":
                     m = self.config_dict["NetworkModelParameters"]["randomly_generate"][
@@ -691,6 +693,7 @@ class NetworkModelConfigurations(TabBase):
                         method="randomly_generate",
                         model="BA",
                         m=m,
+                        rand_seed=rand_seed
                     )
                 elif graph_type == "Random Partition":
                     rp_size = self.config_dict["NetworkModelParameters"][
@@ -710,12 +713,15 @@ class NetworkModelConfigurations(TabBase):
                         rp_size=rp_size,
                         p_within=p_within,
                         p_between=p_between,
+                        rand_seed=rand_seed
                     )
                 else:
                     raise ValueError("Unsupported model.")
 
                 if error is not None:
-                    raise Exception(error)
+                    messagebox.showerror("Network Generation Error", "Network Generation Error: " + str(e))
+                else:
+                    messagebox.showinfo("Success", "Network Generated successfully!")
 
                 G = nx.read_adjlist(os.path.join(wk_dir, "contact_network.adjlist"))
                 degrees = [G.degree(n) for n in G.nodes()]
@@ -733,23 +739,6 @@ class NetworkModelConfigurations(TabBase):
             self.run_network_generate_button.grid()
         else:
             self.run_network_generate_button.grid()
-
-        # if not hasattr(self, 'graph_frame'):
-        #     self.graph_frame = ttk.Frame(self.control_frame)
-        #     self.graph_frame.pack(fill='both', expand=True, after=self.control_frame)
-
-        # def plot_degree_distribution(degrees):
-
-        #     fig, ax = plt.subplots(figsize=(6, 4))
-        #     ax.hist(degrees, bins=range(min(degrees), max(degrees) + 1, 1), edgecolor='black')
-        #     ax.set_title("Degree Distribution")
-        #     ax.set_xlabel("Degree")
-        #     ax.set_ylabel("Number of Nodes")
-
-        #     canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
-        #     canvas.draw()
-        #     canvas_widget = canvas.get_tk_widget()
-        #     canvas_widget.pack(fill=tk.BOTH, expand=True)
 
     def hide_elements_update_methods(self):
         self.hide_elements_network_values()
