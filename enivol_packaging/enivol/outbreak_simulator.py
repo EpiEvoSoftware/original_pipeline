@@ -84,6 +84,15 @@ def create_slim_config(all_config):
 		_check_float(slim_pars["mut_rate"], "Mutation rate")
 	out_config.write(f"mut_rate:{slim_pars['mut_rate']}\n")
 
+	slim_pars["transition_matrix"] = all_config["EvolutionModel"]["transition_matrix"]
+	_check_boolean(slim_pars["transition_matrix"], "Whether to use a transition rate matrix for mutation")
+	out_config.write(f"transition_matrix:{_writebinary(slim_pars['transition_matrix'])}\n")
+	if slim_pars["transition_matrix"]:
+		if not os.path.exists(os.path.join(slim_pars["cwdir"], "muts_transition_matrix.csv")):
+			raise CustomizedError("You specified to use a customized transition rate matrix, but did not provide the matrix in the correct format or location.")
+		else:
+			out_config.write(f"transition_matrix_path:{os.path.join(slim_pars["cwdir"], "muts_transition_matrix.csv")}\n")
+
 	slim_pars["trans_type"] = all_config["EvolutionModel"]["trans_type"]
 	if slim_pars["trans_type"] not in ["additive", "bialleleic"]:
 		raise CustomizedError("Model for transmissibility has to be one of the two models: additive / bialleleic")

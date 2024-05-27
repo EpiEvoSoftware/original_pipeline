@@ -7,6 +7,7 @@
     "EvolutionModel": {
         "n_generation": 0,
         "mut_rate": 0,
+        "transition_matrix": false,
         "trans_type": "additive",
         "dr_type": "additive",
         "within_host_reproduction": false,

@@ -94,7 +94,9 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
 	
 	# Compute the total number of traits for both transmissibility and drug resistance.
 	num_trait = sum(n_trait.values())
-	search_intvls = np.ravel(eff_size[["start", "end"]])
+	search_intvls = np.array(np.ravel(eff_size[["start", "end"]]), dtype="float")
+	search_intvls[0::2] -= 0.1
+	search_intvls[1::2] += 0.1
 
 	# seem unncessary
 	pos_values = [] # list of positions of mutations happened
