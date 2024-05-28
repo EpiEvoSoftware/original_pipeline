@@ -18,9 +18,9 @@ See the software manual at (https://github.com/EpiEvoSoftware/original_pipeline/
   
 * Using conda & git clone
   1. Clone the repository
-    ```sh
-    git clone https://github.com/EpiEvoSoftware/original_pipeline
-    ```
+      ```sh
+      git clone https://github.com/EpiEvoSoftware/original_pipeline
+      ```
   
   2. Create a conda enviornment by our configuration file. For MacOS users, replace `YOUR_YML` with `mac_env_w_builds.yml`. For Linux users, replace `YOUR_YML` with `linux_env_w_builds.yml`.
     ```sh
