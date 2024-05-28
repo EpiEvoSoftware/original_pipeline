@@ -7,8 +7,8 @@
 	{
 		mm1 = readCSV(transition_matrix_path, colNames = T);
 		defineGlobal("mm", mm1.asMatrix());
-		initializeGenomicElementType(0, 0, 1.0, mutationMatrix = mm * mut_rate);
-		initializeGenomicElementType(1, 1, 1.0, mutationMatrix = mm * mut_rate);
+		initializeGenomicElementType(0, 0, 1.0, mutationMatrix = mm);
+		initializeGenomicElementType(1, 1, 1.0, mutationMatrix = mm);
 	}
 	else
 	{
