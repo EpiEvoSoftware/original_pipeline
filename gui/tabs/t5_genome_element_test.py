@@ -329,29 +329,37 @@ class GenomeElement:
             n_gen = config["EvolutionModel"]["n_generation"]
             mut_rate = config["EvolutionModel"]["mut_rate"]
             trait_n = list(config['GenomeElement']['traits_num'].values())
+            rand_seed = config["BasicRunConfiguration"]["random_number_seed"]
+            error_message = None
 
-            if method == "user_input":
-                effsize_path = config['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
-            elif method == "randomly_generate":
-                effsize_path = ""
-                gff_in = config['GenomeElement']['effect_size']['randomly_generate']["gff"]
-                causal_sizes = config['GenomeElement']['effect_size']['randomly_generate']['genes_num']
-                es_lows = config['GenomeElement']['effect_size']['randomly_generate']['effsize_min']
-                es_highs = config['GenomeElement']['effect_size']['randomly_generate']['effsize_max']
-                norm_or_not = config['GenomeElement']['effect_size']['randomly_generate']['normalize']
-            else:
-                raise ValueError("Invalid method specified")
+            try:
+                if method == "user_input":
+                    effsize_path = config['GenomeElement']['effect_size']['user_input']["path_effsize_table"]
+                elif method == "randomly_generate":
+                    effsize_path = ""
+                    gff_in = config['GenomeElement']['effect_size']['randomly_generate']["gff"]
+                    causal_sizes = config['GenomeElement']['effect_size']['randomly_generate']['genes_num']
+                    es_lows = config['GenomeElement']['effect_size']['randomly_generate']['effsize_min']
+                    es_highs = config['GenomeElement']['effect_size']['randomly_generate']['effsize_max']    
+                    norm_or_not = config['GenomeElement']['effect_size']['randomly_generate']['normalize']
+                else:
+                    raise ValueError("Invalid method specified")
+                
+                error_message = run_effsize_generation(method, wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, n_gen=n_gen, mut_rate=mut_rate, rand_seed=rand_seed)
+                
+                if error_message:
+                    messagebox.showerror("Error", str(error_message))
+                else:
+                    messagebox.showinfo("Success", "Effect size generation completed successfully!")
             
-            run_effsize_generation(method, wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, n_gen=n_gen, mut_rate=mut_rate)
-            
-            
-        
+            except Exception as e:
+                messagebox.showerror("Error", str(e))
+
         button_text = "Run Effect Size Generation"
         run_button_component = EasyButton(button_text, self.control_frame, column, frow, effect_size_generation, hide)
         if not hide:
             self.visible_components.add(run_button_component)
         return run_button_component
-
 
     def init_tab(self, parent, tab_parent, tab_title, tab_index, hide):
         self.parent = parent

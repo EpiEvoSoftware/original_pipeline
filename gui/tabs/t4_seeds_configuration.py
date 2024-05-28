@@ -1041,6 +1041,7 @@ class SeedsConfiguration(TabBase):
             seed_size = config["SeedsConfiguration"]["seed_size"]
             method = config["SeedsConfiguration"]["method"]
             ref_path = get_dict_val(config, ["GenomeElement", "ref_path"])
+            rand_seed = config["BasicRunConfiguration"]["random_number_seed"]
 
             try:
                 if method == "SLiM_burnin_WF":
@@ -1059,6 +1060,7 @@ class SeedsConfiguration(TabBase):
                         mu=mu,
                         n_gen=n_gen,
                         ref_path=ref_path,
+                        rand_seed=rand_seed
                     )
                 elif method == "SLiM_burnin_epi":
                     n_gen = config["SeedsConfiguration"]["SLiM_burnin_epi"][
@@ -1109,6 +1111,7 @@ class SeedsConfiguration(TabBase):
                         R_S_rate=R_S_rate,
                         host_size=host_size,
                         ref_path=ref_path,
+                        rand_seed=rand_seed
                     )
 
                 elif method == "user_input":
@@ -1124,10 +1127,13 @@ class SeedsConfiguration(TabBase):
                         seed_size=seed_size,
                         seed_vcf=path_seeds_vcf,
                         path_seeds_phylogeny=path_seeds_phylogeny,
+                        rand_seed=rand_seed
                     )
 
                 if error is not None:
                     raise Exception(error)
+                
+                messagebox.showinfo("Success", "Seed generation completed successfully!")
 
             except Exception as e:
                 messagebox.showerror("Seed Generation Error", str(e))

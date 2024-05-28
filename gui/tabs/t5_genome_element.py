@@ -19,7 +19,7 @@ class GenomeElement(TabBase):
             self.tab_index,
             self.tab_parent,
             self.parent,
-            self.effect_size_generation,
+            None,
             self.global_update,
         )
         ui_selected = self.generate_genetic_architecture_method == "user_input"
@@ -417,6 +417,7 @@ class GenomeElement(TabBase):
         n_gen = config["EvolutionModel"]["n_generation"]
         mut_rate = config["EvolutionModel"]["mut_rate"]
         trait_n = config["GenomeElement"]["traits_num"]
+        rand_seed = config["BasicRunConfiguration"]["random_number_seed"]
 
         if method == "user_input":
             effsize_path = config["GenomeElement"]["effect_size"]["user_input"][
@@ -440,6 +441,7 @@ class GenomeElement(TabBase):
         else:
             raise ValueError("Invalid method specified")
 
+    
         err = run_effsize_generation(
             method,
             wk_dir,
@@ -452,9 +454,12 @@ class GenomeElement(TabBase):
             norm_or_not=norm_or_not,
             n_gen=n_gen,
             mut_rate=mut_rate,
+            rand_seed=rand_seed,
         )
         if err:
             messagebox.showerror("Generation Error", "Generation Error: " + str(err))
+        else:
+            messagebox.showinfo("Success", "Effect size generation completed successfully!")
 
     def render_run_button(self, hide=True, column=None, frow=None):
         button_text = "Run Effect Size Generation"

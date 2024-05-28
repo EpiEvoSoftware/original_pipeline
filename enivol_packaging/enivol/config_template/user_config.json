@@ -1,8 +1,8 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "",
-        "n_replicates": 1,
-        "random_number_seed": 1
+        "cwdir": "/Users/vivianzhao/Desktop/TB_software/wkdir_test",
+        "n_replicates": 3,
+        "random_number_seed": 5
     },
     "EvolutionModel": {
         "n_generation": 0,
@@ -15,21 +15,21 @@
         "cap_withinhost": 1
     },
     "SeedsConfiguration": {
-        "seed_size": 1,
+        "seed_size": 2,
         "use_reference": false,
-        "method": "user_input",
+        "method": "SLiM_burnin_WF",
         "user_input": {
             "path_seeds_vcf": "",
             "path_seeds_phylogeny": ""
         },
         "SLiM_burnin_WF": {
-            "burn_in_Ne": 0,
-            "burn_in_generations": 0,
-            "burn_in_mutrate": 0
+            "burn_in_Ne": 1000,
+            "burn_in_generations": 4000,
+            "burn_in_mutrate": 1.1e-07
         },
         "SLiM_burnin_epi": {
             "burn_in_generations": 0,
-            "burn_in_mutrate": 0,
+            "burn_in_mutrate": 0.0,
             "seeded_host_id": [],
             "S_IE_rate": 0,
             "E_I_rate": 0,
@@ -42,21 +42,30 @@
     },
     "GenomeElement": {
         "use_genetic_model": true,
-        "ref_path": "",
+        "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir_test/GCF_000195955.2_ASM19595v2_genomic.fna",
         "traits_num": {
-            "transmissibility": 0,
-            "drug_resistance": 0
+            "transmissibility": 1,
+            "drug_resistance": 1
         },
         "effect_size": {
-            "method": "",
+            "method": "randomly_generate",
             "user_input": {
                 "path_effsize_table": ""
             },
             "randomly_generate": {
-                "gff": "",
-                "genes_num": [],
-                "effsize_min": [],
-                "effsize_max": [],
+                "gff": "/Users/vivianzhao/Desktop/TB_software/wkdir_test/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
+                "genes_num": [
+                    1,
+                    1
+                ],
+                "effsize_min": [
+                    4,
+                    4
+                ],
+                "effsize_max": [
+                    5,
+                    5
+                ],
                 "normalize": false
             }
         }

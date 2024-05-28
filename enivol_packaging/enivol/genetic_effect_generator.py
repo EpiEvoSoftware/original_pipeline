@@ -388,7 +388,6 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n={
 	except Exception as e:
 		print(f"Genetic effects generation - An error occured: {e}.", flush = True)
 		error_message = e
-
 	return error_message
 
 def effsize_generation_byconfig(all_config):
