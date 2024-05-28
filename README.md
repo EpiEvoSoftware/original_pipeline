@@ -34,7 +34,7 @@ See the software manual at (https://github.com/EpiEvoSoftware/original_pipeline/
       conda activate enivol
       ```
   
-  4. Install R and R packages (ONLY Required for MacOS)
+  4. Install R and R packages (ONLY Required for MacOS) \\
       Download and Install R from here: https://cran.r-project.org/. Run the following command one by one to install required R packages.
         ```sh
         R
