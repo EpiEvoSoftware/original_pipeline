@@ -79,8 +79,8 @@ See the software manual at (https://github.com/EpiEvoSoftware/original_pipeline/
     Command line options for the pre-simulatuion programs includes NetworkGenerator, SeedGenerator, GeneticEffectGenerator, and SeedHostMatcher. Please refer to the manual chapter Y-Z as for how to run them sequentially. Note that `${WORKDIR}` should be provided for each program in option `-wkdir` to ensure the dependent files are saved in the same location. After running these programs, you need to create a configuration file by modifying the config file template. For explanations on the config file, please refer to Manual chapter T.
       ```sh
       cp ${CODESDIR}/config_template/slim_only_template.json ${WORKDIR}/simulation.config
-      ## Then manually change the configuration in ${WORKDIR}/simulation.config.
       ```
+    Then manually change the configuration in `${WORKDIR}/simulation.config`.
 
 3. Run the simulation
     ```sh
@@ -90,8 +90,9 @@ See the software manual at (https://github.com/EpiEvoSoftware/original_pipeline/
 4. (Alternative to 2 & 3) Run the pre-simulation programs and the simulation together in one command. You need to fill out a bigger configuration file.
     ```sh
     cp ${CODESDIR}/config_template/base_params.json ${WORKDIR}/simulation.config
-    ## Then manually change the configuration in ${WORKDIR}/simulation.config.
-    ## After which, run
+    ```
+    Then manually change the configuration in `${WORKDIR}/simulation.config` and run
+    ```sh
     python -u ${CODESDIR}/enivol.py -config ${WORKDIR}/simulation.config
     ```
 
