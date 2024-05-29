@@ -1,6 +1,13 @@
 import json, os, argparse
 from error_handling import CustomizedError
 
+def recursive_update(default, user):
+    for k, v in user.items():
+        if isinstance(v, dict) and k in default and isinstance(default[k], dict):
+            recursive_update(default[k], v)
+        else:
+            default[k] = v
+
 def read_params(path_config, default_config):
     """
     Reads configuration parameters from JSON files and merges with default parameters defined in he template dictionary.
@@ -16,7 +23,8 @@ def read_params(path_config, default_config):
     config = open(path_config, "r")
     usr_param_dict = json.loads(config.read())
     # Update the template with user information
-    default_param_dict.update(usr_param_dict)
+    # default_param_dict.uapdate(usr_param_dict)
+    recursive_update(default_param_dict, usr_param_dict)
 
     return default_param_dict
 
