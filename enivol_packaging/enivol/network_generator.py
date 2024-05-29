@@ -97,7 +97,6 @@ def read_input_network(path_network, pop_size):
         path_network (str): Path to the network file.
         pop_size (int): Population size.
     """
-    # print(path_network)
     if path_network == "":
         raise CustomizedError(
             f"You need to specify a path to the user-provided network (-path_network)"

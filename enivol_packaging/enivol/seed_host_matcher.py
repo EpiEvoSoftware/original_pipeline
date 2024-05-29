@@ -259,7 +259,7 @@ def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme=
 	in the specified directory.
 
 	Parameters:
-		method (str): "user_input" for user-provided matching or "randomly_generated".
+		method (str): "user_input" for user-provided matching or "randomly_generate".
 		wkdir (str): Full path to the workding directory.
 		num_seed (int): Number of seeds for matching.
 		path_matching (str): Full path to the user-provided matching file.
@@ -351,7 +351,7 @@ def main():
                      help="Methods of the seed host matching")
 	parser.add_argument('-wkdir', action='store',dest='wkdir', type=str, required=True, 
                      help="Working directory")
-	parser.add_argument('-n_seed', action='store',dest='num_seed', type=int, required=True, 
+	parser.add_argument('-num_init_seq', action='store',dest='num_seed', type=int, required=True, 
                      help="Number of seeds to be matched.")
     ### optional parameters
 	parser.add_argument('-path_matching',  action='store',dest='path_matching', type=str, 
