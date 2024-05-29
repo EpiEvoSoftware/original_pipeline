@@ -81,11 +81,8 @@ class Configurationv3:
             error_messages.append("Please enter a valid integer for the random seed.")
             
     def update_n_replicates(self, error_messages):
-        """
-        note: int() doesn't process scientific notation for strings but float() does
-        """
         try:
-            new_n_replicates = int(float(self.n_replicates_entry.get()))
+            new_n_replicates = int(self.n_replicates_entry.get())
             config = load_config_as_dict(self.config_path)
             config["BasicRunConfiguration"]["n_replicates"] = new_n_replicates
             save_config(self.config_path, config)
