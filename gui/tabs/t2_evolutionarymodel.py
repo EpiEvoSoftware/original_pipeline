@@ -21,7 +21,7 @@ class EvolutionaryModel:
 
     def initial_render(self):
         self.render_n_generations()
-        self.render_mut_rate()
+        self.render_model_parameterization()
         self.render_trans_type() 
         self.render_dr_type() 
         self.render_within_host_reproduction()
@@ -59,12 +59,12 @@ class EvolutionaryModel:
     def update(self):
         error_messages = []
         self.update_n_generation(error_messages)
-        self.update_cap_withinhost(error_messages)
-        self.update_dr_type(error_messages)
-        self.update_mut_rate(error_messages)
+        self.update_model_parameterization(error_messages)
         self.update_trans_type(error_messages)
-        self.update_within_host_reproduction_rate(error_messages)
+        self.update_dr_type(error_messages)
         self.update_within_host_reproduction(error_messages)
+        self.update_within_host_reproduction_rate(error_messages)
+        self.update_cap_withinhost(error_messages)
         if len(error_messages) == 0:
             #messagebox.showinfo("Update Successful", "Parameters Updated.")
             return 0
@@ -81,33 +81,82 @@ class EvolutionaryModel:
         self.n_generation_entry.insert(0, self.n_generation)  
         self.n_generation_entry.grid(row = 2, column = 0, sticky = 'w', pady = 2, padx = self.padx_width)
 
+    def render_model_parameterization(self):
+        def update_parameterization(event):
+            parameterization = self.model_parameterization_var.get()
+            if parameterization == "mutation rate (single)":
+                try:
+                    self.mut_rate_matrix_label.destroy()
+                except AttributeError:
+                    pass
+                try: 
+                    self.mut_rate_matrix_container.destroy()
+                except AttributeError:
+                    pass
+                self.render_mut_rate()
+            elif parameterization == "mutation rate matrix":
+                try:
+                    self.mut_rate_label.destroy()
+                except AttributeError:
+                    pass
+                try:
+                    self.mut_rate_entry.destroy()
+                except AttributeError:
+                    pass
+                self.render_mut_rate_matrix()
+
+        self.model_parameterization_label = ttk.Label(self.control_frame, text="Substitution Model Parameterization", style = "Bold.TLabel")
+        self.model_parameterization_label.grid(row = 3, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
+        self.model_parameterization_var = tk.StringVar(value=self.model_parameterization)
+        self.model_parameterization_combobox = ttk.Combobox(self.control_frame, textvariable=self.model_parameterization_var, values=["mutation rate (single)", "mutation rate matrix"], state="readonly")
+        self.model_parameterization_combobox.bind("<<ComboboxSelected>>", update_parameterization)
+        self.model_parameterization_combobox.grid(row = 4, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
+
     def render_mut_rate(self):
         self.mut_rate_label = ttk.Label(self.control_frame, text="Mutation Rate Per Site Per Generation (Numerical)", width = minwidth//2, style = "Bold.TLabel")
-        self.mut_rate_label.grid(row = 1, column = 1, sticky = 'w', pady = 5)
+        self.mut_rate_label.grid(row = 5, column = 0, sticky = 'w', pady = 5, padx=10)
         self.mut_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.mut_rate_entry.insert(0, self.mut_rate)
-        self.mut_rate_entry.grid(row = 2, column = 1, sticky = 'w', pady = 5, padx=0)
+        self.mut_rate_entry.grid(row = 6, column = 0, sticky = 'w', pady = 5, padx=10)
+    
+    def render_mut_rate_matrix(self):
+        self.mut_rate_matrix_label = ttk.Label(self.control_frame, text="Mutation Rate Matrix Per Site Per Generation (Numerical)", width = minwidth//2, style = "Bold.TLabel")
+        self.mut_rate_matrix_label.grid(row = 5, column = 0, sticky = 'w', pady = 5, padx=10)
+
+        self.mut_rate_matrix_container = ttk.Frame(self.control_frame)
+        self.mut_rate_matrix_container.grid(row = 6, column = 0, stick='w', padx = 10)
+
+        self.mut_rate_matrix_entries = [[ttk.Entry(self.mut_rate_matrix_container, foreground="black", width=10) for j in range(4)] for i in  range(4)]
+
+        for i in range(4):
+            for j in range(4):
+                entry = self.mut_rate_matrix_entries[i][j]
+                entry.insert(0, self.mut_rate_matrix[i][j])
+                entry.grid(row = i, column = j, stick='w')
+                if i == j:
+                    entry.config(state='disabled', foreground='light grey')
+
+        # self.mut_rate_matrix_entry = ttk.Entry(self.control_frame, foreground="black")
+        # self.mut_rate_matrix_entry.insert(0, self.mut_rate)
+        # self.mut_rate_matrix_entry.grid(row = 6, column = 0, sticky = 'w', pady = 5, padx=10)
         
     def render_trans_type(self):
         self.trans_type_label = ttk.Label(self.control_frame, text="Transmissibility Trait Type", style = "Bold.TLabel")
-        self.trans_type_label.grid(row = 3, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
+        self.trans_type_label.grid(row = 11, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
         self.trans_type_var = tk.StringVar(value=self.trans_type)
         self.trans_type_combobox = ttk.Combobox(self.control_frame, textvariable=self.trans_type_var, values=["Bi-Allelic", "Additive"], state="readonly")
-        self.trans_type_combobox.grid(row = 4, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
+        self.trans_type_combobox.grid(row = 12, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
     
     def render_dr_type(self):
         self.dr_type_label = ttk.Label(self.control_frame, text="Drug-Resistance Trait Type", style = "Bold.TLabel")
-        self.dr_type_label.grid(row = 5, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
+        self.dr_type_label.grid(row = 13, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
         self.dr_type_var = tk.StringVar(value=self.dr_type)
         self.dr_type_combobox = ttk.Combobox(self.control_frame, textvariable=self.dr_type_var, values=["Bi-Allelic", "Additive"], state="readonly")
-        self.dr_type_combobox.grid(row = 6, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)      
+        self.dr_type_combobox.grid(row = 14, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)      
 
     def render_within_host_reproduction(self):
         def update():
             input_value = self.within_host_reproduction_var.get()
-            # config = load_config_as_dict(self.config_path)
-            # config['EvolutionModel']['within_host_reproduction'] = input_value
-            # save_config(self.config_path, config)
             if input_value:
                 self.render_within_host_reproduction_rate(False)
             else:
@@ -117,9 +166,9 @@ class EvolutionaryModel:
         self.rb_true = ttk.Radiobutton(self.control_frame, text="Yes", variable=self.within_host_reproduction_var, value=True, command = update)
         self.rb_false = ttk.Radiobutton(self.control_frame, text="No", variable=self.within_host_reproduction_var, value=False, command = update)
 
-        self.within_host_reproduction_label.grid(row = 7, column = 0, sticky = 'w', pady = 5, padx=10)
-        self.rb_true.grid(row = 8, column = 0, sticky = 'w', pady = 5, padx=10)
-        self.rb_false.grid(row = 9, column = 0, sticky = 'w', pady = 5, padx=10)
+        self.within_host_reproduction_label.grid(row = 15, column = 0, sticky = 'w', pady = 5, padx=10)
+        self.rb_true.grid(row = 16, column = 0, sticky = 'w', pady = 5, padx=10)
+        self.rb_false.grid(row = 17, column = 0, sticky = 'w', pady = 5, padx=10)
 
     def render_within_host_reproduction_rate(self, disabled):
         self.render_within_host_reproduction_rate_title = "Within-host Reproduction Rate Per Generation (Numerical)"
@@ -127,8 +176,8 @@ class EvolutionaryModel:
         self.within_host_reproduction_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.within_host_reproduction_rate_entry.insert(0, self.within_host_reproduction_rate) 
         
-        self.within_host_reproduction_rate_label.grid(row = 7, column = 1, sticky = 'w', pady = 5, padx=0)
-        self.within_host_reproduction_rate_entry.grid(row = 8, column = 1, sticky = 'w', pady = 5, padx=0)
+        self.within_host_reproduction_rate_label.grid(row = 15, column = 1, sticky = 'w', pady = 5, padx=0)
+        self.within_host_reproduction_rate_entry.grid(row = 16, column = 1, sticky = 'w', pady = 5, padx=0)
 
         if disabled:
             self.within_host_reproduction_rate_label.configure(state="disabled")
@@ -136,15 +185,13 @@ class EvolutionaryModel:
         else:
             self.within_host_reproduction_rate_label.configure(state="normal")
             self.within_host_reproduction_rate_entry.configure(foreground='black', state="normal")
-
-        
  
     def render_cap_withinhost(self):
         self.cap_withinhost_label = ttk.Label(self.control_frame, text="Maximum Number of Pathogens within Host (Integer)", style = "Bold.TLabel")
-        self.cap_withinhost_label.grid(row = 10, column = 0, sticky = 'w', pady = 5, padx = self.padx_width)
+        self.cap_withinhost_label.grid(row = 18, column = 0, sticky = 'w', pady = 5, padx = self.padx_width)
         self.cap_withinhost_entry = ttk.Entry(self.control_frame, foreground="black")
         self.cap_withinhost_entry.insert(0, self.cap_withinhost)  
-        self.cap_withinhost_entry.grid(row = 11, column = 0, sticky = 'w', pady = 5, padx = self.padx_width)
+        self.cap_withinhost_entry.grid(row = 19, column = 0, sticky = 'w', pady = 5, padx = self.padx_width)
 
     def update_n_generation(self, error_messages):
         try:
@@ -155,32 +202,28 @@ class EvolutionaryModel:
         except ValueError:
             error_messages.append("Please enter a valid integer for n_generation.")
 
-    def update_mut_rate(self, error_messages):
-        try:
-            new_mut_rate = int(float(self.mut_rate_entry.get()))  
-            config = load_config_as_dict(self.config_path) 
-            config['EvolutionModel']['mut_rate'] = new_mut_rate 
-            save_config(self.config_path, config)  
-        except ValueError:
-            error_messages.append("Please enter a valid number for mut_rate.")
+    def update_model_parameterization(self, error_messages):
+        config = load_config_as_dict(self.config_path) 
+        if self.model_parameterization_var.get():
+            parameterization = self.model_parameterization_var.get()
+            config['EvolutionModel']['subst_model_parameterization'] = parameterization
 
-    def update_cap_withinhost(self, error_messages):
-        try:
-            new_cap_withinhost = int(float(self.cap_withinhost_entry.get()))  
-            config = load_config_as_dict(self.config_path) 
-            config['EvolutionModel']['cap_withinhost'] = new_cap_withinhost 
-            save_config(self.config_path, config)  
-        except ValueError:
-            error_messages.append("Please enter a valid integer for cap_withinhost.")
-
-    def update_within_host_reproduction_rate(self, error_messages):
-        try:
-            new_within_host_reproduction_rate = int(float(self.within_host_reproduction_rate_entry.get()))  
-            config = load_config_as_dict(self.config_path) 
-            config['EvolutionModel']['within_host_reproduction_rate'] = new_within_host_reproduction_rate 
-            save_config(self.config_path, config)  
-        except ValueError:
-            error_messages.append("Please enter a valid number for " + self.render_within_host_reproduction_rate_title + ".")
+            if parameterization == "mutation rate (single)":
+                try:
+                    config['EvolutionModel']['mut_rate'] = float(self.mut_rate_entry.get())
+                    self.mut_rate = config['EvolutionModel']['mut_rate']
+                except ValueError:
+                    error_messages.append("Please enter a valid number for mutation rate.")
+            elif parameterization == "mutation rate matrix":
+                try:
+                    for i in range(4):
+                        for j in range(4):
+                            config['EvolutionModel']['mut_rate_matrix'][i][j] = float(self.mut_rate_matrix_entries[i][j].get())
+                            self.mut_rate_matrix[i][j] = config['EvolutionModel']['mut_rate_matrix'][i][j]
+                except ValueError:
+                    error_messages.append("Please enter valid numbers into the mutation rate matrix.")
+        
+            save_config(self.config_path, config)
 
     def update_trans_type(self, error_messages):
         new_trans_type = self.trans_type_var.get()
@@ -200,15 +243,37 @@ class EvolutionaryModel:
         config['EvolutionModel']['within_host_reproduction'] = input_value
         save_config(self.config_path, config)
 
+    def update_within_host_reproduction_rate(self, error_messages):
+        try:
+            new_within_host_reproduction_rate = float(self.within_host_reproduction_rate_entry.get())
+            config = load_config_as_dict(self.config_path) 
+            config['EvolutionModel']['within_host_reproduction_rate'] = new_within_host_reproduction_rate 
+            save_config(self.config_path, config)  
+        except ValueError:
+            error_messages.append("Please enter a valid number for " + self.render_within_host_reproduction_rate_title + ".")
+
+    def update_cap_withinhost(self, error_messages):
+        try:
+            new_cap_withinhost = int(self.cap_withinhost_entry.get()) 
+            config = load_config_as_dict(self.config_path) 
+            config['EvolutionModel']['cap_withinhost'] = new_cap_withinhost 
+            save_config(self.config_path, config)  
+        except ValueError:
+            error_messages.append("Please enter a valid integer for cap_withinhost.")
+
+
     def init_val(self, config_path):
         self.config_path = config_path
-        self.n_generation = load_config_as_dict(self.config_path)['EvolutionModel']['n_generation']
-        self.mut_rate = load_config_as_dict(self.config_path)['EvolutionModel']['mut_rate']
-        self.trans_type = load_config_as_dict(self.config_path)['EvolutionModel']['trans_type']
-        self.dr_type = load_config_as_dict(self.config_path)['EvolutionModel']['dr_type']
-        self.within_host_reproduction = load_config_as_dict(self.config_path)['EvolutionModel']['within_host_reproduction']
-        self.within_host_reproduction_rate = load_config_as_dict(self.config_path)['EvolutionModel']['within_host_reproduction_rate']
-        self.cap_withinhost = load_config_as_dict(self.config_path)['EvolutionModel']['cap_withinhost']
+        config = load_config_as_dict(self.config_path)
+        self.n_generation = config['EvolutionModel']['n_generation']
+        self.model_parameterization = config['EvolutionModel']['subst_model_parameterization']
+        self.mut_rate = config['EvolutionModel']['mut_rate']
+        self.mut_rate_matrix = config['EvolutionModel']['mut_rate_matrix']
+        self.trans_type = config['EvolutionModel']['trans_type']
+        self.dr_type = config['EvolutionModel']['dr_type']
+        self.within_host_reproduction = config['EvolutionModel']['within_host_reproduction']
+        self.within_host_reproduction_rate = config['EvolutionModel']['within_host_reproduction_rate']
+        self.cap_withinhost = config['EvolutionModel']['cap_withinhost']
 
 
     def init_tab(self, parent, tab_parent, tab_title, tab_index, hide):

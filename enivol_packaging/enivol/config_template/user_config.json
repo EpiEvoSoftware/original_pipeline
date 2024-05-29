@@ -1,36 +1,61 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "/Users/vivianzhao/Desktop/TB_software/wkdir_test",
-        "n_replicates": 3,
-        "random_number_seed": 5
+        "cwdir": "",
+        "n_replicates": 1,
+        "random_number_seed": 1
     },
     "EvolutionModel": {
         "n_generation": 0,
+        "subst_model_parameterization": "mutation rate matrix",
         "mut_rate": 0,
-        "subst_model_parameterization": "mut_rate_matrix",
-        "mut_rate_matrix": [[0,0.1521,0.5162,0.0423], [0.2993,0,0.2145,0.8892], [1.0118,0.2137,0,0.301], [0.0423,0.4517,0.1535,0]],
+        "mut_rate_matrix": [
+            [
+                0.0,
+                0.001,
+                0.0,
+                0.0
+            ],
+            [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
         "trans_type": "additive",
         "dr_type": "additive",
-        "within_host_reproduction": false,
-        "within_host_reproduction_rate": 0,
+        "within_host_reproduction": true,
+        "within_host_reproduction_rate": 1e-10,
         "cap_withinhost": 1
     },
     "SeedsConfiguration": {
-        "seed_size": 2,
+        "seed_size": 1,
         "use_reference": false,
-        "method": "SLiM_burnin_WF",
+        "method": "user_input",
         "user_input": {
             "path_seeds_vcf": "",
             "path_seeds_phylogeny": ""
         },
         "SLiM_burnin_WF": {
-            "burn_in_Ne": 1000,
-            "burn_in_generations": 4000,
-            "burn_in_mutrate": 1.1e-07
+            "burn_in_Ne": 0,
+            "burn_in_generations": 0,
+            "burn_in_mutrate": 0
         },
         "SLiM_burnin_epi": {
             "burn_in_generations": 0,
-            "burn_in_mutrate": 0.0,
+            "burn_in_mutrate": 0,
             "seeded_host_id": [],
             "S_IE_rate": 0,
             "E_I_rate": 0,
@@ -43,30 +68,21 @@
     },
     "GenomeElement": {
         "use_genetic_model": true,
-        "ref_path": "/Users/vivianzhao/Desktop/TB_software/wkdir_test/GCF_000195955.2_ASM19595v2_genomic.fna",
+        "ref_path": "",
         "traits_num": {
-            "transmissibility": 1,
-            "drug_resistance": 1
+            "transmissibility": 0,
+            "drug_resistance": 0
         },
         "effect_size": {
-            "method": "randomly_generate",
+            "method": "",
             "user_input": {
                 "path_effsize_table": ""
             },
             "randomly_generate": {
-                "gff": "/Users/vivianzhao/Desktop/TB_software/wkdir_test/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
-                "genes_num": [
-                    1,
-                    1
-                ],
-                "effsize_min": [
-                    4,
-                    4
-                ],
-                "effsize_max": [
-                    5,
-                    5
-                ],
+                "gff": "",
+                "genes_num": [],
+                "effsize_min": [],
+                "effsize_max": [],
                 "normalize": false
             }
         }
