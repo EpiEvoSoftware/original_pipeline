@@ -168,7 +168,7 @@ def write_eff_size_csv(trait_n, traits_dict, wk_dir):
 	Writes effect sizes of genes into a CSV file.
 	
 	Parameters:
-		trait_n (list): A list containing the number of traits for transmissibility and drug resistance.
+		trait_n (dict[str, int]): A dictionary containing the number of traits for transmissibility and drug resistance.
 		traits_dict (list): A list containing effect sizes of genetic elements.
 							Indices are trait IDs, elements are dictionaries where keys are gene names and values are lists
 							containing start position, end position, and effect size.
@@ -287,9 +287,9 @@ def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir,
 	seeds_trait_vals = []
 	# Generate effect sizes and calculate seeds' trait values for each trait
 	for trait_id in range(sum(trait_n.values())):
-		curret_tdict, seed_vals = generate_eff_vals(gff_, causal_sizes[trait_id], es_lows[trait_id], 
+		current_tdict, seed_vals = generate_eff_vals(gff_, causal_sizes[trait_id], es_lows[trait_id], 
 											  es_highs[trait_id], wk_dir, n_gen, mut_rate, norm_or_not)
-		traits_dict.append(curret_tdict)
+		traits_dict.append(current_tdict)
 		seeds_trait_vals.append(seed_vals)
 
 	# Write seeds' trait values and genetic element information to CSV files

@@ -1,5 +1,6 @@
 import os, shutil, subprocess, argparse
 import pandas as pd
+import numpy as np
 # import tskit, pyslim
 from base_func import *
 from post_simulation_func import *
@@ -29,6 +30,22 @@ def _check_float(value, name):
 def _check_boolean(value, name):
 	if not isinstance(value, bool):
 		raise CustomizedError(f"{name} has to be a boolean value")
+	
+def is_non_negative(matrix):
+	return (matrix >= 0).all()
+
+def _check_write_mut_matrix(lst, wkdir):
+	mat = np.array(lst)
+	dig = mat.diagonal()
+	zero_dig = not np.any(dig)
+	non_neg = is_non_negative(mat)
+	if zero_dig and non_neg:
+		column_names = ["A", "C", "G", "T"]
+		df = pd.DataFrame(mat, columns = column_names)
+		df.to_csv(os.path.join(wkdir, "muts_transition_matrix.csv"), index=False)
+		return True
+	else:
+		return False
 	
 def append_files(file1_path, file2_path):
 	"""
@@ -77,21 +94,48 @@ def create_slim_config(all_config):
 	_check_integer(slim_pars["n_generation"], "Number of ticks")
 	out_config.write(f"n_generation:{slim_pars['n_generation']}\n")
 
-	slim_pars["mut_rate"] = all_config["EvolutionModel"]["mut_rate"]
-	try:
-		_check_integer(slim_pars["mut_rate"], "Mutation rate")
-	except CustomizedError:
-		_check_float(slim_pars["mut_rate"], "Mutation rate")
-	out_config.write(f"mut_rate:{slim_pars['mut_rate']}\n")
+	# check the flag
+	slim_pars["subst_model_parameterization"] = all_config["EvolutionModel"]["subst_model_parameterization"]
+	# mutation matrix
+	if slim_pars["subst_model_parameterization"] == "mut_rate_matrix":
+		matrix = all_config["EvolutionModel"]["mut_rate_matrix"]
+		slim_pars["mut_rate_matrix"] = matrix
+		if not _check_write_mut_matrix(matrix, cwdir):
+			raise CustomizedError(f"The given mutation rate matrix {matrix} does NOT meet the requirement 1) zeros on diagonals \
+				AND 2) non-negative numbers on non-diagonals")
+		out_config.write(f"mut_rate_matrix: {slim_pars["mut_rate_matrix"]}\n")
+		out_config.write(f"transition_matrix: T\n")
+		out_config.write(f"transition_matrix_path:{os.path.join(cwdir, "muts_transition_matrix.csv")}\n")
+	elif slim_pars["subst_model_parameterization"] == "mut_rate":
+		try:
+			_check_integer(slim_pars["mut_rate"], "Mutation rate")
+		except CustomizedError:
+			_check_float(slim_pars["mut_rate"], "Mutation rate")
+		out_config.write(f"mut_rate:{slim_pars['mut_rate']}\n")
+		out_config.write(f"transition_matrix: F\n")
+	else:
+		raise CustomizedError(f"The given subst_model_parameterization is NOT valid -- please input 'mut_rate' or 'mut_rate_matrix'.")
 
-	slim_pars["transition_matrix"] = all_config["EvolutionModel"]["transition_matrix"]
-	_check_boolean(slim_pars["transition_matrix"], "Whether to use a transition rate matrix for mutation")
-	out_config.write(f"transition_matrix:{_writebinary(slim_pars['transition_matrix'])}\n")
-	if slim_pars["transition_matrix"]:
-		if not os.path.exists(os.path.join(slim_pars["cwdir"], "muts_transition_matrix.csv")):
-			raise CustomizedError("You specified to use a customized transition rate matrix, but did not provide the matrix in the correct format or location.")
-		else:
-			out_config.write(f"transition_matrix_path:{os.path.join(slim_pars["cwdir"], "muts_transition_matrix.csv")}\n")
+		# check the validity of mutation matrix and write it to the csv
+
+		
+	# mutation rate
+
+	# slim_pars["mut_rate"] = all_config["EvolutionModel"]["mut_rate"]
+	# try:
+	# 	_check_integer(slim_pars["mut_rate"], "Mutation rate")
+	# except CustomizedError:
+	# 	_check_float(slim_pars["mut_rate"], "Mutation rate")
+	# out_config.write(f"mut_rate:{slim_pars['mut_rate']}\n")
+
+	# slim_pars["transition_matrix"] = all_config["EvolutionModel"]["transition_matrix"]
+	# _check_boolean(slim_pars["transition_matrix"], "Whether to use a transition rate matrix for mutation")
+	# out_config.write(f"transition_matrix:{_writebinary(slim_pars['transition_matrix'])}\n")
+	# if slim_pars["transition_matrix"]:
+	# 	if not os.path.exists(os.path.join(slim_pars["cwdir"], "muts_transition_matrix.csv")):
+	# 		raise CustomizedError("You specified to use a customized transition rate matrix, but did not provide the matrix in the correct format or location.")
+	# 	else:
+	# 		out_config.write(f"transition_matrix_path:{os.path.join(slim_pars["cwdir"], "muts_transition_matrix.csv")}\n")
 
 	slim_pars["trans_type"] = all_config["EvolutionModel"]["trans_type"]
 	if slim_pars["trans_type"] not in ["additive", "bialleleic"]:
@@ -206,21 +250,23 @@ def create_slim_config(all_config):
 	slim_pars["cap_transmissibility"] = all_config["EpidemiologyModel"]["genetic_architecture"]["cap_transmissibility"]
 	slim_pars["drugresistance_effsize"] = all_config["EpidemiologyModel"]["genetic_architecture"]["drug_resistance"]
 	slim_pars["cap_drugresist"] = all_config["EpidemiologyModel"]["genetic_architecture"]["cap_drugresist"]
-	slim_pars["S_IE_rate"] = all_config["EpidemiologyModel"]["transiton_rate"]["S_IE_rate"]
-	slim_pars["I_R_rate"] = all_config["EpidemiologyModel"]["transiton_rate"]["I_R_rate"]
-	slim_pars["R_S_rate"] = all_config["EpidemiologyModel"]["transiton_rate"]["R_S_rate"]
-	slim_pars["latency_prob"] = all_config["EpidemiologyModel"]["transiton_rate"]["latency_prob"]
-	slim_pars["E_I_rate"] = all_config["EpidemiologyModel"]["transiton_rate"]["E_I_rate"]
-	slim_pars["I_E_rate"] = all_config["EpidemiologyModel"]["transiton_rate"]["I_E_rate"]
-	slim_pars["E_R_rate"] = all_config["EpidemiologyModel"]["transiton_rate"]["E_R_rate"]
-	slim_pars["sample_rate"] = all_config["EpidemiologyModel"]["transiton_rate"]["sample_rate"]
-	slim_pars["recovery_prob_after_sampling"] = all_config["EpidemiologyModel"]["transiton_rate"]["recovery_prob_after_sampling"]
+	slim_pars["S_IE_rate"] = all_config["EpidemiologyModel"]["transition_rate"]["S_IE_rate"]
+	slim_pars["I_R_rate"] = all_config["EpidemiologyModel"]["transition_rate"]["I_R_rate"]
+	slim_pars["R_S_rate"] = all_config["EpidemiologyModel"]["transition_rate"]["R_S_rate"]
+	slim_pars["latency_prob"] = all_config["EpidemiologyModel"]["transition_rate"]["latency_prob"]
+	slim_pars["E_I_rate"] = all_config["EpidemiologyModel"]["transition_rate"]["E_I_rate"]
+	slim_pars["I_E_rate"] = all_config["EpidemiologyModel"]["transition_rate"]["I_E_rate"]
+	slim_pars["E_R_rate"] = all_config["EpidemiologyModel"]["transition_rate"]["E_R_rate"]
+	slim_pars["sample_rate"] = all_config["EpidemiologyModel"]["transition_rate"]["sample_rate"]
+	slim_pars["recovery_prob_after_sampling"] = all_config["EpidemiologyModel"]["transition_rate"]["recovery_prob_after_sampling"]
 
 	for param in ["S_IE_rate", "I_R_rate", "R_S_rate", "latency_prob", "E_I_rate", "I_E_rate", "E_R_rate", "sample_rate", "recovery_prob_after_sampling"]:
 		if not isinstance(slim_pars[param], list):
 			raise CustomizedError(f"({param}) has to be a list []")
 		if len(slim_pars[param]) != slim_pars["n_epoch"]:
-			raise CustomizedError(f"{param} (\"epoch_changing_generation\") has to have length of the number of epochs")
+			print("param", slim_pars[param])
+			print(slim_pars["n_epoch"])
+			raise CustomizedError(f"{param} (\"epoch_changing_generation\") needs to be of the same length of the number of epochs")
 		if any(not isinstance(i, (float, int)) for i in slim_pars[param]):
 			raise CustomizedError(f"The probability of event ({param}) has to be a list of floats")
 		if any(i > 1 or i < 0 for i in slim_pars[param]):

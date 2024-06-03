@@ -32,6 +32,18 @@ def ER_generate(pop_size, p_ER):
     er_graph = nx.erdos_renyi_graph(pop_size, p_ER, seed=np.random)
     return er_graph
 
+def fast_ER_generate(pop_size, p_ER):
+    """
+    Returns an Erdos_renyi graph faster than the vanilla implementation.
+
+    Parameters:
+        p_ER (str): The probability of existing edges between two nodes.
+        pop_size (int): Population size.
+    """
+    if not 0 < p_ER <= 1:
+        raise CustomizedError("You need to specify a p>0 (-p_ER) in Erdos-Renyi graph")
+    er_graph = nx.fast_gnp_random_graph(pop_size, p_ER, seed = np.random)
+    return er_graph
 
 def rp_generate(pop_size, rp_size, p_within, p_between):
     """
@@ -165,7 +177,7 @@ def run_network_generation(
                 )
 
             if model == "ER":
-                ntwk = ER_generate(pop_size, p_ER)
+                ntwk = fast_ER_generate(pop_size, p_ER)
             elif model == "RP":
                 ntwk = rp_generate(pop_size, rp_size, p_within, p_between)
             elif model == "BA":

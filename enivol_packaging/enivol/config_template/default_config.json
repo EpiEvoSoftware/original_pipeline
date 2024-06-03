@@ -132,7 +132,7 @@
             "drug_resistance": [],
             "cap_drugresist": []
         },
-        "transiton_rate": {
+        "transition_rate": {
             "S_IE_rate": [],
             "I_R_rate": [],
             "R_S_rate": [],

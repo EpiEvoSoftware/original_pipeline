@@ -160,8 +160,8 @@ def _write_newick_file(wk_dir, sampled_tree, node_labels):
 
 	# Write newicks depending on whether this is a multi-root tree
 	if len(roots) > 1:
+		os.mkdir(phylo_path)
 		for r in roots:
-			os.mkdir(phylo_path)
 			with open(os.path.join(phylo_path, str(r) + NEWICK_SUFFIX), "w") as nwk:	
 				nwk.write(sampled_tree.first().as_newick(root=r, node_labels = node_labels))
 	else:
