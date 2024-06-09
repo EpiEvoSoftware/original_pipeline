@@ -107,12 +107,13 @@ def create_slim_config(all_config):
 		out_config.write(f"transition_matrix: T\n")
 		out_config.write(f"transition_matrix_path:{os.path.join(cwdir, "muts_transition_matrix.csv")}\n")
 	elif slim_pars["subst_model_parameterization"] == "mut_rate":
+		slim_pars["mut_rate"] = all_config["EvolutionModel"]["mut_rate"]
 		try:
 			_check_integer(slim_pars["mut_rate"], "Mutation rate")
 		except CustomizedError:
 			_check_float(slim_pars["mut_rate"], "Mutation rate")
 		out_config.write(f"mut_rate:{slim_pars['mut_rate']}\n")
-		out_config.write(f"transition_matrix: F\n")
+		out_config.write(f"transition_matrix:\n")
 	else:
 		raise CustomizedError(f"The given subst_model_parameterization is NOT valid -- please input 'mut_rate' or 'mut_rate_matrix'.")
 
@@ -323,7 +324,7 @@ def create_slim_config(all_config):
 	
 	slim_pars["super_infection"] = all_config["EpidemiologyModel"]["super_infection"]
 	_check_boolean(slim_pars["super_infection"], "Whether to enable super infection")
-	out_config.write(f"super_infection: {_writebinary(slim_pars["n_massive_sample"])}\n")
+	out_config.write(f"super_infection: {_writebinary(slim_pars["super_infection"])}\n")
 	if slim_pars["super_infection"] and slim_pars["cap_withinhost"]==1:
 		print("WARNING: Though super-infection is activated, you specified the capacity within-host being only 1, thus super-infection actually cannot happen.", flush = True)
 	# slim_pars["slim_replicate_seed_file_path"] = all_config["EpidemiologyModel"]["slim_replicate_seed_file_path"]

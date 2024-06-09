@@ -36,12 +36,12 @@ initialize() {
 	initializeTreeSeq();
 	
 
-	str_pars = c("cwdir", "trans_type", "dr_type", "ref_path", "causal_gene_path", "seed_host_matching_path", "contact_network_path", "epi_model");
+	str_pars = c("cwdir", "trans_type", "dr_type", "ref_path", "causal_gene_path", "seed_host_matching_path", "contact_network_path", "epi_model", "transition_matrix_path");
 	int_pars = c("n_generation", "cap_withinhost", "seed_size", "n_epoch", "n_massive_sample", "host_size", "cap_withinhost");
 	float_pars = c("mut_rate", "within_host_reproduction_rate");
 	list_int_pars = c("epoch_changing_generation", "transmissibility_effsize", "drugresistance_effsize", "massive_sample_generation");
 	list_float_pars = c("S_IE_rate", "I_R_rate", "R_S_rate", "latency_prob", "E_I_rate", "I_E_rate", "E_R_rate", "sample_rate", "recovery_prob_after_sampling", "massive_sample_prob", "massive_sample_recover_prob", "cap_transmissibility", "cap_drugresist");
-	bin_pars = c("within_host_reproduction", "use_genetic_model", "super_infection");
+	bin_pars = c("within_host_reproduction", "use_genetic_model", "super_infection", "transition_matrix");
 
 	// config_path has to be command line input
 	defineGlobal("configs", readFile(config_path));
@@ -68,8 +68,6 @@ initialize() {
 		}
 		else if (any(ll[0]==list_float_pars))
 		{
-			print(ll[0]);
-			print(asFloat(strsplit(ll[1], sep=",")));
 			defineGlobal(ll[0], asFloat(strsplit(ll[1], sep=",")));	
 		}
 		else if (any(ll[0]==bin_pars))
@@ -93,9 +91,25 @@ initialize() {
 	initializeRecombinationRate(0);
 
 	initializeMutationTypeNuc(0, 1, "f", 0.0); // Neutral mutations
-	initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mut_rate / 3));
 	initializeMutationTypeNuc(1, 1, "f", 0.0);  // Mutations contributing to traits
-	initializeGenomicElementType(1, 1, 1.0, mmJukesCantor(mut_rate / 3));
+	if (transition_matrix==T)
+	{
+		mm1 = readCSV(transition_matrix_path, colNames = T);
+		defineGlobal("mm", mm1.asMatrix());
+		initializeGenomicElementType(0, 0, 1.0, mutationMatrix = mm);
+		initializeGenomicElementType(1, 1, 1.0, mutationMatrix = mm);
+	}
+	else
+	{
+		initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mut_rate / 3));
+		initializeGenomicElementType(1, 1, 1.0, mmJukesCantor(mut_rate / 3));
+	}
+
+	// Print the mutation transition rate matrix!
+	print(g1.mutationMatrix);
+	
+
+
 
 		range_genes = c();
 	defineGlobal("effsize_pos", readCSV(causal_gene_path, colNames = T));
@@ -104,22 +118,22 @@ initialize() {
 	trait_names = effsize_pos.colNames[3:ncol_idx];
 	n_trans_traits = sum(strcontains(trait_names, "transmissibility"));
 	n_dr_traits = sum(strcontains(trait_names, "dr"));
-	initializeGenomicElement(0, 0, effsize_pos.subset(0,1) - 1);
+	initializeGenomicElement(0, 0, effsize_pos.subset(0,1) - 2);
 	nminus1 = n_causal_genes - 1;
 	trait_locs = c(0);
 
 	for (i in 1:nminus1)
 	{
-		range_genes = c(range_genes, effsize_pos.subset(i-1,1):effsize_pos.subset(i-1,2));
-		trait_locs = c(trait_locs, effsize_pos.subset(i-1,1), effsize_pos.subset(i-1,2));
-		initializeGenomicElement(1, effsize_pos.subset(i-1,1), effsize_pos.subset(i-1,2) - 1);
-		initializeGenomicElement(0, effsize_pos.subset(i-1,2), effsize_pos.subset(i,1) - 1);
+		range_genes = c(range_genes, effsize_pos.subset(i-1,1):effsize_pos.subset(i-1,2) - 1);
+		trait_locs = c(trait_locs, effsize_pos.subset(i-1,1) - 1, effsize_pos.subset(i-1,2) - 1);
+		initializeGenomicElement(1, effsize_pos.subset(i-1,1) - 1, effsize_pos.subset(i-1,2) - 1);
+		initializeGenomicElement(0, effsize_pos.subset(i-1,2), effsize_pos.subset(i,1) - 2);
 	}
 
-
-	range_genes = c(range_genes, effsize_pos.subset(nminus1,1):effsize_pos.subset(nminus1,2));
-	trait_locs = c(trait_locs, effsize_pos.subset(nminus1,1), effsize_pos.subset(nminus1,2));
-	initializeGenomicElement(1, effsize_pos.subset(nminus1,1), effsize_pos.subset(nminus1,2) - 1);
+ 
+	range_genes = c(range_genes, effsize_pos.subset(nminus1,1):effsize_pos.subset(nminus1,2) - 1);
+	trait_locs = c(trait_locs, effsize_pos.subset(nminus1,1) - 1, effsize_pos.subset(nminus1,2) - 1);
+	initializeGenomicElement(1, effsize_pos.subset(nminus1,1) - 1, effsize_pos.subset(nminus1,2) - 1);
 	initializeGenomicElement(0, effsize_pos.subset(nminus1,2), L-1);
 
 	defineGlobal("n_causal_genes", n_causal_genes);
@@ -158,6 +172,7 @@ mutation(m1) {
 1 first() {
 	//// Turn on warnings
 	suppressWarnings(F);
+	print("Scheduling block");
 
 	// self reproduction (for mutation accumulation) run every generation
 	community.rescheduleScriptBlock(s0, ticks = 2:n_generation);
@@ -449,6 +464,7 @@ s0 reproduction() {
 s1 reproduction()
 {
 	// Transmission
+	print(community.tick);
 	infectors = which(Host_states==2);
 	subpops = sim.subpopulations;
 	infector_subpops = subpops[infectors];
@@ -500,7 +516,6 @@ s8 early()
 	e_inds = which(Host_states==1);
 
 	draw_uniform = runif(length(e_inds));
-	print(E_I_rate[current_epoch]);
 	state_transition = findInterval(draw_uniform, c(0, E_I_rate[current_epoch], E_I_rate[current_epoch] + E_R_rate[current_epoch]));
 	Host_states[e_inds[which(state_transition==0)]] = 2; // state_transition=0 means going from latent to active state (1>2)
 	recover_from_e = e_inds[which(state_transition==1)];
