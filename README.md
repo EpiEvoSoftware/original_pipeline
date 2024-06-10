@@ -1,6 +1,6 @@
-## $e^{3}SIM$: Epidemiological-ecological-evolutionary simulation framework for genetic epidemiology
+## $\text{e}^{\text{3}}\text{SIM}$
 
-$e^{3}SIM$ is an innovative outbreak simulator that features the coupling of pathogen evolution and various epidemiological scenarios. This software is tailored to cater to users of all levels, offering a user-friendly graphical interface for those with limited coding experience, while also providing advanced customization options via command line for users proficient in coding. It is supported in both MacOS system and Linux system.
+$\text{e}^{\text{3}}\text{SIM}$ (Epidemiological-ecological-evolutionary simulation framework for genetic epidemiology) is an innovative outbreak simulator that features the coupling of pathogen evolution and various epidemiological scenarios. This software is tailored to cater to users of all levels, offering a user-friendly graphical interface for those with limited coding experience, while also providing advanced customization options via command line for users proficient in coding. It is supported in both MacOS system and Linux system.
 
 See our manuscript at (manuscript url). # NEED UPDATE
 
@@ -40,8 +40,8 @@ See the software manual at (https://github.com/EpiEvoSoftware/original_pipeline/
         R
         install.packages("phylobase")
         install.packages("ape")
-        install.packages("tidyverse")
         install.packages("ggplot2")
+        install.packages("data.table")
 
         if (!require("BiocManager", quietly = TRUE))
             install.packages("BiocManager")

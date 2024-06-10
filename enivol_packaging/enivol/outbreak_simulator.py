@@ -107,12 +107,13 @@ def create_slim_config(all_config):
 		out_config.write(f"transition_matrix: T\n")
 		out_config.write(f"transition_matrix_path:{os.path.join(cwdir, "muts_transition_matrix.csv")}\n")
 	elif slim_pars["subst_model_parameterization"] == "mut_rate":
+		slim_pars["mut_rate"] = all_config["EvolutionModel"]["mut_rate"]
 		try:
 			_check_integer(slim_pars["mut_rate"], "Mutation rate")
 		except CustomizedError:
 			_check_float(slim_pars["mut_rate"], "Mutation rate")
 		out_config.write(f"mut_rate:{slim_pars['mut_rate']}\n")
-		out_config.write(f"transition_matrix: F\n")
+		out_config.write(f"transition_matrix:\n")
 	else:
 		raise CustomizedError(f"The given subst_model_parameterization is NOT valid -- please input 'mut_rate' or 'mut_rate_matrix'.")
 
@@ -264,8 +265,8 @@ def create_slim_config(all_config):
 		if not isinstance(slim_pars[param], list):
 			raise CustomizedError(f"({param}) has to be a list []")
 		if len(slim_pars[param]) != slim_pars["n_epoch"]:
-			print("param", slim_pars[param])
-			print(slim_pars["n_epoch"])
+			# print("param", slim_pars[param])
+			# print(slim_pars["n_epoch"])
 			raise CustomizedError(f"{param} (\"epoch_changing_generation\") needs to be of the same length of the number of epochs")
 		if any(not isinstance(i, (float, int)) for i in slim_pars[param]):
 			raise CustomizedError(f"The probability of event ({param}) has to be a list of floats")
@@ -323,7 +324,7 @@ def create_slim_config(all_config):
 	
 	slim_pars["super_infection"] = all_config["EpidemiologyModel"]["super_infection"]
 	_check_boolean(slim_pars["super_infection"], "Whether to enable super infection")
-	out_config.write(f"super_infection: {_writebinary(slim_pars["n_massive_sample"])}\n")
+	out_config.write(f"super_infection: {_writebinary(slim_pars["super_infection"])}\n")
 	if slim_pars["super_infection"] and slim_pars["cap_withinhost"]==1:
 		print("WARNING: Though super-infection is activated, you specified the capacity within-host being only 1, thus super-infection actually cannot happen.", flush = True)
 	# slim_pars["slim_replicate_seed_file_path"] = all_config["EpidemiologyModel"]["slim_replicate_seed_file_path"]
@@ -617,14 +618,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
-
-
-
-
-
-
-
-
-
-
