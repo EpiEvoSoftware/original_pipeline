@@ -132,15 +132,15 @@
             "drug_resistance": [],
             "cap_drugresist": []
         },
-        "transition_rate": {
-            "S_IE_rate": [],
-            "I_R_rate": [],
-            "R_S_rate": [],
+        "transition_prob": {
+            "S_IE_prob": [],
+            "I_R_prob": [],
+            "R_S_prob": [],
             "latency_prob": [],
-            "E_I_rate": [],
-            "I_E_rate": [],
-            "E_R_rate": [],
-            "sample_rate": [],
+            "E_I_prob": [],
+            "I_E_prob": [],
+            "E_R_prob": [],
+            "sample_prob": [],
             "recovery_prob_after_sampling": []
         },
         "massive_sampling": {

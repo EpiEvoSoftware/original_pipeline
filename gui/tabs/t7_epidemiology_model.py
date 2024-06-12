@@ -72,21 +72,21 @@ class EpidemiologyModel(TabBase):
         self.render_cap_transmissibility(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
         self.render_cap_drugresist(hide, column=0, columnspan=1, frow = self.increment_frow())
         self.render_drug_resistance(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
-        self.render_title("Transition Rates between Compartments", hide, 0, frow = self.increment_frow(), columnspan=3)
+        self.render_title("Transition Probabilities between Compartments", hide, 0, frow = self.increment_frow(), columnspan=3)
 
-        self.render_S_IE_rate(hide, column=0, columnspan=1, frow = self.increment_frow(by = 1))
+        self.render_S_IE_prob(hide, column=0, columnspan=1, frow = self.increment_frow(by = 1))
         self.render_latency_prob(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
-        self.render_E_R_rate(hide, column=2, columnspan=1, frow = self.increment_frow(increment = False))
+        self.render_E_R_prob(hide, column=2, columnspan=1, frow = self.increment_frow(increment = False))
         self.render_image(hide, image_path="assets/t7.png", desired_width=600, desired_height=300, column = 1, columnspan=2, frow = self.increment_frow())
 
-        self.render_E_I_rate(hide, column=0, columnspan=1, frow = self.increment_frow())
-        self.render_I_E_rate(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_E_I_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_I_E_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
 
-        self.render_I_R_rate(hide, column=0, columnspan=1, frow = self.increment_frow())
-        self.render_R_S_rate(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_I_R_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_R_S_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
         
-        self.render_sample_rate(hide, column=0, columnspan=1, frow = self.increment_frow())
-        self.render_transition_rate_recovery_prob_after_sampling(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_sample_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_transition_prob_recovery_prob_after_sampling(hide, column=0, columnspan=1, frow = self.increment_frow())
 
         self.render_title("Massive Sampling Events", hide, 0, frow = self.increment_frow(), columnspan=3)
 
@@ -114,24 +114,24 @@ class EpidemiologyModel(TabBase):
         self.drug_resistance_keys_path = ['EpidemiologyModel','genetic_architecture','drug_resistance']
         self.cap_drugresist = self.config_dict['EpidemiologyModel']['genetic_architecture']['cap_drugresist']
         self.cap_drugresist_keys_path = ['EpidemiologyModel','genetic_architecture','cap_drugresist']
-        self.S_IE_rate = self.config_dict['EpidemiologyModel']['transition_rate']['S_IE_rate']
-        self.S_IE_rate_keys_path = ['EpidemiologyModel','transition_rate','S_IE_rate']
-        self.I_R_rate = self.config_dict['EpidemiologyModel']['transition_rate']['I_R_rate']
-        self.I_R_rate_keys_path = ['EpidemiologyModel','transition_rate','I_R_rate']
-        self.R_S_rate = self.config_dict['EpidemiologyModel']['transition_rate']['R_S_rate']
-        self.R_S_rate_keys_path = ['EpidemiologyModel','transition_rate','R_S_rate']
-        self.latency_prob = self.config_dict['EpidemiologyModel']['transition_rate']['latency_prob']
-        self.latency_prob_keys_path = ['EpidemiologyModel','transition_rate','latency_prob']
-        self.E_I_rate = self.config_dict['EpidemiologyModel']['transition_rate']['E_I_rate']
-        self.E_I_rate_keys_path = ['EpidemiologyModel','transition_rate','E_I_rate']
-        self.I_E_rate = self.config_dict['EpidemiologyModel']['transition_rate']['I_E_rate']
-        self.I_E_rate_keys_path = ['EpidemiologyModel','transition_rate','I_E_rate']
-        self.E_R_rate = self.config_dict['EpidemiologyModel']['transition_rate']['E_R_rate']
-        self.E_R_rate_keys_path = ['EpidemiologyModel','transition_rate','E_R_rate']
-        self.sample_rate = self.config_dict['EpidemiologyModel']['transition_rate']['sample_rate']
-        self.sample_rate_keys_path = ['EpidemiologyModel','transition_rate','sample_rate']
-        self.transition_rate_recovery_prob_after_sampling = self.config_dict['EpidemiologyModel']['transition_rate']['recovery_prob_after_sampling']
-        self.transition_rate_recovery_prob_after_sampling_keys_path = ['EpidemiologyModel','transition_rate','recovery_prob_after_sampling']
+        self.S_IE_prob = self.config_dict['EpidemiologyModel']['transition_prob']['S_IE_prob']
+        self.S_IE_prob_keys_path = ['EpidemiologyModel','transition_prob','S_IE_prob']
+        self.I_R_prob = self.config_dict['EpidemiologyModel']['transition_prob']['I_R_prob']
+        self.I_R_prob_keys_path = ['EpidemiologyModel','transition_prob','I_R_prob']
+        self.R_S_prob = self.config_dict['EpidemiologyModel']['transition_prob']['R_S_prob']
+        self.R_S_prob_keys_path = ['EpidemiologyModel','transition_prob','R_S_prob']
+        self.latency_prob = self.config_dict['EpidemiologyModel']['transition_prob']['latency_prob']
+        self.latency_prob_keys_path = ['EpidemiologyModel','transition_prob','latency_prob']
+        self.E_I_prob = self.config_dict['EpidemiologyModel']['transition_prob']['E_I_prob']
+        self.E_I_prob_keys_path = ['EpidemiologyModel','transition_prob','E_I_prob']
+        self.I_E_prob = self.config_dict['EpidemiologyModel']['transition_prob']['I_E_prob']
+        self.I_E_prob_keys_path = ['EpidemiologyModel','transition_prob','I_E_prob']
+        self.E_R_prob = self.config_dict['EpidemiologyModel']['transition_prob']['E_R_prob']
+        self.E_R_prob_keys_path = ['EpidemiologyModel','transition_prob','E_R_prob']
+        self.sample_prob = self.config_dict['EpidemiologyModel']['transition_prob']['sample_prob']
+        self.sample_prob_keys_path = ['EpidemiologyModel','transition_prob','sample_prob']
+        self.transition_prob_recovery_prob_after_sampling = self.config_dict['EpidemiologyModel']['transition_prob']['recovery_prob_after_sampling']
+        self.transition_prob_recovery_prob_after_sampling_keys_path = ['EpidemiologyModel','transition_prob','recovery_prob_after_sampling']
 
         self.event_num = self.config_dict['EpidemiologyModel']['massive_sampling']['event_num']
         self.event_num_keys_path = ['EpidemiologyModel','massive_sampling','event_num']
@@ -162,9 +162,9 @@ class EpidemiologyModel(TabBase):
     def render_seir(self):
         seir_controls = GroupControls()
         self.render_latency_prob()
-        self.render_E_I_rate()
-        self.render_I_E_rate()
-        self.render_E_R_rate()
+        self.render_E_I_prob()
+        self.render_I_E_prob()
+        self.render_E_R_prob()
         self.render_image()
         return seir_controls
     
@@ -265,36 +265,36 @@ class EpidemiologyModel(TabBase):
         return component
 
  
-    def render_S_IE_rate(self, hide, column, columnspan, frow):
-        text = "Transmission Rate β (list numerical)"
-        keys_path = self.S_IE_rate_keys_path
+    def render_S_IE_prob(self, hide, column, columnspan, frow):
+        text = "Transmission Prob. β (list numerical)"
+        keys_path = self.S_IE_prob_keys_path
         component = EasyEntry(
             keys_path, self.config_path, 
-            text, 'S_IE_rate', 
+            text, 'S_IE_prob', 
             self.scrollable_frame, column, frow, 'list', hide, columnspan
             )
 
         self.visible_components.add(component)
         return component
 
-    def render_I_R_rate(self, hide, column, columnspan, frow):
-        text = "Active Recovery rate γ (list numerical)"
-        keys_path = self.I_R_rate_keys_path
+    def render_I_R_prob(self, hide, column, columnspan, frow):
+        text = "Active Recovery Prob. γ (list numerical)"
+        keys_path = self.I_R_prob_keys_path
         component = EasyEntry(
             keys_path, self.config_path, 
-            text, 'I_R_rate', 
+            text, 'I_R_prob', 
             self.scrollable_frame, column, frow, 'list', hide, columnspan
             )
 
         self.visible_components.add(component)
         return component
 
-    def render_R_S_rate(self, hide, column, columnspan, frow):
-        text = "Immunity loss rate ω (list numerical)"
+    def render_R_S_prob(self, hide, column, columnspan, frow):
+        text = "Immunity Loss Prob. ω (list numerical)"
         keys_path = self.latency_prob_keys_path
         component = EasyEntry(
             keys_path, self.config_path, 
-            text, 'R_S_rate', 
+            text, 'R_S_prob', 
             self.scrollable_frame, column, frow, 'list', hide, columnspan
             )
 
@@ -313,24 +313,24 @@ class EpidemiologyModel(TabBase):
         self.visible_components.add(component)
         return component
       
-    def render_E_I_rate(self, hide, column, columnspan, frow):
-        text = "Activation rate v (list numerical)"
-        keys_path = self.E_I_rate_keys_path
+    def render_E_I_prob(self, hide, column, columnspan, frow):
+        text = "Activation Prob. v (list numerical)"
+        keys_path = self.E_I_prob_keys_path
         component = EasyEntry(
             keys_path, self.config_path, 
-            text, 'E_I_rate', 
+            text, 'E_I_prob', 
             self.scrollable_frame, column, frow, 'list', hide, columnspan
             )
 
         self.visible_components.add(component)
         return component 
 
-    def render_I_E_rate(self, hide, column, columnspan, frow):
-        text = r'De-activation rate φ (list numerical)'
-        keys_path = self.I_E_rate_keys_path
+    def render_I_E_prob(self, hide, column, columnspan, frow):
+        text = r'De-activation Prob. φ (list numerical)'
+        keys_path = self.I_E_prob_keys_path
         component = EasyEntry(
             keys_path, self.config_path, 
-            text, 'I_E_rate', 
+            text, 'I_E_prob', 
             self.scrollable_frame, column, frow, 'list', hide, columnspan
             )
 
@@ -338,12 +338,12 @@ class EpidemiologyModel(TabBase):
         return component
  
 
-    def render_E_R_rate(self, hide, column, columnspan, frow):
-        text = "Latent Recovery Rate τ (list numerical)"
-        keys_path = self.E_R_rate_keys_path
+    def render_E_R_prob(self, hide, column, columnspan, frow):
+        text = "Latent Recovery Prob. τ \n(list numerical)"
+        keys_path = self.E_R_prob_keys_path
         component = EasyEntry(
             keys_path, self.config_path, 
-            text, 'E_R_rate', 
+            text, 'E_R_prob', 
             self.scrollable_frame, column, frow, 'list', hide, columnspan
             )
 
@@ -362,31 +362,31 @@ class EpidemiologyModel(TabBase):
         return component
         
         
-    def render_sample_rate(self, hide, column, columnspan, frow):
-        text = r"Sample Rate ε (List Numerical)"
-        keys_path = self.sample_rate_keys_path
+    def render_sample_prob(self, hide, column, columnspan, frow):
+        text = r"Sample Prob. ε (List Numerical)"
+        keys_path = self.sample_prob_keys_path
         component = EasyEntry(
             keys_path, self.config_path, 
-            text, 'sample_rate', 
+            text, 'sample_prob', 
             self.scrollable_frame, column, frow, 'list', hide, columnspan
             )
 
         self.visible_components.add(component)
         return component
         def update():
-            keys_path = ['EpidemiologyModel', 'transition_rate', 'sample_rate']
-            update_list_int_params(self.sample_rate_entry, keys_path, self.config_path)
-        self.sample_rate_label = ttk.Label(self.scrollable_frame, text="sample_rate:")
-        self.sample_rate_label.grid()
-        self.sample_rate_entry = ttk.Entry(self.scrollable_frame, foreground="black")
-        self.sample_rate_entry.insert(0, str(self.sample_rate))  
-        self.sample_rate_entry.grid()
-        self.update_sample_rate_button = tk.Button(self.scrollable_frame, text="Update sample_rate", command=update)
-        self.update_sample_rate_button.grid()
+            keys_path = ['EpidemiologyModel', 'transition_prob', 'sample_prob']
+            update_list_int_params(self.sample_prob_entry, keys_path, self.config_path)
+        self.sample_prob_label = ttk.Label(self.scrollable_frame, text="sample_prob:")
+        self.sample_prob_label.grid()
+        self.sample_prob_entry = ttk.Entry(self.scrollable_frame, foreground="black")
+        self.sample_prob_entry.insert(0, str(self.sample_prob))  
+        self.sample_prob_entry.grid()
+        self.update_sample_prob_button = tk.Button(self.scrollable_frame, text="Update sample_prob", command=update)
+        self.update_sample_prob_button.grid()
 
-    def render_transition_rate_recovery_prob_after_sampling(self, hide, column, columnspan, frow):
+    def render_transition_prob_recovery_prob_after_sampling(self, hide, column, columnspan, frow):
         text = r"Recovery Probability after Sampling δ (List Numerical)"
-        keys_path = self.transition_rate_recovery_prob_after_sampling_keys_path
+        keys_path = self.transition_prob_recovery_prob_after_sampling_keys_path
         component = EasyEntry(
             keys_path, self.config_path, 
             text, 'recovery_prob_after_sampling', 
