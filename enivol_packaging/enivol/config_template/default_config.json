@@ -57,13 +57,13 @@
             "burn_in_generations": 0,
             "burn_in_mutrate": 0,
             "seeded_host_id": [],
-            "S_IE_rate": 0,
-            "E_I_rate": 0,
-            "E_R_rate": 0,
+            "S_IE_prob": 0,
+            "E_I_prob": 0,
+            "E_R_prob": 0,
             "latency_prob": 1,
-            "I_R_rate": 0,
-            "I_E_rate": 0,
-            "R_S_rate": 0
+            "I_R_prob": 0,
+            "I_E_prob": 0,
+            "R_S_prob": 0
         }
     },
     "GenomeElement": {
@@ -132,15 +132,15 @@
             "drug_resistance": [],
             "cap_drugresist": []
         },
-        "transition_rate": {
-            "S_IE_rate": [],
-            "I_R_rate": [],
-            "R_S_rate": [],
+        "transition_prob": {
+            "S_IE_prob": [],
+            "I_R_prob": [],
+            "R_S_prob": [],
             "latency_prob": [],
-            "E_I_rate": [],
-            "I_E_rate": [],
-            "E_R_rate": [],
-            "sample_rate": [],
+            "E_I_prob": [],
+            "I_E_prob": [],
+            "E_R_prob": [],
+            "sample_prob": [],
             "recovery_prob_after_sampling": []
         },
         "massive_sampling": {

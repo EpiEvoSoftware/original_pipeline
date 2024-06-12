@@ -1,9 +1,10 @@
 import os, tskit, pyslim, shutil, subprocess
 import pandas as pd
 import numpy as np
+
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-import matplotlib.cm as cm
+import matplotlib
 
 NUM_META_COLS = 3
 POS_COL = 1
@@ -200,7 +201,8 @@ def color_by_seed(tseq_smp, trvs_order, seed_host_match_path):
 	match_dict = df_host_seed_match.set_index('host_id')['seed'].to_dict()
 
 	# Create colormap based on the number of seed-host matches
-	cmap = cm.get_cmap('viridis')
+	# cmap = cm.get_cmap('viridis')
+	cmap = matplotlib.colormaps["viridis"]
 	values = np.linspace(0, 1, len(match_dict))
 	colors = cmap(values)
 	hex_codes = [mcolors.to_hex(color) for color in colors]
