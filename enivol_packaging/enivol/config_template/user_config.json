@@ -57,13 +57,13 @@
             "burn_in_generations": 0,
             "burn_in_mutrate": 0,
             "seeded_host_id": [],
-            "S_IE_rate": 0,
-            "E_I_rate": 0,
-            "E_R_rate": 0,
+            "S_IE_prob": 0,
+            "E_I_prob": 0,
+            "E_R_prob": 0,
             "latency_prob": 1,
-            "I_R_rate": 0,
-            "I_E_rate": 0,
-            "R_S_rate": 0
+            "I_R_prob": 0,
+            "I_E_prob": 0,
+            "R_S_prob": 0
         }
     },
     "GenomeElement": {

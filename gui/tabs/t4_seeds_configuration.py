@@ -62,26 +62,26 @@ class SeedsConfiguration(TabBase):
         self.seeded_host_id = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
             "seeded_host_id"
         ]
-        self.S_IE_rate = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "S_IE_rate"
+        self.S_IE_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
+            "S_IE_prob"
         ]
-        self.E_I_rate = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "E_I_rate"
+        self.E_I_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
+            "E_I_prob"
         ]
-        self.E_R_rate = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "E_R_rate"
+        self.E_R_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
+            "E_R_prob"
         ]
         self.latency_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
             "latency_prob"
         ]
-        self.I_R_rate = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "I_R_rate"
+        self.I_R_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
+            "I_R_prob"
         ]
-        self.I_E_rate = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "I_E_rate"
+        self.I_E_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
+            "I_E_prob"
         ]
-        self.R_S_rate = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "R_S_rate"
+        self.R_S_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
+            "R_S_prob"
         ]
 
     def init_user_input_group(self, hide):
@@ -117,13 +117,13 @@ class SeedsConfiguration(TabBase):
         epi_grpctrls.add(self.render_burn_in_generations_epi(hide, 0, 6 + 5))
         epi_grpctrls.add(self.render_burn_in_mutrate_epi(hide, 1, 6 + 5))
         epi_grpctrls.add(self.render_seeded_host_id(hide, 2, 6 + 5))
-        epi_grpctrls.add(self.render_S_IE_rate(hide, 0, 8 + 5))
-        epi_grpctrls.add(self.render_E_I_rate(hide, 0, 10 + 5))
-        epi_grpctrls.add(self.render_E_R_rate(hide, 2, 8 + 5))
+        epi_grpctrls.add(self.render_S_IE_prob(hide, 0, 8 + 5))
+        epi_grpctrls.add(self.render_E_I_prob(hide, 0, 10 + 5))
+        epi_grpctrls.add(self.render_E_R_prob(hide, 2, 8 + 5))
         epi_grpctrls.add(self.render_latency_prob(hide, 1, 8 + 5))
-        epi_grpctrls.add(self.render_I_R_rate(hide, 0, 16 + 5))
-        epi_grpctrls.add(self.render_I_E_rate(hide, 0, 12 + 5))
-        epi_grpctrls.add(self.render_R_S_rate(hide, 0, 14 + 5))
+        epi_grpctrls.add(self.render_I_R_prob(hide, 0, 16 + 5))
+        epi_grpctrls.add(self.render_I_E_prob(hide, 0, 12 + 5))
+        epi_grpctrls.add(self.render_R_S_prob(hide, 0, 14 + 5))
         epi_grpctrls.add(
             self.render_image(
                 "assets/t4.png",
@@ -779,14 +779,14 @@ class SeedsConfiguration(TabBase):
         # self.update_seeded_host_id_button = tk.Button(self.control_frame, text="Update seeded_host_id", command=self.update_seeded_host_id)
         # self.update_seeded_host_id_button.grid()
 
-    def render_S_IE_rate(self, hide=True, column=None, frow=None):
-        self.render_S_IE_rate_text = "Transmission Rate \u03b2 (Numerical)"
-        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "S_IE_rate"]
+    def render_S_IE_prob(self, hide=True, column=None, frow=None):
+        self.render_S_IE_prob_text = "Transmission Prob. \u03b2 (Numerical)"
+        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "S_IE_prob"]
         component = EasyEntry(
             keys_path,
             self.config_path,
-            self.render_S_IE_rate_text,
-            "S_IE_rate",
+            self.render_S_IE_prob_text,
+            "S_IE_prob",
             self.control_frame,
             column,
             frow,
@@ -797,27 +797,27 @@ class SeedsConfiguration(TabBase):
         self.visible_components.add(component)
         return component
 
-        self.S_IE_rate_label = ttk.Label(
-            self.control_frame, text=self.render_S_IE_rate_text, style="Bold.TLabel"
+        self.S_IE_prob_label = ttk.Label(
+            self.control_frame, text=self.render_S_IE_prob_text, style="Bold.TLabel"
         )
-        self.S_IE_rate_entry = ttk.Entry(self.control_frame, foreground="black")
-        self.S_IE_rate_entry.insert(0, self.S_IE_rate)
+        self.S_IE_prob_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.S_IE_prob_entry.insert(0, self.S_IE_prob)
 
-        self.S_IE_rate_label.grid(row=8 + 3, column=0, sticky="w", pady=5)
-        self.S_IE_rate_entry.grid(row=9 + 3, column=0, sticky="w", pady=5)
+        self.S_IE_prob_label.grid(row=8 + 3, column=0, sticky="w", pady=5)
+        self.S_IE_prob_entry.grid(row=9 + 3, column=0, sticky="w", pady=5)
 
-        # self.render_S_IE_rate_components = []
-        epi_components.add(self.S_IE_rate_label)
-        epi_components.add(self.S_IE_rate_entry)
+        # self.render_S_IE_prob_components = []
+        epi_components.add(self.S_IE_prob_label)
+        epi_components.add(self.S_IE_prob_entry)
 
-    def render_E_R_rate(self, hide=True, column=None, frow=None):
-        self.render_E_R_rate_text = "Latent Recovery Rate \u03c4 (Numerical)"
-        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "E_R_rate"]
+    def render_E_R_prob(self, hide=True, column=None, frow=None):
+        self.render_E_R_prob_text = "Latent Recovery Prob. \u03c4 (Numerical)"
+        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "E_R_prob"]
         component = EasyEntry(
             keys_path,
             self.config_path,
-            self.render_E_R_rate_text,
-            "E_R_rate",
+            self.render_E_R_prob_text,
+            "E_R_prob",
             self.control_frame,
             column,
             frow,
@@ -828,21 +828,21 @@ class SeedsConfiguration(TabBase):
         self.visible_components.add(component)
         return component
 
-        self.E_R_rate_label = ttk.Label(
-            self.control_frame, text=self.render_E_R_rate_text, style="Bold.TLabel"
+        self.E_R_prob_label = ttk.Label(
+            self.control_frame, text=self.render_E_R_prob_text, style="Bold.TLabel"
         )
-        self.E_R_rate_entry = ttk.Entry(self.control_frame, foreground="black")
-        self.E_R_rate_entry.insert(0, self.E_R_rate)
+        self.E_R_prob_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.E_R_prob_entry.insert(0, self.E_R_prob)
 
-        self.E_R_rate_label.grid(row=8 + 3, column=2, sticky="w", pady=5)
-        self.E_R_rate_entry.grid(row=9 + 3, column=2, sticky="w", pady=5)
+        self.E_R_prob_label.grid(row=8 + 3, column=2, sticky="w", pady=5)
+        self.E_R_prob_entry.grid(row=9 + 3, column=2, sticky="w", pady=5)
 
-        # self.render_E_R_rate_components = []
-        epi_components.add(self.E_R_rate_label)
-        epi_components.add(self.E_R_rate_entry)
+        # self.render_E_R_prob_components = []
+        epi_components.add(self.E_R_prob_label)
+        epi_components.add(self.E_R_prob_entry)
 
     def render_latency_prob(self, hide=True, column=None, frow=None):
-        self.render_latency_prob_text = "Latency Probability p (Numerical)"
+        self.render_latency_prob_text = "Latency Prob. p (Numerical)"
         keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "latency_prob"]
         component = EasyEntry(
             keys_path,
@@ -872,14 +872,14 @@ class SeedsConfiguration(TabBase):
         epi_components.add(self.latency_prob_label)
         epi_components.add(self.latency_prob_entry)
 
-    def render_E_I_rate(self, hide=True, column=None, frow=None):
-        self.render_E_I_rate_text = "Activation Rate v (Numerical)"
-        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "E_I_rate"]
+    def render_E_I_prob(self, hide=True, column=None, frow=None):
+        self.render_E_I_prob_text = "Activation Prob. v (Numerical)"
+        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "E_I_prob"]
         component = EasyEntry(
             keys_path,
             self.config_path,
-            self.render_E_I_rate_text,
-            "E_I_rate",
+            self.render_E_I_prob_text,
+            "E_I_prob",
             self.control_frame,
             column,
             frow,
@@ -890,26 +890,26 @@ class SeedsConfiguration(TabBase):
         self.visible_components.add(component)
         return component
 
-        self.E_I_rate_label = ttk.Label(
-            self.control_frame, text=self.render_E_I_rate_text, style="Bold.TLabel"
+        self.E_I_prob_label = ttk.Label(
+            self.control_frame, text=self.render_E_I_prob_text, style="Bold.TLabel"
         )
-        self.E_I_rate_entry = ttk.Entry(self.control_frame, foreground="black")
-        self.E_I_rate_entry.insert(0, self.E_I_rate)
+        self.E_I_prob_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.E_I_prob_entry.insert(0, self.E_I_prob)
 
-        self.E_I_rate_label.grid(row=10 + 3, column=0, sticky="w", pady=5)
-        self.E_I_rate_entry.grid(row=11 + 3, column=0, sticky="w", pady=5)
+        self.E_I_prob_label.grid(row=10 + 3, column=0, sticky="w", pady=5)
+        self.E_I_prob_entry.grid(row=11 + 3, column=0, sticky="w", pady=5)
 
-        epi_components.add(self.E_I_rate_label)
-        epi_components.add(self.E_I_rate_entry)
+        epi_components.add(self.E_I_prob_label)
+        epi_components.add(self.E_I_prob_entry)
 
-    def render_I_E_rate(self, hide=True, column=None, frow=None):
-        self.render_I_E_rate_text = "De-activaton Rate \u03c6 (numerical)"
-        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "I_E_rate"]
+    def render_I_E_prob(self, hide=True, column=None, frow=None):
+        self.render_I_E_prob_text = "De-activaton Prob. \u03c6 (numerical)"
+        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "I_E_prob"]
         component = EasyEntry(
             keys_path,
             self.config_path,
-            self.render_I_E_rate_text,
-            "I_E_rate",
+            self.render_I_E_prob_text,
+            "I_E_prob",
             self.control_frame,
             column,
             frow,
@@ -920,28 +920,28 @@ class SeedsConfiguration(TabBase):
         self.visible_components.add(component)
         return component
 
-        self.I_E_rate_label = ttk.Label(
-            self.control_frame, text=self.render_I_E_rate_text, style="Bold.TLabel"
+        self.I_E_prob_label = ttk.Label(
+            self.control_frame, text=self.render_I_E_prob_text, style="Bold.TLabel"
         )
 
-        self.I_E_rate_entry = ttk.Entry(self.control_frame, foreground="black")
-        self.I_E_rate_entry.insert(0, self.I_E_rate)
+        self.I_E_prob_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.I_E_prob_entry.insert(0, self.I_E_prob)
 
-        self.I_E_rate_label.grid(row=12 + 3, column=0, sticky="w", pady=5)
-        self.I_E_rate_entry.grid(row=13 + 3, column=0, sticky="w", pady=5)
+        self.I_E_prob_label.grid(row=12 + 3, column=0, sticky="w", pady=5)
+        self.I_E_prob_entry.grid(row=13 + 3, column=0, sticky="w", pady=5)
 
-        # self.render_I_E_rate_components = []
-        epi_components.add(self.I_E_rate_label)
-        epi_components.add(self.I_E_rate_entry)
+        # self.render_I_E_prob_components = []
+        epi_components.add(self.I_E_prob_label)
+        epi_components.add(self.I_E_prob_entry)
 
-    def render_R_S_rate(self, hide=True, column=None, frow=None):
-        self.render_R_S_rate_text = "Immunity Loss Rate \u03c9 (numerical)"
-        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "R_S_rate"]
+    def render_R_S_prob(self, hide=True, column=None, frow=None):
+        self.render_R_S_prob_text = "Immunity Loss Prob. \u03c9 (numerical)"
+        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "R_S_prob"]
         component = EasyEntry(
             keys_path,
             self.config_path,
-            self.render_R_S_rate_text,
-            "R_S_rate",
+            self.render_R_S_prob_text,
+            "R_S_prob",
             self.control_frame,
             column,
             frow,
@@ -951,36 +951,24 @@ class SeedsConfiguration(TabBase):
         )
         self.visible_components.add(component)
         return component
-        keys_path = []
+
+        self.R_S_prob_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.R_S_prob_entry.insert(0, self.R_S_prob)
+
+        self.R_S_prob_label.grid(row=14 + 3, column=0, sticky="w", pady=5)
+        self.R_S_prob_entry.grid(row=15 + 3, column=0, sticky="w", pady=5)
+
+        # self.render_R_S_prob_components = []
+        epi_components.add(self.R_S_prob_label)
+        epi_components.add(self.R_S_prob_entry)
+
+    def render_I_R_prob(self, hide=True, column=None, frow=None):
+        self.render_I_R_prob_text = "Active Recovery Prob. \u03b3 (numerical)"
+        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "I_R_prob"]
         component = EasyEntry(
             keys_path,
             self.config_path,
-            self.render_burn_in_mutrate_epi_text,
-            "burn_in_generations",
-            self.control_frame,
-            column,
-            frow,
-            "integer",
-            hide,
-        )
-        self.visible_components.add(component)
-        self.R_S_rate_entry = ttk.Entry(self.control_frame, foreground="black")
-        self.R_S_rate_entry.insert(0, self.R_S_rate)
-
-        self.R_S_rate_label.grid(row=14 + 3, column=0, sticky="w", pady=5)
-        self.R_S_rate_entry.grid(row=15 + 3, column=0, sticky="w", pady=5)
-
-        # self.render_R_S_rate_components = []
-        epi_components.add(self.R_S_rate_label)
-        epi_components.add(self.R_S_rate_entry)
-
-    def render_I_R_rate(self, hide=True, column=None, frow=None):
-        self.render_I_R_rate_text = "Active Recovery Rate \u03b3 (numerical)"
-        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "I_R_rate"]
-        component = EasyEntry(
-            keys_path,
-            self.config_path,
-            self.render_I_R_rate_text,
+            self.render_I_R_prob_text,
             "burn_in_generations",
             self.control_frame,
             column,
@@ -991,19 +979,19 @@ class SeedsConfiguration(TabBase):
         )
         self.visible_components.add(component)
         return component
-        self.I_R_rate_label = ttk.Label(
-            self.control_frame, text=self.render_I_R_rate_text, style="Bold.TLabel"
+        self.I_R_prob_label = ttk.Label(
+            self.control_frame, text=self.render_I_R_prob_text, style="Bold.TLabel"
         )
 
-        self.I_R_rate_entry = ttk.Entry(self.control_frame, foreground="black")
-        self.I_R_rate_entry.insert(0, self.I_R_rate)
+        self.I_R_prob_entry = ttk.Entry(self.control_frame, foreground="black")
+        self.I_R_prob_entry.insert(0, self.I_R_prob)
 
-        self.I_R_rate_label.grid(row=16 + 3, column=0, sticky="w", pady=5)
-        self.I_R_rate_entry.grid(row=17 + 3, column=0, sticky="w", pady=5)
+        self.I_R_prob_label.grid(row=16 + 3, column=0, sticky="w", pady=5)
+        self.I_R_prob_entry.grid(row=17 + 3, column=0, sticky="w", pady=5)
 
-        # self.render_I_R_rate_components = []
-        epi_components.add(self.I_R_rate_label)
-        epi_components.add(self.I_R_rate_entry)
+        # self.render_I_R_prob_components = []
+        epi_components.add(self.I_R_prob_label)
+        epi_components.add(self.I_R_prob_entry)
 
     def render_image(
         self,
@@ -1072,26 +1060,26 @@ class SeedsConfiguration(TabBase):
                     seeded_host_id = config["SeedsConfiguration"]["SLiM_burnin_epi"][
                         "seeded_host_id"
                     ]
-                    S_IE_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "S_IE_rate"
+                    S_IE_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
+                        "S_IE_prob"
                     ]
-                    E_I_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "E_I_rate"
+                    E_I_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
+                        "E_I_prob"
                     ]
-                    E_R_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "E_R_rate"
+                    E_R_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
+                        "E_R_prob"
                     ]
                     latency_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
                         "latency_prob"
                     ]
-                    I_R_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "I_R_rate"
+                    I_R_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
+                        "I_R_prob"
                     ]
-                    I_E_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "I_E_rate"
+                    I_E_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
+                        "I_E_prob"
                     ]
-                    R_S_rate = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "R_S_rate"
+                    R_S_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
+                        "R_S_prob"
                     ]
                     host_size = config["NetworkModelParameters"]["host_size"]
 
@@ -1102,13 +1090,13 @@ class SeedsConfiguration(TabBase):
                         mu=mu,
                         n_gen=n_gen,
                         seeded_host_id=seeded_host_id,
-                        S_IE_rate=S_IE_rate,
-                        E_I_rate=E_I_rate,
-                        E_R_rate=E_R_rate,
+                        S_IE_prob=S_IE_prob,
+                        E_I_prob=E_I_prob,
+                        E_R_prob=E_R_prob,
                         latency_prob=latency_prob,
-                        I_R_rate=I_R_rate,
-                        I_E_rate=I_E_rate,
-                        R_S_rate=R_S_rate,
+                        I_R_prob=I_R_prob,
+                        I_E_prob=I_E_prob,
+                        R_S_prob=R_S_prob,
                         host_size=host_size,
                         ref_path=ref_path,
                         rand_seed=rand_seed
