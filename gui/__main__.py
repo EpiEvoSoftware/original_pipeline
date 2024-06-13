@@ -20,12 +20,10 @@ from tabs.t1_configuration import Configuration
 from tabs.t1_configuration_v2 import Configurationv2
 from tabs.t1_configuration_v3 import Configurationv3
 from tabs.t2_evolutionarymodel import EvolutionaryModel
-# from tabs.t3_networkmodel import NetworkModel
 from tabs.t3_networkmodel_v2 import NetworkModel
 from tabs.t4_seeds_configuration import SeedsConfiguration
 from tabs.t5_genome_element import GenomeElement
-# from tabs.t5_genome_element_v2 import GenomeElementv2
-from tabs.t6_seedhostmatch import NetworkGraphApp
+from tabs.t6_seedhostmatch_v2 import HostMatch
 from tabs.t7_epidemiology_model import EpidemiologyModel
 from tabs.t7_epidemiology_model_v2 import EpidemiologyModelv2
 from tabs.t7_epidemiology_model_v3 import EpidemiologyModelv3
@@ -130,12 +128,10 @@ def launch_gui(default_config_path, user_config_path, hide=False):
 
     network_app = Configurationv3(tab1, tab_parent, config_path, "Basic Configuration", 0, hide)
     network_app = EvolutionaryModel(tab2, tab_parent, config_path, "Evolutionary Model", 1, hide)
-    network_graph_app = None
-    network_model_app = NetworkModel(tab3, tab_parent, network_graph_app, config_path, "Network Model Parameters", 2, hide )
+    network_app = NetworkModel(tab3, tab_parent, config_path, "Network Model Parameters", 2, hide )
     network_app = SeedsConfiguration(tab4, tab_parent, config_path, "Seeds Configuration", 3, hide )
     network_app = GenomeElement(tab5, tab_parent, config_path, "Genome Element", 4, hide )
-    network_graph_app = NetworkGraphApp(tab6, tab_parent, config_path, "Seed Host Match", 5, hide )
-    network_model_app.update_graph(network_graph_app)
+    network_app = HostMatch(tab6, tab_parent, config_path, "Seed Host Match", 5, hide )
     network_app = EpidemiologyModel(tab7, tab_parent, config_path, "Epidemiology Model", 6, hide )
     network_app = PostProcessing(tab8, tab_parent, config_path, "Post Processing Options", 7, hide)
 

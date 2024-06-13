@@ -273,7 +273,7 @@ def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir,
 						f"is not consistent with the number of traits ({total_n_traits})")
 	
 	if len(es_highs) != total_n_traits:
-		raise CustomizedError(f"The given length of the upper bounds (-es_low {len(es_lows)}) "
+		raise CustomizedError(f"The given length of the upper bounds (-es_high {len(es_highs)}) "
 						f"is not consistent with the number of traits ({total_n_traits})")
 	
 	if norm_or_not:

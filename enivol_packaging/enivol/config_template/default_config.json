@@ -100,8 +100,14 @@
                 "p_ER": 0
             },
             "RP": {
-                "rp_size": [0, 0],
-                "p_within": [0, 0],
+                "rp_size": [
+                    0,
+                    0
+                ],
+                "p_within": [
+                    0,
+                    0
+                ],
                 "p_between": 0
             },
             "BA": {
