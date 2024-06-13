@@ -1,8 +1,7 @@
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, font
-import json
-import os
+import platform
 from utils import *
 
 
@@ -11,90 +10,6 @@ from utils import *
 class EpidemiologyModel(TabBase):
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
         super().__init__(parent, tab_parent, config_path, tab_title, tab_index, hide)
-
-    def init_tab(self, parent, tab_parent, tab_title, tab_index, hide):
-        self.parent = parent
-        self.tab_parent = tab_parent
-        self.tab_index = tab_index
-        self.tab_parent.add(parent, text=tab_title)
-        
-        if hide:
-            self.tab_parent.tab(self.tab_index, state="disabled")
-        self.control_frame = ttk.Frame(self.parent, width=300)
-        self.control_frame.pack(padx=10, pady=10)
-        
-        # Modified part for scrolling
-            # Testings
-        self.canvas = tk.Canvas(self.control_frame)
-        self.scrollbar = ttk.Scrollbar(self.control_frame, orient="vertical", command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=self.scrollbar.set, width=1300, height=700)
-        
-        self.scrollable_frame = ttk.Frame(self.canvas)
-        for i in range(4):  
-            self.scrollable_frame.columnconfigure(i, weight=1)
-
-        self.canvas_frame = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-        
-        def configure_scroll_region(event):
-            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-        
-        def configure_canvas_width(event):
-            self.canvas.itemconfig(self.canvas_frame, width=event.width)
-        
-        self.scrollable_frame.bind("<Configure>", configure_scroll_region)
-        self.canvas.bind("<Configure>", configure_canvas_width)
-        
-        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.scrollbar.pack(side=tk.RIGHT, fill="y")
-
-        
-
-
- 
-
-    def increment_frow(self, increment = True, by = 2):
-        if increment:
-            self.frow += by
-        return self.frow
-
-    def load_page(self):
-        self.frow = 1
-        hide = False
-        to_renderer, to_derenderer = None, None
-        
-        self.render_slim_path_label(hide, column=1, columnspan=2, frow = self.increment_frow(increment = False))
-        self.render_model(hide, column=0, columnspan=1, frow = self.increment_frow(increment = False))
-        self.render_n_epoch(hide, column=1, columnspan= 1, frow = self.increment_frow())
-        # self.render_epoch_changing_generation(disabled = True)
-        self.render_epoch_changing_generation(hide, column=0, columnspan= 3, frow = self.increment_frow(increment = False))
-        self.render_title("Evolutionary Components Setting", hide, 0, frow = self.increment_frow(), columnspan=3)
-        self.render_transmissibility(hide, column=0, columnspan=1, frow = self.increment_frow(by = 1))
-        self.render_cap_transmissibility(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
-        self.render_cap_drugresist(hide, column=0, columnspan=1, frow = self.increment_frow())
-        self.render_drug_resistance(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
-        self.render_title("Transition Probabilities between Compartments", hide, 0, frow = self.increment_frow(), columnspan=3)
-
-        self.render_S_IE_prob(hide, column=0, columnspan=1, frow = self.increment_frow(by = 1))
-        self.render_latency_prob(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
-        self.render_E_R_prob(hide, column=2, columnspan=1, frow = self.increment_frow(increment = False))
-        self.render_image(hide, image_path="assets/t7.png", desired_width=600, desired_height=300, column = 1, columnspan=2, frow = self.increment_frow())
-
-        self.render_E_I_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
-        self.render_I_E_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
-
-        self.render_I_R_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
-        self.render_R_S_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
-        
-        self.render_sample_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
-        self.render_transition_prob_recovery_prob_after_sampling(hide, column=0, columnspan=1, frow = self.increment_frow())
-
-        self.render_title("Massive Sampling Events", hide, 0, frow = self.increment_frow(), columnspan=3)
-
-        self.render_massive_sampling(hide, column=0, columnspan=1, frow = self.increment_frow(by = 1))
-        self.render_massive_sampling_generation(hide, column=0, columnspan=1, frow = self.increment_frow())
-        self.render_massive_sampling_probability(hide, column=0, columnspan=1, frow = self.increment_frow())
-        self.render_massive_sampling_after_sampling(hide, column=0, columnspan=1, frow = self.increment_frow())
-        self.render_super_infection(to_renderer, to_derenderer, hide, column=0, columnspan=1, frow = self.increment_frow())
 
     def init_val(self, config_path):
         self.config_path = config_path
@@ -144,29 +59,142 @@ class EpidemiologyModel(TabBase):
         self.super_infection = self.config_dict['EpidemiologyModel']['super_infection']
         self.super_infection_keys_path = ['EpidemiologyModel','super_infection']
 
+    def init_tab(self, parent, tab_parent, tab_title, tab_index, hide):
+        self.parent = parent
+        self.tab_parent = tab_parent
+        self.tab_index = tab_index
+        self.tab_parent.add(parent, text=tab_title)
+        
+        if hide:
+            self.tab_parent.tab(self.tab_index, state="disabled")
+        self.control_frame = ttk.Frame(self.parent, width=300)
+        self.control_frame.pack(padx=10, pady=10)
+        
+        # Modified part for scrolling
+            # Testings
+        self.canvas = tk.Canvas(self.control_frame)
+        self.scrollbar = ttk.Scrollbar(self.control_frame, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set, width=1300, height=700)
+        
+        self.scrollable_frame = ttk.Frame(self.canvas)
+        for i in range(4):  
+            self.scrollable_frame.columnconfigure(i, weight=1)
 
+        self.canvas_frame = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        
+        def configure_frame(event):
+            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        
+        def configure_canvas(event):
+            self.canvas.itemconfig(self.canvas_frame, width=event.width)
+        
+        def _bound_to_mousewheel(event):
+            if platform.system() == 'Linux':
+                self.canvas.bind_all("<Button-4>", _on_mousewheel)
+                self.canvas.bind_all("<Button-5>", _on_mousewheel)
+            else:
+                self.canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+        def _unbound_to_mousewheel(event):
+            if platform.system() == 'Linux':
+                self.canvas.unbind_all("<Button-4>")
+                self.canvas.unbind_all("<Button-5>")
+            else:
+                self.canvas.unbind_all("<MouseWheel>")
+
+        def _on_mousewheel(event):
+            if platform.system() == 'Windows':
+                self.canvas.yview_scroll(int(-1* (event.delta/120)), "units")
+            elif platform.system() == 'Darwin':
+                self.canvas.yview_scroll(int(-1 * (event.delta)), "units")
+            else:
+                if event.num == 4:
+                    self.canvas.yview_scroll( -1, "units" )
+                elif event.num == 5:
+                    self.canvas.yview_scroll( 1, "units" ) 
+        
+        self.scrollable_frame.bind("<Configure>", configure_frame)
+        self.canvas.bind("<Configure>", configure_canvas)
+        self.scrollable_frame.bind('<Enter>', _bound_to_mousewheel)
+        self.scrollable_frame.bind('<Leave>', _unbound_to_mousewheel)
+        
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.scrollbar.pack(side=tk.RIGHT, fill="y")
+
+    def increment_frow(self, increment = True, by = 2):
+        if increment:
+            self.frow += by
+        return self.frow
+
+    def load_page(self):
+        self.frow = 1
+        hide = False
+        to_renderer, to_derenderer = None, None
+
+        self.SEIR_only_entries = set()
+
+        self.render_slim_path_label(hide, column=1, columnspan=2, frow = self.increment_frow(increment = False))
+        self.render_model(hide, column=0, columnspan=1, frow = self.increment_frow(increment = False))
+        self.render_n_epoch(hide, column=1, columnspan= 1, frow = self.increment_frow())
+        # self.render_epoch_changing_generation(disabled = True)
+        self.render_epoch_changing_generation(hide, column=0, columnspan= 3, frow = self.increment_frow(increment = False))
+        self.render_title("Evolutionary Components Setting", hide, 0, frow = self.increment_frow(), columnspan=3)
+        self.render_transmissibility(hide, column=0, columnspan=1, frow = self.increment_frow(by = 1))
+        self.render_cap_transmissibility(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
+        self.render_cap_drugresist(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_drug_resistance(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
+        self.render_title("Transition Probabilities between Compartments", hide, 0, frow = self.increment_frow(), columnspan=3)
+
+        self.render_S_IE_prob(hide, column=0, columnspan=1, frow = self.increment_frow(by = 1))
+        self.render_latency_prob(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
+        self.render_E_R_prob(hide, column=2, columnspan=1, frow = self.increment_frow(increment = False))
+        self.render_image(hide, image_path="assets/t7.png", desired_width=600, desired_height=300, column = 1, columnspan=2, frow = self.increment_frow())
+
+        self.render_E_I_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_I_E_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
+
+        self.render_I_R_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_R_S_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
+        
+        self.render_sample_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_transition_prob_recovery_prob_after_sampling(hide, column=0, columnspan=1, frow = self.increment_frow())
+
+        self.render_title("Massive Sampling Events", hide, 0, frow = self.increment_frow(), columnspan=3)
+
+        self.render_massive_sampling(hide, column=0, columnspan=1, frow = self.increment_frow(by = 1))
+        self.render_massive_sampling_generation(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_massive_sampling_probability(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_massive_sampling_after_sampling(hide, column=0, columnspan=1, frow = self.increment_frow())
+        self.render_super_infection(to_renderer, to_derenderer, hide, column=0, columnspan=1, frow = self.increment_frow())
 
     def render_model(self, hide, column, columnspan, frow):
-        text = "Compartmental Model"
-        keys_path = self.model_keys_path
-        width = 50
+        def update(e):
+            config = load_config_as_dict(self.config_path)
+            config['EpidemiologyModel']['model'] = model_var.get()
+            save_config(self.config_path, config)
 
-        component = EasyCombobox(
-            keys_path, self.config_path, 
-            text,  
-            self.scrollable_frame, column, frow, ["SIR", "SEIR"], None,None, None, hide, width , columnspan)
+            #toggle sir/seir entries
+            if model_var.get() == "SIR":
+                for entry in self.SEIR_only_entries:
+                    entry.config(state='disabled', foreground='light grey')
+                    # entry.grid_remove()
+            elif model_var.get() == "SEIR":
+                for entry in self.SEIR_only_entries:
+                    entry.config(state='normal', foreground='black')
+                    # entry.grid()
+        
+        model_label = ttk.Label(self.scrollable_frame, text="Compartmental Model", style="Bold.TLabel")
+        model_var = tk.StringVar(value=load_config_as_dict(self.config_path)['EpidemiologyModel']['model'])
+        model_combobox = ttk.Combobox(
+            self.scrollable_frame,
+            textvariable=model_var,
+            values=["SIR", "SEIR"],
+            state="readonly",
+        )
+        model_combobox.bind("<<ComboboxSelected>>", update)
 
-        self.visible_components.add(component)
-        return component
-    
-    def render_seir(self):
-        seir_controls = GroupControls()
-        self.render_latency_prob()
-        self.render_E_I_prob()
-        self.render_I_E_prob()
-        self.render_E_R_prob()
-        self.render_image()
-        return seir_controls
+        model_label.grid(row=frow, column=column, columnspan=columnspan, sticky="w", pady=5)
+        model_combobox.grid(row=frow + 1, column=column, columnspan=columnspan, sticky="w", pady=5)
     
     def render_n_epoch(self, hide, column, columnspan, frow):
         text = "Number of Epochs (Integer)"
@@ -311,6 +339,7 @@ class EpidemiologyModel(TabBase):
             )
 
         self.visible_components.add(component)
+        self.SEIR_only_entries.add(component.entry)
         return component
       
     def render_E_I_prob(self, hide, column, columnspan, frow):
@@ -323,6 +352,7 @@ class EpidemiologyModel(TabBase):
             )
 
         self.visible_components.add(component)
+        self.SEIR_only_entries.add(component.entry)
         return component 
 
     def render_I_E_prob(self, hide, column, columnspan, frow):
@@ -335,6 +365,7 @@ class EpidemiologyModel(TabBase):
             )
 
         self.visible_components.add(component)
+        self.SEIR_only_entries.add(component.entry)
         return component
  
 
@@ -348,6 +379,7 @@ class EpidemiologyModel(TabBase):
             )
 
         self.visible_components.add(component)
+        self.SEIR_only_entries.add(component.entry)
         return component 
     
     def render_image(self, hide, image_path, desired_width, desired_height, column, columnspan, frow):
