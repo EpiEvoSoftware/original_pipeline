@@ -1,6 +1,6 @@
 ## $\textbf{e}^{\textbf{3}}\textbf{SIM}$
 
-$\text{e}^{\text{3}}\text{SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation framework for genetic epidemiology) is an innovative outbreak simulator that simultaneously simulates transmission dynamics and molecular evolution of pathogens within a host population contact network using an agent-based, discrete, and forward-in-time approach. This software caters to users of all programming backgrounds. It has an easy-to-use graphical interface for beginners and allows advanced customization through command-line options for experienced coders. It works on both MacOS system and Linux system.
+$\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation framework for genetic epidemiology) is an innovative outbreak simulator that simultaneously simulates transmission dynamics and molecular evolution of pathogens within a host population contact network using an agent-based, discrete, and forward-in-time approach. This software caters to users of all programming backgrounds. It has an easy-to-use graphical interface for beginners and allows advanced customization through command-line options for experienced coders. It works on both MacOS system and Linux system.
 
 ## Publication
 Name_1 A, Name_2 B, Name_3 C. **$\textbf{e}^{\textbf{3}}\textbf{SIM}$: Epidemiological-ecological-evolutionary simulation framework for genetic epidemiology**. [Publication_Link](liyugiub)
@@ -41,7 +41,7 @@ Please see specifics in the [manual](uygukygb) document in this github repositor
         BiocManager::install("ggtree")
         ```
 
-  5. Test whether $\text{e}^{\text{3}}\text{SIM}$ is successfully installed by running a simple model.
+  5. Test whether $\text{e3SIM}$ is successfully installed by running a simple model.
       ```sh
       cd eSIM_packaging/eSIM
       eSIM=${PWD}
