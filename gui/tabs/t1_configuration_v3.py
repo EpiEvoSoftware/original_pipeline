@@ -72,13 +72,19 @@ class Configurationv3:
             messagebox.showerror("Update Error", error_message_str)
             return 1
     def update_random_seed(self, error_messages):
+        if self.random_seed_entry.get() == "None":
+            config = load_config_as_dict(self.config_path)
+            config["BasicRunConfiguration"]["random_number_seed"] = None
+            save_config(self.config_path, config)
+            return
+
         try:
             new_random_seed = int(self.random_seed_entry.get())
             config = load_config_as_dict(self.config_path)
             config["BasicRunConfiguration"]["random_number_seed"] = new_random_seed
             save_config(self.config_path, config)
         except ValueError:
-            error_messages.append("Please enter a valid integer for the random seed.")
+            error_messages.append("Please enter a valid integer for the random seed. Enter 'None' if you don't want to provide a random seed.")
             
     def update_n_replicates(self, error_messages):
         try:

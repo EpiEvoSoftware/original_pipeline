@@ -231,8 +231,10 @@ class GenomeElement(TabBase):
                     )
                 case _:
                     raise ValueError("Invalid method specified")
-            to_rerender()
-            to_derender()
+            if to_rerender:
+                to_rerender()
+            if to_derender:
+                to_derender()
 
         component = EasyCombobox(
             keys_path,

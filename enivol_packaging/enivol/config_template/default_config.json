@@ -2,7 +2,7 @@
     "BasicRunConfiguration": {
         "cwdir": "",
         "n_replicates": 1,
-        "random_number_seed": 1
+        "random_number_seed": null
     },
     "EvolutionModel": {
         "n_generation": 0,
