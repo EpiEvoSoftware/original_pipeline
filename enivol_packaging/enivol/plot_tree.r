@@ -152,7 +152,7 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
       rTipData <- cbind(rTipData, color_value_df[1:nTips(g1), ncol(color_value_df)])
     }
     # Prepare heatmap dataframe if we have processed >= 1 drug resistance
-    df_heatmap <- prepare_drug_resist_heatmap_data(color_value_df, g1, n_dr, n_trans)
+    df_heatmap <- prepare_drug_resist_heatmap(color_value_df, g1, n_dr, n_trans)
   }
 
   # Convert to phylo4d object      
