@@ -315,8 +315,8 @@ def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen, rand_seed = None):
 	# Remove the seeds aggregation VCF because tskit use different indexing for base positions than we and SLiM do.
 	os.remove(os.path.join(wk_dir, VCF_NAME))
 
-def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, S_IE_rate, \
-			 E_I_rate=0, E_R_rate=0, latency_prob=0, I_R_rate=0, I_E_rate=0, R_S_rate=0, rand_seed = None):
+def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, S_IE_prob, \
+			 E_I_prob=0, E_R_prob=0, latency_prob=0, I_R_prob=0, I_E_prob=0, R_S_prob=0, rand_seed = None):
 	"""
 	Burn-in w/ an epidemiological model for seed generations and write the VCF/NWK of seeds to working directory.
 	Note: The network and all epidemiological parameters must be available for this burn-in method.
@@ -329,13 +329,13 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
         n_gen (int): Number of generations.
         host_size (int): Total number of hosts in the simulation.
         seeded_host_id (list): List of IDs of initially infected hosts.
-        S_IE_rate (float): Rate of transition from susceptible to exposed.
-        E_I_rate (float, optional): Rate of transition from exposed to infected.
-        E_R_rate (float, optional): Rate of transition from exposed to recovered.
+        S_IE_prob (float): Rate of transition from susceptible to exposed.
+        E_I_prob (float, optional): Rate of transition from exposed to infected.
+        E_R_prob (float, optional): Rate of transition from exposed to recovered.
         latency_prob (float, optional): Probability of latency.
-        I_R_rate (float, optional): Rate of transition from infected to recovered.
-        I_E_rate (float, optional): Rate of transition from infected to exposed.
-        R_S_rate (float, optional): Rate of transition from recovered to susceptible.
+        I_R_prob (float, optional): Rate of transition from infected to recovered.
+        I_E_prob (float, optional): Rate of transition from infected to exposed.
+        R_S_prob (float, optional): Rate of transition from recovered to susceptible.
     """
 	if len(seeded_host_id) == 0:
 		raise CustomizedError("You need to specify at least one host id (-seeded_host_id) "
@@ -345,19 +345,19 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
 						"bigger than the size of the seeded hosts in SLiM epi model burn-in mode")
 	elif max(seeded_host_id) >= host_size:
 		raise CustomizedError("All the host ids to be seeded has to be smaller than host population size")
-	elif S_IE_rate <= 0:		
-		raise CustomizedError("An infection rate (-S_IE_rate, Susceptible to infected/exposed rate) bigger than 0 needs "
+	elif S_IE_prob <= 0:		
+		raise CustomizedError("An infection rate (-S_IE_prob, Susceptible to infected/exposed rate) bigger than 0 needs "
 						"to be provided in SLiM epi model burn-in mode")
-	elif latency_prob > 0 and E_I_rate == 0 and E_R_rate == 0:
+	elif latency_prob > 0 and E_I_prob == 0 and E_R_prob == 0:
 		print("WARNING: You activated an SEIR model, in which exposed compartment exists, "
 			"but you doesn't specify any transition from exposed compartment, which will lead "
 			"to exposed hosts being locked (never recovered and cannot infect others). Please "
 			"make sure this is what you want.", flush = True)
-	elif I_R_rate == 0:
+	elif I_R_prob == 0:
 		print("WARNING: You activated a S(E)I model by setting I>R rate = 0, where recovered "
 		"component doesn't exists, meaning that all infected hosts never recovered. Please make sure "
 		"this is what you want.", flush = True)
-	elif R_S_rate == 0:
+	elif R_S_prob == 0:
 		print("WARNING: You activated a S(E)IR model with Recovered individuals are fully immune, "
 		"they don't go back to recovered state. This can probably lead to the outbreak ending before "
 		"the specified burn-in generation and makes the seeds' sampling fail. Please make sure this "
@@ -375,18 +375,18 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
 					f"contact_network_path=\"{os.path.join(wk_dir, "contact_network.adjlist")}\"", "-d", \
 						f"host_size={host_size}", "-d", f"mut_rate={mu}", "-d", f"n_generation={n_gen}", "-d", \
 						f"seeded_host_id=c({",".join([str(i) for i in seeded_host_id])})", "-d", \
-						f"S_IE_rate={S_IE_rate}", "-d", f"E_I_rate={E_I_rate}", "-d", \
-						f"E_R_rate={E_R_rate}", "-d", f"latency_prob={latency_prob}", "-d", \
-						f"I_R_rate={I_R_rate}", "-d", f"I_E_rate={I_E_rate}", "-d", f"R_S_rate={R_S_rate}", \
+						f"S_IE_prob={S_IE_prob}", "-d", f"E_I_prob={E_I_prob}", "-d", \
+						f"E_R_prob={E_R_prob}", "-d", f"latency_prob={latency_prob}", "-d", \
+						f"I_R_prob={I_R_prob}", "-d", f"I_E_prob={I_E_prob}", "-d", f"R_S_prob={R_S_prob}", \
 						slim_script], stdout=fd)
 		else:
 			subprocess.run(["slim", "-d", f"cwdir=\"{wk_dir}\"", "-d", f"ref_path=\"{ref_path}\"", "-d", \
 					f"contact_network_path=\"{os.path.join(wk_dir, "contact_network.adjlist")}\"", "-d", \
 						f"host_size={host_size}", "-d", f"mut_rate={mu}", "-d", f"n_generation={n_gen}", "-d", \
 						f"seeded_host_id=c({",".join([str(i) for i in seeded_host_id])})", "-d", \
-						f"S_IE_rate={S_IE_rate}", "-d", f"E_I_rate={E_I_rate}", "-d", \
-						f"E_R_rate={E_R_rate}", "-d", f"latency_prob={latency_prob}", "-d", \
-						f"I_R_rate={I_R_rate}", "-d", f"I_E_rate={I_E_rate}", "-d", f"R_S_rate={R_S_rate}", "-d", \
+						f"S_IE_prob={S_IE_prob}", "-d", f"E_I_prob={E_I_prob}", "-d", \
+						f"E_R_prob={E_R_prob}", "-d", f"latency_prob={latency_prob}", "-d", \
+						f"I_R_prob={I_R_prob}", "-d", f"I_E_prob={I_E_prob}", "-d", f"R_S_prob={R_S_prob}", "-d", \
 						f"seed={rand_seed}", slim_script], stdout=fd)
 
 
@@ -416,8 +416,8 @@ def seeds_tree_scaling(tree_path, scale_factor, wk_dir):
 	phylo.write(outfile=os.path.join(wk_dir, "seeds.nwk"))
 
 def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="", mu=0, n_gen=0, \
-						path_seeds_phylogeny="", host_size=0, seeded_host_id=[], S_IE_rate=0, E_I_rate=0, \
-						E_R_rate=0, latency_prob=0, I_R_rate=0, I_E_rate=0, R_S_rate=0, rand_seed = None):
+						path_seeds_phylogeny="", host_size=0, seeded_host_id=[], S_IE_prob=0, E_I_prob=0, \
+						E_R_prob=0, latency_prob=0, I_R_prob=0, I_E_prob=0, R_S_prob=0, rand_seed = None):
 	"""
 	Generate seeds's phylogeny and individual VCFs.
 
@@ -433,13 +433,13 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 		path_seeds_phylogeny (str): Full path to the seeds' phylogeny VCF.
         host_size (int): Total number of hosts in the simulation.
         seeded_host_id (list[int]): List of IDs of initially infected hosts.
-        S_IE_rate (float): Rate of transition from susceptible to exposed.
-        E_I_rate (float, optional): Rate of transition from exposed to infected.
-        E_R_rate (float, optional): Rate of transition from exposed to recovered.
+        S_IE_prob (float): Rate of transition from susceptible to exposed.
+        E_I_prob (float, optional): Rate of transition from exposed to infected.
+        E_R_prob (float, optional): Rate of transition from exposed to recovered.
         latency_prob (float, optional): Probability of latency.
-        I_R_rate (float, optional): Rate of transition from infected to recovered.
-        I_E_rate (float, optional): Rate of transition from infected to exposed.
-        R_S_rate (float, optional): Rate of transition from recovered to susceptible.
+        I_R_prob (float, optional): Rate of transition from infected to recovered.
+        I_E_prob (float, optional): Rate of transition from infected to exposed.
+        R_S_prob (float, optional): Rate of transition from recovered to susceptible.
 
 		Returns:
 			error_message (str): Error message.
@@ -471,8 +471,8 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 			if method == "SLiM_burnin_WF":
 				seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen)
 			else:
-				seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, S_IE_rate, \
-				E_I_rate, E_R_rate, latency_prob, I_R_rate, I_E_rate, R_S_rate)
+				seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, S_IE_prob, \
+				E_I_prob, E_R_prob, latency_prob, I_R_prob, I_E_prob, R_S_prob)
 		else: # the given method is invalid
 			raise CustomizedError(f"{method} isn't a valid method. Please provide a permitted method. "
 							"(user_input/SLiM_burnin_WF/SLiM_burnin_epi)")
@@ -515,21 +515,21 @@ def seeds_generation_byconfig(all_config):
 
 	host_size = all_config["NetworkModelParameters"]["host_size"]
 	seeded_host_id = seeds_config["SLiM_burnin_epi"]["seeded_host_id"]
-	S_IE_rate = seeds_config["SLiM_burnin_epi"]["S_IE_rate"]
-	E_I_rate = seeds_config["SLiM_burnin_epi"]["E_I_rate"]
-	E_R_rate = seeds_config["SLiM_burnin_epi"]["E_R_rate"]
+	S_IE_prob = seeds_config["SLiM_burnin_epi"]["S_IE_prob"]
+	E_I_prob = seeds_config["SLiM_burnin_epi"]["E_I_prob"]
+	E_R_prob = seeds_config["SLiM_burnin_epi"]["E_R_prob"]
 	latency_prob = seeds_config["SLiM_burnin_epi"]["latency_prob"]
-	I_R_rate = seeds_config["SLiM_burnin_epi"]["I_R_rate"]
-	I_E_rate = seeds_config["SLiM_burnin_epi"]["I_E_rate"]
-	R_S_rate = seeds_config["SLiM_burnin_epi"]["R_S_rate"]
+	I_R_prob = seeds_config["SLiM_burnin_epi"]["I_R_prob"]
+	I_E_prob = seeds_config["SLiM_burnin_epi"]["I_E_prob"]
+	R_S_prob = seeds_config["SLiM_burnin_epi"]["R_S_prob"]
 	random_number_seed = all_config["BasicRunConfiguration"].get("random_number_seed", None)
 
 	# Run simulation for seed generation
 	error = run_seed_generation(method=method, wk_dir=wk_dir, seed_size=seed_size, seed_vcf=seed_vcf, Ne=Ne, \
 					 	ref_path=ref_path, mu=mu, n_gen=n_gen, path_seeds_phylogeny=path_seeds_phylogeny, \
-						host_size=host_size, seeded_host_id=seeded_host_id, S_IE_rate=S_IE_rate, \
-						E_I_rate=E_I_rate, E_R_rate=E_R_rate, latency_prob=latency_prob, 
-						I_R_rate=I_R_rate, I_E_rate=I_E_rate, R_S_rate=R_S_rate, rand_seed = random_number_seed)
+						host_size=host_size, seeded_host_id=seeded_host_id, S_IE_prob=S_IE_prob, \
+						E_I_prob=E_I_prob, E_R_prob=E_R_prob, latency_prob=latency_prob, 
+						I_R_prob=I_R_prob, I_E_prob=I_E_prob, R_S_prob=R_S_prob, rand_seed = random_number_seed)
 	return error
 
 def main():
@@ -545,13 +545,13 @@ def main():
 	parser.add_argument('-path_init_seq_phylogeny', action='store',dest='path_seeds_phylogeny', type=str, required=False, help="Phylogeny of the provided seeds", default="")
 	parser.add_argument('-host_size', action='store',dest='host_size', type=int, required=False, help="Size of the host population", default=0)
 	parser.add_argument('-seeded_host_id','--seeded_host_id', nargs='+', help='IDs of the host(s) that are seeded', required=False, type=int, default=[])
-	parser.add_argument('-S_IE_rate', action='store',dest='S_IE_rate', type=float, required=False, help="Probability of transmission for each contact pair per generation", default=0)
-	parser.add_argument('-E_I_rate', action='store',dest='E_I_rate', type=float, required=False, help="Probability of activation (E>I) for each infected host per generation", default=0)
-	parser.add_argument('-E_R_rate', action='store',dest='E_R_rate', type=float, required=False, help="Probability of recovery (E>R) for each exposed host per generation", default=0)
+	parser.add_argument('-S_IE_prob', action='store',dest='S_IE_prob', type=float, required=False, help="Probability of transmission for each contact pair per generation", default=0)
+	parser.add_argument('-E_I_prob', action='store',dest='E_I_prob', type=float, required=False, help="Probability of activation (E>I) for each infected host per generation", default=0)
+	parser.add_argument('-E_R_prob', action='store',dest='E_R_prob', type=float, required=False, help="Probability of recovery (E>R) for each exposed host per generation", default=0)
 	parser.add_argument('-latency_prob', action='store',dest='latency_prob', type=float, required=False, help="Probability of being a latent infection per infection event", default=0)
-	parser.add_argument('-I_R_rate', action='store',dest='I_R_rate', type=float, required=False, help="Probability of recovery (I>R) for each infected host per generation", default=0)
-	parser.add_argument('-I_E_rate', action='store',dest='I_E_rate', type=float, required=False, help="Probability of deactivation (I>E) for each infected host per generation", default=0)
-	parser.add_argument('-R_S_rate', action='store',dest='R_S_rate', type=float, required=False, help="Probability of immunity loss (R>S) for each recovered host per generation", default=0)
+	parser.add_argument('-I_R_prob', action='store',dest='I_R_prob', type=float, required=False, help="Probability of recovery (I>R) for each infected host per generation", default=0)
+	parser.add_argument('-I_E_prob', action='store',dest='I_E_prob', type=float, required=False, help="Probability of deactivation (I>E) for each infected host per generation", default=0)
+	parser.add_argument('-R_S_prob', action='store',dest='R_S_prob', type=float, required=False, help="Probability of immunity loss (R>S) for each recovered host per generation", default=0)
 	parser.add_argument('-random_seed', action = 'store', dest = 'random_seed', required = False, type = int, default = None)
 
 
@@ -569,21 +569,21 @@ def main():
 	path_seeds_phylogeny = args.path_seeds_phylogeny
 	host_size = args.host_size
 	seeded_host_id = args.seeded_host_id
-	S_IE_rate = args.S_IE_rate
-	E_I_rate = args.E_I_rate
-	E_R_rate = args.E_R_rate
+	S_IE_prob = args.S_IE_prob
+	E_I_prob = args.E_I_prob
+	E_R_prob = args.E_R_prob
 	latency_prob = args.latency_prob
-	I_R_rate = args.I_R_rate
-	I_E_rate = args.I_E_rate
-	R_S_rate = args.R_S_rate
+	I_R_prob = args.I_R_prob
+	I_E_prob = args.I_E_prob
+	R_S_prob = args.R_S_prob
 	rand_seed = args.random_seed
 
 
 	run_seed_generation(method=method, wk_dir=wk_dir, seed_size=seed_size, seed_vcf=seed_vcf, Ne=Ne, \
 					ref_path=ref_path, mu=mu, n_gen=n_gen, path_seeds_phylogeny=path_seeds_phylogeny, \
-					host_size=host_size, seeded_host_id=seeded_host_id, S_IE_rate=S_IE_rate, \
-					E_I_rate=E_I_rate, E_R_rate=E_R_rate, latency_prob=latency_prob, I_R_rate=I_R_rate, \
-					I_E_rate=I_E_rate, R_S_rate=R_S_rate, rand_seed = rand_seed)
+					host_size=host_size, seeded_host_id=seeded_host_id, S_IE_prob=S_IE_prob, \
+					E_I_prob=E_I_prob, E_R_prob=E_R_prob, latency_prob=latency_prob, I_R_prob=I_R_prob, \
+					I_E_prob=I_E_prob, R_S_prob=R_S_prob, rand_seed = rand_seed)
 
 
 if __name__ == "__main__":
