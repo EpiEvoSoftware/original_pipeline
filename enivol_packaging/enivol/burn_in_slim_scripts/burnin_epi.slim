@@ -8,9 +8,19 @@ initialize() {
 	initializeRecombinationRate(0);
 
 	initializeMutationTypeNuc(0, 1, "f", 0.0); // Neutral mutations
-	initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mut_rate / 3));
+	if (use_subst_matrix==0)
+	{
+		initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mu / 3));
+	}
+	else
+	{
+		mm1 = readCSV(mtx_path, colNames = T);
+		defineGlobal("mm", mm1.asMatrix());
+		initializeGenomicElementType(0, 0, 1.0, mutationMatrix = mm);
+	}
 
 	initializeGenomicElement(0, 0, L - 1);
+	print(g0.mutationMatrix);
 }
 
 1 early() {

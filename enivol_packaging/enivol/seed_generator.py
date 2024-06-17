@@ -34,6 +34,7 @@ NODES_PER_IND = 2
 NW_PRE = ".nwk"
 NW_PATH = "seeds.nwk"
 VCF_PATH = "seeds.vcf"
+MUT_MTX = "burnin_muts_prob_matrix.csv"
 
 SLIM_DIR = "burn_in_slim_scripts"
 WF_SLIM = "burnin_WF.slim"
@@ -284,7 +285,14 @@ def seeds_treeseq(wk_dir, seed_size):
 	_write_newick_file(wk_dir, sampled_tree, new_labels)
 	_write_vcf_file(wk_dir, sampled_tree, new_labels)
 
-def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen, rand_seed = None):
+
+def bool2SLiM(val):
+	if val==True:
+		return 1
+	else:
+		return 0
+
+def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen, rand_seed = None, use_subst_matrix=False):
 	"""
 	Burn-in w/ Wright-Fisher model for seed generations and write the VCF/NWK of seeds to working diretory.
 
@@ -296,19 +304,25 @@ def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen, rand_seed = None):
         mu (float): Mutation rate.
         n_gen (int): Number of generations.
 		rand_seed (int): Random number generator.
+		use_subst_matrix (bool): Whether to use substitution rate matrix
 	"""
-	
+
 	slim_script = os.path.join(os.path.dirname(__file__), SLIM_DIR, WF_SLIM)
 	slim_stdout_path = os.path.join(wk_dir, OUT_SLIM)
 	# Run SLiM
 
+	mtx_path = os.path.join(wk_dir, MUT_MTX)
+
 	with open(slim_stdout_path, 'w') as fd:
 		if rand_seed == None:
 			subprocess.run(["slim", "-d", f"Ne={Ne}", "-d", f"ref_path=\"{ref_path}\"", "-d", \
-					f"wk_dir=\"{wk_dir}\"", "-d", f"mu={mu}", "-d", f"n_gen={n_gen}", slim_script], stdout=fd)
+					f"wk_dir=\"{wk_dir}\"", "-d", f"mu={mu}", "-d", f"n_gen={n_gen}", \
+						"-d", f"use_subst_matrix={bool2SLiM(use_subst_matrix)}", \
+						"-d", f"mtx_path=\"{mtx_path}\"", slim_script], stdout=fd)
 		else:
 			subprocess.run(["slim", "-d", f"Ne={Ne}", "-d", f"ref_path=\"{ref_path}\"", "-d", \
-					f"wk_dir=\"{wk_dir}\"", "-d", f"mu={mu}", "-d", f"n_gen={n_gen}", "-d", f"seed={rand_seed}", slim_script], stdout=fd)
+					f"wk_dir=\"{wk_dir}\"", "-d", f"mu={mu}", "-d", f"n_gen={n_gen}", "-d", f"seed={rand_seed}", \
+					"-d", f"use_subst_matrix={bool2SLiM(use_subst_matrix)}", "-d", f"mtx_path=\"{mtx_path}\"", slim_script], stdout=fd)
 	# VCF/NWK
 	seeds_treeseq(wk_dir, seed_size)
 	split_seedvcf(os.path.join(wk_dir, VCF_NAME), wk_dir, seed_size, "slim")
@@ -316,7 +330,8 @@ def seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen, rand_seed = None):
 	os.remove(os.path.join(wk_dir, VCF_NAME))
 
 def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, S_IE_prob, \
-			 E_I_prob=0, E_R_prob=0, latency_prob=0, I_R_prob=0, I_E_prob=0, R_S_prob=0, rand_seed = None):
+			 E_I_prob=0, E_R_prob=0, latency_prob=0, I_R_prob=0, I_E_prob=0, R_S_prob=0, rand_seed = None, \
+			 use_subst_matrix=False):
 	"""
 	Burn-in w/ an epidemiological model for seed generations and write the VCF/NWK of seeds to working directory.
 	Note: The network and all epidemiological parameters must be available for this burn-in method.
@@ -336,6 +351,7 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
         I_R_prob (float, optional): Rate of transition from infected to recovered.
         I_E_prob (float, optional): Rate of transition from infected to exposed.
         R_S_prob (float, optional): Rate of transition from recovered to susceptible.
+		use_subst_matrix (bool): Whether to use substitution rate matrix
     """
 	if len(seeded_host_id) == 0:
 		raise CustomizedError("You need to specify at least one host id (-seeded_host_id) "
@@ -417,7 +433,8 @@ def seeds_tree_scaling(tree_path, scale_factor, wk_dir):
 
 def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="", mu=0, n_gen=0, \
 						path_seeds_phylogeny="", host_size=0, seeded_host_id=[], S_IE_prob=0, E_I_prob=0, \
-						E_R_prob=0, latency_prob=0, I_R_prob=0, I_E_prob=0, R_S_prob=0, rand_seed = None):
+						E_R_prob=0, latency_prob=0, I_R_prob=0, I_E_prob=0, R_S_prob=0, rand_seed = None,
+						use_subst_matrix=False, mu_matrix=""):
 	"""
 	Generate seeds's phylogeny and individual VCFs.
 
@@ -462,17 +479,56 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 						"(-ref_path) in SLiM burn-in mode")
 			elif not os.path.exists(ref_path):
 				raise FileNotFoundError(f"The path to the reference genome {ref_path} provided doesn't exist")
-			if mu <= 0:
-				raise CustomizedError("You need to specify a mutation rate (-mu) bigger than 0 "
-						f"instead of {mu} in SLiM burn-in mode")
+			if use_subst_matrix == True:
+				default_matrix = [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]]
+				try:
+					mu_matrix = json.loads(mu_matrix)
+				except json.decoder.JSONDecodeError:
+					raise CustomizedError(f"The mutation matrix {mu_matrix} is "
+						   "not a valid json format")
+				alleles = ["A", "C", "G", "T"]
+				from_allele = 0
+				for allele in alleles:
+					if allele not in mu_matrix:
+						print(f"WARNING: The allele {allele} is not specified in the substitution rate matrix")
+					elif len(mu_matrix[allele]) != 4:
+						raise CustomizedError(f"The transition probability (from) each allele should be a list of 4, but the allele {allele} is not.")
+					else:
+						to_allele = 0
+						for j in mu_matrix[allele]:
+							if type(j) != float:
+								raise CustomizedError(f"The provided substitution probability from {allele} contains non-floats, please provide a float for each probability")
+							elif j<0 or j>1:
+								raise CustomizedError(f"The provided substitution probability from {allele} should be between 0 and 1")
+							elif from_allele == to_allele and j!=0:
+								print(f"WARNING: The probability {allele}>{allele} should be zero following SLiM's notation, though non-zero value is provided, it will be ignored.")
+								to_allele = to_allele + 1
+							else:
+								default_matrix[from_allele][to_allele] = j
+								to_allele = to_allele + 1
+						from_allele = from_allele + 1
+				with open(os.path.join(wk_dir, MUT_MTX), "w") as mtx:
+					mtx.write("A,C,G,T\n")
+					for i in default_matrix:
+						line2write = ""
+						for j in i:
+							line2write = line2write + str(j) + ","
+						line2write = line2write[:-1] + "\n"
+						mtx.write(line2write)
+
+
+			else:
+				if mu <= 0:
+					raise CustomizedError("You need to specify a mutation rate (-mu) bigger than 0 "
+							f"instead of {mu} in SLiM burn-in mode")
 			if n_gen <= 0:
 				raise CustomizedError("You need to specify a burn-in generation (-n_gen) bigger than 0 "
 						f"instead of {n_gen} in SLiM burn-in mode")
 			if method == "SLiM_burnin_WF":
-				seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen)
+				seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen, rand_seed, use_subst_matrix)
 			else:
 				seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, S_IE_prob, \
-				E_I_prob, E_R_prob, latency_prob, I_R_prob, I_E_prob, R_S_prob)
+				E_I_prob, E_R_prob, latency_prob, I_R_prob, I_E_prob, R_S_prob, rand_seed, use_subst_matrix)
 		else: # the given method is invalid
 			raise CustomizedError(f"{method} isn't a valid method. Please provide a permitted method. "
 							"(user_input/SLiM_burnin_WF/SLiM_burnin_epi)")
@@ -511,7 +567,16 @@ def seeds_generation_byconfig(all_config):
 	if method== "user_input":
 		n_gen = 0
 	n_gen = seeds_config[method]["burn_in_generations"]
+	subst_model_param = seeds_config[method]["subst_model_parameterization"]
+	if subst_model_param=="mut_rate":
+		use_subst_matrix=True
+	elif subst_model_param=="mut_rate_matrix":
+		use_subst_matrix=False
+	else:
+		raise CustomizedError(f"The given subst_model_parameterization is NOT valid -- please input 'mut_rate' or 'mut_rate_matrix'.")
 	mu = seeds_config[method]["burn_in_mutrate"]
+	mu_matrix_ori = seeds_config[method]["burn_in_mutrate_matrix"]
+	mu_matrix = {"A": mu_matrix_ori[0], "C": mu_matrix_ori[1], "G": mu_matrix_ori[2], "T": mu_matrix_ori[3]}
 
 	host_size = all_config["NetworkModelParameters"]["host_size"]
 	seeded_host_id = seeds_config["SLiM_burnin_epi"]["seeded_host_id"]
@@ -529,7 +594,8 @@ def seeds_generation_byconfig(all_config):
 					 	ref_path=ref_path, mu=mu, n_gen=n_gen, path_seeds_phylogeny=path_seeds_phylogeny, \
 						host_size=host_size, seeded_host_id=seeded_host_id, S_IE_prob=S_IE_prob, \
 						E_I_prob=E_I_prob, E_R_prob=E_R_prob, latency_prob=latency_prob, 
-						I_R_prob=I_R_prob, I_E_prob=I_E_prob, R_S_prob=R_S_prob, rand_seed = random_number_seed)
+						I_R_prob=I_R_prob, I_E_prob=I_E_prob, R_S_prob=R_S_prob, rand_seed = random_number_seed,
+						use_subst_matrix=False, mu_matrix=mu_matrix)
 	return error
 
 def main():
@@ -540,7 +606,9 @@ def main():
 	parser.add_argument('-init_seq_vcf', action='store',dest='seed_vcf', type=str, required=False, help="Path to the user-provided seeds' vcf", default="")
 	parser.add_argument('-Ne', action='store',dest='Ne', type=int, required=False, help="Ne for a WF model, required in WF burn-in mode", default=0)
 	parser.add_argument('-ref_path', action='store',dest='ref_path', type=str, required=False, help="Reference genome path, required in SLiM burn-in", default="")
-	parser.add_argument('-mu', action='store',dest='mu', type=float, required=False, help="Mutation rate, required in SLiM burn-in", default=0)
+	parser.add_argument('-use_subst_matrix', action='store',dest='use_subst_matrix', type=str2bool, required=False, help="Whether to use a substitution probability matrix to parametrize mutations", default=False)
+	parser.add_argument('-mu', action='store',dest ='mu', type=float, required=False, help="Single mutation rate, required in SLiM burn-in", default=0)
+	parser.add_argument('-mu_matrix', action='store',dest='mu_matrix', type=str, required=False, help="JSON format string specifying the mutation probability matrix, required in SLiM burn-in", default="")
 	parser.add_argument('-n_gen', action='store',dest='n_gen', type=int, required=False, help="Number of generations of the burn-in process, required in SLiM burn-in", default=0)
 	parser.add_argument('-path_init_seq_phylogeny', action='store',dest='path_seeds_phylogeny', type=str, required=False, help="Phylogeny of the provided seeds", default="")
 	parser.add_argument('-host_size', action='store',dest='host_size', type=int, required=False, help="Size of the host population", default=0)
@@ -577,13 +645,16 @@ def main():
 	I_E_prob = args.I_E_prob
 	R_S_prob = args.R_S_prob
 	rand_seed = args.random_seed
+	use_subst_matrix = args.use_subst_matrix
+	mu_matrix = args.mu_matrix
 
 
 	run_seed_generation(method=method, wk_dir=wk_dir, seed_size=seed_size, seed_vcf=seed_vcf, Ne=Ne, \
 					ref_path=ref_path, mu=mu, n_gen=n_gen, path_seeds_phylogeny=path_seeds_phylogeny, \
 					host_size=host_size, seeded_host_id=seeded_host_id, S_IE_prob=S_IE_prob, \
 					E_I_prob=E_I_prob, E_R_prob=E_R_prob, latency_prob=latency_prob, I_R_prob=I_R_prob, \
-					I_E_prob=I_E_prob, R_S_prob=R_S_prob, rand_seed = rand_seed)
+					I_E_prob=I_E_prob, R_S_prob=R_S_prob, rand_seed = rand_seed, use_subst_matrix= use_subst_matrix, \
+					mu_matrix=mu_matrix)
 
 
 if __name__ == "__main__":
