@@ -1,4 +1,5 @@
 import json, os, argparse
+from Bio import SeqIO
 from error_handling import CustomizedError
 
 def recursive_update(default, user):
@@ -62,6 +63,68 @@ def dump_json(json2dump):
 
 def check_config(config_dict):
     pass
+
+def format_subst_mtx(mu_matrix, diag_zero=True):
+    """
+    From a string object of the mutation probability, to the list type probability rate matrix.
+
+    Parameters:
+        mu_matrix: A string object of the mutation probability, having the format '{"A":[,,,], "C":[,,,],"G":[,,,],"T":[,,,]}'.
+    """
+    default_matrix = [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]]
+    try:
+        mu_matrix = json.loads(mu_matrix)
+    except json.decoder.JSONDecodeError:
+        raise CustomizedError(f"The mutation matrix {mu_matrix} (-mu_matrix) is "
+    		   "not a valid json format")
+    alleles = ["A", "C", "G", "T"]
+    from_allele = 0
+    for allele in alleles:
+        if allele not in mu_matrix:
+            print(f"WARNING: The allele {allele} is not specified in the substitution rate matrix")
+        elif len(mu_matrix[allele]) != 4:
+            raise CustomizedError(f"The transition probability (from) each allele should be a list of 4, but the allele {allele} is not.")
+        else:
+            to_allele = 0
+            for j in mu_matrix[allele]:
+                if type(j) != float:
+                    raise CustomizedError(f"The provided substitution probability from {allele} contains non-floats, please provide a float for each probability")
+                elif j<0 or j>1:
+                    raise CustomizedError(f"The provided substitution probability from {allele} should be between 0 and 1")
+                elif from_allele == to_allele and j!=0:
+                    if diag_zero==True:
+                        print(f"WARNING: The probability {allele}>{allele} should be zero following SLiM's notation, though non-zero value is provided, it will be ignored.")
+                    to_allele = to_allele + 1
+                else:
+                    default_matrix[from_allele][to_allele] = j
+                    to_allele = to_allele + 1
+            if sum(default_matrix[from_allele])>1:
+                raise CustomizedError(f"The sum of the provided substitution probability from {allele} should be smaller than 1, please check your entry.")
+            if diag_zero==False:
+                default_matrix[from_allele][from_allele] = 1 - sum(default_matrix[from_allele])
+            from_allele = from_allele + 1
+    return(default_matrix)
+
+
+
+def check_ref_format(ref_path):
+    ref_seq = SeqIO.parse(open(ref_path), 'fasta')
+    seq_num = 0
+    for fasta in ref_seq:
+        seq_num = seq_num + 1
+        name, sequence = fasta.id, str(fasta.seq)
+    if seq_num>1:
+        raise CustomizedError("The reference genome file provided contains more than 1 sequences!")
+    else:
+        count_A = sequence.count("A")
+        count_C = sequence.count("C")
+        count_G = sequence.count("G")
+        count_T = sequence.count("T")
+        seq_len = len(sequence)
+        if sum([count_A, count_C, count_G, count_T]) != seq_len:
+            raise CustomizedError("The reference genome file provided contains characters that are not A, C, G, T!")
+        return([count_A/seq_len, count_C/seq_len, count_G/seq_len, count_T/seq_len])
+
 
 
 

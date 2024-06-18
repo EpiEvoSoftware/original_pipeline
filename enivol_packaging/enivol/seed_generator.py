@@ -480,36 +480,10 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 			elif not os.path.exists(ref_path):
 				raise FileNotFoundError(f"The path to the reference genome {ref_path} provided doesn't exist")
 			if use_subst_matrix == True:
-				default_matrix = [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]]
-				try:
-					mu_matrix = json.loads(mu_matrix)
-				except json.decoder.JSONDecodeError:
-					raise CustomizedError(f"The mutation matrix {mu_matrix} is "
-						   "not a valid json format")
-				alleles = ["A", "C", "G", "T"]
-				from_allele = 0
-				for allele in alleles:
-					if allele not in mu_matrix:
-						print(f"WARNING: The allele {allele} is not specified in the substitution rate matrix")
-					elif len(mu_matrix[allele]) != 4:
-						raise CustomizedError(f"The transition probability (from) each allele should be a list of 4, but the allele {allele} is not.")
-					else:
-						to_allele = 0
-						for j in mu_matrix[allele]:
-							if type(j) != float:
-								raise CustomizedError(f"The provided substitution probability from {allele} contains non-floats, please provide a float for each probability")
-							elif j<0 or j>1:
-								raise CustomizedError(f"The provided substitution probability from {allele} should be between 0 and 1")
-							elif from_allele == to_allele and j!=0:
-								print(f"WARNING: The probability {allele}>{allele} should be zero following SLiM's notation, though non-zero value is provided, it will be ignored.")
-								to_allele = to_allele + 1
-							else:
-								default_matrix[from_allele][to_allele] = j
-								to_allele = to_allele + 1
-						from_allele = from_allele + 1
+				matrix_ = format_subst_mtx(mu_matrix, diag_zero=True)
 				with open(os.path.join(wk_dir, MUT_MTX), "w") as mtx:
 					mtx.write("A,C,G,T\n")
-					for i in default_matrix:
+					for i in matrix_:
 						line2write = ""
 						for j in i:
 							line2write = line2write + str(j) + ","
@@ -520,7 +494,7 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 			else:
 				if mu <= 0:
 					raise CustomizedError("You need to specify a mutation rate (-mu) bigger than 0 "
-							f"instead of {mu} in SLiM burn-in mode")
+							f"instead of {mu} in SLiM burn-in mode when a single mutation rate is used.")
 			if n_gen <= 0:
 				raise CustomizedError("You need to specify a burn-in generation (-n_gen) bigger than 0 "
 						f"instead of {n_gen} in SLiM burn-in mode")
@@ -595,12 +569,12 @@ def seeds_generation_byconfig(all_config):
 						host_size=host_size, seeded_host_id=seeded_host_id, S_IE_prob=S_IE_prob, \
 						E_I_prob=E_I_prob, E_R_prob=E_R_prob, latency_prob=latency_prob, 
 						I_R_prob=I_R_prob, I_E_prob=I_E_prob, R_S_prob=R_S_prob, rand_seed = random_number_seed,
-						use_subst_matrix=False, mu_matrix=mu_matrix)
+						use_subst_matrix=use_subst_matrix, mu_matrix=mu_matrix)
 	return error
 
 def main():
 	parser = argparse.ArgumentParser(description='Generate or modify seeds.')
-	parser.add_argument('-method', action='store',dest='method', type=str, required=True, help="Method of the seed generation")
+	parser.add_argument('-method', action='store',dest='method', type=str, required=True, help="Method of the seed generation: user_input/SLiM_burnin_WF/SLiM_burnin_epi")
 	parser.add_argument('-wkdir', action='store',dest='wkdir', type=str, required=True, help="Working directory")
 	parser.add_argument('-num_init_seq', action='store',dest='seed_size', type=int, required=True, help="How many seeds is required")
 	parser.add_argument('-init_seq_vcf', action='store',dest='seed_vcf', type=str, required=False, help="Path to the user-provided seeds' vcf", default="")

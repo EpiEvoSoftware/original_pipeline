@@ -3,6 +3,7 @@ from error_handling import CustomizedError
 import numpy as np
 import pandas as pd
 import argparse, statistics, os, json
+from Bio import SeqIO
 
 START_IDX = 0
 END_IDX = 1
@@ -75,7 +76,7 @@ def seeds_trait_calc(wk_dir, dict_c_g, num_seed = 0):
 
 	return seed_vals
 
-def normalization_by_mutscounts(wk_dir, dict_c_g, n_gen, mut_rate):
+def normalization_by_mutscounts(wk_dir, dict_c_g, n_gen, mut_rate, pis_ref, matrix_, use_subst_matrix=False, final_T=1):
 	"""
 	Normalize the effect sizes based on the expected trait values at the end of the simulation.
 	
@@ -85,6 +86,9 @@ def normalization_by_mutscounts(wk_dir, dict_c_g, n_gen, mut_rate):
 						 Keys are gene names, values are lists of the form [start_pos(int), end_pos(int), effect_size(float)].
 		n_gen (int): Number of generations to be simulated.
 		mut_rate (float): Mutation rate.
+		pis_ref (list): Allele frequencies of A, C, G, T in reference genome, [piA, piC, piG, piT]
+		matrix_ (list os lists): mutation probability matrix
+		use_subst_matrix: whether to use mutation probability matirx
 		
 	Returns:
 		dict_c_g (dict): A normalized dictionary storing the genetic elements' effect sizes.
@@ -94,19 +98,24 @@ def normalization_by_mutscounts(wk_dir, dict_c_g, n_gen, mut_rate):
 	avg_trait_value = statistics.mean(seeds_trait_calc(wk_dir, dict_c_g))
 	
 	# Calculate the total sum for normalization
-	total_sum = avg_trait_value + sum(
-		(n_gen * mut_rate) * (end_pos - start_pos) * effect_size
-		for start_pos, end_pos, effect_size in dict_c_g.values()
-	)
+	if use_subst_matrix:
+		r = (1-matrix_[0][0]) * pis_ref[0] + (1-matrix_[1][1]) * pis_ref[1] + (1-matrix_[2][2]) * pis_ref[2] + (1-matrix_[3][3]) * pis_ref[3]
+		total_sum = avg_trait_value + sum((n_gen * r) * (end_pos - start_pos + 1) * effect_size
+			for start_pos, end_pos, effect_size in dict_c_g.values())
+	else:
+		total_sum = avg_trait_value + sum(
+			(n_gen * mut_rate) * (end_pos - start_pos + 1) * effect_size
+			for start_pos, end_pos, effect_size in dict_c_g.values()
+		)
 	
 	# Normalize the effect sizes
-	k = 1 / total_sum
+	k = final_T / total_sum
 	for _ , gene_info in dict_c_g.items():
 		gene_info[E_SIZE] *= k
 	
 	return dict_c_g
 
-def generate_eff_vals(gff_, causal, es_low, es_high, wk_dir, n_gen, mut_rate, norm_or_not):
+def generate_eff_vals(gff_, causal, es_low, es_high, wk_dir, n_gen, mut_rate, norm_or_not, pis_ref, matrix_, use_subst_matrix=False, final_T=1):
 	"""
 	Randomly generate a set of effect sizes for some genes sampled from a GFF-like annotation file
 	and computes the trait value of each seed according to the gff file.
@@ -120,6 +129,10 @@ def generate_eff_vals(gff_, causal, es_low, es_high, wk_dir, n_gen, mut_rate, no
 		n_gen (int): Number of generations to be simulated (used only when norm_or_not is True).
 		mut_rate (float): Mutation rate (used only when norm_or_not is True).
 		norm_or_not (bool): Specifies whether the generated effect sizes will be normalized.
+		pis_ref (list): Allele frequencies of A, C, G, T in reference genome, [piA, piC, piG, piT]
+		matrix_ (list os lists): mutation probability matrix
+		use_subst_matrix: whether to use mutation probability matirx
+		final_T: Expected average trait value by the end of the simulation
 		
 	Returns:
 		dict_causal_genes (dict): A dictionary storing the genetic elements' effect sizes. 
@@ -156,7 +169,7 @@ def generate_eff_vals(gff_, causal, es_low, es_high, wk_dir, n_gen, mut_rate, no
 	
 	if norm_or_not:
 		# modify dict_causal_genes by the normalization factor k
-		dict_causal_genes = normalization_by_mutscounts(wk_dir, dict_causal_genes, n_gen, mut_rate)
+		dict_causal_genes = normalization_by_mutscounts(wk_dir, dict_causal_genes, n_gen, mut_rate, pis_ref, matrix_, use_subst_matrix, final_T)
 	
 	seeds_trait_vals = seeds_trait_calc(wk_dir, dict_causal_genes)
 
@@ -248,7 +261,7 @@ def write_seeds_trait(wk_dir, seeds_trait_vals, traits_num):
 		for i, seed_traits in enumerate(zip(*seeds_trait_vals)):
 			csv_file.write(f"{i},{','.join(map(str, seed_traits))}\n")
 
-def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir, n_gen, mut_rate, norm_or_not):
+def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir, n_gen, mut_rate, norm_or_not, use_subst_matrix, mu_matrix, ref, final_T):
 	"""
 	Generate a CSV file containing genetic element information for all traits and calculate seeds' trait values.
 
@@ -262,6 +275,11 @@ def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir,
 		n_gen (int): Number of generations to simulate.
 		mut_rate (float): Mutation rate.
 		norm_or_not (bool): Whether to normalize the generated effect sizes.
+		use_subst_matrix (bool): Whether to use mutation probability matrix
+		mu_matrix (str): substitution probability matrix
+		ref (str): path to the reference genome
+		final_T: Expected average trait value by the end of the simulation
+
 	"""
 	total_n_traits = sum(trait_n.values())
 	if len(causal_sizes) != total_n_traits:
@@ -275,20 +293,34 @@ def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir,
 	if len(es_highs) != total_n_traits:
 		raise CustomizedError(f"The given length of the upper bounds (-es_high {len(es_highs)}) "
 						f"is not consistent with the number of traits ({total_n_traits})")
-	
+
+	pis_ref = []
+	matrix_ = []
 	if norm_or_not:
 		if type(n_gen) != int or n_gen <= 0:
 			raise CustomizedError("Please specify a positive integer for generation "
 						"(-sim_generation) in normalization mode")
-		if (type(mut_rate) != float and type(mut_rate) != int) or mut_rate <= 0:
-			raise CustomizedError("Please specify a positive number for mutation rate "
-						"(-mut_rate) in normalization mode")
+		if use_subst_matrix==True:
+			if os.path.exists(ref)==False:
+				raise CustomizedError("Please provide a valid path to the reference genome "
+							"(-ref) in normalization mode using substitution probability matrix")
+			else:
+				matrix_ = format_subst_mtx(mu_matrix, diag_zero=False)
+				pis_ref = check_ref_format(ref)
+		else:
+			if (type(mut_rate) != float and type(mut_rate) != int) or mut_rate <= 0:
+				raise CustomizedError("Please specify a positive number for mutation rate "
+							"(-mut_rate) in normalization mode using single mutation rate")
+
 	traits_dict =[]
 	seeds_trait_vals = []
 	# Generate effect sizes and calculate seeds' trait values for each trait
 	for trait_id in range(sum(trait_n.values())):
-		current_tdict, seed_vals = generate_eff_vals(gff_, causal_sizes[trait_id], es_lows[trait_id], 
-											  es_highs[trait_id], wk_dir, n_gen, mut_rate, norm_or_not)
+		current_tdict, seed_vals = generate_eff_vals(gff_=gff_, causal=causal_sizes[trait_id], es_low=es_lows[trait_id], 
+										 es_high=es_highs[trait_id], wk_dir=wk_dir, n_gen=n_gen, mut_rate=mut_rate, 
+										 norm_or_not=norm_or_not, pis_ref=pis_ref, matrix_=matrix_, use_subst_matrix=use_subst_matrix,
+										 final_T=final_T)
+
 		traits_dict.append(current_tdict)
 		seeds_trait_vals.append(seed_vals)
 
@@ -346,7 +378,8 @@ def read_effvals(wk_dir, effsize_path, traits_num, num_seed = 0):
 
 
 def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n={}, causal_sizes=[], es_lows=[], es_highs=[], 
-						   norm_or_not=False, n_gen=0, mut_rate=0, rand_seed = None, num_seed = 0):
+						   norm_or_not=False, n_gen=0, mut_rate=0, rand_seed = None, num_seed = 0, use_subst_matrix=False, 
+						   mu_matrix="", ref="", final_T = 1):
 	"""
 	Generate effect sizes for genes and computes trait values for seeds' sequences.
 
@@ -362,6 +395,7 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n={
         norm_or_not (bool, optional): Boolean indicating whether to normalize effect sizes.
         n_gen (int, optional): Number of generations for randomly_generate method.
         mut_rate (float or int, optional): Mutation rate for randomly_generate method.
+		
 
 	Returns:
 		error_message (str): Error message.
@@ -378,7 +412,8 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n={
 			write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path, trait_n, num_seed), trait_n)
 		elif method == "randomly_generate":
 			
-			generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, norm_or_not)
+			generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, \
+				norm_or_not, use_subst_matrix, mu_matrix, ref, final_T)
 		else:
 			raise CustomizedError(f"{method} isn't a valid method. Please provide a permitted method. "
 							"(user_input/randomly_generate)")
@@ -403,6 +438,15 @@ def effsize_generation_byconfig(all_config):
 	effsize_method = genetic_config["effect_size"]["method"]
 	random_seed = all_config["BasicRunConfiguration"].get("random_number_seed", None)
 	num_seed = all_config["SeedsConfiguration"]["seed_size"]
+	subst_model_param = all_config["EvolutionModel"]["subst_model_parameterization"]
+	if subst_model_param=="mut_rate":
+		use_subst_matrix=True
+	elif subst_model_param=="mut_rate_matrix":
+		use_subst_matrix=False
+	else:
+		raise CustomizedError(f"The given subst_model_parameterization is NOT valid -- please input 'mut_rate' or 'mut_rate_matrix'.")
+	mu_matrix_ori = all_config["EvolutionModel"]["burn_in_mutrate_matrix"]
+	mu_matrix = {"A": mu_matrix_ori[0], "C": mu_matrix_ori[1], "G": mu_matrix_ori[2], "T": mu_matrix_ori[3]}
 
 	eff_params_config = genetic_config["effect_size"]["randomly_generate"]
 	error = run_effsize_generation(method=effsize_method, wk_dir=wk_dir, trait_n=genetic_config["traits_num"], 
@@ -410,7 +454,9 @@ def effsize_generation_byconfig(all_config):
 						 causal_sizes=eff_params_config["genes_num"], es_lows=eff_params_config["effsize_min"], 
 						 es_highs=eff_params_config["effsize_max"], gff_in=eff_params_config["gff"], 
 						 n_gen=all_config["EvolutionModel"]["n_generation"], mut_rate=all_config["EvolutionModel"]["mut_rate"], 
-						 norm_or_not=eff_params_config["normalize"], rand_seed = random_seed, num_seed=num_seed)
+						 norm_or_not=eff_params_config["normalize"], rand_seed = random_seed, num_seed=num_seed,
+						 use_subst_matrix=use_subst_matrix, mu_matrix=mu_matrix, ref=all_config["GenomeElement"]["ref_path"], 
+						 final_T = eff_params_config["final_trait"])
 	return error
 
 
@@ -419,7 +465,7 @@ def main():
 	parser.add_argument('-method', action='store',dest='method', type=str, required=True, help="Method of the genetic element file generation")
 	parser.add_argument('-wkdir', action='store',dest='wkdir', type=str, required=True, help="Working directory")
 	parser.add_argument('-effsize_path', action='store',dest='effsize_path', type=str, required=False, help="Path to the user-provided effect size genetic element csv file", default="")
-	parser.add_argument('-trait_n', action='store', dest='trait_n', type=str, required=False, help="Number of traits that user want to generate a genetic architecture for, 1st number for transmissibility, 2nd number for drug resistance", default="")
+	parser.add_argument('-trait_n', action='store', dest='trait_n', type=str, required=False, help="Number of traits that user want to generate a genetic architecture for transmissibility and drug resistance, format: '{\"transmissibility\": x, \"drug-resistance\": y}'", default="")
 	parser.add_argument('-causal_size_each','--causal_size_each', nargs='+', help='Size of causal genes for each trait', required=False, type=int, default=[])
 	parser.add_argument('-es_low','--es_low', nargs='+', help='Lower bounds of effect size for each trait', required=False, type=float, default=[])
 	parser.add_argument('-es_high','--es_high', nargs='+', help='Higher bounds of effect size for each trait', required=False, type=float, default=[])
@@ -427,9 +473,12 @@ def main():
 	parser.add_argument('-normalize','--normalize', default=False, required=False, type=str2bool, help='Whether to normalize the effect size based on sim_generations and mut_rate')
 	parser.add_argument('-sim_generation', action='store',dest='sim_generation', required=False, type=int, default=0)
 	parser.add_argument('-mut_rate', action='store',dest='mut_rate', required=False, type=float, default=0)
+	parser.add_argument('-use_subst_matrix', action='store',dest='use_subst_matrix', type=str2bool, required=False, help="Whether to use a substitution probability matrix to parametrize mutations", default=False)
+	parser.add_argument('-mu_matrix', action='store',dest='mu_matrix', type=str, required=False, help="JSON format string specifying the mutation probability matrix, required in SLiM burn-in", default="")
 	parser.add_argument('-random_seed', action = 'store', dest = 'random_seed', required = False, type = int, default = None)
-
+	parser.add_argument('-ref', action = 'store', dest = 'ref', required = False, type = str, default = "", help='Reference genome of the pathogen, required for normalization using substitution probability matrix.')
 	parser.add_argument('-n_seed', action='store', dest = 'num_seed', required = False, type = int, default = None)
+	parser.add_argument('-final_T', action='store', dest = 'final_T', required = False, type = float, default = 1, help='Expected average trait value at the end of the simulation, used in normalization mode. Default is 1.')
 
 
 	args = parser.parse_args()
@@ -447,10 +496,15 @@ def main():
 	norm_or_not = args.normalize
 	rand_seed = args.random_seed
 	num_seed = args.num_seed
+	use_subst_matrix = args.use_subst_matrix
+	mu_matrix = args.mu_matrix
+	ref = args.ref
+	final_T = args.final_T
 
 	run_effsize_generation(method=method, wk_dir=wk_dir, effsize_path=effsize_path, gff_in=gff_in, trait_n=trait_n, 
 						causal_sizes=causal_sizes, es_lows=es_lows, es_highs=es_highs, norm_or_not=norm_or_not, 
-						n_gen=n_gen, mut_rate=mut_rate, rand_seed = rand_seed, num_seed = num_seed)
+						n_gen=n_gen, mut_rate=mut_rate, rand_seed = rand_seed, num_seed = num_seed,
+						use_subst_matrix=use_subst_matrix, mu_matrix=mu_matrix, ref=ref, final_T = final_T)
 
 
 if __name__ == "__main__":
