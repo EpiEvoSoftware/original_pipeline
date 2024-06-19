@@ -66,8 +66,7 @@
 	// either s3 or s7 will be run each tick
 	not_dr_gens = c();
 	not_dr_epochs = which(drugresistance_effsize==0);
-	print("Any not DR epochs???");
-	print(not_dr_epochs);
+
 
 	if (n_epoch==1)
 	{
@@ -78,16 +77,13 @@
 	}
 	else
 	{
-		print("This definitely should be run");
 		for (epoch_indx in not_dr_epochs)
 		{
 			if (epoch_indx == 0)
 			{
-				print("Damn");
 
 				start_gen = 2;
 				end_gen = epoch_changing_generation[epoch_indx] - 1;
-				print(end_gen);
 			}
 			else if (epoch_indx == n_epoch - 1)
 			{
@@ -105,8 +101,6 @@
 	
 	if (any(not_dr_gens > 1))
 	{
-		print("How to schedule s3");
-		print(not_dr_gens);
 		community.rescheduleScriptBlock(s3, ticks = not_dr_gens);
 	}
 
