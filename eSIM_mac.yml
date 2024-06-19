@@ -66,7 +66,7 @@ dependencies:
   - setuptools=69.5.1
   - sip=6.7.12
   - six=1.16.0
-  - slim=4.0.1
+  - slim=4.1
   - sqlite=3.45.3
   - svgwrite=1.4.3
   - tk=8.6.14
@@ -76,6 +76,7 @@ dependencies:
   - xz=5.4.6
   - zlib=1.2.13
   - zstd=1.5.5
+  - biopython=1.83
   - pip:
       - attrs==23.2.0
       - contourpy==1.2.1
