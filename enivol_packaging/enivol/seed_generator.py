@@ -394,6 +394,7 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
 						f"S_IE_prob={S_IE_prob}", "-d", f"E_I_prob={E_I_prob}", "-d", \
 						f"E_R_prob={E_R_prob}", "-d", f"latency_prob={latency_prob}", "-d", \
 						f"I_R_prob={I_R_prob}", "-d", f"I_E_prob={I_E_prob}", "-d", f"R_S_prob={R_S_prob}", \
+						"-d", f"use_subst_matrix={bool2SLiM(use_subst_matrix)}", \
 						slim_script], stdout=fd)
 		else:
 			subprocess.run(["slim", "-d", f"cwdir=\"{wk_dir}\"", "-d", f"ref_path=\"{ref_path}\"", "-d", \
@@ -403,7 +404,7 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
 						f"S_IE_prob={S_IE_prob}", "-d", f"E_I_prob={E_I_prob}", "-d", \
 						f"E_R_prob={E_R_prob}", "-d", f"latency_prob={latency_prob}", "-d", \
 						f"I_R_prob={I_R_prob}", "-d", f"I_E_prob={I_E_prob}", "-d", f"R_S_prob={R_S_prob}", "-d", \
-						f"seed={rand_seed}", slim_script], stdout=fd)
+						f"seed={rand_seed}", "-d", f"use_subst_matrix={bool2SLiM(use_subst_matrix)}", slim_script], stdout=fd)
 
 
 	# VCF/NWK
