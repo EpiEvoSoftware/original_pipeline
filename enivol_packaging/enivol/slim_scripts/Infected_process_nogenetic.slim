@@ -1,4 +1,5 @@
 s3 early(){
+	print("Are you also running??");
 	i_inds = which(current_hoststates==2);
 	hosts = sim.subpopulations;
 	draw_uniform = runif(length(i_inds));
@@ -29,8 +30,6 @@ s3 early(){
 			writeFile(paste0(cwdir, runid, "/recovery.csv"), line1, append=T, compress=T);
 		}
 		sim.killIndividuals(hosts[recover_from_i].individuals);
-		print("Test please");
-		print(hosts[recover_from_i].individualCount);
 	}
 
 	if (length(go_latent_inds)>0)
