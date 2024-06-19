@@ -1,6 +1,6 @@
 s11 early() {
-	// Massive sampling event
-	i_inds = which(Host_states==2);
+	// Concerted sampling event
+	i_inds = which(current_hoststates==2);
 	hosts = sim.subpopulations;
 	draw_uniform = runif(length(i_inds));
 	which_samp_event = which(massive_sample_generation == community.tick);
@@ -15,7 +15,7 @@ s11 early() {
 		{
 			sampled_pathogen = sample(hosts[ind].individuals, 1);
 			line1 = paste(community.tick, ind);
-			writeFile(paste0(cwdir, runid, "/sample.csv"), line1, append=T, compress=T);
+			writeFile(paste0(cwdir, runid, "/concerted.sample.csv"), line1, append=T, compress=T);
 			sampled_inds_genomes = c(sampled_inds_genomes, sampled_pathogen);
 		}
 		sim.treeSeqRememberIndividuals(sampled_inds_genomes);
@@ -27,7 +27,7 @@ s11 early() {
 		for (ind in recovered_inds)
 		{
 			line1 = paste(community.tick, ind);
-			writeFile(paste0(cwdir, runid, "/massive_recovery.csv"), line1, append=T, compress=T);
+			writeFile(paste0(cwdir, runid, "/concerted.sample.recovery.csv"), line1, append=T, compress=T);
 		} 
 		sim.killIndividuals(sim.subpopulations[recovered_inds].individuals);
 	}

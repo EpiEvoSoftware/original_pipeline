@@ -1,9 +1,9 @@
 s8 early()
 {
-	hosts = sim.subpopulations;
-	
 	// State transitions for exposed hosts
-	e_inds = which(Host_states==1);
+	// There are 4 states: 0 - susceptible, 1 - exposed, 2 - infected, 3 - recovered
+	hosts = sim.subpopulations;
+	e_inds = which(current_hoststates==1);
 
 	draw_uniform = runif(length(e_inds));
 	state_transition = findInterval(draw_uniform, c(0, E_I_rate[current_epoch], E_I_rate[current_epoch] + E_R_rate[current_epoch]));

@@ -1,9 +1,10 @@
 1 first() {
-	//// Turn on warnings
+	// Schedule all the blocks.
+	// Turn on warnings
 	suppressWarnings(F);
 	print("Scheduling block");
 
-	// self reproduction (for mutation accumulation) run every generation
+	// self reproduction (for mutation accumulation) run every tick
 	community.rescheduleScriptBlock(s0, ticks = 2:n_generation);
 	all_gens_vector = 2:n_generation;
 
@@ -54,11 +55,15 @@
 		community.rescheduleScriptBlock(s2, ticks = all_gens_vector);
 	}
 
-	// s6, kill all old pathogens, run at all generations as a complement of the mutation process
+	// s6, kill all old pathogens, run at all generations as a component of the mutation process
 	community.rescheduleScriptBlock(s6, ticks = all_gens_vector);
+
+	// s14, store the current state profile of hosts, so that any host will just be manipulated once.
+	community.rescheduleScriptBlock(s14, ticks = all_gens_vector);
 
 	// s3, State transition process without drug resistance
 	// s7, treatment block, will activate only at the generations specified by treatment_gens as substitution of s3
+	// either s3 or s7 will be run each tick
 	not_dr_gens = c();
 	not_dr_epochs = which(drugresistance_effsize==0);
 

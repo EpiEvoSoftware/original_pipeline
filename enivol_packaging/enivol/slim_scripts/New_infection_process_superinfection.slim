@@ -1,5 +1,5 @@
 s10 early(){
-	s_inds = which((Host_states==0)&(sim.subpopulations.individualCount>0));
+	s_inds = which((current_hoststates==0)&(sim.subpopulations.individualCount>0));
 
 	draw_uniform = runif(length(s_inds));
 	state_transition = findInterval(draw_uniform, c(0, latency_prob[current_epoch]));

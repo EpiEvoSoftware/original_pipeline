@@ -324,7 +324,7 @@ def create_slim_config(all_config):
 	
 	slim_pars["super_infection"] = all_config["EpidemiologyModel"]["super_infection"]
 	_check_boolean(slim_pars["super_infection"], "Whether to enable super infection")
-	out_config.write(f"super_infection: {_writebinary(slim_pars["super_infection"])}\n")
+	out_config.write(f"super_infection:{_writebinary(slim_pars["super_infection"])}\n")
 	if slim_pars["super_infection"] and slim_pars["cap_withinhost"]==1:
 		print("WARNING: Though super-infection is activated, you specified the capacity within-host being only 1, thus super-infection actually cannot happen.", flush = True)
 	# slim_pars["slim_replicate_seed_file_path"] = all_config["EpidemiologyModel"]["slim_replicate_seed_file_path"]
@@ -432,6 +432,9 @@ def create_slim_script(slim_pars):
 
 	# Kill old pathogens
 	append_files(os.path.join(code_path, "kill_old_pathogens.slim"), mainslim_path)
+
+	# Store current state of the hosts
+	append_files(os.path.join(code_path, "store_current_states.slim"), mainslim_path)
 
 	# State transition for exposed hosts
 	if slim_pars["epi_model"]=="SEIR":

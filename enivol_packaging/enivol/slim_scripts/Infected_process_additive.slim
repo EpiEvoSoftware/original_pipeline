@@ -1,5 +1,5 @@
 s7 early(){
-	i_inds = which(Host_states==2);
+	i_inds = which(current_hoststates==2);
 	hosts = sim.subpopulations;
 	draw_uniform = runif(length(i_inds));
 	state_transition = findInterval(draw_uniform, c(0, sample_rate[current_epoch] * recovery_prob_after_sampling[current_epoch], sample_rate[current_epoch], I_R_rate[current_epoch] + sample_rate[current_epoch], I_R_rate[current_epoch] + sample_rate[current_epoch] + I_E_rate[current_epoch]));
