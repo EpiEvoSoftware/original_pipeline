@@ -100,6 +100,8 @@ def format_subst_mtx(mu_matrix, diag_zero=True):
                     to_allele = to_allele + 1
             if sum(default_matrix[from_allele])>1:
                 raise CustomizedError(f"The sum of the provided substitution probability from {allele} should be smaller than 1, please check your entry.")
+            if sum(default_matrix[from_allele])==0:
+                print(f"WARNING: The sum of the provided substitution probability from {allele} is 0, meaning that allele \"{allele}\" will never mutate. Please check if this is not what you desired")
             if diag_zero==False:
                 default_matrix[from_allele][from_allele] = 1 - sum(default_matrix[from_allele])
             from_allele = from_allele + 1
