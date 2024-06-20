@@ -29,60 +29,28 @@ class SeedsConfiguration(TabBase):
         # SeedsConfiguration
         self.seed_size = self.config_dict["SeedsConfiguration"]["seed_size"]
         self.method = self.config_dict["SeedsConfiguration"]["method"]
-        self.use_reference: bool = self.config_dict["SeedsConfiguration"][
-            "use_reference"
-        ]
+        self.use_reference: bool = self.config_dict["SeedsConfiguration"]["use_reference"]
 
         # user_input
-        self.path_seeds_vcf = self.config_dict["SeedsConfiguration"]["user_input"][
-            "path_seeds_vcf"
-        ]
-        self.path_seeds_phylogeny = self.config_dict["SeedsConfiguration"][
-            "user_input"
-        ]["path_seeds_phylogeny"]
+        self.path_seeds_vcf = self.config_dict["SeedsConfiguration"]["user_input"]["path_seeds_vcf"]
+        self.path_seeds_phylogeny = self.config_dict["SeedsConfiguration"]["user_input"]["path_seeds_phylogeny"]
 
         # SLiM_burnin_WF
-        self.burn_in_Ne = self.config_dict["SeedsConfiguration"]["SLiM_burnin_WF"][
-            "burn_in_Ne"
-        ]
-        self.burn_in_generations_wf = self.config_dict["SeedsConfiguration"][
-            "SLiM_burnin_WF"
-        ]["burn_in_generations"]
-        self.burn_in_mutrate_wf = self.config_dict["SeedsConfiguration"][
-            "SLiM_burnin_WF"
-        ]["burn_in_mutrate"]
+        self.burn_in_Ne = self.config_dict["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_Ne"]
+        self.burn_in_generations_wf = self.config_dict["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_generations"]
+        self.burn_in_mutrate_wf = self.config_dict["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_mutrate"]
 
         # SLiM_burnin_epi
-        self.burn_in_generations_epi = self.config_dict["SeedsConfiguration"][
-            "SLiM_burnin_epi"
-        ]["burn_in_generations"]
-        self.burn_in_mutrate_epi = self.config_dict["SeedsConfiguration"][
-            "SLiM_burnin_epi"
-        ]["burn_in_mutrate"]
-        self.seeded_host_id = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "seeded_host_id"
-        ]
-        self.S_IE_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "S_IE_prob"
-        ]
-        self.E_I_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "E_I_prob"
-        ]
-        self.E_R_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "E_R_prob"
-        ]
-        self.latency_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "latency_prob"
-        ]
-        self.I_R_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "I_R_prob"
-        ]
-        self.I_E_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "I_E_prob"
-        ]
-        self.R_S_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"][
-            "R_S_prob"
-        ]
+        self.burn_in_generations_epi = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"]["burn_in_generations"]
+        self.burn_in_mutrate_epi = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"]["burn_in_mutrate"]
+        self.seeded_host_id = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"]["seeded_host_id"]
+        self.S_IE_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"]["S_IE_prob"]
+        self.E_I_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"]["E_I_prob"]
+        self.E_R_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"]["E_R_prob"]
+        self.latency_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"]["latency_prob"]
+        self.I_R_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"]["I_R_prob"]
+        self.I_E_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"]["I_E_prob"]
+        self.R_S_prob = self.config_dict["SeedsConfiguration"]["SLiM_burnin_epi"]["R_S_prob"]
 
     def init_user_input_group(self, hide):
         # tab_t = self.render_tab_title(hide, 5+3, 0, 3)
@@ -107,34 +75,45 @@ class SeedsConfiguration(TabBase):
         wf_grpctrls.add(self.display_burn_in_settings_label(hide, 1, 9))
         wf_grpctrls.add(self.render_burn_in_ne(hide, 1, 11))
         wf_grpctrls.add(self.render_burn_in_generations_wf(hide, 2, 11))
-        wf_grpctrls.add(self.render_burn_in_mutrate_wf(hide, 1, 13))
+        wf_grpctrls.add(self.render_subst_model_parameterization_wf(hide, 1, 13))
+        self.burn_in_mutrate_wf_control = self.render_burn_in_mutrate_wf(hide, 1, 15)
+        self.burn_in_mutrate_matrix_wf_control = self.render_burn_in_mutrate_matrix_wf(hide, 2, 15)
+        wf_grpctrls.add(self.burn_in_mutrate_wf_control)
+        wf_grpctrls.add(self.burn_in_mutrate_matrix_wf_control)
+        wf_grpctrls.add(self.render_burn_in_load_mutrate_wf(hide, 1, 19))
         return wf_grpctrls
 
     def init_epi_group(self, hide):
         epi_grpctrls = GroupControls()
         # epi_grpctrls.add(self.render_tab_title(hide, 5+3, 0, 3))
         epi_grpctrls.add(self.display_burn_in_settings_label(hide, 0, 9))
-        epi_grpctrls.add(self.render_burn_in_generations_epi(hide, 0, 6 + 5))
-        epi_grpctrls.add(self.render_burn_in_mutrate_epi(hide, 1, 6 + 5))
-        epi_grpctrls.add(self.render_seeded_host_id(hide, 2, 6 + 5))
-        epi_grpctrls.add(self.render_S_IE_prob(hide, 0, 8 + 5))
-        epi_grpctrls.add(self.render_E_I_prob(hide, 0, 10 + 5))
-        epi_grpctrls.add(self.render_E_R_prob(hide, 2, 8 + 5))
-        epi_grpctrls.add(self.render_latency_prob(hide, 1, 8 + 5))
-        epi_grpctrls.add(self.render_I_R_prob(hide, 0, 16 + 5))
-        epi_grpctrls.add(self.render_I_E_prob(hide, 0, 12 + 5))
-        epi_grpctrls.add(self.render_R_S_prob(hide, 0, 14 + 5))
+        epi_grpctrls.add(self.render_seeded_host_id(hide, 0, 11))
+        epi_grpctrls.add(self.render_burn_in_generations_epi(hide, 1, 11))
+        epi_grpctrls.add(self.render_subst_model_parameterization_epi(hide, 2, 11))
+        self.burn_in_mutrate_epi_control = self.render_burn_in_mutrate_epi(hide, 2, 13)
+        self.burn_in_mutrate_matrix_epi_control = self.render_burn_in_mutrate_matrix_epi(hide, 3, 13)
+        epi_grpctrls.add(self.burn_in_mutrate_epi_control)
+        epi_grpctrls.add(self.burn_in_mutrate_matrix_epi_control)
+        epi_grpctrls.add(self.render_burn_in_load_mutrate_epi(hide, 2, 16))
+        
+        epi_grpctrls.add(self.render_S_IE_prob(hide, 0, 13))
+        epi_grpctrls.add(self.render_E_I_prob(hide, 0, 15))
+        epi_grpctrls.add(self.render_latency_prob(hide, 1, 13))
+        epi_grpctrls.add(self.render_E_R_prob(hide, 1, 15))
+        epi_grpctrls.add(self.render_I_E_prob(hide, 0, 17))
+        epi_grpctrls.add(self.render_R_S_prob(hide, 0, 19))
+        epi_grpctrls.add(self.render_I_R_prob(hide, 0, 21))
         epi_grpctrls.add(
             self.render_image(
                 "assets/t4.png",
-                700,
+                550,
                 255,
                 hide,
                 self.control_frame,
-                frow=10 + 5,
+                frow=18,
                 column=1,
                 columnspan=2,
-                rowspan=8,
+                rowspan=10,
             )
         )
 
@@ -162,7 +141,7 @@ class SeedsConfiguration(TabBase):
             keys_path,
             self.config_path,
             text,
-            "seeding_pathogens",
+            "Number of Seeding Pathogens",
             self.control_frame,
             column,
             frow,
@@ -485,7 +464,7 @@ class SeedsConfiguration(TabBase):
                     )
                 case _:
                     raise ValueError("Invalid method")
-
+                
             to_derender()
             to_rerender()
 
@@ -580,7 +559,7 @@ class SeedsConfiguration(TabBase):
             keys_path,
             self.config_path,
             self.render_burn_in_ne_text,
-            "burn_in_ne",
+            "Effective Population Size",
             self.control_frame,
             column,
             frow,
@@ -615,7 +594,7 @@ class SeedsConfiguration(TabBase):
             keys_path,
             self.config_path,
             self.render_burn_in_generations_wf_text,
-            "burn_in_generations_wf",
+            "Number of Burn-in Generations (WF)",
             self.control_frame,
             column,
             frow,
@@ -625,45 +604,122 @@ class SeedsConfiguration(TabBase):
         )
         self.visible_components.add(component)
         return component
+    
+    def render_subst_model_parameterization_wf(self, hide=True, column=None, frow=None):
+        def comboboxselected(var, to_rerender, to_derender):
+            local_var = var.get()
+            no_validate_update_val(local_var, self.config_path, keys_path)
+            if local_var == "mutation rate (single)":
+                self.burn_in_mutrate_wf_control.label.config(state="normal")
+                self.burn_in_mutrate_wf_control.entry.config(state="normal", foreground="black")
+                self.burn_in_mutrate_matrix_wf_control.label.config(state="disabled")
+                for i in range(4):
+                    for j in range(4):
+                        self.burn_in_mutrate_matrix_wf_control.matrix_entries[i][j].config(state="disabled", foreground="light grey")
+            elif local_var == "mutation rate matrix":
+                self.burn_in_mutrate_wf_control.label.config(state="disabled")
+                self.burn_in_mutrate_wf_control.entry.config(state="disabled", foreground="light grey")
+                self.burn_in_mutrate_matrix_wf_control.label.config(state="normal")
+                for i in range(4):
+                    for j in range(4):
+                        if i != j:
+                            self.burn_in_mutrate_matrix_wf_control.matrix_entries[i][j].config(state="normal", foreground="black")
+
+        text = "Substitution Model Parameterization"
+        keys_path = ["SeedsConfiguration", "SLiM_burnin_WF", "subst_model_parameterization"]
+        to_rerender, to_derender = None, None
+        width = 20
+        column_span = 1
+        component = EasyCombobox(
+            keys_path,
+            self.config_path,
+            text,
+            self.control_frame,
+            column,
+            frow,
+            ["mutation rate (single)", "mutation rate matrix"],
+            to_rerender,
+            to_derender,
+            comboboxselected,
+            hide,
+            width,
+            column_span
+        )
+
+        self.visible_components.add(component)
+
+        return component
 
     def render_burn_in_mutrate_wf(self, hide=True, column=None, frow=None):
         columnspan = 1
-        self.render_burn_in_mutrate_wf_text = "Burn-in Mutation Rate (Numerical)"
+        text = "Mutation Rate (Numerical)"
         keys_path = ["SeedsConfiguration", "SLiM_burnin_WF", "burn_in_mutrate"]
         component = EasyEntry(
             keys_path,
             self.config_path,
-            self.render_burn_in_mutrate_wf_text,
-            "burn_in_mutrate",
+            text,
+            "Mutation Rate (WF)",
             self.control_frame,
             column,
             frow,
             "numerical",
             hide,
             columnspan=columnspan,
+            sticky="wn",
+            disabled=True
         )
         self.visible_components.add(component)
         return component
 
-        self.burn_in_mutrate_wf_label = ttk.Label(
+    def render_burn_in_mutrate_matrix_wf(self, hide=True, column=None, frow=None):
+        columnspan = 1
+        self.render_burn_in_mutrate_wf_text = "Mutation Rate Matrix (Numerical)"
+        keys_path = ["SeedsConfiguration", "SLiM_burnin_WF", "burn_in_mutrate_matrix"]
+        component = EasyEntryMatrix(
+            keys_path,
+            self.config_path,
+            self.render_burn_in_mutrate_wf_text,
+            "Mutation Rate Matrix (WF)",
             self.control_frame,
-            text=self.render_burn_in_mutrate_wf_text,
-            style="Bold.TLabel",
+            column,
+            frow,
+            "numerical",
+            hide,
+            columnspan=columnspan,
+            disabled=True
         )
-        self.burn_in_mutrate_wf_entry = ttk.Entry(
-            self.control_frame, foreground="black"
+        
+        self.visible_components.add(component)
+        return component
+    
+    def render_burn_in_load_mutrate_wf(self, hide=True, column=None, frow=None):
+        def click():
+            config = load_config_as_dict(self.config_path)["EvolutionModel"]
+            self.burn_in_mutrate_wf_control.entry.delete(0, tk.END)
+            self.burn_in_mutrate_wf_control.entry.insert(0, str(config["mut_rate"]))
+            for i in range(4):
+                for j in range(4):
+                    self.burn_in_mutrate_matrix_wf_control.matrix_entries[i][j].delete(0, tk.END)
+                    self.burn_in_mutrate_matrix_wf_control.matrix_entries[i][j].insert(0, str(config["mut_rate_matrix"][i][j]))
+
+        text = "Load mut. rate(s) \n from Evolutionary Model"
+        component = EasyButton(
+            text,
+            self.control_frame,
+            column,
+            frow,
+            click,
+            hide,
+            sticky="w"
         )
-        self.burn_in_mutrate_wf_entry.insert(0, self.burn_in_mutrate_wf)
+        
+        self.visible_components.add(component)
+        return component
 
-        self.burn_in_mutrate_wf_label.grid(row=13, column=1, sticky="w", pady=5)
-        self.burn_in_mutrate_wf_entry.grid(row=14, column=1, sticky="w", pady=5)
-        # self.update_burn_in_mutrate_wf_button = tk.Button(self.control_frame, text="Update burn_in_mutrate_wf", command=self.update_burn_in_mutrate_wf)
-        # self.update_burn_in_mutrate_wf_button.grid()
+    ##########################################################################
+    ####### startofepi
+    ##########################################################################
 
-        components.add(self.burn_in_mutrate_wf_label)
-        components.add(self.burn_in_mutrate_wf_entry)
-
-    # startofepi
     def render_burn_in_generations_epi(self, hide=True, column=None, frow=None):
         self.render_burn_in_generations_epi_text = (
             "Number of Burn-in Generations (Integer)"
@@ -674,7 +730,7 @@ class SeedsConfiguration(TabBase):
             keys_path,
             self.config_path,
             self.render_burn_in_generations_epi_text,
-            "burn_in_generations_epi",
+            "Number of Burn-in Generations (epi)",
             self.control_frame,
             column,
             frow,
@@ -707,20 +763,66 @@ class SeedsConfiguration(TabBase):
 
         # self.t4_title.grid(row=7, column=0, sticky='w', pady=5)
 
+    def render_subst_model_parameterization_epi(self, hide=True, column=None, frow=None):
+        def comboboxselected(var, to_rerender, to_derender):
+            local_var = var.get()
+            no_validate_update_val(local_var, self.config_path, keys_path)
+            if local_var == "mutation rate (single)":
+                self.burn_in_mutrate_epi_control.label.config(state="normal")
+                self.burn_in_mutrate_epi_control.entry.config(state="normal", foreground="black")
+                self.burn_in_mutrate_matrix_epi_control.label.config(state="disabled")
+                for i in range(4):
+                    for j in range(4):
+                        self.burn_in_mutrate_matrix_epi_control.matrix_entries[i][j].config(state="disabled", foreground="light grey")
+            elif local_var == "mutation rate matrix":
+                self.burn_in_mutrate_epi_control.label.config(state="disabled")
+                self.burn_in_mutrate_epi_control.entry.config(state="disabled", foreground="light grey")
+                self.burn_in_mutrate_matrix_epi_control.label.config(state="normal")
+                for i in range(4):
+                    for j in range(4):
+                        if i != j:
+                            self.burn_in_mutrate_matrix_epi_control.matrix_entries[i][j].config(state="normal", foreground="black")
+
+        text = "Substitution Model Parameterization"
+        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "subst_model_parameterization"]
+        to_rerender, to_derender = None, None
+        width = 20
+        column_span = 1
+        component = EasyCombobox(
+            keys_path,
+            self.config_path,
+            text,
+            self.control_frame,
+            column,
+            frow,
+            ["mutation rate (single)", "mutation rate matrix"],
+            to_rerender,
+            to_derender,
+            comboboxselected,
+            hide,
+            width,
+            column_span
+        )
+
+        self.visible_components.add(component)
+
+        return component
+
     def render_burn_in_mutrate_epi(self, hide=True, column=None, frow=None):
-        self.render_burn_in_mutrate_epi_text = "Burn-in Mutation Rate (Numerical)"
+        self.render_burn_in_mutrate_epi_text = "Mutation Rate (Numerical)"
         keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "burn_in_mutrate"]
         component = EasyEntry(
             keys_path,
             self.config_path,
             self.render_burn_in_mutrate_epi_text,
-            "burn_in_mutrate",
+            "Mutation Rate (epi)",
             self.control_frame,
             column,
             frow,
             "numerical",
             hide,
             1,
+            disabled=True
         )
         self.visible_components.add(component)
         return component
@@ -743,15 +845,60 @@ class SeedsConfiguration(TabBase):
         epi_components.add(self.burn_in_mutrate_epi_entry)
         # self.update_burn_in_mutrate_epi_button = tk.Button(self.control_frame, text="Update burn_in_mutrate_epi", command=self.update_burn_in_mutrate_epi)
         # self.update_burn_in_mutrate_epi_button.grid()
+    
+    def render_burn_in_mutrate_matrix_epi(self, hide=True, column=None, frow=None):
+        columnspan = 1
+        text = "Mutation Rate Matrix (Numerical)"
+        keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "burn_in_mutrate_matrix"]
+        component = EasyEntryMatrix(
+            keys_path,
+            self.config_path,
+            text,
+            "Mutation Rate Matrix (epi)",
+            self.control_frame,
+            column,
+            frow,
+            "numerical",
+            hide,
+            columnspan=columnspan,
+            disabled=True
+        )
+        
+        self.visible_components.add(component)
+        return component
+    
+    def render_burn_in_load_mutrate_epi(self, hide=True, column=None, frow=None):
+        def click():
+            config = load_config_as_dict(self.config_path)["EvolutionModel"]
+            self.burn_in_mutrate_epi_control.entry.delete(0, tk.END)
+            self.burn_in_mutrate_epi_control.entry.insert(0, str(config["mut_rate"]))
+            for i in range(4):
+                for j in range(4):
+                    self.burn_in_mutrate_matrix_epi_control.matrix_entries[i][j].delete(0, tk.END)
+                    self.burn_in_mutrate_matrix_epi_control.matrix_entries[i][j].insert(0, str(config["mut_rate_matrix"][i][j]))
+
+        text = "Load mut. rate(s) \n from Evolutionary Model"
+        component = EasyButton(
+            text,
+            self.control_frame,
+            column,
+            frow,
+            click,
+            hide,
+            sticky="w"
+        )
+        
+        self.visible_components.add(component)
+        return component
 
     def render_seeded_host_id(self, hide=True, column=None, frow=None):
-        self.render_seeded_host_id_text = "Seeded Host (Patient 0) ID(s) (integer)"
+        self.render_seeded_host_id_text = "Seeded Host ID(s) (Integer)"
         keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "seeded_host_id"]
         component = EasyEntry(
             keys_path,
             self.config_path,
             self.render_seeded_host_id_text,
-            "seeded_host_id",
+            "Seeded Host IDs",
             self.control_frame,
             column,
             frow,
@@ -786,11 +933,11 @@ class SeedsConfiguration(TabBase):
             keys_path,
             self.config_path,
             self.render_S_IE_prob_text,
-            "S_IE_prob",
+            "Transmission Prob.",
             self.control_frame,
             column,
             frow,
-            "integer",
+            "numerical",
             hide,
             1,
         )
@@ -817,11 +964,11 @@ class SeedsConfiguration(TabBase):
             keys_path,
             self.config_path,
             self.render_E_R_prob_text,
-            "E_R_prob",
+            "Latent Recovery Prob.",
             self.control_frame,
             column,
             frow,
-            "integer",
+            "numerical",
             hide,
             1,
         )
@@ -848,11 +995,11 @@ class SeedsConfiguration(TabBase):
             keys_path,
             self.config_path,
             self.render_latency_prob_text,
-            "latency_prob",
+            "Latency Prob. p",
             self.control_frame,
             column,
             frow,
-            "integer",
+            "numerical",
             hide,
             1,
         )
@@ -879,11 +1026,11 @@ class SeedsConfiguration(TabBase):
             keys_path,
             self.config_path,
             self.render_E_I_prob_text,
-            "E_I_prob",
+            "Activation Prob.",
             self.control_frame,
             column,
             frow,
-            "integer",
+            "numerical",
             hide,
             1,
         )
@@ -903,17 +1050,17 @@ class SeedsConfiguration(TabBase):
         epi_components.add(self.E_I_prob_entry)
 
     def render_I_E_prob(self, hide=True, column=None, frow=None):
-        self.render_I_E_prob_text = "De-activaton Prob. \u03c6 (numerical)"
+        self.render_I_E_prob_text = "De-activation Prob. \u03c6 (Numerical)"
         keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "I_E_prob"]
         component = EasyEntry(
             keys_path,
             self.config_path,
             self.render_I_E_prob_text,
-            "I_E_prob",
+            "De-activation Prob.",
             self.control_frame,
             column,
             frow,
-            "integer",
+            "numerical",
             hide,
             columnspan=1,
         )
@@ -935,17 +1082,17 @@ class SeedsConfiguration(TabBase):
         epi_components.add(self.I_E_prob_entry)
 
     def render_R_S_prob(self, hide=True, column=None, frow=None):
-        self.render_R_S_prob_text = "Immunity Loss Prob. \u03c9 (numerical)"
+        self.render_R_S_prob_text = "Immunity Loss Prob. \u03c9 (Numerical)"
         keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "R_S_prob"]
         component = EasyEntry(
             keys_path,
             self.config_path,
             self.render_R_S_prob_text,
-            "R_S_prob",
+            "Immunity Loss Prob.",
             self.control_frame,
             column,
             frow,
-            "integer",
+            "numerical",
             hide,
             columnspan=1,
         )
@@ -963,17 +1110,17 @@ class SeedsConfiguration(TabBase):
         epi_components.add(self.R_S_prob_entry)
 
     def render_I_R_prob(self, hide=True, column=None, frow=None):
-        self.render_I_R_prob_text = "Active Recovery Prob. \u03b3 (numerical)"
+        self.render_I_R_prob_text = "Active Recovery Prob. \u03b3 (Numerical)"
         keys_path = ["SeedsConfiguration", "SLiM_burnin_epi", "I_R_prob"]
         component = EasyEntry(
             keys_path,
             self.config_path,
             self.render_I_R_prob_text,
-            "burn_in_generations",
+            "Active Recovery Prob.",
             self.control_frame,
             column,
             frow,
-            "integer",
+            "numerical",
             hide,
             columnspan=1,
         )
@@ -1024,6 +1171,7 @@ class SeedsConfiguration(TabBase):
             if self.global_update() == 1:
                 return
             
+            self.global_update()
             config = load_config_as_dict(self.config_path)
             cwdir = config["BasicRunConfiguration"]["cwdir"]
             seed_size = config["SeedsConfiguration"]["seed_size"]
@@ -1034,12 +1182,14 @@ class SeedsConfiguration(TabBase):
             try:
                 if method == "SLiM_burnin_WF":
                     Ne = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_Ne"]
-                    n_gen = config["SeedsConfiguration"]["SLiM_burnin_WF"][
-                        "burn_in_generations"
-                    ]
-                    mu = config["SeedsConfiguration"]["SLiM_burnin_WF"][
-                        "burn_in_mutrate"
-                    ]
+                    n_gen = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_generations"]
+                    mu = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_mutrate"]
+                    if config["SeedsConfiguration"]["SLiM_burnin_WF"]["subst_model_parameterization"] == "":
+                        messagebox.showerror("Error", "Please select a substitution model parameterization")
+                        return
+                    use_subst_matrix = config["SeedsConfiguration"]["SLiM_burnin_WF"]["subst_model_parameterization"] == "mutation rate matrix"
+                    mu_matrix = config["SeedsConfiguration"]["SLiM_burnin_WF"]["burn_in_mutrate_matrix"]
+                    mu_matrix = json.dumps({"A": mu_matrix[0], "C": mu_matrix[1], "G": mu_matrix[2], "T": mu_matrix[3]})
                     error = run_seed_generation(
                         method=method,
                         wk_dir=cwdir,
@@ -1048,46 +1198,36 @@ class SeedsConfiguration(TabBase):
                         mu=mu,
                         n_gen=n_gen,
                         ref_path=ref_path,
-                        rand_seed=rand_seed
+                        rand_seed=rand_seed,
+                        use_subst_matrix=use_subst_matrix, 
+                        mu_matrix=mu_matrix
                     )
                 elif method == "SLiM_burnin_epi":
-                    n_gen = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "burn_in_generations"
-                    ]
-                    mu = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "burn_in_mutrate"
-                    ]
-                    seeded_host_id = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "seeded_host_id"
-                    ]
-                    S_IE_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "S_IE_prob"
-                    ]
-                    E_I_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "E_I_prob"
-                    ]
-                    E_R_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "E_R_prob"
-                    ]
-                    latency_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "latency_prob"
-                    ]
-                    I_R_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "I_R_prob"
-                    ]
-                    I_E_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "I_E_prob"
-                    ]
-                    R_S_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"][
-                        "R_S_prob"
-                    ]
+                    seeded_host_id = config["SeedsConfiguration"]["SLiM_burnin_epi"]["seeded_host_id"]
+                    n_gen = config["SeedsConfiguration"]["SLiM_burnin_epi"]["burn_in_generations"]
+                    mu = config["SeedsConfiguration"]["SLiM_burnin_epi"]["burn_in_mutrate"]
+                    if config["SeedsConfiguration"]["SLiM_burnin_epi"]["subst_model_parameterization"] == "":
+                        messagebox.showerror("Error", "Please select a substitution model parameterization")
+                        return
+                    use_subst_matrix = config["SeedsConfiguration"]["SLiM_burnin_epi"]["subst_model_parameterization"] == "mutation rate matrix"
+                    mu_matrix = config["SeedsConfiguration"]["SLiM_burnin_epi"]["burn_in_mutrate_matrix"]
+                    mu_matrix = json.dumps({"A": mu_matrix[0], "C": mu_matrix[1], "G": mu_matrix[2], "T": mu_matrix[3]})
+                    S_IE_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"]["S_IE_prob"]
+                    E_I_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"]["E_I_prob"]
+                    E_R_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"]["E_R_prob"]
+                    latency_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"]["latency_prob"]
+                    I_R_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"]["I_R_prob"]
+                    I_E_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"]["I_E_prob"]
+                    R_S_prob = config["SeedsConfiguration"]["SLiM_burnin_epi"]["R_S_prob"]
                     host_size = config["NetworkModelParameters"]["host_size"]
 
                     error = run_seed_generation(
                         method=method,
                         wk_dir=cwdir,
                         seed_size=seed_size,
+                        use_subst_matrix=use_subst_matrix, 
                         mu=mu,
+                        mu_matrix=mu_matrix,
                         n_gen=n_gen,
                         seeded_host_id=seeded_host_id,
                         S_IE_prob=S_IE_prob,
@@ -1103,12 +1243,8 @@ class SeedsConfiguration(TabBase):
                     )
 
                 elif method == "user_input":
-                    path_seeds_vcf = config["SeedsConfiguration"]["user_input"][
-                        "path_seeds_vcf"
-                    ]
-                    path_seeds_phylogeny = config["SeedsConfiguration"]["user_input"][
-                        "path_seeds_phylogeny"
-                    ]
+                    path_seeds_vcf = config["SeedsConfiguration"]["user_input"]["path_seeds_vcf"]
+                    path_seeds_phylogeny = config["SeedsConfiguration"]["user_input"]["path_seeds_phylogeny"]
                     error = run_seed_generation(
                         method=method,
                         wk_dir=cwdir,
@@ -1126,8 +1262,8 @@ class SeedsConfiguration(TabBase):
             except Exception as e:
                 messagebox.showerror("Seed Generation Error", str(e))
 
-        column, frow = 1, 100
-        # self.global_update()
+        column = 1
+        frow = 100
         component = EasyButton(
             "Run Seed Generation",
             self.control_frame,
@@ -1176,27 +1312,24 @@ class SeedsConfiguration(TabBase):
                 width=20,
                 column_span=3,
             )
-            self.run_button_control = self.render_run_button(hide)
-
+            
             match self.method:
                 case "user_input":
                     # self.burn_in_settings_label = self.display_burn_in_settings_label(hide, column=1, frow=9)
                     self.user_input_group_controls = self.init_user_input_group(hide)
                     self.wf_group_controls = self.init_wf_group(not hide)
                     self.epi_group_controls = self.init_epi_group(not hide)
+                    self.run_button_control = self.render_run_button(hide)
                 case "SLiM_burnin_WF":
                     # self.burn_in_settings_label = self.display_burn_in_settings_label(hide, column=1, frow=9)
                     self.wf_group_controls = self.init_wf_group(hide)
-                    self.user_input_group_controls = self.init_user_input_group(
-                        not hide
-                    )
+                    self.user_input_group_controls = self.init_user_input_group(not hide)
                     self.epi_group_controls = self.init_epi_group(not hide)
+                    self.run_button_control = self.render_run_button(hide)
                 case "SLiM_burnin_epi":
                     # self.burn_in_settings_label = self.display_burn_in_settings_label(hide, column=0, frow=9)
                     self.epi_group_controls = self.init_epi_group(hide)
-                    self.user_input_group_controls = self.init_user_input_group(
-                        not hide
-                    )
+                    self.user_input_group_controls = self.init_user_input_group(not hide)
                     self.wf_group_controls = self.init_wf_group(not hide)
                 case _:
                     raise ValueError("Invalid method")
@@ -1208,24 +1341,16 @@ class SeedsConfiguration(TabBase):
                     self.epi_group_controls,
                     self.epi_group_controls,
                 ]
-                self.use_method_controls.set_to_derender(
-                    GroupControls(derender).derender_itself
-                )
-                self.use_method_controls.set_to_rerender(
-                    self.user_input_group_controls.rerender_itself
-                )
+                self.use_method_controls.set_to_derender(GroupControls(derender).derender_itself)
+                self.use_method_controls.set_to_rerender(self.user_input_group_controls.rerender_itself)
             case "SLiM_burnin_WF":
                 derender = [
                     self.user_input_group_controls,
                     self.epi_group_controls,
                     self.epi_group_controls,
                 ]
-                self.use_method_controls.set_to_derender(
-                    GroupControls(derender).derender_itself
-                )
-                self.use_method_controls.set_to_rerender(
-                    self.wf_group_controls.rerender_itself
-                )
+                self.use_method_controls.set_to_derender(GroupControls(derender).derender_itself)
+                self.use_method_controls.set_to_rerender(self.wf_group_controls.rerender_itself)
             case "SLiM_burnin_epi":
                 derender = [
                     self.user_input_group_controls,

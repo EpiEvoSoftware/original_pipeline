@@ -221,17 +221,18 @@ def update_list_int_params_v2(
 ):
     try:
         stripped_entry = entry.get().strip()
-        cleaned_input = stripped_entry.strip("[]").strip()
+        if stripped_entry[0] != "[" or stripped_entry[-1] != "]":
+            raise ValueError
+        cleaned_input = stripped_entry[1:-1].strip()
 
         if cleaned_input == "":
             new_parsed = []
         elif cleaned_input.isdigit():
-            new_parsed = [int(float(cleaned_input))]
+            new_parsed = [int(cleaned_input)]
         elif "," in stripped_entry:
-            new_parsed = [int(float(item.strip())) for item in cleaned_input.split(",")]
+            new_parsed = [int(item.strip()) for item in cleaned_input.split(",")]
         else:
-            new_parsed = []
-            error_messages.append(f"{render_text_short}: Invalid input format.")
+            raise ValueError
 
         config = load_config_as_dict(config_path)
         update_nested_dict(config, keys_path, new_parsed)
@@ -242,7 +243,7 @@ def update_list_int_params_v2(
         # messagebox.showinfo("Success", "Updated successfully")
     except ValueError:  # This catches cases where conversion to integer fails
         error_messages.append(
-            f"{render_text_short}: Please enter a valid list of numbers, separated by commas."
+            f"{render_text_short}: Please enter a valid list of integers, separated by commas."
         )
     except Exception as e:  # General error handling (e.g., file operation failures)
         error_messages.append(f"{render_text_short + ": Update Error, " + str(e)}")
@@ -469,7 +470,7 @@ def update_numerical_input(
 ):
     try:
         if is_int:
-            new_val = int(float(entry.get()))
+            new_val = int(entry.get())
         else:
             new_val = float(entry.get())
         config = load_config_as_dict(config_path)
@@ -715,6 +716,7 @@ class EasyEntry(EasyWidgetBase):
         hide,
         columnspan,
         disabled=False,
+        sticky='w'
     ) -> None:
         super().__init__()
         self.keys_path = keys_path
@@ -723,6 +725,7 @@ class EasyEntry(EasyWidgetBase):
         self.validate_for = validate_for
         dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
         label = tk.ttk.Label(control_frame, text=render_text, style="Bold.TLabel")
+        self.label = label
         self.entry = tk.ttk.Entry(control_frame, foreground="black")
         self.entry.insert(0, str(dict_var))
 
@@ -731,10 +734,10 @@ class EasyEntry(EasyWidgetBase):
             self.entry.grid()
         else:
             label.grid(
-                row=frow, column=column, columnspan=columnspan, sticky="w", pady=5
+                row=frow, column=column, columnspan=columnspan, sticky=sticky, pady=5
             )
             self.entry.grid(
-                row=frow + 1, column=column, columnspan=columnspan, sticky="w", pady=5
+                row=frow + 1, column=column, columnspan=columnspan, sticky=sticky, pady=5
             )
 
         self.local_components = {self.entry, label}
@@ -777,6 +780,89 @@ class EasyEntry(EasyWidgetBase):
                     self.render_text_short,
                     False,
                 )
+            case _:
+                raise ValueError("Invalid internal type.")
+
+class EasyEntryMatrix(EasyWidgetBase):
+    "Used for mutation rate matrices"
+    
+    def __init__(
+        self,
+        keys_path,
+        config_path,
+        render_text,
+        render_text_short,
+        control_frame,
+        column,
+        frow,
+        validate_for,
+        hide,
+        columnspan,
+        disabled=False,
+    ) -> None:
+        super().__init__()
+        self.keys_path = keys_path
+        self.config_path = config_path
+        self.render_text_short = render_text_short
+        self.validate_for = validate_for
+        initial_matrix = get_dict_val(load_config_as_dict(config_path), keys_path)
+        label = tk.ttk.Label(control_frame, text=render_text, style="Bold.TLabel")
+        self.label = label
+        matrix_container = tk.ttk.Frame(control_frame)
+        matrix_entries = [[tk.ttk.Entry(matrix_container, foreground="black", width=10) for j in range(4)] for i in  range(4)]
+        self.matrix_entries = matrix_entries
+
+        if frow is None or column is None:
+            label.grid()
+            matrix_container.grid()
+        else:
+            label.grid(row=frow, column=column, columnspan=columnspan, sticky="w", pady=5)
+            matrix_container.grid(row=frow+1, column=column, columnspan=columnspan, rowspan=4, sticky="w", pady=5)
+            # matrix_container.grid(row = 6, column = 0, stick='w', padx = 10)
+        
+        for i in range(4):
+            for j in range(4):
+                entry = matrix_entries[i][j]
+                entry.insert(0, initial_matrix[i][j])
+                entry.grid(row = i, column = j, stick='w')
+                if i == j:
+                    entry.config(state='disabled', foreground='light grey')
+
+
+        self.local_components = {label, matrix_container}
+        self.grid_layout = derender_components(self.local_components)
+        if not hide:
+            rerender_components(self.local_components, self.grid_layout)
+
+        if disabled:
+            label.configure(state="disabled")
+            for i in range(4):
+                for j in range(4):
+                    matrix_entries[i][j].config(state='disabled', foreground='light grey')
+                
+        else:
+            label.configure(state="normal")
+            for i in range(4):
+                for j in range(4):
+                    if i != j:
+                        matrix_entries[i][j].config(state='normal', foreground='black')
+
+    def update(self, error_messages):
+        match self.validate_for:
+            case "numerical":
+                try:
+                    config = load_config_as_dict(self.config_path)
+                    new_matrix_vals = [[0, 0, 0, 0] for i in range(4)]
+                    for i in range(4):
+                        for j in range(4):
+                            new_val = float(self.matrix_entries[i][j].get())
+                            new_matrix_vals[i][j] = new_val
+                    update_nested_dict(config, self.keys_path, new_matrix_vals)
+                    save_config(self.config_path, config)
+                except ValueError:  # This catches cases where conversion to integer fails
+                    error_messages.append(f"{self.render_text_short}: Please enter a valid numerical values for all matrix entries.")
+                except Exception as e:  # General error handling (e.g., file operation failures)
+                    error_messages.append(f"{self.render_text_short + ": Update Error, " + str(e)}")
             case _:
                 raise ValueError("Invalid internal type.")
 
@@ -835,8 +921,8 @@ class EasyRadioButton(EasyWidgetBase):
             label.grid(
                 row=frow, column=column, columnspan=columnspan, sticky="w", pady=5
             )
-            self.rb_true.grid(row=frow + 1, column=column, sticky="w", pady=5)
-            self.rb_false.grid(row=frow + 2, column=column, sticky="w", pady=5)
+            self.rb_true.grid(row=frow + 1, column=column, columnspan=columnspan, sticky="w", pady=5)
+            self.rb_false.grid(row=frow + 2, column=column, columnspan=columnspan, sticky="w", pady=5)
 
         self.local_components = {label, self.rb_true, self.rb_false}
         self.grid_layout = derender_components(self.local_components)

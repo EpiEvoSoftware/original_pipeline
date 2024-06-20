@@ -357,16 +357,16 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
 		raise CustomizedError("You need to specify at least one host id (-seeded_host_id) "
 						"to be seeded in SLiM epi model burn-in mode")
 	elif host_size < len(seeded_host_id):
-		raise CustomizedError("You need to specify a host population size (-host_size) "
-						"bigger than the size of the seeded hosts in SLiM epi model burn-in mode")
+		raise CustomizedError("You need to specify a network and network host population size (-host_size) "
+						"bigger than the number the seeded hosts in SLiM epi model burn-in mode")
 	elif max(seeded_host_id) >= host_size:
-		raise CustomizedError("All the host ids to be seeded has to be smaller than host population size")
+		raise CustomizedError("All host ids to be seeded have to exist (i.e. be smaller than host population size).")
 	elif S_IE_prob <= 0:		
 		raise CustomizedError("An infection rate (-S_IE_prob, Susceptible to infected/exposed rate) bigger than 0 needs "
 						"to be provided in SLiM epi model burn-in mode")
 	elif latency_prob > 0 and E_I_prob == 0 and E_R_prob == 0:
-		print("WARNING: You activated an SEIR model, in which exposed compartment exists, "
-			"but you doesn't specify any transition from exposed compartment, which will lead "
+		print("WARNING: You activated an SEIR model, in which an exposed compartment exists, "
+			"but you haven't't specify any transition from exposed compartment, which will lead "
 			"to exposed hosts being locked (never recovered and cannot infect others). Please "
 			"make sure this is what you want.", flush = True)
 	elif I_R_prob == 0:
@@ -374,7 +374,7 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
 		"component doesn't exists, meaning that all infected hosts never recovered. Please make sure "
 		"this is what you want.", flush = True)
 	elif R_S_prob == 0:
-		print("WARNING: You activated a S(E)IR model with Recovered individuals are fully immune, "
+		print("WARNING: You activated a S(E)IR model where Recovered individuals are fully immune, "
 		"they don't go back to recovered state. This can probably lead to the outbreak ending before "
 		"the specified burn-in generation and makes the seeds' sampling fail. Please make sure this "
 		"is what you want.", flush = True)	
@@ -382,30 +382,37 @@ def seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, 
 	trajectory = os.path.join(wk_dir, TRAJ)
 	if os.path.exists(trajectory): os.remove(trajectory)
 
-	slim_script = os.join(os.path.dirname(__file__), SLIM_DIR, EPI_SLIM)
+	mtx_path = os.path.join(wk_dir, MUT_MTX)
+	if not os.path.exists(os.path.join(wk_dir, "contact_network.adjlist")):
+		raise FileNotFoundError("A contact_network.adjlist file needs to exist in the working directory"
+													+ " to run SLiM epidemiological model burn-in.")
+
+	slim_script = os.path.join(os.path.dirname(__file__), SLIM_DIR, EPI_SLIM)
 	slim_stdout_path = os.path.join(wk_dir, OUT_SLIM)
 	# Run SLiM
 	with open(slim_stdout_path, 'w') as fd:
-		if rand_seed == None:
-			subprocess.run(["slim", "-d", f"cwdir=\"{wk_dir}\"", "-d", f"ref_path=\"{ref_path}\"", "-d", \
-					f"contact_network_path=\"{os.path.join(wk_dir, "contact_network.adjlist")}\"", "-d", \
-						f"host_size={host_size}", "-d", f"mut_rate={mu}", "-d", f"n_generation={n_gen}", "-d", \
-						f"seeded_host_id=c({",".join([str(i) for i in seeded_host_id])})", "-d", \
-						f"S_IE_prob={S_IE_prob}", "-d", f"E_I_prob={E_I_prob}", "-d", \
-						f"E_R_prob={E_R_prob}", "-d", f"latency_prob={latency_prob}", "-d", \
-						f"I_R_prob={I_R_prob}", "-d", f"I_E_prob={I_E_prob}", "-d", f"R_S_prob={R_S_prob}", \
-						"-d", f"use_subst_matrix={bool2SLiM(use_subst_matrix)}", \
-						slim_script], stdout=fd)
-		else:
-			subprocess.run(["slim", "-d", f"cwdir=\"{wk_dir}\"", "-d", f"ref_path=\"{ref_path}\"", "-d", \
-					f"contact_network_path=\"{os.path.join(wk_dir, "contact_network.adjlist")}\"", "-d", \
-						f"host_size={host_size}", "-d", f"mut_rate={mu}", "-d", f"n_generation={n_gen}", "-d", \
-						f"seeded_host_id=c({",".join([str(i) for i in seeded_host_id])})", "-d", \
-						f"S_IE_prob={S_IE_prob}", "-d", f"E_I_prob={E_I_prob}", "-d", \
-						f"E_R_prob={E_R_prob}", "-d", f"latency_prob={latency_prob}", "-d", \
-						f"I_R_prob={I_R_prob}", "-d", f"I_E_prob={I_E_prob}", "-d", f"R_S_prob={R_S_prob}", "-d", \
-						f"seed={rand_seed}", "-d", f"use_subst_matrix={bool2SLiM(use_subst_matrix)}", slim_script], stdout=fd)
+		args = ["slim", 
+			"-d", f"cwdir=\"{wk_dir}\"", 
+			"-d", f"ref_path=\"{ref_path}\"", 
+			"-d", f"contact_network_path=\"{os.path.join(wk_dir, "contact_network.adjlist")}\"", 
+			"-d", f"host_size={host_size}", 
+			"-d", f"mu={mu}", 
+			"-d", f"n_generation={n_gen}", 
+			"-d", f"seeded_host_id=c({",".join([str(i) for i in seeded_host_id])})", 
+			"-d", f"S_IE_prob={S_IE_prob}", 
+			"-d", f"E_I_prob={E_I_prob}", 
+			"-d", f"E_R_prob={E_R_prob}", 
+			"-d", f"latency_prob={latency_prob}", 
+			"-d", f"I_R_prob={I_R_prob}", 
+			"-d", f"I_E_prob={I_E_prob}", 
+			"-d", f"R_S_prob={R_S_prob}", 
+			"-d", f"use_subst_matrix={bool2SLiM(use_subst_matrix)}", 
+			"-d", f"mtx_path=\"{mtx_path}\""]
+		if rand_seed:
+			args += ["-d", f"seed={rand_seed}"]
+		args += [slim_script]
 
+		subprocess.run(args, stdout=fd)
 
 	# VCF/NWK
 	seeds_treeseq(wk_dir, seed_size)
@@ -468,18 +475,21 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 	try:	
 		if not os.path.exists(wk_dir):
 			raise CustomizedError(f"The provided working directory ({wk_dir}) doesn't exist")
-		# User input
+
 		if method == "user_input":
 			seed_userinput(seed_vcf, seed_size, wk_dir, path_seeds_phylogeny)
+
 		elif method == "SLiM_burnin_WF" or method == "SLiM_burnin_epi": # assuming SLiM burn-in (currently just WF and epi), checking violation of parameters for all SLiM burn-in
-			if Ne <= 0: 
+			if Ne <= 0 and method == "SLiM_burnin_WF": 
 				raise CustomizedError("You need to specify an effective population size (-Ne) "
-						f"bigger than 0 instead of {Ne} in SLiM WF burn-in mode")
+						f"bigger than 0 instead of {Ne} in SLiM burn-in WF mode")
+			
 			if ref_path == "":
 				raise CustomizedError("You need to specify a path to the reference genome "
 						"(-ref_path) in SLiM burn-in mode")
 			elif not os.path.exists(ref_path):
 				raise FileNotFoundError(f"The path to the reference genome {ref_path} provided doesn't exist")
+			
 			if use_subst_matrix == True:
 				matrix_ = format_subst_mtx(mu_matrix, diag_zero=True)
 				with open(os.path.join(wk_dir, MUT_MTX), "w") as mtx:
@@ -490,26 +500,29 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 							line2write = line2write + str(j) + ","
 						line2write = line2write[:-1] + "\n"
 						mtx.write(line2write)
-
-
 			else:
 				if mu <= 0:
 					raise CustomizedError("You need to specify a mutation rate (-mu) bigger than 0 "
 							f"instead of {mu} in SLiM burn-in mode when a single mutation rate is used.")
+				
 			if n_gen <= 0:
-				raise CustomizedError("You need to specify a burn-in generation (-n_gen) bigger than 0 "
+				raise CustomizedError("You need to specify a number of burn-in generations (-n_gen) bigger than 0 "
 						f"instead of {n_gen} in SLiM burn-in mode")
+			
 			if method == "SLiM_burnin_WF":
 				seed_WF(Ne, seed_size, ref_path, wk_dir, mu, n_gen, rand_seed, use_subst_matrix)
 			else:
 				seed_epi(wk_dir, seed_size, ref_path, mu, n_gen, host_size, seeded_host_id, S_IE_prob, \
 				E_I_prob, E_R_prob, latency_prob, I_R_prob, I_E_prob, R_S_prob, rand_seed, use_subst_matrix)
+
 		else: # the given method is invalid
 			raise CustomizedError(f"{method} isn't a valid method. Please provide a permitted method. "
 							"(user_input/SLiM_burnin_WF/SLiM_burnin_epi)")
 		print("******************************************************************** \n" +
 				"                   	    SEEDS GENERATED		                        \n" +
 				"******************************************************************** \n", flush = True)
+		if use_subst_matrix:
+			os.remove(os.path.join(wk_dir, MUT_MTX))
 	except Exception as e:
 		print(f"Seed sequences generation - A error occured: {e}.")
 		error_message = e

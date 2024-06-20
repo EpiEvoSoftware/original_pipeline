@@ -40,6 +40,34 @@
         "within_host_reproduction_rate": 0.0,
         "cap_withinhost": 1
     },
+    "NetworkModelParameters": {
+        "use_network_model": true,
+        "method": "",
+        "host_size": 0,
+        "user_input": {
+            "path_network": ""
+        },
+        "randomly_generate": {
+            "network_model": "",
+            "ER": {
+                "p_ER": 0
+            },
+            "RP": {
+                "rp_size": [
+                    0,
+                    0
+                ],
+                "p_within": [
+                    0,
+                    0
+                ],
+                "p_between": 0
+            },
+            "BA": {
+                "ba_m": 0
+            }
+        }
+    },
     "SeedsConfiguration": {
         "seed_size": 1,
         "use_reference": false,
@@ -52,7 +80,7 @@
             "burn_in_Ne": 0,
             "burn_in_generations": 0,
             "subst_model_parameterization": "",
-            "burn_in_mutrate": 0,
+            "burn_in_mutrate": 0.0,
             "burn_in_mutrate_matrix": [
                 [
                     0.0,
@@ -83,7 +111,7 @@
         "SLiM_burnin_epi": {
             "burn_in_generations": 0,
             "subst_model_parameterization": "",
-            "burn_in_mutrate": 0,
+            "burn_in_mutrate": 0.0,
             "burn_in_mutrate_matrix": [
                 [
                     0.0,
@@ -114,7 +142,7 @@
             "S_IE_prob": 0,
             "E_I_prob": 0,
             "E_R_prob": 0,
-            "latency_prob": 1,
+            "latency_prob": 0,
             "I_R_prob": 0,
             "I_E_prob": 0,
             "R_S_prob": 0
@@ -139,34 +167,6 @@
                 "effsize_max": [],
                 "normalize": false,
                 "final_trait": 1
-            }
-        }
-    },
-    "NetworkModelParameters": {
-        "use_network_model": true,
-        "method": "",
-        "host_size": 0,
-        "user_input": {
-            "path_network": ""
-        },
-        "randomly_generate": {
-            "network_model": "",
-            "ER": {
-                "p_ER": 0
-            },
-            "RP": {
-                "rp_size": [
-                    0,
-                    0
-                ],
-                "p_within": [
-                    0,
-                    0
-                ],
-                "p_between": 0
-            },
-            "BA": {
-                "ba_m": 0
             }
         }
     },

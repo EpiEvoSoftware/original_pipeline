@@ -40,53 +40,6 @@
         "within_host_reproduction_rate": 0.0,
         "cap_withinhost": 1
     },
-    "SeedsConfiguration": {
-        "seed_size": 1,
-        "use_reference": false,
-        "method": "user_input",
-        "user_input": {
-            "path_seeds_vcf": "",
-            "path_seeds_phylogeny": ""
-        },
-        "SLiM_burnin_WF": {
-            "burn_in_Ne": 0,
-            "burn_in_generations": 0,
-            "burn_in_mutrate": 0
-        },
-        "SLiM_burnin_epi": {
-            "burn_in_generations": 0,
-            "burn_in_mutrate": 0,
-            "seeded_host_id": [],
-            "S_IE_prob": 0,
-            "E_I_prob": 0,
-            "E_R_prob": 0,
-            "latency_prob": 1,
-            "I_R_prob": 0,
-            "I_E_prob": 0,
-            "R_S_prob": 0
-        }
-    },
-    "GenomeElement": {
-        "use_genetic_model": true,
-        "ref_path": "",
-        "traits_num": {
-            "transmissibility": 0,
-            "drug_resistance": 0
-        },
-        "effect_size": {
-            "method": "",
-            "user_input": {
-                "path_effsize_table": ""
-            },
-            "randomly_generate": {
-                "gff": "",
-                "genes_num": [],
-                "effsize_min": [],
-                "effsize_max": [],
-                "normalize": false
-            }
-        }
-    },
     "NetworkModelParameters": {
         "use_network_model": true,
         "method": "",
@@ -112,6 +65,108 @@
             },
             "BA": {
                 "ba_m": 0
+            }
+        }
+    },
+    "SeedsConfiguration": {
+        "seed_size": 1,
+        "use_reference": false,
+        "method": "user_input",
+        "user_input": {
+            "path_seeds_vcf": "",
+            "path_seeds_phylogeny": ""
+        },
+        "SLiM_burnin_WF": {
+            "burn_in_Ne": 0,
+            "burn_in_generations": 0,
+            "subst_model_parameterization": "",
+            "burn_in_mutrate": 0.0,
+            "burn_in_mutrate_matrix": [
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            ]
+        },
+        "SLiM_burnin_epi": {
+            "burn_in_generations": 0,
+            "subst_model_parameterization": "",
+            "burn_in_mutrate": 0.0,
+            "burn_in_mutrate_matrix": [
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            ],
+            "seeded_host_id": [],
+            "S_IE_prob": 0,
+            "E_I_prob": 0,
+            "E_R_prob": 0,
+            "latency_prob": 0,
+            "I_R_prob": 0,
+            "I_E_prob": 0,
+            "R_S_prob": 0
+        }
+    },
+    "GenomeElement": {
+        "use_genetic_model": true,
+        "ref_path": "",
+        "traits_num": {
+            "transmissibility": 0,
+            "drug_resistance": 0
+        },
+        "effect_size": {
+            "method": "",
+            "user_input": {
+                "path_effsize_table": ""
+            },
+            "randomly_generate": {
+                "gff": "",
+                "genes_num": [],
+                "effsize_min": [],
+                "effsize_max": [],
+                "normalize": false,
+                "final_trait": 1
             }
         }
     },

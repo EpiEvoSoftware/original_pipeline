@@ -71,7 +71,7 @@ def format_subst_mtx(mu_matrix, diag_zero=True):
     Parameters:
         mu_matrix: A string object of the mutation probability, having the format '{"A":[,,,], "C":[,,,],"G":[,,,],"T":[,,,]}'.
     """
-    default_matrix = [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]]
+    default_matrix = [[0.0,0.0,0.0,0.0], [0.0,0.0,0.0,0.0], [0.0,0.0,0.0,0.0], [0.0,0.0,0.0,0.0]]
     try:
         mu_matrix = json.loads(mu_matrix)
     except json.decoder.JSONDecodeError:
@@ -87,7 +87,7 @@ def format_subst_mtx(mu_matrix, diag_zero=True):
         else:
             to_allele = 0
             for j in mu_matrix[allele]:
-                if type(j) != float:
+                if type(j) != float and type(j) != int:
                     raise CustomizedError(f"The provided substitution probability from {allele} contains non-floats, please provide a float for each probability")
                 elif j<0 or j>1:
                     raise CustomizedError(f"The provided substitution probability from {allele} should be between 0 and 1")

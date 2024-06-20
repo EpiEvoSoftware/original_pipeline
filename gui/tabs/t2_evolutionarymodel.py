@@ -113,14 +113,14 @@ class EvolutionaryModel:
         self.model_parameterization_combobox.grid(row = 4, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
 
     def render_mut_rate(self):
-        self.mut_rate_label = ttk.Label(self.control_frame, text="Mutation Rate Per Site Per Generation (Numerical)", width = minwidth//2, style = "Bold.TLabel")
+        self.mut_rate_label = ttk.Label(self.control_frame, text="Mutation Rate Per Site Per Generation (Numerical)", width = 50, style = "Bold.TLabel")
         self.mut_rate_label.grid(row = 5, column = 0, sticky = 'w', pady = 5, padx=10)
         self.mut_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.mut_rate_entry.insert(0, self.mut_rate)
         self.mut_rate_entry.grid(row = 6, column = 0, sticky = 'w', pady = 5, padx=10)
     
     def render_mut_rate_matrix(self):
-        self.mut_rate_matrix_label = ttk.Label(self.control_frame, text="Mutation Rate Matrix Per Site Per Generation (Numerical)", width = minwidth//2, style = "Bold.TLabel")
+        self.mut_rate_matrix_label = ttk.Label(self.control_frame, text="Mutation Rate Matrix Per Site Per Generation (Numerical)", width = 50, style = "Bold.TLabel")
         self.mut_rate_matrix_label.grid(row = 5, column = 0, sticky = 'w', pady = 5, padx=10)
 
         self.mut_rate_matrix_container = ttk.Frame(self.control_frame)
@@ -135,10 +135,6 @@ class EvolutionaryModel:
                 entry.grid(row = i, column = j, stick='w')
                 if i == j:
                     entry.config(state='disabled', foreground='light grey')
-
-        # self.mut_rate_matrix_entry = ttk.Entry(self.control_frame, foreground="black")
-        # self.mut_rate_matrix_entry.insert(0, self.mut_rate)
-        # self.mut_rate_matrix_entry.grid(row = 6, column = 0, sticky = 'w', pady = 5, padx=10)
         
     def render_trans_type(self):
         self.trans_type_label = ttk.Label(self.control_frame, text="Transmissibility Trait Type", style = "Bold.TLabel")
@@ -195,12 +191,12 @@ class EvolutionaryModel:
 
     def update_n_generation(self, error_messages):
         try:
-            new_n_generation = int(float(self.n_generation_entry.get()))  
+            new_n_generation = int(self.n_generation_entry.get())
             config = load_config_as_dict(self.config_path) 
             config['EvolutionModel']['n_generation'] = new_n_generation 
             save_config(self.config_path, config)  
         except ValueError:
-            error_messages.append("Please enter a valid integer for n_generation.")
+            error_messages.append("Please enter a valid integer for Number of Generations.")
 
     def update_model_parameterization(self, error_messages):
         config = load_config_as_dict(self.config_path) 
@@ -213,7 +209,7 @@ class EvolutionaryModel:
                     config['EvolutionModel']['mut_rate'] = float(self.mut_rate_entry.get())
                     self.mut_rate = config['EvolutionModel']['mut_rate']
                 except ValueError:
-                    error_messages.append("Please enter a valid number for mutation rate.")
+                    error_messages.append("Please enter a valid number for mutation rate (single).")
             elif parameterization == "mutation rate matrix":
                 try:
                     for i in range(4):

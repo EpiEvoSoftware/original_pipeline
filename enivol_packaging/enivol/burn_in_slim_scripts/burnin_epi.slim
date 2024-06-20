@@ -115,7 +115,7 @@ initialize() {
 		{
 			infector_pathogen = infector_subpop.individuals[0];
 
-			trans_event = rbinom(length(contact_ids), 1, S_IE_rate);
+			trans_event = rbinom(length(contact_ids), 1, S_IE_prob);
 			contacts_states = Host_states[contact_ids];
 			
 			infectee_id = contact_ids[which((trans_event==1)&(contacts_states==0))];
@@ -145,7 +145,7 @@ initialize() {
 	e_inds = which(Host_states==1);
 
 	draw_uniform = runif(length(e_inds));
-	state_transition = findInterval(draw_uniform, c(0, E_I_rate, E_I_rate + E_R_rate));
+	state_transition = findInterval(draw_uniform, c(0, E_I_prob, E_I_prob + E_R_prob));
 	Host_states[e_inds[which(state_transition==0)]] = 2; // state_transition=0 means going from latent to active state (1>2)
 	recover_from_e = e_inds[which(state_transition==1)];
 	if (length(recover_from_e)>0)
@@ -160,8 +160,8 @@ initialize() {
 	i_inds = which(Host_states==2);
 	hosts = sim.subpopulations;
 	draw_uniform = runif(length(i_inds));
-	sample_rate = 0;
-	state_transition = findInterval(draw_uniform, c(0, 0, 0, I_R_rate, I_R_rate + I_E_rate));
+	sample_prob = 0;
+	state_transition = findInterval(draw_uniform, c(0, 0, 0, I_R_prob, I_R_prob + I_E_prob));
 	recover_from_i = i_inds[which((state_transition<=2))];
 	go_latent_inds = i_inds[which((state_transition==3))];
 
@@ -199,7 +199,7 @@ initialize() {
 1: early(){
 	r_inds = which(Host_states==3);
 	draw_uniform = runif(length(r_inds));
-	state_transition = findInterval(draw_uniform, c(0, R_S_rate));
+	state_transition = findInterval(draw_uniform, c(0, R_S_prob));
 	Host_states[r_inds[which(state_transition==0)]]=0;
 }
 
