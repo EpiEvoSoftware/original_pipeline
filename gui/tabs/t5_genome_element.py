@@ -465,10 +465,15 @@ class GenomeElement(TabBase):
                     messagebox.showerror("Value Error", "Mutation rate (Evolutionary Model) has to be a positive number"
                                          " if normalization is turned on.")
                     return
-                if use_subst_matrix and ref == "":
-                    messagebox.showerror("Value Error", "Pathogen Reference Genome File (Basic Configuration) must be provided"
-                                         " if normalization is turned on and if using substitution matrix.")
-                    return
+                if use_subst_matrix:
+                    if sum(sum(lst) for lst in mu_matrix_values) == 0:
+                        messagebox.showerror("Value Error", "Mutation rate matrix (Evolutionary Model) cannot be"
+                                             " all 0s if normalization is turned on and using substitution matrix")
+                        return
+                    if ref == "":
+                        messagebox.showerror("Value Error", "Pathogen Reference Genome File (Basic Configuration) must be provided"
+                                            " if normalization is turned on and if using substitution matrix.")
+                        return
         else:
             messagebox.showerror("Value Error", "Please select a method to generate the genetic architecture.")
             return
