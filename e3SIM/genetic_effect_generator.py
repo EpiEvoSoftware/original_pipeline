@@ -56,7 +56,7 @@ def seeds_trait_calc(wk_dir, dict_c_g, num_seed = 0):
 					"If you want to use seed sequence different than reference genome, "
 					"you must run seed_generator first", flush = True)
 		if num_seed == 0:
-			raise CustomizedError("Please provide the number of seed when seeding with one reference genome.")
+			raise CustomizedError("The number of seeds cannot be 0 when seeding with one reference genome.")
 		return [0]*num_seed
 	else:
 		seeds = ["seed." + str(i) + ".vcf" for i in range(len(os.listdir(seeds_vcf_dir)))]
@@ -76,7 +76,7 @@ def seeds_trait_calc(wk_dir, dict_c_g, num_seed = 0):
 
 	return seed_vals
 
-def normalization_by_mutscounts(wk_dir, dict_c_g, n_gen, mut_rate, pis_ref, matrix_, use_subst_matrix=False, final_T=1):
+def normalization_by_mutscounts(wk_dir, dict_c_g, n_gen, mut_rate, pis_ref, matrix_, num_seed, use_subst_matrix=False, final_T=1):
 	"""
 	Normalize the effect sizes based on the expected trait values at the end of the simulation.
 	
@@ -95,7 +95,7 @@ def normalization_by_mutscounts(wk_dir, dict_c_g, n_gen, mut_rate, pis_ref, matr
 						 Same as input dict_c_g, but with the effect size values normalized.
 	"""
 	# Calculate the average trait value at the initialization
-	avg_trait_value = statistics.mean(seeds_trait_calc(wk_dir, dict_c_g))
+	avg_trait_value = statistics.mean(seeds_trait_calc(wk_dir, dict_c_g, num_seed))
 	
 	# Calculate the total sum for normalization
 	if use_subst_matrix:
@@ -115,7 +115,7 @@ def normalization_by_mutscounts(wk_dir, dict_c_g, n_gen, mut_rate, pis_ref, matr
 	
 	return dict_c_g
 
-def generate_eff_vals(gff_, causal, es_low, es_high, wk_dir, n_gen, mut_rate, norm_or_not, pis_ref, matrix_, use_subst_matrix=False, final_T=1):
+def generate_eff_vals(gff_, causal, es_low, es_high, wk_dir, n_gen, mut_rate, norm_or_not, pis_ref, matrix_, num_seed, use_subst_matrix=False, final_T=1):
 	"""
 	Randomly generate a set of effect sizes for some genes sampled from a GFF-like annotation file
 	and computes the trait value of each seed according to the gff file.
@@ -169,9 +169,9 @@ def generate_eff_vals(gff_, causal, es_low, es_high, wk_dir, n_gen, mut_rate, no
 	
 	if norm_or_not:
 		# modify dict_causal_genes by the normalization factor k
-		dict_causal_genes = normalization_by_mutscounts(wk_dir, dict_causal_genes, n_gen, mut_rate, pis_ref, matrix_, use_subst_matrix, final_T)
+		dict_causal_genes = normalization_by_mutscounts(wk_dir, dict_causal_genes, n_gen, mut_rate, pis_ref, matrix_, num_seed, use_subst_matrix, final_T)
 	
-	seeds_trait_vals = seeds_trait_calc(wk_dir, dict_causal_genes)
+	seeds_trait_vals = seeds_trait_calc(wk_dir, dict_causal_genes, num_seed)
 
 	return (dict_causal_genes, seeds_trait_vals)
 
@@ -261,7 +261,7 @@ def write_seeds_trait(wk_dir, seeds_trait_vals, traits_num):
 		for i, seed_traits in enumerate(zip(*seeds_trait_vals)):
 			csv_file.write(f"{i},{','.join(map(str, seed_traits))}\n")
 
-def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir, n_gen, mut_rate, norm_or_not, use_subst_matrix, mu_matrix, ref, final_T):
+def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir, n_gen, mut_rate, norm_or_not, num_seed, use_subst_matrix, mu_matrix, ref, final_T):
 	"""
 	Generate a CSV file containing genetic element information for all traits and calculate seeds' trait values.
 
@@ -318,8 +318,8 @@ def generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_, wk_dir,
 	for trait_id in range(sum(trait_n.values())):
 		current_tdict, seed_vals = generate_eff_vals(gff_=gff_, causal=causal_sizes[trait_id], es_low=es_lows[trait_id], 
 										 es_high=es_highs[trait_id], wk_dir=wk_dir, n_gen=n_gen, mut_rate=mut_rate, 
-										 norm_or_not=norm_or_not, pis_ref=pis_ref, matrix_=matrix_, use_subst_matrix=use_subst_matrix,
-										 final_T=final_T)
+										 norm_or_not=norm_or_not, pis_ref=pis_ref, matrix_=matrix_, num_seed=num_seed, 
+										 use_subst_matrix=use_subst_matrix, final_T=final_T)
 
 		traits_dict.append(current_tdict)
 		seeds_trait_vals.append(seed_vals)
@@ -413,7 +413,7 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n={
 		elif method == "randomly_generate":
 			
 			generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, \
-				norm_or_not, use_subst_matrix, mu_matrix, ref, final_T)
+				norm_or_not, num_seed, use_subst_matrix, mu_matrix, ref, final_T)
 		else:
 			raise CustomizedError(f"{method} isn't a valid method. Please provide a permitted method. "
 							"(user_input/randomly_generate)")

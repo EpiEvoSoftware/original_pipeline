@@ -1,8 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-import json
-import os
-import sys
+from tkinter import ttk, messagebox
 from utils import *
 from genetic_effect_generator import *
 
@@ -23,31 +20,19 @@ class GenomeElement(TabBase):
             self.global_update,
         )
         ui_selected = self.generate_genetic_architecture_method == "user_input"
+        rg_selected = self.generate_genetic_architecture_method == "randomly_generate"
         hide = not self.use_genetic_model
         self.global_group_control = GroupControls()
         self.init_landing_group(hide=False)
         self.init_num_traits_group(hide=hide)
         self.init_user_input_group(ui_selected, hide=hide)
-        self.init_random_generate_group(ui_selected, hide=hide)
+        self.init_random_generate_group(rg_selected, hide=hide)
 
     def init_landing_group(self, hide=False):
         self.render_simulation_settings_title(False, 0, self.frow_val, 1)
         self.use_genetic_model_component = self.render_use_genetic_model(
-            None, None, hide, 0, self.frow_val + 1, 2
+            None, None, hide, 0, self.frow_val + 1, 1
         )
-
-    def init_user_input_group(self, ui_selected, hide=False):
-        hide: bool
-        if not hide:
-            if ui_selected:
-                hide = False
-            else:
-                hide = True
-
-        self.user_input_group_control = self.render_path_eff_size_table(
-            hide, 0, self.frow_val + 9, 2
-        )
-        self.global_group_control.add(self.user_input_group_control)
 
     def init_num_traits_group(self, hide=False):
         number_of_traits_title = self.render_number_of_traits_title(
@@ -73,15 +58,28 @@ class GenomeElement(TabBase):
         for control in num_traits_group_control:
             self.num_traits_group_control.add(control)
         self.global_group_control.add(self.num_traits_group_control)
-
-    def init_random_generate_group(self, ui_selected, hide=False):
+    
+    def init_user_input_group(self, ui_selected, hide=False):
+        hide: bool
         if not hide:
             if ui_selected:
-                hide = True
-            else:
                 hide = False
+            else:
+                hide = True
 
-        gff = self.render_gff(hide, 0, self.frow_val + 9, 2)
+        self.user_input_group_control = self.render_path_eff_size_table(
+            hide, 0, self.frow_val + 9, 2
+        )
+        self.global_group_control.add(self.user_input_group_control)
+
+    def init_random_generate_group(self, rg_selected, hide=False):
+        if not hide:
+            if rg_selected:
+                hide = False
+            else:
+                hide = True
+
+        gff = self.render_gff(hide, 0, self.frow_val + 9, 1)
 
         genes_num = self.render_genes_num(hide, 0, self.frow_val + 12)
 
@@ -89,9 +87,12 @@ class GenomeElement(TabBase):
 
         effsize_max = self.render_effsize_max(hide, 0, self.frow_val + 16)
 
-        normalize = self.render_normalize(hide, 0, self.frow_val + 18)
+        normalize = self.render_normalize(hide, 1, self.frow_val + 9)
 
-        run_button = self.render_run_button(hide, 1, self.frow_val + 21)
+        normalize_f_trait = self.render_normalize_f_trait(hide, 1, self.frow_val + 12)
+        self.f_trait_control = normalize_f_trait
+
+        run_button = self.render_run_button(hide, 0, self.frow_val + 31)
 
         random_generate_group_control = [
             gff,
@@ -99,6 +100,7 @@ class GenomeElement(TabBase):
             effsize_min,
             effsize_max,
             normalize,
+            normalize_f_trait,
             run_button,
         ]
 
@@ -127,9 +129,7 @@ class GenomeElement(TabBase):
             self.visible_components.add(component)
         return component
 
-    def render_simulation_settings_title(
-        self, hide=True, column=None, frow=None, columnspan=1
-    ):
+    def render_simulation_settings_title(self, hide=True, column=None, frow=None, columnspan=1):
         self.render_simulation_settings_title_text = "Simulation Settings"
         self.number_of_traits_label = EasyTitle(
             self.render_simulation_settings_title_text,
@@ -145,8 +145,7 @@ class GenomeElement(TabBase):
         component = EasyLabel(
             self.render_number_of_traits_text, self.control_frame, column, frow, hide
         )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
     def render_transmissibility(self, hide=True, column=None, frow=None):
@@ -164,8 +163,7 @@ class GenomeElement(TabBase):
             hide,
             columnspan=1,
         )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
     def render_drug_resistance(self, hide=True, column=None, frow=None):
@@ -184,8 +182,7 @@ class GenomeElement(TabBase):
             hide,
             columnspan=1,
         )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
     def render_generate_genetic_architecture_method(
@@ -200,14 +197,9 @@ class GenomeElement(TabBase):
     ):
         """
         generate_genetic_architecture_method
-        self.generate_genetic_architecture_method = ['GenomeElement']['effect_size']['method']
         """
         keys_path = ["GenomeElement", "effect_size", "method"]
-        # keys_path = ["GenomeElement",  "method"]
-
-        render_generate_genetic_architecture_method_text = (
-            "Method to Generate the Genetic Architecture"
-        )
+        text = ("Method to Generate the Genetic Architecture")
 
         def comboboxselected(var, to_rerender, to_derender):
             converted_var = render_to_val_generate_genetic_architecture_method.get(
@@ -239,7 +231,7 @@ class GenomeElement(TabBase):
         component = EasyCombobox(
             keys_path,
             self.config_path,
-            render_generate_genetic_architecture_method_text,
+            text,
             self.control_frame,
             column,
             frow,
@@ -252,9 +244,7 @@ class GenomeElement(TabBase):
             columnspan,
             val_to_render_generate_genetic_architecture_method,
         )
-        if not hide:
-            self.visible_components.add(component)
-
+        self.visible_components.add(component)
         return component
 
     def render_genes_num(self, hide=True, column=None, frow=None):
@@ -273,15 +263,15 @@ class GenomeElement(TabBase):
             hide,
             columnspan=1,
         )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
     def render_use_genetic_model(
         self, to_rerender, to_derender, hide=True, column=None, frow=None, columnspan=1
     ):
         keys_path = ["GenomeElement", "use_genetic_model"]
-        render_use_genetic_model_text = "Do you want to use genetic architecture for traits (transmissibility and/or Drug-resistance)?"
+        render_use_genetic_model_text = "Do you want to use genetic architecture "
+        "for traits (transmissibility/Drug-resistance)?"
 
         def radiobuttonselected(var, to_rerender, to_derender):
             no_validate_update(var, self.config_path, keys_path)
@@ -306,9 +296,7 @@ class GenomeElement(TabBase):
             columnspan,
             radiobuttonselected,
         )
-
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
     def render_effsize_min(self, hide=True, column=None, frow=None):
@@ -328,8 +316,7 @@ class GenomeElement(TabBase):
             hide,
             columnspan=1,
         )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
     def render_effsize_max(self, hide=True, column=None, frow=None):
@@ -349,8 +336,7 @@ class GenomeElement(TabBase):
             hide,
             columnspan=1,
         )
-        if not hide:
-            self.visible_components.add(component)
+        self.visible_components.add(component)
         return component
 
     def render_normalize(
@@ -362,7 +348,19 @@ class GenomeElement(TabBase):
         to_derender=None,
         columnspan=1,
     ):
-        render_text = "Whether to Normalize randomly-selected effect sizes by the expected number of mutations?"
+        def update(var, to_rerender, to_derender):
+            if var.get():
+                self.f_trait_control.label.configure(state="normal")
+                self.f_trait_control.entry.configure(state="normal")
+            else:
+                self.f_trait_control.label.configure(state="disabled")
+                self.f_trait_control.label.configure(state="disabled")
+            
+            config = load_config_as_dict(self.config_path)
+            config["GenomeElement"]["effect_size"]["randomly_generate"]["normalize"] = var.get()
+            save_config(self.config_path, config)
+
+        render_text = "Whether to normalize randomly-selected effect sizes \nby the expected number of mutations?"
         keys_path = ["GenomeElement", "effect_size", "randomly_generate", "normalize"]
         component = EasyRadioButton(
             keys_path,
@@ -376,7 +374,26 @@ class GenomeElement(TabBase):
             to_rerender,
             to_derender,
             columnspan,
-            lambda: None,
+            update,
+        )
+        self.visible_components.add(component)
+        return component
+    
+    def render_normalize_f_trait(self, hide=True, column=None, frow=None):
+        keys_path = ["GenomeElement", "effect_size", "randomly_generate", "final_trait"]
+        text = "Final trait normalization factor (Numerical)"
+        component = EasyEntry(
+            keys_path,
+            self.config_path,
+            text,
+            "Final trait normalization factor",
+            self.control_frame,
+            column,
+            frow,
+            "numerical",
+            hide,
+            disabled=True,
+            columnspan=1,
         )
         if not hide:
             self.visible_components.add(component)
@@ -417,31 +434,42 @@ class GenomeElement(TabBase):
         method = config["GenomeElement"]["effect_size"]["method"]
         wk_dir = config["BasicRunConfiguration"]["cwdir"]
         n_gen = config["EvolutionModel"]["n_generation"]
+        num_seed = config["SeedsConfiguration"]["seed_size"]
+        use_subst_matrix = config["EvolutionModel"]["subst_model_parameterization"] == "mutation rate matrix"
         mut_rate = config["EvolutionModel"]["mut_rate"]
+        mu_matrix = config["EvolutionModel"]["mut_rate_matrix"]
+
         trait_n = config["GenomeElement"]["traits_num"]
         rand_seed = config["BasicRunConfiguration"]["random_number_seed"]
+        ref = config["GenomeElement"]["ref_path"]
 
         if method == "user_input":
-            effsize_path = config["GenomeElement"]["effect_size"]["user_input"][
-                "path_effsize_table"
-            ]
+            effsize_path = config["GenomeElement"]["effect_size"]["user_input"]["path_effsize_table"]
         elif method == "randomly_generate":
             effsize_path = ""
             gff_in = config["GenomeElement"]["effect_size"]["randomly_generate"]["gff"]
-            causal_sizes = config["GenomeElement"]["effect_size"]["randomly_generate"][
-                "genes_num"
-            ]
-            es_lows = config["GenomeElement"]["effect_size"]["randomly_generate"][
-                "effsize_min"
-            ]
-            es_highs = config["GenomeElement"]["effect_size"]["randomly_generate"][
-                "effsize_max"
-            ]
-            norm_or_not = config["GenomeElement"]["effect_size"]["randomly_generate"][
-                "normalize"
-            ]
+            causal_sizes = config["GenomeElement"]["effect_size"]["randomly_generate"]["genes_num"]
+            es_lows = config["GenomeElement"]["effect_size"]["randomly_generate"]["effsize_min"]
+            es_highs = config["GenomeElement"]["effect_size"]["randomly_generate"]["effsize_max"]
+            norm_or_not = config["GenomeElement"]["effect_size"]["randomly_generate"]["normalize"]
+            final_T = config["GenomeElement"]["effect_size"]["randomly_generate"]["final_trait"]
+
+            if norm_or_not:
+                if n_gen <= 0:
+                    messagebox.showerror("Value Error", "Number of Generations (Evolutionary Model) has to be a positive integer"
+                                         " if normalization is turned on.")
+                    return
+                if not use_subst_matrix and mut_rate == 0:
+                    messagebox.showerror("Value Error", "Mutation rate (Evolutionary Model) has to be a positive number"
+                                         " if normalization is turned on.")
+                    return
+                if use_subst_matrix and ref == "":
+                    messagebox.showerror("Value Error", "Pathogen Reference Genome File (Basic Configuration) must be provided"
+                                         " if normalization is turned on and if using substitution matrix.")
+                    return
         else:
-            raise ValueError("Invalid method specified")
+            messagebox.showerror("Value Error", "Please select a method to generate the genetic architecture.")
+            return
 
     
         err = run_effsize_generation(
@@ -455,8 +483,13 @@ class GenomeElement(TabBase):
             es_highs=es_highs,
             norm_or_not=norm_or_not,
             n_gen=n_gen,
+            num_seed=num_seed,
+            use_subst_matrix=use_subst_matrix,
             mut_rate=mut_rate,
+            mu_matrix=mu_matrix,
             rand_seed=rand_seed,
+            ref=ref,
+            final_T=final_T
         )
         if err:
             messagebox.showerror("Generation Error", "Generation Error: " + str(err))

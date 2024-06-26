@@ -209,9 +209,7 @@ def update_list_int_params(
         # messagebox.showinfo("Success", "Updated successfully")
         tk.messagebox.showinfo("Success", "Updated successfully")
     except ValueError:  # This catches cases where conversion to integer fails
-        tk.messagebox.showerror(
-            "Update Error", "Please enter a valid list of numbers, separated by commas."
-        )
+        tk.messagebox.showerror("Update Error", "Please enter a valid list of numbers, separated by commas.")
     except Exception as e:  # General error handling (e.g., file operation failures)
         tk.messagebox.showerror("Update Error", str(e))
 
@@ -723,7 +721,10 @@ class EasyEntry(EasyWidgetBase):
         self.config_path = config_path
         self.render_text_short = render_text_short
         self.validate_for = validate_for
-        dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
+        if keys_path:
+            dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
+        else:
+            dict_var = ""
         label = tk.ttk.Label(control_frame, text=render_text, style="Bold.TLabel")
         self.label = label
         self.entry = tk.ttk.Entry(control_frame, foreground="black")
@@ -780,11 +781,13 @@ class EasyEntry(EasyWidgetBase):
                     self.render_text_short,
                     False,
                 )
+            case "no update":
+                pass
             case _:
                 raise ValueError("Invalid internal type.")
 
 class EasyEntryMatrix(EasyWidgetBase):
-    "Used for mutation rate matrices"
+    "Used for 4x4 mutation rate matrices"
     
     def __init__(
         self,
@@ -805,7 +808,10 @@ class EasyEntryMatrix(EasyWidgetBase):
         self.config_path = config_path
         self.render_text_short = render_text_short
         self.validate_for = validate_for
-        initial_matrix = get_dict_val(load_config_as_dict(config_path), keys_path)
+        if keys_path:
+            initial_matrix = get_dict_val(load_config_as_dict(config_path), keys_path)
+        else:
+            initial_matrix = [["" for i in range(4)] for j in range(4)]
         label = tk.ttk.Label(control_frame, text=render_text, style="Bold.TLabel")
         self.label = label
         matrix_container = tk.ttk.Frame(control_frame)
@@ -835,17 +841,7 @@ class EasyEntryMatrix(EasyWidgetBase):
             rerender_components(self.local_components, self.grid_layout)
 
         if disabled:
-            label.configure(state="disabled")
-            for i in range(4):
-                for j in range(4):
-                    matrix_entries[i][j].config(state='disabled', foreground='light grey')
-                
-        else:
-            label.configure(state="normal")
-            for i in range(4):
-                for j in range(4):
-                    if i != j:
-                        matrix_entries[i][j].config(state='normal', foreground='black')
+            self.disable()
 
     def update(self, error_messages):
         match self.validate_for:
@@ -859,12 +855,30 @@ class EasyEntryMatrix(EasyWidgetBase):
                             new_matrix_vals[i][j] = new_val
                     update_nested_dict(config, self.keys_path, new_matrix_vals)
                     save_config(self.config_path, config)
-                except ValueError:  # This catches cases where conversion to integer fails
+                except ValueError:
                     error_messages.append(f"{self.render_text_short}: Please enter a valid numerical values for all matrix entries.")
                 except Exception as e:  # General error handling (e.g., file operation failures)
                     error_messages.append(f"{self.render_text_short + ": Update Error, " + str(e)}")
+            case "no update":
+                pass
             case _:
                 raise ValueError("Invalid internal type.")
+    
+    def disable(self, include_label=True):
+        if include_label:
+            self.label.configure(state="disabled")
+        for i in range(4):
+            for j in range(4):
+                self.matrix_entries[i][j].config(state='disabled', foreground='light grey')
+
+    def enable(self):
+        self.label.configure(state="normal")
+        for i in range(4):
+            for j in range(4):
+                if i != j:
+                    self.matrix_entries[i][j].config(state='normal', foreground='black')
+
+
 
 
 class EasyRadioButton(EasyWidgetBase):
@@ -887,6 +901,7 @@ class EasyRadioButton(EasyWidgetBase):
         columnspan,
         radiobuttonselected,
         disabled=False,
+        text=None,
     ) -> None:
         super().__init__()
         self.keys_path = keys_path
@@ -896,19 +911,24 @@ class EasyRadioButton(EasyWidgetBase):
         self.to_derender = to_derender
         self.radiobuttonselected = radiobuttonselected
 
-        dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
-        self.var = tk.BooleanVar(value=dict_var)
+        if keys_path:
+            dict_var = get_dict_val(load_config_as_dict(config_path), keys_path)
+            self.var = tk.BooleanVar(value=dict_var)
+        else:
+            self.var = tk.BooleanVar(value=True)
+        
         label = tk.ttk.Label(control_frame, text=render_text, style="Bold.TLabel")
+        self.label = label
         self.rb_true = tk.ttk.Radiobutton(
             control_frame,
-            text="Yes",
+            text="Yes" if not text else text[0],
             variable=self.var,
             value=True,
             command=self._updater,
         )
         self.rb_false = tk.ttk.Radiobutton(
             control_frame,
-            text="No",
+            text="No" if not text else text[1],
             variable=self.var,
             value=False,
             command=self._updater,
