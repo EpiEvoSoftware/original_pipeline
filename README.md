@@ -122,5 +122,5 @@ pyinstaller --onefile --windowed --icon=__icon__.ico __script__.py
 
 https://www.pythonguis.com/tutorials/packaging-tkinter-applications-windows-pyinstaller/ -->
 
-## Additional from Manuscript
-Templates for all necessary input files are available in our GitHub repository. It is recommended to run the relevant pre-simulation modules with the $\texttt{-method user_input}$ flag to enable $\text{e3SIM}$ to validate the format of the user-provided files. 
+<!-- ## Additional from Manuscript
+Templates for all necessary input files are available in our GitHub repository. It is recommended to run the relevant pre-simulation modules with the $\texttt{-method user_input}$ flag to enable $\text{e3SIM}$ to validate the format of the user-provided files.  -->
