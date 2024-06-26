@@ -105,7 +105,7 @@ class SeedsConfiguration(TabBase):
         epi_grpctrls.add(self.render_I_R_prob(hide, 0, 21))
         epi_grpctrls.add(
             self.render_image(
-                "assets/t4.png",
+                "gui/assets/t4.png",
                 550,
                 255,
                 hide,

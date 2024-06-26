@@ -148,7 +148,7 @@ class EpidemiologyModel(TabBase):
         self.render_S_IE_prob(hide, column=0, columnspan=1, frow = self.increment_frow(by = 1))
         self.render_latency_prob(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
         self.render_E_R_prob(hide, column=2, columnspan=1, frow = self.increment_frow(increment = False))
-        self.render_image(hide, image_path="assets/t7.png", desired_width=500, desired_height=300, column = 1, columnspan=2, frow = self.increment_frow())
+        self.render_image(hide, image_path="gui/assets/t7.png", desired_width=500, desired_height=300, column = 1, columnspan=2, frow = self.increment_frow())
 
         self.render_E_I_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
         self.render_I_E_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
