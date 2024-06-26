@@ -658,7 +658,7 @@ class SeedsConfiguration(TabBase):
             keys_path,
             self.config_path,
             text,
-            "Mutation Rate (WF)",
+            "Mutation Rate",
             self.control_frame,
             column,
             frow,
@@ -1331,6 +1331,7 @@ class SeedsConfiguration(TabBase):
                     self.epi_group_controls = self.init_epi_group(hide)
                     self.user_input_group_controls = self.init_user_input_group(not hide)
                     self.wf_group_controls = self.init_wf_group(not hide)
+                    self.run_button_control = self.render_run_button(hide)
                 case _:
                     raise ValueError("Invalid method")
 

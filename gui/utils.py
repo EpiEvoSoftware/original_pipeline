@@ -995,7 +995,7 @@ class EasyPathSelector(EasyWidgetBase):
                 row=frow + 1, column=column, columnspan=columnspan, sticky="w", pady=5
             )
             button.grid(
-                row=frow + 2, column=column, columnspan=columnspan, sticky="e", pady=5
+                row=frow + 2, column=column, columnspan=columnspan, pady=5
             )
 
         self.local_components = {label, self.value_label, button}

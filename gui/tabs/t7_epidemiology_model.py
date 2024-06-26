@@ -74,7 +74,7 @@ class EpidemiologyModel(TabBase):
             # Testings
         self.canvas = tk.Canvas(self.control_frame)
         self.scrollbar = ttk.Scrollbar(self.control_frame, orient="vertical", command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=self.scrollbar.set, width=1300, height=700)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set, width=1300, height=800)
         
         self.scrollable_frame = ttk.Frame(self.canvas)
         for i in range(4):  
@@ -135,7 +135,7 @@ class EpidemiologyModel(TabBase):
 
         self.render_slim_path_label(hide, column=1, columnspan=2, frow = self.increment_frow(increment = False))
         self.render_model(hide, column=0, columnspan=1, frow = self.increment_frow(increment = False))
-        self.render_n_epoch(hide, column=1, columnspan= 1, frow = self.increment_frow())
+        self.render_n_epoch(hide, column=1, columnspan= 1, frow = self.increment_frow(by=3))
         # self.render_epoch_changing_generation(disabled = True)
         self.render_epoch_changing_generation(hide, column=0, columnspan= 3, frow = self.increment_frow(increment = False))
         self.render_title("Evolutionary Components Setting", hide, 0, frow = self.increment_frow(), columnspan=3)
@@ -148,7 +148,7 @@ class EpidemiologyModel(TabBase):
         self.render_S_IE_prob(hide, column=0, columnspan=1, frow = self.increment_frow(by = 1))
         self.render_latency_prob(hide, column=1, columnspan=1, frow = self.increment_frow(increment = False))
         self.render_E_R_prob(hide, column=2, columnspan=1, frow = self.increment_frow(increment = False))
-        self.render_image(hide, image_path="assets/t7.png", desired_width=600, desired_height=300, column = 1, columnspan=2, frow = self.increment_frow())
+        self.render_image(hide, image_path="assets/t7.png", desired_width=500, desired_height=300, column = 1, columnspan=2, frow = self.increment_frow())
 
         self.render_E_I_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
         self.render_I_E_prob(hide, column=0, columnspan=1, frow = self.increment_frow())
@@ -319,7 +319,7 @@ class EpidemiologyModel(TabBase):
 
     def render_R_S_prob(self, hide, column, columnspan, frow):
         text = "Immunity Loss Prob. ω (list numerical)"
-        keys_path = self.latency_prob_keys_path
+        keys_path = self.R_S_prob_keys_path
         component = EasyEntry(
             keys_path, self.config_path, 
             text, 'R_S_prob', 
@@ -330,7 +330,7 @@ class EpidemiologyModel(TabBase):
         return component
 
     def render_latency_prob(self, hide, column, columnspan, frow):
-        text = "Latency Probability p (list numerical)"
+        text = "Latency Probability ζ (list numerical)"
         keys_path = self.latency_prob_keys_path
         component = EasyEntry(
             keys_path, self.config_path, 

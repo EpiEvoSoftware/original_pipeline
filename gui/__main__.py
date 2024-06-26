@@ -12,9 +12,9 @@ import json
 import tkinter.font as tkFont
 import sys
 
-enivol_dir = os.path.join(os.path.dirname(__file__), '../enivol_packaging/enivol')
-if enivol_dir not in sys.path:
-    sys.path.insert(0, enivol_dir)
+e3SIM_dir = os.path.join(os.path.dirname(__file__), '../e3SIM')
+if e3SIM_dir not in sys.path:
+    sys.path.insert(0, e3SIM_dir)
 
 from tabs.t1_configuration import Configuration
 from tabs.t1_configuration_v2 import Configurationv2
@@ -73,7 +73,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         prog='cluster', description='Application to view GUI')
     parser.add_argument('--config_path', type=str,
-                        help='path to the configuration JSON file', default="enivol_packaging/enivol/config_template/user_config.json")
+                        help='path to the configuration JSON file', default="e3SIM/config_template/user_config.json")
     parser.add_argument('-v', '--view', action='store_true',
                         help='visualize network graph')
     parser.add_argument('--hide', action='store_true', help='Set hide to False, default is True')
@@ -93,9 +93,9 @@ def launch_gui(default_config_path, user_config_path, hide=False):
     style = ttk.Style(root)
     if 'aqua' in style.theme_names():
         style.theme_use('aqua')
-    root.title("EnivolCrossing: Simulation Framework for Genetic Epidemiology")
+    root.title("e3SIM: Simulation Framework for Genetic Epidemiology")
     
-    if user_config_path == "enivol_packaging/enivol/config_template/user_config.json":
+    if user_config_path == "e3SIM/config_template/user_config.json":
         config_path = initialize_configuration(default_config_path, user_config_path)
     else:
         config_path = user_config_path
@@ -145,7 +145,7 @@ def execute():
     Executes the application, according to the command line arguments specified.
     """
     args = parse_args()
-    default_config_path = "enivol_packaging/enivol/config_template/default_config.json"
+    default_config_path = "e3SIM/config_template/default_config.json"
     launch_gui(default_config_path, args.config_path, args.hide)
 
 
