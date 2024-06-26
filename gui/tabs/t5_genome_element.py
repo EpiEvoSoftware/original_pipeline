@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from utils import *
-from genetic_effect_generator import *
+from genetic_effect_generator import run_effsize_generation
 
 
 # TODO: fix ui for next button
@@ -437,7 +437,9 @@ class GenomeElement(TabBase):
         num_seed = config["SeedsConfiguration"]["seed_size"]
         use_subst_matrix = config["EvolutionModel"]["subst_model_parameterization"] == "mutation rate matrix"
         mut_rate = config["EvolutionModel"]["mut_rate"]
-        mu_matrix = config["EvolutionModel"]["mut_rate_matrix"]
+        mu_matrix_values = config["EvolutionModel"]["mut_rate_matrix"]
+        mu_matrix = json.dumps({"A": mu_matrix_values[0], "C": mu_matrix_values[1], 
+                                "G": mu_matrix_values[2], "T": mu_matrix_values[3]})
 
         trait_n = config["GenomeElement"]["traits_num"]
         rand_seed = config["BasicRunConfiguration"]["random_number_seed"]
