@@ -355,6 +355,9 @@ def create_slim_config(all_config):
 		heatmap_trait = post_processing_config["tree_plotting"]["heatmap"]
 		if heatmap_trait not in ["none", "drug_resistance", "transmissibility"]:
 			raise CustomizedError(f"The trait for heatmap is not permitted. The possible choices are: none / drug_resistance, transmissibility")
+
+		_check_boolean(post_processing_config["sequence_output"]["vcf"], "Whether to output VCF file")
+		_check_boolean(post_processing_config["sequence_output"]["fasta"], "Whether to output FASTA file")
 	else:
 		print("Post-simulation data processing is not enabled.", flush = True)
 		post_processing_config = {}
@@ -550,7 +553,8 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 				# Run data processing for each replicate
 				run_per_data_processing(
 					slim_pars["cwdir"], slim_pars["use_genetic_model"], runid, dataprocess_pars["n_trait"], 
-					slim_pars["seed_host_matching_path"], dataprocess_pars["tree_plotting"]["branch_color_trait"])
+					slim_pars["seed_host_matching_path"], dataprocess_pars["sequence_output"],
+					dataprocess_pars["tree_plotting"]["branch_color_trait"])
 				if slim_pars["use_reference"]:
 					seed_phylo = ""
 				else:
