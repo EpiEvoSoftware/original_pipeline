@@ -319,7 +319,12 @@ def output_tseq_vcf(wk_dir_, real_label, sampled_ts):
 	os.remove(vcf_path)
 
 
-def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_path, color_trait=1):
+def output_fasta(wk_dir_):
+	rscript_path = os.path.join(os.path.dirname(__file__), "generate_fas.r")
+	subprocess.run(["Rscript", rscript_path, wk_dir_])
+
+
+def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_path, seq_out, color_trait=1):
 	"""
 	Performs data processing tasks for a specific run.
 
@@ -367,7 +372,14 @@ def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_
 
 	
 	# Output VCF file
-	output_tseq_vcf(each_wk_dir, real_label, sampled_ts)
+	if seq_out["vcf"]:
+		print("Writing VCF file of sampled pathogens.")
+		output_tseq_vcf(each_wk_dir, real_label, sampled_ts)
+
+	# OUtput FASTA file
+	if seq_out["fasta"]:
+		print("Writing FASTA file of sampled pathogens.")
+		output_fasta(each_wk_dir)
 
 
 
@@ -384,7 +396,6 @@ def plot_per_transmission_tree(each_wk_dir_, seed_size, slim_config_path, n_trai
         n_traits (tuple): Tuple containing the number of traits for transmissibility and drug resistance.
         seed_phylo_path (str): Path to the seed phylogeny file.
 	"""
-	print(heatmap_trait)
 	rscript_path = os.path.join(os.path.dirname(__file__), "plot_tree.r")
 	subprocess.run(["Rscript", rscript_path, each_wk_dir_, str(seed_size), slim_config_path, \
 				 str(n_traits["transmissibility"]), str(n_traits["drug_resistance"]), seed_phylo_path, \
