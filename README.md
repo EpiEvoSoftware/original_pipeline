@@ -39,6 +39,7 @@ Please see specifics in the [manual](uygukygb) document in this github repositor
         if (!require("BiocManager", quietly = TRUE))
             install.packages("BiocManager")
         BiocManager::install("ggtree")
+        BiocManager::install("Biostrings")
         ```
 
   5. Test whether $\text{e3SIM}$ is successfully installed by running a simple model.
