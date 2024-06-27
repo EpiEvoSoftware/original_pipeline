@@ -351,6 +351,10 @@ def create_slim_config(all_config):
 			print("The tree will be colored by seed.", flush = True)
 		else:
 			print(f"The tree will be colored by its trait {post_processing_config["tree_plotting"]["branch_color_trait"]}", flush = True)
+
+		heatmap_trait = post_processing_config["tree_plotting"]["heatmap"]
+		if heatmap_trait not in ["none", "drug_resistance", "transmissibility"]:
+			raise CustomizedError(f"The trait for heatmap is not permitted. The possible choices are: none / drug_resistance, transmissibility")
 	else:
 		print("Post-simulation data processing is not enabled.", flush = True)
 		post_processing_config = {}
@@ -553,7 +557,8 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 					seed_phylo = os.path.join(slim_pars["cwdir"], "seeds.nwk")
 				# Plot transmission tree, strain distribution trajectory, and SEIR trajectory
 				print(f"Plotting transmission tree for replication {runid}...", flush = True)
-				plot_per_transmission_tree(each_wkdir, slim_pars["seed_size"], slim_config_path, dataprocess_pars["n_trait"], seed_phylo)
+				plot_per_transmission_tree(each_wkdir, slim_pars["seed_size"], slim_config_path, dataprocess_pars["n_trait"], \
+					seed_phylo, dataprocess_pars["tree_plotting"]["heatmap"])
 				print(f"Plotting strain distribution trajectory for replication {runid}...", flush = True)
 				plot_strain_distribution_trajectory(each_wkdir, slim_pars["seed_size"], slim_pars["n_generation"])
 				print(f"Plotting SEIR trajectory for replication {runid}...", flush = True)

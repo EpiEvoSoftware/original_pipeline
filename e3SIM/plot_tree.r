@@ -93,11 +93,56 @@ assign_dr <- function(meta_df, id_value, dr_id, n_trans, g1) {
   return(id_value)
 }
 
+assign_trans <- function(meta_df, id_value, trans_id, g1) {
+  col_id <- trans_id + NUM_META_COLS_A  # Get the position of the column of wanted transmissibility
+  nodes_num <- length(nodeId(g1)) # Get the size of the tree
+  # Construct a table of #rows = nodes_num, |col| = NA
+  trans_df <- data.frame(trans = rep(NA, nodes_num))
+  colnames(trans_df) <- paste0("trans", trans_id)
+
+  for (i in 1:nodes_num) {
+    ori_id <- id_value[i,]$ori_id
+    matching_row <- which(meta_df$node_id == ori_id)
+    if (length(matching_row) > 0) {
+      trans_df[i,1] <- meta_df[matching_row,col_id]
+    }
+    else {
+      trans_df[i,1] <- 0
+    }
+  }
+
+  # Combine transmissibility data frame with existing data
+  id_value = cbind(id_value, trans_df)
+  return(id_value)
+}
+
 # Function to prepare data for the drug resistance heatmap
 prepare_drug_resist_heatmap <- function(color_value_df, g1, n_dr, n_trans) {
-  df_heatmap <- color_value_df[1:nTips(g1), NUM_META_COLS_B:ncol(color_value_df)]
+  if (length(NUM_META_COLS_B:ncol(color_value_df))==1)
+  {
+    df_heatmap <- data.frame(dr1 = color_value_df[1:nTips(g1), NUM_META_COLS_B:ncol(color_value_df)])
+  }
+  else
+  {
+    df_heatmap <- color_value_df[1:nTips(g1), NUM_META_COLS_B:ncol(color_value_df)]
+  }
   rownames(df_heatmap) <- color_value_df[1:nTips(g1),]$label_nm
   return(df_heatmap)
+}
+
+# Function to prepare data for the transmissibility heatmap
+prepare_trans_heatmap <- function(color_value_df, g1, n_trans) {
+  # trans_heatmap <- color_value_df[1:nTips(g1), NUM_META_COLS_B:ncol(color_value_df)]
+  if (length(NUM_META_COLS_B:ncol(color_value_df))==1)
+  {
+    trans_heatmap <- data.frame(trans1 = color_value_df[1:nTips(g1), NUM_META_COLS_B:ncol(color_value_df)])
+  }
+  else
+  {
+    trans_heatmap <- color_value_df[1:nTips(g1), NUM_META_COLS_B:ncol(color_value_df)]
+  }
+  rownames(trans_heatmap) <- color_value_df[1:nTips(g1),]$label_nm
+  return(trans_heatmap)
 }
 
 # Function to add drug resistance heatmap
@@ -121,7 +166,7 @@ save_transmission_tree_plot <- function(p3, wk_dir, seed_id) {
 }
 
 # Function to plot the transmission tree if it has > 1 tip
-plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, seed_id) {
+plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, heatmap_trait, seed_id) {
   g1 <- as(tree, 'phylo4')
   nodes_num <- length(nodeId(g1)) # Get the number of nodes
   # Create data frame to store color values
@@ -143,17 +188,44 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
   rTipData <- data.frame(color = color_value_df[1:nTips(g1),]$color)
   
   # If drug resistance is enabled
-  if (n_dr > 0) {
-    for (i in 1:n_dr) { # Assign drug resistance values
-      color_value_df <- assign_dr(meta_df, color_value_df, i, n_trans, g1)
-      dr_df <- data.frame(dr = color_value_df[start_id:nodes_num, ncol(color_value_df)])
-      colnames(dr_df) <- paste0("dr", i)
-      rNodeData <- cbind(rNodeData, dr_df)
-      rTipData <- cbind(rTipData, color_value_df[1:nTips(g1), ncol(color_value_df)])
+  
+  plot_heatmap=FALSE
+  
+  # Prepare heatmap dataframe if we have processed >= 1 drug resistance
+  if (heatmap_trait=="drug_resistance") {
+    if (n_dr > 0) {
+      for (i in 1:n_dr) { # Assign drug resistance values
+        color_value_df <- assign_dr(meta_df, color_value_df, i, n_trans, g1)
+        dr_df <- data.frame(dr = color_value_df[start_id:nodes_num, ncol(color_value_df)])
+        colnames(dr_df) <- paste0("dr", i)
+        rNodeData <- cbind(rNodeData, dr_df)
+        rTipData <- cbind(rTipData, color_value_df[1:nTips(g1), ncol(color_value_df)])
+      }
+      df_heatmap <- prepare_drug_resist_heatmap(color_value_df, g1, n_dr, n_trans)
+      plot_heatmap = TRUE
     }
-    # Prepare heatmap dataframe if we have processed >= 1 drug resistance
-    df_heatmap <- prepare_drug_resist_heatmap(color_value_df, g1, n_dr, n_trans)
+    else {
+      print("There's no drug_resistance values to plot.")
+    }
   }
+  else if (heatmap_trait=="transmissibility") {
+    if (n_trans > 0) {
+      for (i in 1:n_trans) { # Assign transmissibility values
+        color_value_df <- assign_trans(meta_df, color_value_df, i, g1)
+        trans_df <- data.frame(trans = color_value_df[start_id:nodes_num, ncol(color_value_df)])
+        colnames(trans_df) <- paste0("trans", i)
+        rNodeData <- cbind(rNodeData, trans_df)
+        rTipData <- cbind(rTipData, color_value_df[1:nTips(g1), ncol(color_value_df)])
+      }
+      df_heatmap <- prepare_trans_heatmap(color_value_df, g1, n_trans)
+      plot_heatmap = TRUE
+    }
+    else {
+      print("There's no drug_resistance values to plot.")
+    }
+  }
+
+
 
   # Convert to phylo4d object      
   g2 <- phylo4d(g1)
@@ -165,7 +237,7 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
   p2 <- ggtree(g2, aes(color=I(color)), ladderize = TRUE)
 
   # Add drug resistance heatmap if applicable
-  if (n_dr > 0) {
+  if (plot_heatmap==TRUE) {
     p3 <- add_drug_resistance_heatmap(p2, df_heatmap)
   }
   else {
@@ -179,7 +251,7 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
 }
 
 # Plot tranmission tree of individual seed
-plot_transmission_tree <- function(seed_id, wk_dir, meta_df, n_trans, n_dr, whole_phylo_output, seed_phylo){
+plot_transmission_tree <- function(seed_id, wk_dir, meta_df, n_trans, n_dr, whole_phylo_output, seed_phylo, heatmap_trait){
 # Print message indicating the transmission tree being plotted
   cat(paste0("Plotting seed ", seed_id - 1, "'s transmission tree...\n"))
   # File path to the transmission tree
@@ -196,7 +268,7 @@ plot_transmission_tree <- function(seed_id, wk_dir, meta_df, n_trans, n_dr, whol
     if (length(tree$tip.label) == 1) {
       cat("Sorry, we do NOT support visualizing single branch tree.\n")
     } else { # Convert the tree into phylo4 object
-      plot_transmission_tree_helper(tree, meta_df, n_dr, n_trans, wk_dir, seed_id)
+      plot_transmission_tree_helper(tree, meta_df, n_dr, n_trans, wk_dir, heatmap_trait, seed_id)
     }
     return(tree)
   } else { # If the seed has no progeny sampled
@@ -218,9 +290,10 @@ main <- function(){
   n_trans <- as.integer(args[4])
   n_dr <- as.integer(args[5])
   seed_tree <- args[6]
+  heatmap_trait <- args[7]
 
   # Read metadata
-  meta_df <- read.csv(file.path(wk_dir, "transmission_tree_metadata.csv"), header = TRUE, sep = ",")
+  meta_df <- data.frame(fread(file.path(wk_dir, "transmission_tree_metadata.csv"), sep = ","))
   colnames(meta_df)[6] <- "color_trait"
   meta_df$name <- as.character(meta_df$name)
 
@@ -242,7 +315,7 @@ main <- function(){
   # Iterate over seed size
   for (seed_id in 1:seed_size) {
     # Plot transmission tree
-    tree <- plot_transmission_tree(seed_id, wk_dir, meta_df, n_trans, n_dr, whole_phylo_output, seed_phylo)
+    tree <- plot_transmission_tree(seed_id, wk_dir, meta_df, n_trans, n_dr, whole_phylo_output, seed_phylo, heatmap_trait)
     if(whole_phylo_output) {
       if (is.null(tree)) {
         seed_phylo <- drop.tip(seed_phylo, as.character(seed_id - 1))
@@ -263,7 +336,7 @@ main <- function(){
   # Plot whole transmission tree if exists
   if (whole_phylo_output){
     write.tree(seed_phylo, file = file.path(wk_dir, "whole_transmission_tree.nwk"))
-    plot_transmission_tree_helper(seed_phylo, meta_df, n_dr, n_trans, wk_dir)
+    plot_transmission_tree_helper(seed_phylo, meta_df, n_dr, n_trans, heatmap_trait)
   }
 }
 

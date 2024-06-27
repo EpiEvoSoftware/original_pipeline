@@ -216,7 +216,7 @@
         "do_postprocess": true,
         "tree_plotting": {
             "branch_color_trait": 1,
-            "drug_resistance_heatmap": true
+            "heatmap": "none"
         }
     }
 }

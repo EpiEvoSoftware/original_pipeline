@@ -373,7 +373,7 @@ def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_
 
 ############################## PLOTTING #############################################################
 
-def plot_per_transmission_tree(each_wk_dir_, seed_size, slim_config_path, n_traits, seed_phylo_path):
+def plot_per_transmission_tree(each_wk_dir_, seed_size, slim_config_path, n_traits, seed_phylo_path, heatmap_trait):
 	"""
     Plots transmission trees per simulation run.
 
@@ -384,9 +384,11 @@ def plot_per_transmission_tree(each_wk_dir_, seed_size, slim_config_path, n_trai
         n_traits (tuple): Tuple containing the number of traits for transmissibility and drug resistance.
         seed_phylo_path (str): Path to the seed phylogeny file.
 	"""
+	print(heatmap_trait)
 	rscript_path = os.path.join(os.path.dirname(__file__), "plot_tree.r")
 	subprocess.run(["Rscript", rscript_path, each_wk_dir_, str(seed_size), slim_config_path, \
-				 str(n_traits["transmissibility"]), str(n_traits["drug_resistance"]), seed_phylo_path])
+				 str(n_traits["transmissibility"]), str(n_traits["drug_resistance"]), seed_phylo_path, \
+				 heatmap_trait])
 
 
 def plot_strain_distribution_trajectory(each_wk_dir_, seed_size, n_generation):
