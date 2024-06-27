@@ -213,10 +213,14 @@
         "super_infection": false
     },
     "Postprocessing_options": {
-        "do_postprocess": true,
+        "do_postprocess": false,
         "tree_plotting": {
-            "branch_color_trait": 1,
-            "drug_resistance_heatmap": true
+            "branch_color_trait": 123121,
+            "heatmap": "none"
+        },
+        "sequence_output": {
+            "vcf": false,
+            "fasta": false
         }
     }
 }

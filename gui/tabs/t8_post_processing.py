@@ -1,13 +1,11 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-import json
+from tkinter import messagebox
 import os
 import shutil
 import sys
 from utils import *
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-# parent_dir = os.path.join(os.path.dirname(current_dir), '../codes')
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
@@ -27,43 +25,54 @@ class PostProcessing(TabBase):
         generate_config_file_button.pack()
 
     def generate_config_file(self):
-        source = self.config_path
-        cwdir = load_config_as_dict(self.config_path)["BasicRunConfiguration"]["cwdir"]
+        config = load_config_as_dict(self.config_path)
+
+        if config["Postprocessing_options"]["do_postprocess"]:
+            try:
+                val = int(self.branch_color_trait_control.entry.get())
+            except ValueError:
+                messagebox.showerror("Value Error", "Please enter a valid integer for trait number")
+                return
+            
+            config["Postprocessing_options"]["tree_plotting"]["branch_color_trait"] = val
+            save_config(self.config_path, config)
+
+        cwdir = config["BasicRunConfiguration"]["cwdir"]
         target = os.path.join(cwdir, "config_file.json")
 
         try:
-            shutil.copy(source, target)
-            tk.messagebox.showinfo("Success", "Config file saved successfully")
+            shutil.copy(self.config_path, target)
+            messagebox.showinfo("Success", "Config file saved successfully")
         except IOError as e:
             print("Unable to copy file. %s" % e)
 
     def load_page(self):
         hide = False
-        self.global_group_control = GroupControls()
-        self.render_do_postprocess(None, None, hide, 0, 1)
-        self.render_branch_color_trait(hide, 0, 1, 4)
-        self.render_drug_resistance_heatmap(None, None, hide, 0, 6)
+        self.render_do_postprocess(hide, 0, 1)
+        self.render_branch_color_trait(hide, 0, 4)
+        self.render_heatmap(hide, 0, 6)
+        self.render_vcf(hide, 0, 8)
+        self.render_fasta(hide, 0, 11)
 
-    def render_do_postprocess(
-        self, to_rerender, to_derender, hide=True, column=None, frow=None, columnspan=1
-    ):
+    def render_do_postprocess(self, hide=True, column=None, frow=None, columnspan=1):
         to_rerender = None
         to_derender = None
         keys_path = self.do_postprocess_keys_path
-        text = "Do you want to run post-processing (plotting trajectories & transmission trees) after the simulation?"
+        text = "Do you want to run post-processing after the simulation?\n"\
+            "(Plotting trajectories & transmission trees, and outputting VCF/FASTA files.)"
 
         def radiobuttonselected(var, to_rerender, to_derender):
             no_validate_update(var, self.config_path, keys_path)
             if var.get():
-                self.render_branch_color_trait(hide, 0, 1, 4, disabled=False)
-                self.render_drug_resistance_heatmap(
-                    None, None, hide, 0, 6, disabled=False
-                )
+                self.render_branch_color_trait(hide, 0, 4, disabled=False)
+                self.render_heatmap(hide, 0, 6, disabled=False)
+                self.render_vcf(hide, 0, 8, disabled=False)
+                self.render_fasta(hide, 0, 11, disabled=False)
             else:
-                self.render_branch_color_trait(hide, 0, 1, 4, disabled=True)
-                self.render_drug_resistance_heatmap(
-                    None, None, hide, 0, 6, disabled=True
-                )
+                self.render_branch_color_trait(hide, 0, 4, disabled=True)
+                self.render_heatmap(hide, 0, 6, disabled=True)
+                self.render_vcf(hide, 0, 8, disabled=True)
+                self.render_fasta(hide, 0, 11, disabled=True)
 
         component = EasyRadioButton(
             keys_path,
@@ -83,7 +92,7 @@ class PostProcessing(TabBase):
         self.visible_components.add(component)
         return component
 
-    def render_branch_color_trait(self, hide, column, columnspan, frow, disabled=False):
+    def render_branch_color_trait(self, hide, column, frow, columnspan=1, disabled=False):
         text = "Which trait do you want to use for coloring the branches in the transmission tree plot (integer)"
         keys_path = self.branch_color_trait_keys_path
         component = EasyEntry(
@@ -101,69 +110,70 @@ class PostProcessing(TabBase):
         )
 
         self.visible_components.add(component)
+        self.branch_color_trait_control = component
         return component
 
-    def render_branch_color_trait_dep(self):
-        """
-        self.branch_color_trait = load_config_as_dict(self.config_path)['Postprocessing_options']['tree_plotting']['branch_color_trait']
-        """
-
-        def update():
-            try:
-                prev_val = self.branch_color_trait
-                self.branch_color_trait = int(
-                    float(self.branch_color_trait_entry.get())
-                )
-                config = load_config_as_dict(self.config_path)
-                keys_path = [
-                    "Postprocessing_options",
-                    "tree_plotting",
-                    "branch_color_trait",
-                ]
-                update_nested_dict(config, keys_path, self.branch_color_trait)
-                save_config(self.config_path, config)
-                if prev_val != self.branch_color_trait:
-                    messagebox.showinfo("Success", "Updated successfully")
-            except ValueError:
-                messagebox.showerror("Update Error", "Please enter a valid number.")
-            except Exception as e:
-                messagebox.showerror("Update Error", str(e))
-
-        self.branch_color_trait_label = ttk.Label(
-            self.control_frame, text="branch_color_trait:"
-        ).grid()
-        self.branch_color_trait_entry = ttk.Entry(
-            self.control_frame, foreground="black"
-        )
-        self.branch_color_trait_entry.grid()
-        self.branch_color_trait_entry.insert(0, self.branch_color_trait)
-        self.update_branch_color_trait_button = tk.Button(
-            self.control_frame, text="Update branch_color_trait", command=update
-        ).grid()
-
-    def render_drug_resistance_heatmap(
+    def render_heatmap(
         self,
-        to_rerender,
-        to_derender,
         hide=True,
         column=None,
         frow=None,
         columnspan=1,
         disabled=False,
     ):
+        def comboboxselected(var, to_rerender, to_derender):
+            no_validate_update(var, self.config_path, keys_path)
+            
         to_rerender = None
         to_derender = None
-        keys_path = self.drug_resistance_heatmap_keys_path
-        text = "Do you want to plot the heatmap for drug-resistance of all sampled genomes in the transmission tree plot?"
+        keys_path = self.heatmap_keys_path
+        text = "Plot a heatmap for a fitness effect of all sampled genomes in the transmission tree plot?"
+        width = 20
 
+        component = EasyCombobox(
+            keys_path,
+            self.config_path,
+            text,
+            self.control_frame,
+            column,
+            frow,
+            ["none", "transmissibility", "drug resistance"],
+            to_rerender,
+            to_derender,
+            comboboxselected,
+            hide,
+            width,
+            columnspan,
+        )
+
+        if disabled:
+            component.label.configure(state="disabled")
+            component.combobox.configure(state="disabled")
+
+        self.visible_components.add(component)
+        return component
+    
+    def render_vcf(
+        self,
+        hide=True,
+        column=None,
+        frow=None,
+        columnspan=1,
+        disabled=False,
+    ):
         def radiobuttonselected(var, to_rerender, to_derender):
             no_validate_update(var, self.config_path, keys_path)
+        
+        to_rerender = None
+        to_derender = None
+        keys_path = ["Postprocessing_options", "sequence_output", "vcf"]
+        text = "Output a VCF file for sampled pathogens?"
 
         component = EasyRadioButton(
             keys_path,
             self.config_path,
             text,
-            "do_postprocess",
+            "output_vcf",
             self.control_frame,
             column,
             frow,
@@ -177,43 +187,41 @@ class PostProcessing(TabBase):
 
         self.visible_components.add(component)
         return component
+    
+    def render_fasta(
+        self,
+        hide=True,
+        column=None,
+        frow=None,
+        columnspan=1,
+        disabled=False,
+    ):
+        def radiobuttonselected(var, to_rerender, to_derender):
+            no_validate_update(var, self.config_path, keys_path)
 
-    def render_drug_resistance_heatmap_dep(self):
-        """
-        self.drug_resistance_heatmap = load_config_as_dict(self.config_path)['Postprocessing_options']['tree_plotting']['drug_resistance_heatmap']
-        """
+        to_rerender = None
+        to_derender = None
+        keys_path = ["Postprocessing_options", "sequence_output", "fasta"]
+        text = "Output a FASTA file of concatenated SNPs for sampled pathogens?"
 
-        def update():
-            prev_val = self.drug_resistance_heatmap
-            self.drug_resistance_heatmap = string_to_bool_mapping[
-                self.drug_resistance_heatmap_var.get()
-            ]
-            config = load_config_as_dict(self.config_path)
-            keys_path = [
-                "Postprocessing_options",
-                "tree_plotting",
-                "drug_resistance_heatmap",
-            ]
-            update_nested_dict(config, keys_path, self.drug_resistance_heatmap)
-            save_config(self.config_path, config)
-            if prev_val != self.drug_resistance_heatmap:
-                messagebox.showinfo("Success", "Updated successfully")
-
-        self.drug_resistance_heatmap_label = ttk.Label(
-            self.control_frame, text="drug_resistance_heatmap:"
-        ).grid()
-        self.drug_resistance_heatmap_var = tk.StringVar(
-            value=bool_to_string_mapping[self.drug_resistance_heatmap]
-        )
-        self.drug_resistance_heatmap_combobox = ttk.Combobox(
+        component = EasyRadioButton(
+            keys_path,
+            self.config_path,
+            text,
+            "output_fasta",
             self.control_frame,
-            textvariable=self.drug_resistance_heatmap_var,
-            values=["Yes", "No"],
-            state="readonly",
-        ).grid()
-        self.update_drug_resistance_heatmap_button = tk.Button(
-            self.control_frame, text="Update Method", command=update
-        ).grid()
+            column,
+            frow,
+            hide,
+            to_rerender,
+            to_derender,
+            columnspan,
+            radiobuttonselected,
+            disabled,
+        )
+
+        self.visible_components.add(component)
+        return component
 
     def init_val(self, config_path):
         self.render_nb = False
@@ -239,12 +247,12 @@ class PostProcessing(TabBase):
             "tree_plotting",
             "branch_color_trait",
         ]
-        self.drug_resistance_heatmap = load_config_as_dict(self.config_path)[
+        self.heatmap = load_config_as_dict(self.config_path)[
             "Postprocessing_options"
-        ]["tree_plotting"]["drug_resistance_heatmap"]
+        ]["tree_plotting"]["heatmap"]
 
-        self.drug_resistance_heatmap_keys_path = [
+        self.heatmap_keys_path = [
             "Postprocessing_options",
             "tree_plotting",
-            "drug_resistance_heatmap",
+            "heatmap",
         ]

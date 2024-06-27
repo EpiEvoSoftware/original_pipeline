@@ -217,6 +217,10 @@
         "tree_plotting": {
             "branch_color_trait": 1,
             "heatmap": "none"
+        },
+        "sequence_output": {
+            "vcf": true,
+            "fasta": true
         }
     }
 }
