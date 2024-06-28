@@ -1,50 +1,20 @@
-import tkinter as tk
 from tkinter import messagebox
 import os
 import shutil
 import sys
-from utils import *
+from utils import (load_config_as_dict, save_config, no_validate_update, 
+                   TabBase, EasyCombobox, EasyRadioButton, EasyEntry, EasyButton)
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
-
 class PostProcessing(TabBase):
-    def __init__(
-        self, parent, tab_parent, config_path, tab_title, tab_index, hide=False
-    ):
-        super().__init__(parent, tab_parent, config_path, tab_title, tab_index, hide)
-
-        # generate_config_file Button
-        generate_config_file_button = tk.Button(
-            self.parent,
-            text="Generate the configuration file",
-            command=self.generate_config_file,
-        )
-        generate_config_file_button.pack()
-
-    def generate_config_file(self):
-        config = load_config_as_dict(self.config_path)
-
-        if config["Postprocessing_options"]["do_postprocess"]:
-            try:
-                val = int(self.branch_color_trait_control.entry.get())
-            except ValueError:
-                messagebox.showerror("Value Error", "Please enter a valid integer for trait number")
-                return
-            
-            config["Postprocessing_options"]["tree_plotting"]["branch_color_trait"] = val
-            save_config(self.config_path, config)
-
-        cwdir = config["BasicRunConfiguration"]["cwdir"]
-        target = os.path.join(cwdir, "config_file.json")
-
-        try:
-            shutil.copy(self.config_path, target)
-            messagebox.showinfo("Success", "Config file saved successfully")
-        except IOError as e:
-            print("Unable to copy file. %s" % e)
+    def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide=False):
+        super().__init__(parent, tab_parent, config_path, tab_title, tab_index, hide, False)
+    
+    def init_val(self, config_path):
+        self.config_path = config_path
 
     def load_page(self):
         hide = False
@@ -53,14 +23,9 @@ class PostProcessing(TabBase):
         self.render_heatmap(hide, 0, 6)
         self.render_vcf(hide, 0, 8)
         self.render_fasta(hide, 0, 11)
+        self.render_config_button(hide, 0, 14)
 
-    def render_do_postprocess(self, hide=True, column=None, frow=None, columnspan=1):
-        to_rerender = None
-        to_derender = None
-        keys_path = self.do_postprocess_keys_path
-        text = "Do you want to run post-processing after the simulation?\n"\
-            "(Plotting trajectories & transmission trees, and outputting VCF/FASTA files.)"
-
+    def render_do_postprocess(self, hide, column, frow, columnspan=1):
         def radiobuttonselected(var, to_rerender, to_derender):
             no_validate_update(var, self.config_path, keys_path)
             if var.get():
@@ -74,11 +39,15 @@ class PostProcessing(TabBase):
                 self.render_vcf(hide, 0, 8, disabled=True)
                 self.render_fasta(hide, 0, 11, disabled=True)
 
+        to_rerender, to_derender = None, None
+        keys_path = ["Postprocessing_options", "do_postprocess"]
+        text = "Run Post-processing After the Simulation?\n"\
+            "(Plotting Trajectories & Transmission trees, and Outputting VCF/FASTA Files.)"
         component = EasyRadioButton(
             keys_path,
             self.config_path,
             text,
-            "do_postprocess",
+            "Do Post-processing",
             self.control_frame,
             column,
             frow,
@@ -88,18 +57,18 @@ class PostProcessing(TabBase):
             columnspan,
             radiobuttonselected,
         )
-
         self.visible_components.add(component)
         return component
 
     def render_branch_color_trait(self, hide, column, frow, columnspan=1, disabled=False):
-        text = "Which trait do you want to use for coloring the branches in the transmission tree plot (integer)"
-        keys_path = self.branch_color_trait_keys_path
+        text = ("Which Trait Do You Want to Use for Coloring the Branches "
+                "in the Transmission Tree Plot (Integer)")
+        keys_path = ["Postprocessing_options","tree_plotting","branch_color_trait"]
         component = EasyEntry(
             keys_path,
             self.config_path,
             text,
-            "branch_color_trait",
+            "Branch Color Trait",
             self.control_frame,
             column,
             frow,
@@ -108,28 +77,19 @@ class PostProcessing(TabBase):
             columnspan,
             disabled,
         )
-
         self.visible_components.add(component)
         self.branch_color_trait_control = component
         return component
 
-    def render_heatmap(
-        self,
-        hide=True,
-        column=None,
-        frow=None,
-        columnspan=1,
-        disabled=False,
-    ):
+    def render_heatmap(self, hide, column, frow, columnspan=1, disabled=False):
         def comboboxselected(var, to_rerender, to_derender):
             no_validate_update(var, self.config_path, keys_path)
             
-        to_rerender = None
-        to_derender = None
-        keys_path = self.heatmap_keys_path
-        text = "Plot a heatmap for a fitness effect of all sampled genomes in the transmission tree plot?"
+        keys_path = ["Postprocessing_options","tree_plotting","heatmap",]
+        text = ("Plot a Heatmap for a Fitness Effect of all Sampled Genomes "
+                "in the Transmission Tree Plot?")
+        to_rerender, to_derender = None, None
         width = 20
-
         component = EasyCombobox(
             keys_path,
             self.config_path,
@@ -145,35 +105,24 @@ class PostProcessing(TabBase):
             width,
             columnspan,
         )
-
         if disabled:
             component.label.configure(state="disabled")
             component.combobox.configure(state="disabled")
-
         self.visible_components.add(component)
         return component
     
-    def render_vcf(
-        self,
-        hide=True,
-        column=None,
-        frow=None,
-        columnspan=1,
-        disabled=False,
-    ):
+    def render_vcf(self, hide, column, frow, columnspan=1, disabled=False):
         def radiobuttonselected(var, to_rerender, to_derender):
             no_validate_update(var, self.config_path, keys_path)
         
-        to_rerender = None
-        to_derender = None
-        keys_path = ["Postprocessing_options", "sequence_output", "vcf"]
         text = "Output a VCF file for sampled pathogens?"
-
+        keys_path = ["Postprocessing_options", "sequence_output", "vcf"]
+        to_rerender, to_derender = None, None
         component = EasyRadioButton(
             keys_path,
             self.config_path,
             text,
-            "output_vcf",
+            "Output VCF",
             self.control_frame,
             column,
             frow,
@@ -184,31 +133,21 @@ class PostProcessing(TabBase):
             radiobuttonselected,
             disabled,
         )
-
         self.visible_components.add(component)
         return component
     
-    def render_fasta(
-        self,
-        hide=True,
-        column=None,
-        frow=None,
-        columnspan=1,
-        disabled=False,
-    ):
+    def render_fasta(self, hide, column, frow, columnspan=1, disabled=False):
         def radiobuttonselected(var, to_rerender, to_derender):
             no_validate_update(var, self.config_path, keys_path)
 
-        to_rerender = None
-        to_derender = None
-        keys_path = ["Postprocessing_options", "sequence_output", "fasta"]
         text = "Output a FASTA file of concatenated SNPs for sampled pathogens?"
-
+        keys_path = ["Postprocessing_options", "sequence_output", "fasta"]
+        to_rerender, to_derender = None, None
         component = EasyRadioButton(
             keys_path,
             self.config_path,
             text,
-            "output_fasta",
+            "Output FASTA",
             self.control_frame,
             column,
             frow,
@@ -219,40 +158,38 @@ class PostProcessing(TabBase):
             radiobuttonselected,
             disabled,
         )
-
         self.visible_components.add(component)
         return component
 
-    def init_val(self, config_path):
-        self.render_nb = False
-        self.frow_val = 0
+    def render_config_button(self, hide, column, frow, columnspan=1):
+        component = EasyButton(
+            "Generate the configuration file",
+            self.control_frame,
+            column,
+            frow,
+            self.generate_config_file,
+            hide,
+            "",
+        )
+        self.visible_components.add(component)
+        return component
 
-        self.config_path = config_path
-        self.config_dict = load_config_as_dict(self.config_path)
-        self.config_path = config_path
+    def generate_config_file(self):
+        config = load_config_as_dict(self.config_path)
+        if config["Postprocessing_options"]["do_postprocess"]:
+            try:
+                val = int(self.branch_color_trait_control.entry.get())
+            except ValueError:
+                messagebox.showerror(
+                    "Value Error", "Please enter a valid integer for trait number")
+                return
+            config["Postprocessing_options"]["tree_plotting"]["branch_color_trait"] = val
+            save_config(self.config_path, config)
 
-        self.cwdir = load_config_as_dict(self.config_path)["BasicRunConfiguration"][
-            "cwdir"
-        ]
-        # Postprocessing_options Configurations
-        self.do_postprocess = load_config_as_dict(self.config_path)[
-            "Postprocessing_options"
-        ]["do_postprocess"]
-        self.do_postprocess_keys_path = ["Postprocessing_options", "do_postprocess"]
-        self.branch_color_trait = load_config_as_dict(self.config_path)[
-            "Postprocessing_options"
-        ]["tree_plotting"]["branch_color_trait"]
-        self.branch_color_trait_keys_path = [
-            "Postprocessing_options",
-            "tree_plotting",
-            "branch_color_trait",
-        ]
-        self.heatmap = load_config_as_dict(self.config_path)[
-            "Postprocessing_options"
-        ]["tree_plotting"]["heatmap"]
-
-        self.heatmap_keys_path = [
-            "Postprocessing_options",
-            "tree_plotting",
-            "heatmap",
-        ]
+        cwdir = config["BasicRunConfiguration"]["cwdir"]
+        target = os.path.join(cwdir, "config_file.json")
+        try:
+            shutil.copy(self.config_path, target)
+            messagebox.showinfo("Success", "Config file saved successfully")
+        except IOError as e:
+            print("Unable to copy file. %s" % e)

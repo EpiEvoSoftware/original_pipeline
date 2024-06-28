@@ -16,7 +16,7 @@ def update_dir():
     config_dict["GenomeElement"]["ref_path"] = data_path
 
     with open(config_path, "w") as f:
-        json.dump(config_dict, f, indent=4)
+        json.dump(config_dict, f, indent=2)
 
 def main():
     update_dir()

@@ -248,10 +248,12 @@ def write_seeds_trait(wk_dir, seeds_trait_vals, traits_num):
 	n_trans_traits = traits_num["transmissibility"]
 	n_drug_traits = traits_num["drug_resistance"]
 
-	# Create the header string, traits are indexed from 1 (? not consistent with other 0-index uses)
+	# Create the header string, traits are indexed from 1
 	header = "seed_id,"
-	header += ",".join(f"transmissibility_{i+1}" for i in range(n_trans_traits))
-	header += ","
+	if n_trans_traits > 0:
+		header += ",".join(f"transmissibility_{i+1}" for i in range(n_trans_traits))
+		if n_drug_traits > 0:
+			header += ","
 	header += ",".join(f"drugresist_{i+1}" for i in range(n_drug_traits))
 
 	# Write to CSV file

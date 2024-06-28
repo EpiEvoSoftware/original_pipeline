@@ -1,150 +1,143 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
-import json
-from utils import *
-
-
-# TODO: generate config file, put it in the working directory
+from utils import render_next_button, load_config_as_dict, save_config
+from base_func import check_ref_format
 
 class Configuration:
-    def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
+    def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide=False):
         self.config_path = config_path
-        self.cwd = load_config_as_dict(self.config_path)['BasicRunConfiguration']['cwdir']
-        self.n_replicates = load_config_as_dict(self.config_path)['BasicRunConfiguration']['n_replicates']
-        self.ref_path = load_config_as_dict(self.config_path)['GenomeElement']['ref_path']
+        initial_config = load_config_as_dict(self.config_path)
+        self.cwd = initial_config["BasicRunConfiguration"]["cwdir"]
+        self.n_replicates = initial_config["BasicRunConfiguration"]["n_replicates"]
+        self.random_number_seed = initial_config["BasicRunConfiguration"]["random_number_seed"]
+        self.ref_path = initial_config["GenomeElement"]["ref_path"]
         self.parent = parent
         self.tab_parent = tab_parent
         self.tab_index = tab_index
 
         self.tab_parent.add(self.parent, text=tab_title)
-        # self.tab_parent.tab(tab_index, state="disabled")
-        # self.tab_parent.tab(tab_index, state="normal")
-
         self.control_frame = ttk.Frame(self.parent, width=300)
-        self.control_frame.pack(fill='both', expand=True) 
-        self.control_frame.grid_columnconfigure(0, weight=1)
-        
+        self.control_frame.pack(padx=10, pady=10)
 
         self.render_working_directory()
-
+        self.render_ref_path_control()
         self.render_n_replicates()
-
-        self.render_ref_path_label()
-
-        render_next_button(self.tab_index, self.tab_parent, self.parent)
-        
-
+        self.render_random_seed()
+        render_next_button(self.tab_index, self.tab_parent, self.parent, update_config=self.update_config)
+    
     def render_working_directory(self):
-        def diagnostic_label_title():
-            title = "Choose Working Directory"
-            self.diagnostic_label_title = ttk.Label(self.control_frame, text=title)
-            self.diagnostic_label_title.pack() #grid(row = 0, column = 0, sticky = 'W', pady = 2)
+        def choose_directory():
+            dir_inp = filedialog.askdirectory(title="Select a Directory")
+            if dir_inp:
+                self.cwd = dir_inp
+                self.user_working_directory_label.config(text=f"{self.cwd}")
 
-        def choose_directory_button():
-            choose_directory_button = tk.Button(self.control_frame, text="Choose Directory", command=self.choose_directory)
-            # choose_directory_button.grid(row=1, column=0, sticky='ew', padx=5, pady=5)
-            choose_directory_button.pack()
+                config = load_config_as_dict(self.config_path)
+                config["BasicRunConfiguration"]["cwdir"] = self.cwd
+                save_config(self.config_path, config)
 
-        def diagnostic_label():
-            self.cwd = "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff"
-            self.diagnostic_label = ttk.Label(self.control_frame, text="Current Working Directory: " + self.cwd, background="black")
-            self.diagnostic_label.pack()# grid(row=2, column=0, sticky='ew', padx=5, pady=5)
-        self.test = tk.StringVar(value = "bi-allele")
-        self.trans_type_combobox = ttk.Combobox(self.control_frame, foreground = "black", width = 23, textvariable=self.test, values=["bi-allele", "additive", "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff"], state="disabled").pack() #grid(row=3, column=0, sticky='ew', padx=5, pady=5)
+        choose_directory_button = tk.Button(
+            self.control_frame, text="Choose Directory",command=choose_directory)
+        choose_directory_button.grid(row=2, column=0, sticky="e")
+    
+    def render_ref_path_control(self):
+        def choose_ref_path():
+            input_dir = filedialog.askopenfilename(title="Select a Genome Reference File")
+            if not input_dir:
+                return
+            try:
+                check_ref_format(input_dir)
+            except Exception as e:
+                messagebox.showerror(
+                    "File Error", "Please check that your file is in correct fasta format.")
+                return
+                
+            self.ref_path = input_dir
+            self.ref_path_label.config(text=self.ref_path)
+            config = load_config_as_dict(self.config_path)
+            config["GenomeElement"]["ref_path"] = self.ref_path
+            save_config(self.config_path, config)
 
-        diagnostic_label_title()
-        choose_directory_button()
-        diagnostic_label()
-        # self.diagnostic_label_title = ttk.Label(self.control_frame, text="Choose Working Directory")
-        # self.diagnostic_label_title.pack()
-        # choose_directory_button = tk.Button(self.control_frame, text="Choose Directory", command=self.choose_directory)
-        # choose_directory_button.pack()
-        # self.diagnostic_label = ttk.Label(self.control_frame, text="Current Working Directory: " + self.cwd)
-        # self.diagnostic_label.pack()
+        ref_path_label = ttk.Label(
+            self.control_frame, text="Pathogen Reference Genome File (FASTA Format)", 
+            style="Bold.TLabel")
+        ref_path_label.grid(row=4, column=0, sticky="w", pady=5)
+
+        if self.ref_path == "":
+            self.ref_path_label = ttk.Label(
+                self.control_frame, text="None selected", foreground="black", width=50)
+        else:
+            self.ref_path_label = ttk.Label(
+                self.control_frame, text=self.ref_path, foreground="black", width=50)
+
+        self.ref_path_label.grid(row=5, column=0, pady=5, sticky="w")
+
+        choose_ref_path_button = tk.Button(
+            self.control_frame, text="Choose File", command=choose_ref_path)
+        choose_ref_path_button.grid(row=6, column=0, sticky="e", pady=5)
 
     def render_n_replicates(self):
-        def update(event):
+        self.working_directory_label = ttk.Label(
+            self.control_frame, text="Working Directory:", style="Bold.TLabel")
+        self.working_directory_label.grid(row=0, column=0, pady=5, sticky="w")
+        if self.cwd == "":
+            self.user_working_directory_label = ttk.Label(
+                self.control_frame, text="None Selected", foreground="black", width=50)
+        else:
+            self.user_working_directory_label = ttk.Label(
+                self.control_frame, text=self.cwd, foreground="black", width=50)
+
+        self.user_working_directory_label.grid(row=1, column=0, pady=5, sticky="w")
+
+        self.n_replicates_label = ttk.Label(
+            self.control_frame, text="Number of Simulation Replicates (Integer)", 
+            style="Bold.TLabel")
+
+        self.n_replicates_label.grid(row=7, column=0, sticky="w", pady=5)
+        self.n_replicates_entry = ttk.Entry(self.control_frame, foreground="black", width=20)
+        self.n_replicates_entry.grid(row=8, column=0, sticky="w", pady=5)
+        self.n_replicates_entry.insert(0, self.n_replicates)
+
+    def render_random_seed(self):
+        random_seed_label = ttk.Label(
+            self.control_frame, text="Random Seed (Integer)", style="Bold.TLabel")
+        random_seed_label.grid(row=9, column=0, sticky="w", pady=5)
+        self.random_seed_entry = ttk.Entry(self.control_frame, foreground="black", width=20)
+        self.random_seed_entry.grid(row=10, column=0, sticky="w", pady=5)
+        self.random_seed_entry.insert(0, str(self.random_number_seed))
+
+    def update_config(self):
+        error_messages = []
+        self.update_n_replicates(error_messages)
+        self.update_random_seed(error_messages)
+        if len(error_messages) == 0:
+            return 0
+        else:
+            error_message_str = "\n".join(error_messages)
+            messagebox.showerror("Update Error", error_message_str)
+            return 1
+    
+    def update_random_seed(self, error_messages):
+        if self.random_seed_entry.get() == "None":
+            config = load_config_as_dict(self.config_path)
+            config["BasicRunConfiguration"]["random_number_seed"] = None
+            save_config(self.config_path, config)
             return
 
-        self.n_replicates_label = ttk.Label(self.control_frame, text="n_replicates:").pack(side='left')
-        # self.n_replicates_label.pack() #grid(row=3, column=1, sticky='ew', padx=5, pady=5)
-        self.n_replicates_entry = ttk.Entry(self.control_frame, foreground="black", width = 80)
-        # self.n_replicates_entry.insert(0, self.n_replicates)
-        self.n_replicates_entry.insert(0, "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff")
-        # self.n_replicates_entry.delete(0, tk.END)
-        self.n_replicates_entry.configure(state="disabled")
-        self.n_replicates_entry.configure(state="normal")
-        # self.n_replicates_entry.insert(0, 'new_text')
-        new_width = len('/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff')
-        self.n_replicates_entry.config(width=new_width)
-        self.n_replicates_entry.configure(state="disabled")
-        CreateToolTip(self.n_replicates_entry, \
-   '/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff')
-        self.n_replicates_entry.pack(side='right') #grid(row=4, column=0, sticky='ew', padx=5, pady=5)
-        update_n_replicates_button = tk.Button(self.control_frame, text="Update n_replicates", command=self.update_n_replicates)
-        update_n_replicates_button.pack() #grid(row=5, column=0, sticky='ew', padx=5, pady=5)
-        # self.n_replicates_label = ttk.Label(self.control_frame, text="n_replicates:")
-        # self.n_replicates_label.pack()
-        # self.n_replicates_entry = ttk.Entry(self.control_frame, foreground="black")
-        # self.n_replicates_entry.insert(0, self.n_replicates)  
-        # self.n_replicates_entry.pack()
-        # update_n_replicates_button = tk.Button(self.control_frame, text="Update n_replicates", command=self.update_n_replicates)
-        # update_n_replicates_button.pack()
-
-        CreateToolTip(update_n_replicates_button, \
-   'Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, '
-   'consectetur, adipisci velit. Neque porro quisquam est qui dolorem ipsum '
-   'quia dolor sit amet, consectetur, adipisci velit. Neque porro quisquam '
-   'est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.')
-        
-    def render_ref_path_label(self):
-        ref_path_label = ttk.Label(self.control_frame, text="Choose Ref Path")
-        ref_path_label.pack() #grid(row=6, column=0, sticky='ew', padx=5, pady=5)
-        choose_ref_path_button = tk.Button(self.control_frame, text="Choose File", command=self.choose_ref_path)
-        choose_ref_path_button.pack() #grid(row=7, column=0, sticky='ew', padx=5, pady=5)
-        self.ref_path_label = ttk.Label(self.control_frame, text="Current Ref Path: " + self.ref_path)
-        self.ref_path_label.pack() #grid(row=8, column=0, sticky='ew', padx=5, pady=5)
-        # ref_path_label = ttk.Label(self.control_frame, text="Choose Ref Path")
-        # ref_path_label.pack()
-        # choose_ref_path_button = tk.Button(self.control_frame, text="Choose File", command=self.choose_ref_path)
-        # choose_ref_path_button.pack()
-        # self.ref_path_label = ttk.Label(self.control_frame, text="Current Ref Path: " + self.ref_path)
-        # self.ref_path_label.pack()
-
-
-    def save_ref_path(self, config):
-        with open(self.ref_path, 'w') as file:
-            json.dump(config, file, indent=4)
-
-    def choose_directory(self):  
-        chosen_directory = filedialog.askdirectory(title="Select a Directory")
-        if chosen_directory:  
-            self.cwd = chosen_directory
-            self.diagnostic_label.config(text=f"Working Directory: {self.cwd}")  # Update the label with the new directory
-            config = load_config_as_dict(self.config_path)
-            config['BasicRunConfiguration']['cwdir'] = self.cwd
-            save_config(self.config_path, config)
-     
-    def choose_ref_path(self):  
-        filetypes = ( #don't need to check if its genome file: or use python package jaehee said
-            ("Genome files", ("*.fasta", "*.fa", "*.gb", "*.gtf", "*.vcf", "*.bam", "*.sam", "*.fna")),
-            ("All files", "*.*")
-        )
-        chosen_file = filedialog.askopenfilename(title="Select a Genome Reference File", filetypes=filetypes)
-        if chosen_file:  
-            self.ref_path = chosen_file
-            self.ref_path_label.config(text=f"Ref Path: {self.ref_path}") 
-            config = load_config_as_dict(self.config_path)
-            config['GenomeElement']['ref_path'] = self.ref_path
-            save_config(self.config_path, config)
-
-    def update_n_replicates(self):
         try:
-            new_n_replicates = int(float(self.n_replicates_entry.get()))
-            # int() doesn't process scientific notation for strings, but float() does
-            config = load_config_as_dict(self.config_path) 
-            config['BasicRunConfiguration']['n_replicates'] = new_n_replicates 
-            save_config(self.config_path, config)  
-            messagebox.showinfo("Update Successful", "n_replicates changed.")  
+            new_random_seed = int(self.random_seed_entry.get())
+            config = load_config_as_dict(self.config_path)
+            config["BasicRunConfiguration"]["random_number_seed"] = new_random_seed
+            save_config(self.config_path, config)
         except ValueError:
-            messagebox.showerror("Update Error", "Please enter a valid integer for n_replicates.") 
+            error_messages.append("Please enter a valid integer for the random seed. " 
+                                  "Enter 'None' if you don't want to provide a random seed.")
+    
+    def update_n_replicates(self, error_messages):
+        try:
+            new_n_replicates = int(self.n_replicates_entry.get())
+            config = load_config_as_dict(self.config_path)
+            config["BasicRunConfiguration"]["n_replicates"] = new_n_replicates
+            save_config(self.config_path, config)
+        except ValueError:
+            error_messages.append("Please enter a valid integer for the number of replicates.")

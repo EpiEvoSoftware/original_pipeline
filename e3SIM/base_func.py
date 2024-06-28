@@ -59,7 +59,7 @@ def dump_json(json2dump):
     """
     out_config_path = os.path.join(json2dump["BasicRunConfiguration"]["cwdir"], "params.json")
     with open(out_config_path, 'w') as out_config:
-        json.dump(json2dump, out_config, indent = 4)
+        json.dump(json2dump, out_config, indent=2)
 
 def check_config(config_dict):
     pass
