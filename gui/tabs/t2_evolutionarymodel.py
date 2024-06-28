@@ -24,8 +24,6 @@ class EvolutionaryModel:
     def initial_render(self):
         self.render_n_generations()
         self.render_model_parameterization()
-        self.render_trans_type() 
-        self.render_dr_type() 
         self.render_within_host_reproduction()
         if self.initial_evolution_config['within_host_reproduction']:
             self.render_within_host_reproduction_rate(False)
@@ -118,34 +116,6 @@ class EvolutionaryModel:
                 entry.grid(row = i, column = j, stick='w')
                 if i == j:
                     entry.config(state='disabled', foreground='light grey')
-        
-    def render_trans_type(self):
-        self.trans_type_label = ttk.Label(
-            self.control_frame, text="Transmissibility Trait Type", style="Bold.TLabel")
-        self.trans_type_label.grid(
-            row=11, column=0, columnspan=2, sticky='w', pady=5, padx=10)
-        self.trans_type_var = tk.StringVar(value=self.initial_evolution_config['trans_type'])
-        self.trans_type_combobox = ttk.Combobox(
-            self.control_frame,
-            textvariable=self.trans_type_var,
-            values=["Bi-Allelic", "Additive"],
-            state="readonly")
-        self.trans_type_combobox.grid(
-            row=12, column=0, columnspan=2, sticky='w', pady=5, padx=10)
-    
-    def render_dr_type(self):
-        self.dr_type_label = ttk.Label(
-            self.control_frame, text="Drug-Resistance Trait Type", style="Bold.TLabel")
-        self.dr_type_label.grid(
-            row=13, column=0, columnspan=2, sticky='w', pady=5, padx=10)
-        self.dr_type_var = tk.StringVar(value=self.initial_evolution_config['dr_type'])
-        self.dr_type_combobox = ttk.Combobox(
-            self.control_frame,
-            textvariable=self.dr_type_var,
-            values=["Bi-Allelic", "Additive"],
-            state="readonly")
-        self.dr_type_combobox.grid(
-            row=14, column=0, columnspan=2, sticky='w', pady=5, padx=10)      
 
     def render_within_host_reproduction(self):
         def update():
@@ -245,18 +215,6 @@ class EvolutionaryModel:
         
             save_config(self.config_path, config)
 
-    def update_trans_type(self):
-        new_trans_type = self.trans_type_var.get()
-        config = load_config_as_dict(self.config_path)
-        config['EvolutionModel']['trans_type'] = new_trans_type
-        save_config(self.config_path, config)
-
-    def update_dr_type(self):
-        new_dr_type = self.dr_type_var.get()
-        config = load_config_as_dict(self.config_path)
-        config['EvolutionModel']['dr_type'] = new_dr_type
-        save_config(self.config_path, config)
-
     def update_within_host_reproduction(self):
         new_val = self.within_host_reproduction_var.get()
         config = load_config_as_dict(self.config_path)
@@ -288,8 +246,6 @@ class EvolutionaryModel:
         error_messages = []
         self.update_n_generation(error_messages)
         self.update_mutation_rates(error_messages)
-        self.update_trans_type()
-        self.update_dr_type()
         self.update_within_host_reproduction()
         self.update_within_host_reproduction_rate(error_messages)
         self.update_cap_withinhost(error_messages)
