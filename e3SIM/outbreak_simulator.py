@@ -552,7 +552,7 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 				print(f"Processing replication {runid} treesequence file...", flush = True)
 				# Run data processing for each replicate
 				run_per_data_processing(
-					slim_pars["cwdir"], slim_pars["use_genetic_model"], runid, dataprocess_pars["n_trait"], 
+					slim_pars["ref_path"], slim_pars["cwdir"], slim_pars["use_genetic_model"], runid, dataprocess_pars["n_trait"], 
 					slim_pars["seed_host_matching_path"], dataprocess_pars["sequence_output"],
 					dataprocess_pars["tree_plotting"]["branch_color_trait"])
 				if slim_pars["use_reference"]:

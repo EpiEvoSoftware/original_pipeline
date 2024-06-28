@@ -1,6 +1,7 @@
 import os, tskit, pyslim, shutil, subprocess
 import pandas as pd
 import numpy as np
+from Bio import SeqIO
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
@@ -319,12 +320,40 @@ def output_tseq_vcf(wk_dir_, real_label, sampled_ts):
 	os.remove(vcf_path)
 
 
-def output_fasta(wk_dir_):
+def get_full_fasta(ref_path, wk_dir_):
+	ref_seq = SeqIO.parse(open(ref_path), 'fasta')
+	for fasta in ref_seq:
+		refseq = str(fasta.seq)
+	
+	index_SNP = []
+	with open(os.path.join(wk_dir_, "final_samples_snp_pos.csv")) as index_file:
+		for line2 in index_file:
+			line1 = line2.rstrip()
+			line = line1.split(",")[1]
+			if line.isdigit():
+				num_index = int(line)
+				index_SNP.append(num_index - 1)
+
+	snp_path = os.path.join(wk_dir_, "sample.SNPs_only.fasta")
+	snp_seq = SeqIO.parse(open(snp_path), 'fasta')
+	with open(os.path.join(wk_dir_, "sample.wholegenome.fasta"), "w") as out_fa:
+		for fasta in snp_seq:
+			ref = list(refseq)
+			name, sequence = fasta.id, str(fasta.seq)
+			out_fa.write(">" + name + "\n")
+			for i, index in enumerate(index_SNP):
+				ref[index] = sequence[i]
+			out_fa.write(''.join(ref) + "\n")
+
+
+
+def output_fasta(ref_path, wk_dir_):
 	rscript_path = os.path.join(os.path.dirname(__file__), "generate_fas.r")
 	subprocess.run(["Rscript", rscript_path, wk_dir_])
+	get_full_fasta(ref_path, wk_dir_)
 
 
-def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_path, seq_out, color_trait=1):
+def run_per_data_processing(ref_path, wk_dir_, gen_model, runid, n_trait, seed_host_match_path, seq_out, color_trait=1):
 	"""
 	Performs data processing tasks for a specific run.
 
@@ -373,13 +402,13 @@ def run_per_data_processing(wk_dir_, gen_model, runid, n_trait, seed_host_match_
 	
 	# Output VCF file
 	if seq_out["vcf"]:
-		print("Writing VCF file of sampled pathogens.")
+		print("Writing VCF file of sampled pathogens...")
 		output_tseq_vcf(each_wk_dir, real_label, sampled_ts)
 
 	# OUtput FASTA file
 	if seq_out["fasta"]:
-		print("Writing FASTA file of sampled pathogens.")
-		output_fasta(each_wk_dir)
+		print("Writing FASTA file of sampled pathogens...")
+		output_fasta(ref_path, each_wk_dir)
 
 
 
