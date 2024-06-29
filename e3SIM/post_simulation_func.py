@@ -401,14 +401,14 @@ def run_per_data_processing(ref_path, wk_dir_, gen_model, runid, n_trait, seed_h
 
 	
 	# Output VCF file
-	if seq_out["vcf"]:
+	if seq_out["vcf"] or seq_out["fasta"]:
 		print("Writing VCF file of sampled pathogens...")
 		output_tseq_vcf(each_wk_dir, real_label, sampled_ts)
 
 	# OUtput FASTA file
-	if seq_out["fasta"]:
-		print("Writing FASTA file of sampled pathogens...")
-		output_fasta(ref_path, each_wk_dir)
+		if seq_out["fasta"]:
+			print("Writing FASTA file of sampled pathogens...")
+			output_fasta(ref_path, each_wk_dir)
 
 
 
