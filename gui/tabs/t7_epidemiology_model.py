@@ -12,7 +12,14 @@ class EpidemiologyModel(TabBase):
         self.config_path = config_path
 
     def init_tab(self, parent, tab_parent, tab_title, tab_index, hide):
-        super().init_tab(parent, tab_parent, tab_title, tab_index, hide)
+        self.parent = parent
+        self.tab_parent = tab_parent
+        self.tab_index = tab_index
+        self.tab_parent.add(parent, text=tab_title)
+        if hide:
+            self.tab_parent.tab(self.tab_index, state="disabled")
+        self.control_frame = ttk.Frame(self.parent, width=300)
+        self.control_frame.pack(expand=1, fill='y')
         
         # Enable scrolling
         self.canvas = tk.Canvas(self.control_frame)
@@ -98,7 +105,7 @@ class EpidemiologyModel(TabBase):
         self.render_R_S_prob(hide, 0, 1, frow())
         self.render_sample_prob(hide, 0, 1, frow())
         self.render_sampling_recovery_prob(hide, 0, 1, frow())
-        self.render_image(hide, "gui/assets/t7.png", 500, 300, 1, 2, 17)
+        self.render_image(hide, "gui/assets/t7.png", 500, 300, 1, 1, 17)
 
         self.render_title("Massive Sampling Events", hide, 0, 1, frow(),)
         self.render_massive_sampling(hide, 0, 1, frow(by=1))
