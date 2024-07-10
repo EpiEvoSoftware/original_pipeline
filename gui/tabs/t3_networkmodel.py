@@ -144,11 +144,29 @@ class NetworkModel:
             chosen_file = filedialog.askopenfilename(title="Select a File")
 
             if chosen_file:
+                # Validate file
+                if not self.update_config():
+                    return
+
                 config = load_config_as_dict(self.config_path)
+                wk_dir = config["BasicRunConfiguration"]["cwdir"]
+                pop_size = config["NetworkModelParameters"]["host_size"]
+                network, error = run_network_generation(
+                        pop_size=pop_size,
+                        wk_dir=wk_dir,
+                        method="user_input",
+                        path_network=chosen_file)
+                
+                if error:
+                    messagebox.showerror("Error", error)
+                    return
+
+                # Reflect in GUI
                 config["NetworkModelParameters"]["user_input"]["path_network"] = chosen_file
                 save_config(self.config_path, config)
-                
                 file_value_label.config(text=chosen_file)
+
+                
                 
         config = load_config_as_dict(self.config_path)
         file = config["NetworkModelParameters"]["user_input"]["path_network"]

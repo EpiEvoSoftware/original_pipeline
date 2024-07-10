@@ -5,7 +5,8 @@ from error_handling import CustomizedError
 
 def write_network(ntwk_, wk_dir):
     """
-    Writes a network to the workding directory and returns the path to the network.
+    Writes a network to the working directory and returns the path to the network.
+    The output file will be named contact_network.adjlist.
 
     Parameters:
         wk_dir (str): Working directory.
@@ -102,10 +103,9 @@ def ba_generate(pop_size, m):
 
 def read_input_network(path_network, pop_size):
     """
-    Checks the format of the input network and copy it in the working directory.
+    Checks the format of the input network and return it.
 
     Parameters:
-        wk_dir (str): Working directory.
         path_network (str): Path to the network file.
         pop_size (int): Population size.
     """
