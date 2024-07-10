@@ -138,15 +138,15 @@ def create_slim_config(all_config):
 	# 	else:
 	# 		out_config.write(f"transition_matrix_path:{os.path.join(slim_pars["cwdir"], "muts_transition_matrix.csv")}\n")
 
-	slim_pars["trans_type"] = all_config["EvolutionModel"]["trans_type"]
-	if slim_pars["trans_type"] not in ["additive", "bialleleic"]:
-		raise CustomizedError("Model for transmissibility has to be one of the two models: additive / bialleleic")
-	out_config.write(f"trans_type:{slim_pars['trans_type']}\n")
+	# slim_pars["trans_type"] = all_config["EvolutionModel"]["trans_type"]
+	# if slim_pars["trans_type"] not in ["additive", "bialleleic"]:
+	# 	raise CustomizedError("Model for transmissibility has to be one of the two models: additive / bialleleic")
+	# out_config.write(f"trans_type:{slim_pars['trans_type']}\n")
 
-	slim_pars["dr_type"] = all_config["EvolutionModel"]["dr_type"]
-	if slim_pars["dr_type"] not in ["additive", "bialleleic"]:
-		raise CustomizedError("Model for drug-resistance has to be one of the two models: additive / bialleleic")
-	out_config.write(f"dr_type:{slim_pars['dr_type']}\n")
+	# slim_pars["dr_type"] = all_config["EvolutionModel"]["dr_type"]
+	# if slim_pars["dr_type"] not in ["additive", "bialleleic"]:
+	# 	raise CustomizedError("Model for drug-resistance has to be one of the two models: additive / bialleleic")
+	# out_config.write(f"dr_type:{slim_pars['dr_type']}\n")
 
 	slim_pars["within_host_reproduction"] = all_config["EvolutionModel"]["within_host_reproduction"]
 	_check_boolean(slim_pars["within_host_reproduction"], "Within-host reproduction")
@@ -426,10 +426,11 @@ def create_slim_script(slim_pars):
 	if slim_pars["use_genetic_model"] == False:
 		append_files(os.path.join(code_path, "transmission_nogenetic.slim"), mainslim_path)
 	else:
-		if slim_pars["trans_type"] == "additive":
-			append_files(os.path.join(code_path, "transmission_additive.slim"), mainslim_path)
-		elif slim_pars["trans_type"] == "bialleleic":
-			append_files(os.path.join(code_path, "transmission_bialleleic.slim"), mainslim_path)
+		append_files(os.path.join(code_path, "transmission_additive.slim"), mainslim_path)
+		# if slim_pars["trans_type"] == "additive":
+		# 	append_files(os.path.join(code_path, "transmission_additive.slim"), mainslim_path)
+		# elif slim_pars["trans_type"] == "bialleleic":
+		# 	append_files(os.path.join(code_path, "transmission_bialleleic.slim"), mainslim_path)
 		if any(idx == 0 for idx in slim_pars["transmissibility_effsize"]):
 			append_files(os.path.join(code_path, "transmission_nogenetic.slim"), mainslim_path)
 
@@ -449,10 +450,11 @@ def create_slim_script(slim_pars):
 
 	# State transition for infected hosts
 	if any(idx != 0 for idx in slim_pars["drugresistance_effsize"]):
-		if slim_pars["trans_type"] == "additive":
-			append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
-		elif slim_pars["trans_type"] == "bialleleic":
-			append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
+		append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
+		# if slim_pars["trans_type"] == "additive":
+		# 	append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
+		# elif slim_pars["trans_type"] == "bialleleic":
+		# 	append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
 	if any(idx == 0 for idx in slim_pars["drugresistance_effsize"]):
 		append_files(os.path.join(code_path, "Infected_process_nogenetic.slim"), mainslim_path)
 
