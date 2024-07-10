@@ -467,7 +467,7 @@ def main():
 	parser.add_argument('-method', action='store',dest='method', type=str, required=True, help="Method of the genetic element file generation")
 	parser.add_argument('-wkdir', action='store',dest='wkdir', type=str, required=True, help="Working directory")
 	parser.add_argument('-effsize_path', action='store',dest='effsize_path', type=str, required=False, help="Path to the user-provided effect size genetic element csv file", default="")
-	parser.add_argument('-trait_n', action='store', dest='trait_n', type=str, required=False, help="Number of traits that user want to generate a genetic architecture for transmissibility and drug resistance, format: '{\"transmissibility\": x, \"drug-resistance\": y}'", default="")
+	parser.add_argument('-trait_n', action='store', dest='trait_n', type=str, required=True, help="Number of traits that user want to generate a genetic architecture for transmissibility and drug resistance, format: '{\"transmissibility\": x, \"drug-resistance\": y}'", default="")
 	parser.add_argument('-causal_size_each','--causal_size_each', nargs='+', help='Size of causal genes for each trait', required=False, type=int, default=[])
 	parser.add_argument('-es_low','--es_low', nargs='+', help='Lower bounds of effect size for each trait', required=False, type=float, default=[])
 	parser.add_argument('-es_high','--es_high', nargs='+', help='Higher bounds of effect size for each trait', required=False, type=float, default=[])
