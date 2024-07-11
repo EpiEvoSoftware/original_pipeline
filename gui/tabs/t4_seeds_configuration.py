@@ -72,14 +72,17 @@ class SeedsConfiguration(TabBase):
                     raise ValueError("Invalid method")
 
         # Initial render logic for use reference controls
-        renders = [self.use_method_controls, self.run_button_control]
+        renders = [self.use_method_controls]
         match self.method:
             case "user_input":
                 renders.append(self.user_input_group_controls)
+                renders.append(self.run_button_control)
             case "SLiM_burnin_WF":
                 renders.append(self.wf_group_controls)
+                renders.append(self.run_button_control)
             case "SLiM_burnin_epi":
                 renders.append(self.epi_group_controls)
+                renders.append(self.run_button_control)
             case "":
                 pass
             case _:
@@ -264,9 +267,9 @@ class SeedsConfiguration(TabBase):
                     derender = [self.user_input_group_controls, self.wf_group_controls]
                     GroupControls(derender).derender_itself()
                     self.epi_group_controls.rerender_itself()
-
                 case _:
                     raise ValueError("Invalid method")
+            self.run_button_control.rerender_itself()
 
         text = "Method to Generate Sequences of the Seeding Pathogens"
         keys_path = ["SeedsConfiguration", "method"]
