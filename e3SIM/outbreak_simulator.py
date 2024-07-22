@@ -20,12 +20,12 @@ def _writebinary(v):
 	return "T" if v else ""
 
 def _check_integer(value, name):
-	if not isinstance(value, int) or value < 1:
-		raise CustomizedError(f"{name} has to be a positive integer")
+	if not isinstance(value, int) or value < 0:
+		raise CustomizedError(f"{name} has to be a non-negative integer")
 	
 def _check_float(value, name):
-	if not isinstance(value, float):
-		raise CustomizedError(f"{name} has to be a float number")
+	if not isinstance(value, float) or value < 0:
+		raise CustomizedError(f"{name} has to be a non-negative float number")
 
 def _check_boolean(value, name):
 	if not isinstance(value, bool):
@@ -79,7 +79,7 @@ def create_slim_config(all_config):
 
 	print("Checking \"BasicRunConfiguration\"...... ", flush = True)
 	if not os.path.exists(cwdir):
-		raise CustomizedError(f"The working directory specified {cwdir} doesn't exist")
+		raise CustomizedError(f"The specified working directory '{cwdir}' doesn't exist")
 	
 	out_config = open(os.path.join(cwdir, "slim.params"), "w")
 	out_config.write("cwdir:" + cwdir + "\n")
@@ -91,7 +91,7 @@ def create_slim_config(all_config):
 
 	print("Checking \"EvolutionModel\"...... ", flush = True)
 	slim_pars["n_generation"] = all_config["EvolutionModel"]["n_generation"]
-	_check_integer(slim_pars["n_generation"], "Number of ticks")
+	_check_integer(slim_pars["n_generation"], "Number of generations")
 	out_config.write(f"n_generation:{slim_pars['n_generation']}\n")
 
 	# check the flag
@@ -103,8 +103,8 @@ def create_slim_config(all_config):
 		if not _check_write_mut_matrix(matrix, cwdir):
 			raise CustomizedError(f"The given mutation rate matrix {matrix} does NOT meet the requirement 1) zeros on diagonals \
 				AND 2) non-negative numbers on non-diagonals")
-		out_config.write(f"mut_rate_matrix: {slim_pars["mut_rate_matrix"]}\n")
-		out_config.write(f"transition_matrix: T\n")
+		out_config.write(f"mut_rate_matrix:{slim_pars["mut_rate_matrix"]}\n")
+		# out_config.write(f"transition_matrix: T\n")
 		out_config.write(f"transition_matrix_path:{os.path.join(cwdir, "muts_transition_matrix.csv")}\n")
 	elif slim_pars["subst_model_parameterization"] == "mut_rate":
 		slim_pars["mut_rate"] = all_config["EvolutionModel"]["mut_rate"]
@@ -113,51 +113,18 @@ def create_slim_config(all_config):
 		except CustomizedError:
 			_check_float(slim_pars["mut_rate"], "Mutation rate")
 		out_config.write(f"mut_rate:{slim_pars['mut_rate']}\n")
-		out_config.write(f"transition_matrix:\n")
+		# out_config.write(f"transition_matrix:\n")
 	else:
 		raise CustomizedError(f"The given subst_model_parameterization is NOT valid -- please input 'mut_rate' or 'mut_rate_matrix'.")
-
-		# check the validity of mutation matrix and write it to the csv
-
-		
-	# mutation rate
-
-	# slim_pars["mut_rate"] = all_config["EvolutionModel"]["mut_rate"]
-	# try:
-	# 	_check_integer(slim_pars["mut_rate"], "Mutation rate")
-	# except CustomizedError:
-	# 	_check_float(slim_pars["mut_rate"], "Mutation rate")
-	# out_config.write(f"mut_rate:{slim_pars['mut_rate']}\n")
-
-	# slim_pars["transition_matrix"] = all_config["EvolutionModel"]["transition_matrix"]
-	# _check_boolean(slim_pars["transition_matrix"], "Whether to use a transition rate matrix for mutation")
-	# out_config.write(f"transition_matrix:{_writebinary(slim_pars['transition_matrix'])}\n")
-	# if slim_pars["transition_matrix"]:
-	# 	if not os.path.exists(os.path.join(slim_pars["cwdir"], "muts_transition_matrix.csv")):
-	# 		raise CustomizedError("You specified to use a customized transition rate matrix, but did not provide the matrix in the correct format or location.")
-	# 	else:
-	# 		out_config.write(f"transition_matrix_path:{os.path.join(slim_pars["cwdir"], "muts_transition_matrix.csv")}\n")
-
-	# slim_pars["trans_type"] = all_config["EvolutionModel"]["trans_type"]
-	# if slim_pars["trans_type"] not in ["additive", "bialleleic"]:
-	# 	raise CustomizedError("Model for transmissibility has to be one of the two models: additive / bialleleic")
-	# out_config.write(f"trans_type:{slim_pars['trans_type']}\n")
-
-	# slim_pars["dr_type"] = all_config["EvolutionModel"]["dr_type"]
-	# if slim_pars["dr_type"] not in ["additive", "bialleleic"]:
-	# 	raise CustomizedError("Model for drug-resistance has to be one of the two models: additive / bialleleic")
-	# out_config.write(f"dr_type:{slim_pars['dr_type']}\n")
 
 	slim_pars["within_host_reproduction"] = all_config["EvolutionModel"]["within_host_reproduction"]
 	_check_boolean(slim_pars["within_host_reproduction"], "Within-host reproduction")
 	out_config.write(f"within_host_reproduction:{_writebinary(slim_pars['within_host_reproduction'])}\n")
 
 	slim_pars["cap_withinhost"] = all_config["EvolutionModel"]["cap_withinhost"]
-	_check_integer(slim_pars["cap_withinhost"], "Capacity within host")
 	if slim_pars["within_host_reproduction"]:
-		if slim_pars["cap_withinhost"] < 1:
-			raise CustomizedError("Capacity within host has to be at least 1")
-		elif slim_pars["cap_withinhost"] == 1:
+		_check_integer(slim_pars["cap_withinhost"], "Capacity within host")
+		if slim_pars["cap_withinhost"] == 1:
 			print("WARNING: Within-host reproduction is turned on, but the capacity within-host is 1, which will be no different from within-host evolution being turned off.", flush = True)
 
 		slim_pars["within_host_reproduction_rate"] = all_config["EvolutionModel"]["within_host_reproduction_rate"]
@@ -232,7 +199,7 @@ def create_slim_config(all_config):
 	print("Checking \"EpidemiologyModel\"...... ", flush = True)
 	slim_pars["epi_model"] = all_config["EpidemiologyModel"]["model"]
 	if slim_pars["epi_model"] not in ["SIR", "SEIR"]:
-		raise CustomizedError("Compartmental model (\"model\") has to be SIR or SEIR")
+		raise CustomizedError("Compartmental model (\"model\") has to be 'SIR' or 'SEIR'")
 	out_config.write(f"epi_model:{slim_pars["epi_model"]}\n")
 	slim_pars["n_epoch"] = all_config["EpidemiologyModel"]["epoch_changing"]["n_epoch"]
 	_check_integer(slim_pars["n_epoch"], "Number of epochs")
@@ -240,11 +207,11 @@ def create_slim_config(all_config):
 
 	slim_pars["epoch_changing_generation"] = all_config["EpidemiologyModel"]["epoch_changing"]["epoch_changing_generation"]
 	if slim_pars["n_epoch"] > 1:
-		if not isinstance(slim_pars["epoch_changing_generation"], list) or len(slim_pars["epoch_changing_generation"])!=slim_pars["n_epoch"]-1:
-			raise CustomizedError("Ticks to change epochs (\"epoch_changing_generation\") has to be a list of length of the number of epochs - 1")
-		if any(not isinstance(i, int) or i < 1 or i > slim_pars["n_generation"] for i in slim_pars["epoch_changing_generation"]):
-			raise CustomizedError(f"Ticks to change epoch (\"massive_sample_generation\") has to in a tick that is valid (1..{slim_pars["n_generation"]})")
-		out_config.write(f"epoch_changing_generation: {",".join([str(x) for x in slim_pars["epoch_changing_generation"]])}\n")
+		if not isinstance(slim_pars["epoch_changing_generation"], list) or len(slim_pars["epoch_changing_generation"]) != slim_pars["n_epoch"]-1:
+			raise CustomizedError("Generations to change epochs (\"epoch_changing_generation\") has to be a list of length of the number of epochs - 1")
+		if any(not isinstance(i, int) or i <= 1 or i > slim_pars["n_generation"] for i in slim_pars["epoch_changing_generation"]):
+			raise CustomizedError(f"Generations to change epochs (\"epoch_changing_generation\") has to be valid in the range [2..{slim_pars["n_generation"]}]")
+		out_config.write(f"epoch_changing_generation:{",".join([str(x) for x in slim_pars["epoch_changing_generation"]])}\n")
 
 	
 	slim_pars["transmissibility_effsize"] = all_config["EpidemiologyModel"]["genetic_architecture"]["transmissibility"]
@@ -263,7 +230,7 @@ def create_slim_config(all_config):
 
 	for param in ["S_IE_rate", "I_R_rate", "R_S_rate", "latency_prob", "E_I_rate", "I_E_rate", "E_R_rate", "sample_rate", "recovery_prob_after_sampling"]:
 		if not isinstance(slim_pars[param], list):
-			raise CustomizedError(f"({param}) has to be a list []")
+			raise CustomizedError(f"({param}) has to be a list ([])")
 		if len(slim_pars[param]) != slim_pars["n_epoch"]:
 			# print("param", slim_pars[param])
 			# print(slim_pars["n_epoch"])
@@ -301,33 +268,31 @@ def create_slim_config(all_config):
 	_check_effect_size("drugresistance_effsize", all_config["GenomeElement"]["traits_num"]["drug_resistance"])
 
 	slim_pars["n_massive_sample"] = all_config["EpidemiologyModel"]["massive_sampling"]["event_num"]
-	if not isinstance(slim_pars["n_massive_sample"], int):
-		raise CustomizedError("The number of massive sampling events must be an integer")
+	_check_integer(slim_pars["n_massive_sample"], "The number of massive sampling events")
 	out_config.write(f"n_massive_sample:{slim_pars["n_massive_sample"]}\n")
 
 	if slim_pars["n_massive_sample"] > 0:
 		slim_pars["massive_sample_generation"] = all_config["EpidemiologyModel"]["massive_sampling"]["generation"]
 		if not isinstance(slim_pars["massive_sample_generation"], list) or len(slim_pars["massive_sample_generation"])!=slim_pars["n_massive_sample"]:
-			raise CustomizedError("Ticks to do massive sampling (\"massive_sample_generation\") should be a list of length of the number of massive sampling events")
+			raise CustomizedError("Generations to do massive sampling (\"massive_sample_generation\") should be a list of length of the number of massive sampling events")
 		if any([i > slim_pars["n_generation"] or i < 1 for i in slim_pars["massive_sample_generation"]]):
-			raise CustomizedError(f"Ticks to do massive sampling (\"massive_sample_generation\") has to be a tick that is valid (1..{slim_pars["n_generation"]})")
-		out_config.write(f"massive_sample_generation: {",".join([str(x) for x in slim_pars["massive_sample_generation"]])}\n")
+			raise CustomizedError(f"Generations to do massive sampling (\"massive_sample_generation\") has to be a generation that is valid (1..{slim_pars["n_generation"]})")
+		out_config.write(f"massive_sample_generation:{",".join([str(x) for x in slim_pars["massive_sample_generation"]])}\n")
 
 		slim_pars["massive_sample_prob"] = all_config["EpidemiologyModel"]["massive_sampling"]["sampling_prob"]
 		slim_pars["massive_sample_recover_prob"] = all_config["EpidemiologyModel"]["massive_sampling"]["recovery_prob_after_sampling"]
 		for param in ["massive_sample_prob", "massive_sample_recover_prob"]:
-			if not isinstance(slim_pars[param], list) or len(slim_pars[param])!=slim_pars["n_massive_sample"]:
+			if not isinstance(slim_pars[param], list) or len(slim_pars[param]) != slim_pars["n_massive_sample"]:
 				raise CustomizedError(f"(\"{param}\") has to be a list []")
-			if any([type(i) not in [float, int] or i >1 or i < 0 for i in slim_pars[param]]):
-				raise CustomizedError(f"(\"{param}\") has to be a list of probability, thus between 0 and 1")
-			out_config.write(f"{param}: {",".join([str(x) for x in slim_pars[param]])}\n")
+			if any(not isinstance(i, (float, int)) or i > 1 or i < 0 for i in slim_pars[param]):
+				raise CustomizedError(f"(\"{param}\") has to be a list of probability with values between 0 and 1")
+			out_config.write(f"{param}:{",".join([str(x) for x in slim_pars[param]])}\n")
 	
 	slim_pars["super_infection"] = all_config["EpidemiologyModel"]["super_infection"]
 	_check_boolean(slim_pars["super_infection"], "Whether to enable super infection")
 	out_config.write(f"super_infection:{_writebinary(slim_pars["super_infection"])}\n")
-	if slim_pars["super_infection"] and slim_pars["cap_withinhost"]==1:
+	if slim_pars["super_infection"] and slim_pars["cap_withinhost"] == 1:
 		print("WARNING: Though super-infection is activated, you specified the capacity within-host being only 1, thus super-infection actually cannot happen.", flush = True)
-	# slim_pars["slim_replicate_seed_file_path"] = all_config["EpidemiologyModel"]["slim_replicate_seed_file_path"]
 	slim_seeds_path = all_config["EpidemiologyModel"].get("slim_replicate_seed_file_path", None)
 	if slim_seeds_path == "" or slim_seeds_path == None:
 		slim_pars["slim_replicate_seed_file_path"] = None
@@ -347,14 +312,14 @@ def create_slim_config(all_config):
 		if not isinstance(branch_color_trait, int) or branch_color_trait < 0 or branch_color_trait > sum(post_processing_config["n_trait"].values()):
 			raise CustomizedError(f"How to color the branches of the tree (branch_color_trait) should "
 						f"be an integer chosen from (0: color by seed, 1..{sum(post_processing_config["n_trait"].values())}: trait id")
-		if post_processing_config["tree_plotting"]["branch_color_trait"]==0:
+		if post_processing_config["tree_plotting"]["branch_color_trait"] == 0:
 			print("The tree will be colored by seed.", flush = True)
 		else:
 			print(f"The tree will be colored by its trait {post_processing_config["tree_plotting"]["branch_color_trait"]}", flush = True)
 
 		heatmap_trait = post_processing_config["tree_plotting"]["heatmap"]
 		if heatmap_trait not in ["none", "drug_resistance", "transmissibility"]:
-			raise CustomizedError(f"The trait for heatmap is not permitted. The possible choices are: none / drug_resistance, transmissibility")
+			raise CustomizedError(f"The trait for heatmap is not permitted. The possible choices are: none / drug_resistance / transmissibility")
 
 		_check_boolean(post_processing_config["sequence_output"]["vcf"], "Whether to output VCF file")
 		_check_boolean(post_processing_config["sequence_output"]["fasta"], "Whether to output FASTA file")

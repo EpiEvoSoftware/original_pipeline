@@ -524,7 +524,7 @@ def run_seed_generation(method, wk_dir, seed_size, seed_vcf="", Ne=0, ref_path="
 		if use_subst_matrix:
 			os.remove(os.path.join(wk_dir, MUT_MTX))
 	except Exception as e:
-		print(f"Seed sequences generation - A error occured: {e}.")
+		print(f"Seed sequences generation - An error occured: {e}.")
 		error_message = e
 	
 	return error_message
@@ -557,9 +557,9 @@ def seeds_generation_byconfig(all_config):
 	n_gen = seeds_config[method]["burn_in_generations"]
 	subst_model_param = seeds_config[method]["subst_model_parameterization"]
 	if subst_model_param=="mut_rate":
-		use_subst_matrix=True
-	elif subst_model_param=="mut_rate_matrix":
 		use_subst_matrix=False
+	elif subst_model_param=="mut_rate_matrix":
+		use_subst_matrix=True
 	else:
 		raise CustomizedError(f"The given subst_model_parameterization is NOT valid -- please input 'mut_rate' or 'mut_rate_matrix'.")
 	mu = seeds_config[method]["burn_in_mutrate"]

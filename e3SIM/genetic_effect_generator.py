@@ -405,26 +405,26 @@ def run_effsize_generation(method, wk_dir, effsize_path="", gff_in="", trait_n={
 	if rand_seed != None:
 		np.random.seed(rand_seed)
 	error_message = None
-	try:
-		if len(trait_n.keys()) != 2:
-			raise CustomizedError("Please specify exactly 2 traits quantities in a list (-trait_n for transmissibility and drug resistance)")
-		if sum(trait_n.values()) < 1:
-			raise CustomizedError("Please provide a list of trait quantities (-trait_n) that sums up to at least 1")
-		if method == "user_input":
-			write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path, trait_n, num_seed), trait_n)
-		elif method == "randomly_generate":
-			
-			generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, \
-				norm_or_not, num_seed, use_subst_matrix, mu_matrix, ref, final_T)
-		else:
-			raise CustomizedError(f"{method} isn't a valid method. Please provide a permitted method. "
-							"(user_input/randomly_generate)")
-		print("******************************************************************** \n" +
-				"                  GENETIC ARCHITECTURES GENERATED		            \n" +
-				"******************************************************************** \n", flush = True)
-	except Exception as e:
-		print(f"Genetic effects generation - An error occured: {e}.", flush = True)
-		error_message = e
+	# try:
+	if len(trait_n.keys()) != 2:
+		raise CustomizedError("Please specify exactly 2 traits quantities in a list (-trait_n for transmissibility and drug resistance)")
+	if sum(trait_n.values()) < 1:
+		raise CustomizedError("Please provide a list of trait quantities (-trait_n) that sums up to at least 1")
+	if method == "user_input":
+		write_seeds_trait(wk_dir, read_effvals(wk_dir, effsize_path, trait_n, num_seed), trait_n)
+	elif method == "randomly_generate":
+		
+		generate_effsize_csv(trait_n, causal_sizes, es_lows, es_highs, gff_in, wk_dir, n_gen, mut_rate, \
+			norm_or_not, num_seed, use_subst_matrix, mu_matrix, ref, final_T)
+	else:
+		raise CustomizedError(f"{method} isn't a valid method. Please provide a permitted method. "
+						"(user_input/randomly_generate)")
+	print("******************************************************************** \n" +
+			"                  GENETIC ARCHITECTURES GENERATED		            \n" +
+			"******************************************************************** \n", flush = True)
+	# except Exception as e:
+		# print(f"Genetic effects generation - An error occured: {e}.", flush = True)
+		# error_message = e
 	return error_message
 
 def effsize_generation_byconfig(all_config):
@@ -442,12 +442,12 @@ def effsize_generation_byconfig(all_config):
 	num_seed = all_config["SeedsConfiguration"]["seed_size"]
 	subst_model_param = all_config["EvolutionModel"]["subst_model_parameterization"]
 	if subst_model_param=="mut_rate":
-		use_subst_matrix=True
-	elif subst_model_param=="mut_rate_matrix":
 		use_subst_matrix=False
+	elif subst_model_param=="mut_rate_matrix":
+		use_subst_matrix=True
 	else:
 		raise CustomizedError(f"The given subst_model_parameterization is NOT valid -- please input 'mut_rate' or 'mut_rate_matrix'.")
-	mu_matrix_ori = all_config["EvolutionModel"]["burn_in_mutrate_matrix"]
+	mu_matrix_ori = all_config["EvolutionModel"]["mut_rate_matrix"]
 	mu_matrix = {"A": mu_matrix_ori[0], "C": mu_matrix_ori[1], "G": mu_matrix_ori[2], "T": mu_matrix_ori[3]}
 
 	eff_params_config = genetic_config["effect_size"]["randomly_generate"]

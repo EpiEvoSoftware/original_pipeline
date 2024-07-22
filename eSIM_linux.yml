@@ -1,4 +1,4 @@
-name: eSIM_linux
+name: eSIM_linux_2
 channels:
   - anaconda
   - conda-forge
@@ -246,7 +246,7 @@ dependencies:
   - setuptools=70.0.0
   - sip=6.7.12
   - six=1.16.0
-  - slim=4.0.1
+  - slim=4.1
   - sysroot_linux-64=2.12
   - tk=8.6.13
   - tktable=2.10
@@ -293,6 +293,7 @@ dependencies:
   - yq=3.4.3
   - zlib=1.3.1
   - zstd=1.5.6
+  - biopython=1.83
   - pip:
       - attrs==23.2.0
       - contourpy==1.2.1
