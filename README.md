@@ -44,9 +44,9 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
 
   5. Test whether $\text{e3SIM}$ is successfully installed by running a simple model.
       ```sh
-      cd e3SIM_packaging/e3SIM
+      cd e3SIM
       e3SIM=${PWD}
-      cd ../../test/test_installation
+      cd ../test/test_installation
       python update_config.py # To update the test_config.json with user's directory
       python ${e3SIM}/outbreak_simulator.py -config test_config.json # To run the simulation
       ```
