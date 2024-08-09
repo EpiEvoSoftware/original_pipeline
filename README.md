@@ -15,16 +15,16 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
       git clone https://github.com/EpiEvoSoftware/original_pipeline
       ```
   
-  2. Create a conda environment with the provided environment file. For MacOS users, replace `${ENV_YML}` with `eSIM_mac.yml`. For Linux users, replace `${ENV_YML}` with `eSIM_linux.yml`.
+  2. Create a conda environment with the provided environment file. For MacOS users, replace `${ENV_YML}` with `e3SIM_mac.yml`. For Linux users, replace `${ENV_YML}` with `e3SIM_linux.yml`.
       ```sh
       cd original_pipeline
-      conda env create --name eSIM --file ${ENV_YML}
+      conda env create --name e3SIM --file ${ENV_YML}
       ```
-      <!-- If environment creation fails or you encounter errors about importing packages in testing (step 4), do `conda deactivate` to deactivate the environment and delete it by `conda remove --name enivol --all`, then repeat this step by using the no-builds options of the yml file (`mac_env_wo_builds.yml` for MacOS or `linux_env_wo_builds.yml` for Linux). -->
+      <!-- If environment creation fails or you encounter errors about importing packages in testing (step 4), do `conda deactivate` to deactivate the environment and delete it by `conda remove --name e3SIM --all`, then repeat this step by using the no-builds options of the yml file (`mac_env_wo_builds.yml` for MacOS or `linux_env_wo_builds.yml` for Linux). -->
   
   3. Activate the conda environment.
       ```sh
-      conda activate eSIM
+      conda activate e3SIM
       ```
   
   4. Install R and R packages (ONLY Required for MacOS). \
@@ -44,11 +44,11 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
 
   5. Test whether $\text{e3SIM}$ is successfully installed by running a simple model.
       ```sh
-      cd eSIM_packaging/eSIM
-      eSIM=${PWD}
+      cd e3SIM_packaging/e3SIM
+      e3SIM=${PWD}
       cd ../../test/test_installation
       python update_config.py # To update the test_config.json with user's directory
-      python ${eSIM}/outbreak_simulator.py -config test_config.json # To run the simulation
+      python ${e3SIM}/outbreak_simulator.py -config test_config.json # To run the simulation
       ```
       Standard output in the terminal should show progress of the simulator. After the simulation ends, output files(e.g., `all_SEIR_trajectory.png`) are expected in the directory (test_installation) if the installation is successful.
 
@@ -73,22 +73,22 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
     
         Command line tools for the pre-simulatuion programs includes NetworkGenerator, SeedGenerator, GeneticEffectGenerator, and SeedHostMatcher. Please refer to the manual chapter Y-Z for how to run them sequentially. After running these programs, you need to create a configuration file by modifying the config file template. For explanations on the configuration file, please refer to Manual chapter T. The following commands copy the template to your designated working directory.
         ```sh
-        cp ${eSIM}/config_template/slim_only_template.json ${WKDIR}/simulation.config
+        cp ${e3SIM}/config_template/slim_only_template.json ${WKDIR}/simulation.config
         ```
         Then manually change the configuration in `${WKDIR}/simulation.config`.
 
 3. Run the simulation
     ```sh
-    python ${eSIM}/outbreak_simulator.py -config ${WKDIR}/simulation.config
+    python ${e3SIM}/outbreak_simulator.py -config ${WKDIR}/simulation.config
     ```
 
 4. (Alternative to 2 & 3) Run the pre-simulation programs and the simulation together in one command. You need to fill out a bigger configuration file.
     ```sh
-    cp ${eSIM}/config_template/base_params.json ${WKDIR}/simulation.config
+    cp ${e3SIM}/config_template/base_params.json ${WKDIR}/simulation.config
     ```
     Then manually change the configuration in `${WKDIR}/simulation.config` and run
     ```sh
-    python ${eSIM}/enivol.py -config ${WKDIR}/simulation.config
+    python ${e3SIM}/enivol.py -config ${WKDIR}/simulation.config
     ```
 
 ## Liscence
