@@ -257,7 +257,7 @@ def seed_userinput(seed_vcf_path, seed_size, wk_dir, path_seeds_phylogeny):
 	"""
 	if seed_vcf_path == "":
 		raise CustomizedError("You need to specify a path to the seeds' vcf "
-						"(-seed_vcf) file in user_input mode")
+						"(-init_seq_vcf) file in user_input mode")
 	# Check shared seed vcf
 	if check_seedsvcf_input(seed_vcf_path, seed_size):
 		split_seedvcf(seed_vcf_path, wk_dir, seed_size, "user")

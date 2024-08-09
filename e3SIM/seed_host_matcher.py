@@ -166,6 +166,8 @@ def match_ranking(nodes_sorted, taken_hosts, rank):
 		raise CustomizedError(f"The provided rank {rank} of of type {type(rank)}, please provide an interger")
 	if rank > ntwk_size:
 		raise CustomizedError(f"Your provided ranking {rank} exceed host size {ntwk_size}")
+	if rank < 1:
+		raise CustomizedError(f"Your provided ranking {rank} is smaller than 1, while the rank starts from 1 (the highest rank)")
 	host = nodes_sorted[rank - 1]
 	if host in taken_hosts: 
 		raise CustomizedError(f"Host of specified rank {rank} is already taken")

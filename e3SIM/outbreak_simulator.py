@@ -103,8 +103,8 @@ def create_slim_config(all_config):
 		if not _check_write_mut_matrix(matrix, cwdir):
 			raise CustomizedError(f"The given mutation rate matrix {matrix} does NOT meet the requirement 1) zeros on diagonals \
 				AND 2) non-negative numbers on non-diagonals")
-		out_config.write(f"mut_rate_matrix: {slim_pars["mut_rate_matrix"]}\n")
-		out_config.write(f"transition_matrix: T\n")
+		#out_config.write(f"mut_rate_matrix: {slim_pars["mut_rate_matrix"]}\n")
+		out_config.write(f"transition_matrix:T\n")
 		out_config.write(f"transition_matrix_path:{os.path.join(cwdir, "muts_transition_matrix.csv")}\n")
 	elif slim_pars["subst_model_parameterization"] == "mut_rate":
 		slim_pars["mut_rate"] = all_config["EvolutionModel"]["mut_rate"]
@@ -213,11 +213,11 @@ def create_slim_config(all_config):
 	print("\"GenomeElement\" Checked.", flush = True)
 
 	print("Checking \"NetworkModelParameters\"...... ", flush = True)
-	slim_pars["use_network_model"] = all_config["NetworkModelParameters"]["use_network_model"]
-	_check_boolean(slim_pars["use_network_model"], "Whether to use network model as contact network")
-	if not slim_pars["use_network_model"]:
-		raise CustomizedError("Please specify \"true\" for whether to use the network model (\"use_network_model\")")
-	out_config.write(f"use_network_model:{_writebinary(slim_pars["use_network_model"])}\n")
+	# slim_pars["use_network_model"] = all_config["NetworkModelParameters"]["use_network_model"]
+	# _check_boolean(slim_pars["use_network_model"], "Whether to use network model as contact network")
+	# if not slim_pars["use_network_model"]:
+	# 	raise CustomizedError("Please specify \"true\" for whether to use the network model (\"use_network_model\")")
+	# out_config.write(f"use_network_model:{_writebinary(slim_pars["use_network_model"])}\n")
 
 	if not os.path.exists(os.path.join(slim_pars["cwdir"], "contact_network.adjlist")):
 		raise CustomizedError("NetworkGenerator hasn't been run. Please run NetworkGenerator before running this program")
@@ -354,7 +354,7 @@ def create_slim_config(all_config):
 
 		heatmap_trait = post_processing_config["tree_plotting"]["heatmap"]
 		if heatmap_trait not in ["none", "drug_resistance", "transmissibility"]:
-			raise CustomizedError(f"The trait for heatmap is not permitted. The possible choices are: none / drug_resistance, transmissibility")
+			raise CustomizedError(f"The trait for heatmap is not permitted. The possible choices are: none / drug_resistance / transmissibility")
 
 		_check_boolean(post_processing_config["sequence_output"]["vcf"], "Whether to output VCF file")
 		_check_boolean(post_processing_config["sequence_output"]["fasta"], "Whether to output FASTA file")
@@ -408,12 +408,12 @@ def create_slim_script(slim_pars):
 	append_files(os.path.join(code_path, "block_control.slim"), mainslim_path)
 
 	# Seedss read-in and network read=in
-	if slim_pars["use_network_model"]:
-		if slim_pars["use_reference"]:
-			append_files(os.path.join(code_path, "seeds_read_in_noburnin.slim"), mainslim_path)
-		else:
-			append_files(os.path.join(code_path, "seeds_read_in_network.slim"), mainslim_path)
-		append_files(os.path.join(code_path, "contact_network_read_in.slim"), mainslim_path)
+	# if slim_pars["use_network_model"]:
+	if slim_pars["use_reference"]:
+		append_files(os.path.join(code_path, "seeds_read_in_noburnin.slim"), mainslim_path)
+	else:
+		append_files(os.path.join(code_path, "seeds_read_in_network.slim"), mainslim_path)
+	append_files(os.path.join(code_path, "contact_network_read_in.slim"), mainslim_path)
 
 	# Epoch changing
 	if slim_pars["n_epoch"] > 1:
@@ -549,7 +549,7 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 		# Check if sampled genomes exits
 		sampled_genomes_path = os.path.join(slim_pars["cwdir"], str(runid), "sampled_genomes.trees")
 		if os.path.exists(sampled_genomes_path):
-			if len(dataprocess_pars) > 0:
+			if dataprocess_pars["do_postprocess"]:
 				each_wkdir = os.path.join(slim_pars["cwdir"], str(runid))
 				print(f"Processing replication {runid} treesequence file...", flush = True)
 				# Run data processing for each replicate

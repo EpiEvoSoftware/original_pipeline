@@ -193,10 +193,10 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
   
   # Prepare heatmap dataframe if we want to plot the heatmap
   if (heatmap_trait=="none") {
-    cat(paste0("No heatmap on the tree plot."))
+    cat(paste0("No heatmap on the tree plot.\n"))
   }
   else if (heatmap_trait=="drug_resistance") {
-    cat(paste0("Plotting drug resistance traits as heatmap on the tree plot."))
+    cat(paste0("Plotting drug resistance traits as heatmap on the tree plot.\n"))
     if (n_dr > 0) {
       for (i in 1:n_dr) { # Assign drug resistance values
         color_value_df <- assign_dr(meta_df, color_value_df, i, n_trans, g1)
@@ -209,11 +209,11 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
       plot_heatmap = TRUE
     }
     else {
-      cat(paste0("There's no drug_resistance values to plot."))
+      cat(paste0("There's no drug_resistance values to plot.\n"))
     }
   }
   else if (heatmap_trait=="transmissibility") {
-    cat(paste0("Plotting transmissibility traits as heatmap on the tree plot."))
+    cat(paste0("Plotting transmissibility traits as heatmap on the tree plot.\n"))
     if (n_trans > 0) {
       for (i in 1:n_trans) { # Assign transmissibility values
         color_value_df <- assign_trans(meta_df, color_value_df, i, g1)
@@ -226,7 +226,7 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
       plot_heatmap = TRUE
     }
     else {
-      cat(paste0("There's no drug_resistance values to plot."))
+      cat(paste0("There's no drug_resistance values to plot.\n"))
     }
   }
 

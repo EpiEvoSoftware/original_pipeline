@@ -96,6 +96,16 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
 	
 	# Compute the total number of traits for both transmissibility and drug resistance.
 	num_trait = sum(n_trait.values())
+
+	node_size = tseq_smp.tables.nodes.num_rows
+	muts_size = tseq_smp.tables.mutations.num_rows
+	tree_first = tseq_smp.first()
+	trvs_order = list(tree_first.nodes(order="preorder"))
+
+	# if there are no traits to calculate, directly return empty list
+	if num_trait==0:
+		return [], trvs_order
+
 	search_intvls = np.array(np.ravel(eff_size[["start", "end"]]), dtype="float")
 	search_intvls[0::2] -= 0.1
 	search_intvls[1::2] += 0.1
@@ -103,11 +113,6 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
 	# seem unncessary
 	pos_values = [] # list of positions of mutations happened
 	node_ids = [] # list of list of nodes with specific mutations
-
-	node_size = tseq_smp.tables.nodes.num_rows
-	muts_size = tseq_smp.tables.mutations.num_rows
-	tree_first = tseq_smp.first()
-	trvs_order = list(tree_first.nodes(order="preorder"))
 
 	for mut_idx in range(muts_size):
 		mut = tseq_smp.mutation(mut_idx)
@@ -392,12 +397,17 @@ def run_per_data_processing(ref_path, wk_dir_, gen_model, runid, n_trait, seed_h
 			trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
 		else:
 			trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
-		if color_trait > 0:
-			trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
-		else:
-			trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
-		mtdata = metadata_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
-		write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
+		# if color_trait > 0:
+		# 	trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
+		# else:
+		# 	trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
+	else:
+		traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, {})
+		trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
+		color_trait = 0
+	mtdata = metadata_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
+	write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
+
 
 	
 	# Output VCF file

@@ -25,7 +25,6 @@
     }
   },
   "NetworkModelParameters": {
-    "use_network_model": true,
     "host_size": 0
   },
   "EpidemiologyModel": {
