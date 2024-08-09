@@ -15,7 +15,7 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
       git clone https://github.com/EpiEvoSoftware/original_pipeline
       ```
   
-  2. Create a conda environment with the provided environment file. For MacOS users, replace `${ENV_YML}` with `e3SIM_mac.yml`. For Linux users, replace `${ENV_YML}` with `e3SIM_linux.yml`.
+  2. Create a conda environment with the provided environment file. For MacOS users, replace `${ENV_YML}` with `e3SIM_mac.yml`. For Linux users, replace `${ENV_YML}` with `e3SIM_linux.yml`. This step took 2.5 minutes on a M2 pro macbook. 
       ```sh
       cd original_pipeline
       conda env create --name e3SIM --file ${ENV_YML}
@@ -42,7 +42,7 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
         BiocManager::install("Biostrings")
         ```
 
-  5. Test whether $\text{e3SIM}$ is successfully installed by running a simple model.
+  5. Test whether $\text{e3SIM}$ is successfully installed by running a simple model. This testing took ~2 minutes on a M2 pro macbook. 
       ```sh
       cd e3SIM
       e3SIM=${PWD}
