@@ -68,7 +68,7 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
         ```sh
         python gui
         ```
-        A window will pop up and you will be asked to navigate to your working directory in the first tab. By going through all the tabs, a configuation file called `simulation_config.json` will be generated in the working directory according to the given inputs. Please refer to Chapter X in the manual for more details on the GUI application.
+        A window will pop up and you will be asked to navigate to your working directory in the first tab. By going through all the tabs, a configuation file called `simulation_config.json` will be generated in the working directory according to the given inputs. Please refer to Chapter 7 in the manual for more details on the GUI application.
 
     * Command Line
     
