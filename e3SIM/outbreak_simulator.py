@@ -267,7 +267,7 @@ def create_slim_config(all_config):
 		if len(slim_pars[param]) != slim_pars["n_epoch"]:
 			# print("param", slim_pars[param])
 			# print(slim_pars["n_epoch"])
-			raise CustomizedError(f"{param} needs to be of the same length of the number of epochs")
+			raise CustomizedError(f"{param} {slim_pars[param]} needs to be of the same length of the number of epochs {slim_pars["n_epoch"]}")
 		if any(not isinstance(i, (float, int)) for i in slim_pars[param]):
 			raise CustomizedError(f"The probability of event ({param}) has to be a list of floats")
 		if any(i > 1 or i < 0 for i in slim_pars[param]):
