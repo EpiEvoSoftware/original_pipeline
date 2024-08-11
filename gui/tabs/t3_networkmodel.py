@@ -30,7 +30,6 @@ class NetworkModel:
         self.control_frame = ttk.Frame(self.right_frame, width=300)
         self.control_frame.pack(padx=10, pady=(0, 10))
         
-        self.derender_group_use_network_model = set()
         self.derender_group_network_method = set()
         self.derender_group_network_model = set()
         self.update_config_entries = {}
@@ -48,7 +47,7 @@ class NetworkModel:
 
     def render_initial(self):
         self.render_host_size()
-        self.render_use_network_model()
+        self.render_method()
 
     def render_host_size(self):
         host_size_label = tk.ttk.Label(self.control_frame, text="Host Size", style="Bold.TLabel")
@@ -59,41 +58,6 @@ class NetworkModel:
 
         host_size_label.pack()
         host_size_entry.pack(pady=(0, 10))
-
-    def render_use_network_model(self):
-        def update():
-            config = load_config_as_dict(self.config_path)
-            config["NetworkModelParameters"]["use_network_model"] = use_network_model_var.get()
-            save_config(self.config_path, config)
-
-            if use_network_model_var.get():
-                self.render_method()
-            else:
-                self.derender(self.derender_group_use_network_model)
-
-        use_network_model_var = tk.BooleanVar(
-            value=self.initial_config["NetworkModelParameters"]["use_network_model"])
-        use_network_model_label = tk.ttk.Label(
-            self.control_frame, text="Use Network Model", style="Bold.TLabel")
-        use_network_model_rb_true = tk.ttk.Radiobutton(
-            self.control_frame,
-            text="Yes",
-            variable=use_network_model_var,
-            value=True,
-            command=update)
-        use_network_model_rb_false = tk.ttk.Radiobutton(
-            self.control_frame,
-            text="No",
-            variable=use_network_model_var,
-            value=False,
-            command=update)
-
-        use_network_model_label.pack()
-        use_network_model_rb_true.pack()
-        use_network_model_rb_false.pack(pady=(0, 10))
-
-        if use_network_model_var.get():
-            self.render_method()
 
     def render_method(self):
         def update():
@@ -130,9 +94,6 @@ class NetworkModel:
         network_method_label.pack()
         network_method_rb_user.pack()
         network_method_rb_random.pack(pady=(0, 10))
-
-        self.derender_group_use_network_model.update(
-            [network_method_label, network_method_rb_user, network_method_rb_random])
 
         if network_method_var.get() == "user_input":
             self.render_select_file()
@@ -185,7 +146,6 @@ class NetworkModel:
         file_value_label.pack()
         file_button.pack(pady=(0, 10))
 
-        self.derender_group_use_network_model.update([file_label, file_value_label, file_button])
         self.derender_group_network_method.update([file_label, file_value_label, file_button])
 
     def render_network_model(self):
@@ -219,7 +179,6 @@ class NetworkModel:
         network_model_label.pack()
         network_model_combobox.pack(pady=(0, 10))
 
-        self.derender_group_use_network_model.update([network_model_label, network_model_combobox])
         self.derender_group_network_method.update([network_model_label, network_model_combobox])
 
         match network_model_var.get():
@@ -242,7 +201,6 @@ class NetworkModel:
         p_ER_label.pack()
         p_ER_entry.pack()
 
-        self.derender_group_use_network_model.update([p_ER_label, p_ER_entry])
         self.derender_group_network_method.update([p_ER_label, p_ER_entry])
         self.derender_group_network_model.update([p_ER_label, p_ER_entry])
 
@@ -278,9 +236,6 @@ class NetworkModel:
         p_between_label.pack()
         p_between_entry.pack()
 
-        self.derender_group_use_network_model.update(
-            [rp_size_label, rp_size_entry, p_within_label,
-             p_within_entry, p_between_label, p_between_entry])
         self.derender_group_network_method.update(
             [rp_size_label, rp_size_entry, p_within_label,
              p_within_entry, p_between_label, p_between_entry])
@@ -301,7 +256,6 @@ class NetworkModel:
         ba_m_label.pack()
         ba_m_entry.pack()
 
-        self.derender_group_use_network_model.update([ba_m_label, ba_m_entry])
         self.derender_group_network_method.update([ba_m_label, ba_m_entry])
         self.derender_group_network_model.update([ba_m_label, ba_m_entry])
 
@@ -374,7 +328,6 @@ class NetworkModel:
             command=run_network_generate,
         )
         run_network_generate_button.pack(pady=10)
-        self.derender_group_use_network_model.add(run_network_generate_button)
         self.derender_group_network_method.add(run_network_generate_button)
         self.derender_group_network_model.add(run_network_generate_button)
 

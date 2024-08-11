@@ -1,6 +1,6 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "",
+    "cwdir": "/Users/jacklo/github_repos/original_pipeline/test3",
     "n_replicates": 1,
     "random_number_seed": null
   },
@@ -39,13 +39,13 @@
     "cap_withinhost": 1
   },
   "NetworkModelParameters": {
-    "method": "",
-    "host_size": 0,
+    "method": "user_input",
+    "host_size": 100,
     "user_input": {
       "path_network": ""
     },
     "randomly_generate": {
-      "network_model": "",
+      "network_model": "BA",
       "ER": {
         "p_ER": 0
       },
@@ -61,7 +61,7 @@
         "p_between": 0
       },
       "BA": {
-        "ba_m": 0
+        "ba_m": 10
       }
     }
   },
