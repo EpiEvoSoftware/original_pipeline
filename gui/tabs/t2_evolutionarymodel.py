@@ -205,10 +205,10 @@ class EvolutionaryModel:
                 try:
                     for i in range(4):
                         for j in range(4):
-                            config['EvolutionModel']['mut_rate_matrix'][i][j] = float(
-                                self.mut_rate_matrix_entries[i][j].get())
-                            self.mut_rate_matrix[i][j] = \
-                                config['EvolutionModel']['mut_rate_matrix'][i][j]
+                            e = self.mut_rate_matrix_entries[i][j]
+                            config['EvolutionModel']['mut_rate_matrix'][i][j] = float(e.get())
+                            e.delete(0, tk.END)
+                            e.insert(0, config['EvolutionModel']['mut_rate_matrix'][i][j])
                 except ValueError:
                     error_messages.append(
                         "Please enter valid numbers into the mutation rate matrix.")
