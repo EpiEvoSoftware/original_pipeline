@@ -1,13 +1,12 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "/Users/vivianzhao/Desktop/TB_software/tb-software/original_pipeline/test", 
+    "cwdir": "test_drugresist", 
     "n_replicates": 3
   },
   "EvolutionModel": {
+    "subst_model_parameterization": "mut_rate",
     "n_generation": 730,
     "mut_rate": 1.8e-6,
-    "trans_type": "additive",
-    "dr_type": "additive",
     "within_host_reproduction": false,
     "within_host_reproduction_rate": 0,
     "cap_withinhost": 1
@@ -18,8 +17,8 @@
   },
   "GenomeElement": {
     "use_genetic_model": true,
-    "ref_path": "/Users/px54/Documents/TB_software/V2_code/test/data/COVID/EPI_ISL_402124.fasta",
-    "traits_num": [1, 2]
+    "ref_path": "COVID/EPI_ISL_402124.fasta",
+    "traits_num": {"transmissibility": 1, "drug_resistance": 2}
   },
   "NetworkModelParameters": {
     "use_network_model": true,
@@ -37,15 +36,15 @@
       "drug_resistance": [0, 1, 2],
       "cap_drugresist": [0, 10, 10]
     },
-    "transiton_rate": {
-      "S_IE_rate": [0.04, 0.04, 0.04],
-      "I_R_rate": [0.03, 0.06, 0.05],
-      "R_S_rate": [0.05, 0.1, 0.1],
+    "transition_prob": {
+      "S_IE_prob": [0.04, 0.04, 0.04],
+      "I_R_prob": [0.03, 0.06, 0.05],
+      "R_S_prob": [0.05, 0.1, 0.1],
       "latency_prob": [1, 1, 1],
-      "E_I_rate": [0.3, 0.3, 0.3],
-      "I_E_rate": [0, 0, 0],
-      "E_R_rate": [0, 0, 0],
-      "sample_rate": [0.0001, 0.0001, 0.0001],
+      "E_I_prob": [0.3, 0.3, 0.3],
+      "I_E_prob": [0, 0, 0],
+      "E_R_prob": [0, 0, 0],
+      "sample_prob": [0.0002, 0.0002, 0.0002],
       "recovery_prob_after_sampling": [0, 0, 0]
     },
     "massive_sampling": {
@@ -60,7 +59,11 @@
     "do_postprocess": true,
     "tree_plotting": {
       "branch_color_trait": 1,
-      "drug_resistance_heatmap": true
+      "heatmap": "drug_resistance"
+    },
+    "sequence_output": {
+      "vcf": true,
+      "fasta": true
     }
   }
 }

@@ -547,7 +547,7 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 
 		# Extract the seed number for the current
 		# Check if sampled genomes exits
-		sampled_genomes_path = os.path.join(slim_pars["cwdir"], str(runid), "sampled_genomes.trees")
+		sampled_genomes_path = os.path.join(slim_pars["cwdir"], str(runid), "sample.csv.gz")
 		if os.path.exists(sampled_genomes_path):
 			if dataprocess_pars["do_postprocess"]:
 				each_wkdir = os.path.join(slim_pars["cwdir"], str(runid))
