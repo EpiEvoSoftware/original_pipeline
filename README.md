@@ -41,6 +41,8 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
             install.packages("BiocManager")
         BiocManager::install("ggtree")
         BiocManager::install("Biostrings")
+
+        q()
         ```
 
   5. Test whether $\text{e3SIM}$ is successfully installed by running a simple model. This testing took ~2 minutes on a M2 pro macbook. 
@@ -74,13 +76,13 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
     
         Command line tools for the pre-simulatuion programs includes NetworkGenerator, SeedGenerator, GeneticEffectGenerator, and SeedHostMatcher. Please refer to the manual chapter 2 for how to run them sequentially. After running these programs, you need to create a configuration file by modifying the config file template. For explanations on the configuration file, please refer to Manual chapter 3.2. The following commands copy the template to your designated working directory.
         ```sh
-        cp ${e3SIM}/config_template/slim_only_template.json ${WKDIR}/simulation.config
+        cp ${e3SIM}/config_template/slim_only_template.json ${WKDIR}/simulation_config.json
         ```
-        Then manually change the configuration in `${WKDIR}/simulation.config`.
+        Then manually change the configuration in `${WKDIR}/simulation_config.json`.
 
 3. Run the simulation
     ```sh
-    python ${e3SIM}/outbreak_simulator.py -config ${WKDIR}/simulation.config
+    python ${e3SIM}/outbreak_simulator.py -config ${WKDIR}/simulation_config.json
     ```
 
 4. (Alternative to 2 & 3) Run the pre-simulation programs and the simulation together in one command. You need to fill out a bigger configuration file.
@@ -91,6 +93,10 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
     ```sh
     python ${e3SIM}/enivol.py -config ${WKDIR}/simulation.config
     ```
+
+5. Working examples: There are two working example runs of the simulation that are described in the [Manual](https://github.com/EpiEvoSoftware/original_pipeline/blob/main/e3SIM_manual.pdf) Chapter 5 step-by-step. It is recommended to read Chapter 5 and try out the whole pipeline as instructed to understand the whole workflow since e3SIM contains a lot of information to be digest for a first-time-user.
+
+
 
 ## Liscence
 
