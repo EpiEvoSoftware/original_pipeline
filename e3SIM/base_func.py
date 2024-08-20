@@ -72,11 +72,14 @@ def format_subst_mtx(mu_matrix, diag_zero=True):
         mu_matrix: A string object of the mutation probability, having the format '{"A":[,,,], "C":[,,,],"G":[,,,],"T":[,,,]}'.
     """
     default_matrix = [[0.0,0.0,0.0,0.0], [0.0,0.0,0.0,0.0], [0.0,0.0,0.0,0.0], [0.0,0.0,0.0,0.0]]
-    try:
-        mu_matrix = json.loads(mu_matrix)
-    except json.decoder.JSONDecodeError:
-        raise CustomizedError(f"The mutation matrix {mu_matrix} (-mu_matrix) is "
-    		   "not a valid json format")
+    # try:
+    #     mu_matrix = json.loads(mu_matrix)
+    # except json.decoder.JSONDecodeError:
+    #     raise CustomizedError(f"The mutation matrix {mu_matrix} (-mu_matrix) is "
+    # 		   "not a valid json format")
+    if not isinstance(mu_matrix, dict):
+        raise CustomizedError(f"The mutation matrix {mu_matrix} (-mu_matrix) is not "
+                              "a valid dictionary")
     alleles = ["A", "C", "G", "T"]
     from_allele = 0
     for allele in alleles:

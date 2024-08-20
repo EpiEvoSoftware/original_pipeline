@@ -104,7 +104,7 @@ def create_slim_config(all_config):
 			raise CustomizedError(f"The given mutation rate matrix {matrix} does NOT meet the requirement 1) zeros on diagonals \
 				AND 2) non-negative numbers on non-diagonals")
 		out_config.write(f"mut_rate_matrix:{slim_pars["mut_rate_matrix"]}\n")
-		# out_config.write(f"transition_matrix: T\n")
+		out_config.write(f"transition_matrix:T\n")
 		out_config.write(f"transition_matrix_path:{os.path.join(cwdir, "muts_transition_matrix.csv")}\n")
 	elif slim_pars["subst_model_parameterization"] == "mut_rate":
 		slim_pars["mut_rate"] = all_config["EvolutionModel"]["mut_rate"]
