@@ -1,0 +1,11 @@
+// Initial random seed:
+3450771199427085558
+
+// RunInitializeCallbacks():
+initializeSLiMModelType(modelType = 'nonWF');
+initializeSLiMOptions(nucleotideBased = T);
+initializeTreeSeq();
+initializeAncestralNucleotides("TTGACCGATGACCCCGGTTC...");
+initializeRecombinationRate(0);
+initializeMutationTypeNuc(0, 1, "f", 0);
+initializeMutationTypeNuc(1, 1, "f", 0);

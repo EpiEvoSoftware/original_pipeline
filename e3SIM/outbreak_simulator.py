@@ -219,6 +219,7 @@ def create_slim_config(all_config):
 	slim_pars["drugresistance_effsize"] = all_config["EpidemiologyModel"]["genetic_architecture"]["drug_resistance"]
 	slim_pars["cap_drugresist"] = all_config["EpidemiologyModel"]["genetic_architecture"]["cap_drugresist"]
 	slim_pars["S_IE_rate"] = all_config["EpidemiologyModel"]["transition_prob"]["S_IE_prob"]
+	print("test_print", all_config["EpidemiologyModel"]["transition_prob"]["S_IE_prob"])
 	slim_pars["I_R_rate"] = all_config["EpidemiologyModel"]["transition_prob"]["I_R_prob"]
 	slim_pars["R_S_rate"] = all_config["EpidemiologyModel"]["transition_prob"]["R_S_prob"]
 	slim_pars["latency_prob"] = all_config["EpidemiologyModel"]["transition_prob"]["latency_prob"]
@@ -232,8 +233,8 @@ def create_slim_config(all_config):
 		if not isinstance(slim_pars[param], list):
 			raise CustomizedError(f"({param}) has to be a list ([])")
 		if len(slim_pars[param]) != slim_pars["n_epoch"]:
-			# print("param", slim_pars[param])
-			# print(slim_pars["n_epoch"])
+			print("param", slim_pars[param])
+			print(slim_pars["n_epoch"])
 			raise CustomizedError(f"{param} needs to be of the same length of the number of epochs")
 		if any(not isinstance(i, (float, int)) for i in slim_pars[param]):
 			raise CustomizedError(f"The probability of event ({param}) has to be a list of floats")

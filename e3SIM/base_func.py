@@ -27,6 +27,7 @@ def read_params(path_config, default_config):
     # default_param_dict.uapdate(usr_param_dict)
     recursive_update(default_param_dict, usr_param_dict)
 
+    print(default_param_dict)
     return default_param_dict
 
 def read_params_simonly(path_config):

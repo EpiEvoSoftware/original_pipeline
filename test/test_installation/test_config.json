@@ -1,6 +1,6 @@
 {
     "BasicRunConfiguration": {
-        "cwdir": "",
+        "cwdir": "/workdir/sl984/epievosoftware/original_pipeline/test/test_installation",
         "n_replicates": 3
     },
     "EvolutionModel": {
@@ -19,7 +19,7 @@
     },
     "GenomeElement": {
         "use_genetic_model": true,
-        "ref_path": "",
+        "ref_path": "/workdir/sl984/epievosoftware/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.fna",
         "traits_num": {
             "transmissibility": 1,
             "drug_resistance": 0
@@ -49,29 +49,29 @@
                 0
             ]
         },
-        "transition_rate": {
-            "S_IE_rate": [
+        "transition_prob": {
+            "S_IE_prob": [
                 0.004
             ],
-            "I_R_rate": [
+            "I_R_prob": [
                 0.008
             ],
-            "R_S_rate": [
+            "R_S_prob": [
                 0.05
             ],
             "latency_prob": [
                 1
             ],
-            "E_I_rate": [
+            "E_I_prob": [
                 0.01
             ],
-            "I_E_rate": [
+            "I_E_prob": [
                 0
             ],
-            "E_R_rate": [
+            "E_R_prob": [
                 0
             ],
-            "sample_rate": [
+            "sample_prob": [
                 1e-05
             ],
             "recovery_prob_after_sampling": [
