@@ -27,8 +27,9 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
       conda activate e3SIM
       ```
   
-  4. Install R and R packages (ONLY Required for MacOS). Note that R has to be directly callable without the full path (test by running `Rscript --help`)  \
+  4. Install R and R packages. Note that R has to be directly callable without the full path (test by running `Rscript --help`)  \
       Download and install R from here: https://cran.r-project.org/. After successful installation of R, run the following command one by one to install required R packages.
+     **For MacOS users:**
         ```sh
         R
         install.packages("phylobase")
@@ -44,8 +45,15 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
 
         q()
         ```
+  **For Linux users:**
+        ```sh
+        R
+        install.packages("ade4")
+        
+        q()
+        ```
 
-  5. Test whether $\text{e3SIM}$ is successfully installed by running a simple model. This testing took ~2 minutes on a M2 pro macbook. 
+  6. Test whether $\text{e3SIM}$ is successfully installed by running a simple model. This testing took ~2 minutes on a M2 pro macbook. 
       ```sh
       cd e3SIM
       e3SIM=${PWD}
