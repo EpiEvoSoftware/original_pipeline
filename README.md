@@ -29,7 +29,7 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
   
   4. Install R and R packages. Note that R has to be directly callable without the full path (test by running `Rscript --help`)  \
       Download and install R from here: https://cran.r-project.org/. After successful installation of R, run the following command one by one to install required R packages.\
-     **For MacOS users:** \
+     **For MacOS users:** 
         ```sh
         R
         install.packages("phylobase")
@@ -46,11 +46,11 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
         q()
         ```
         
-  **For Linux users:** \
+    **For Linux users:** 
         ```sh
         R
         install.packages("ade4")
-        
+
         q()
         ```
 
