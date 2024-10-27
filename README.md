@@ -46,7 +46,7 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
         q()
         ```
         
-    **For Linux users:** 
+      **For Linux users:**
         ```sh
         R
         install.packages("ade4")
