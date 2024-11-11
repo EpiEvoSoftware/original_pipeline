@@ -1,4 +1,4 @@
-name: eSIM_linux
+name: eSIM_linux_10_22
 channels:
   - anaconda
   - conda-forge

@@ -1,0 +1,35 @@
+// Initial random seed:
+7056635742506197334
+
+// RunInitializeCallbacks():
+initializeSLiMModelType(modelType = 'nonWF');
+initializeSLiMOptions(nucleotideBased = T);
+initializeTreeSeq();
+initializeAncestralNucleotides("TTGACCGATGACCCCGGTTC...");
+initializeRecombinationRate(0);
+initializeMutationTypeNuc(0, 1, "f", 0);
+initializeMutationTypeNuc(1, 1, "f", 0);
+initializeGenomicElementType(0, m0, 1);
+initializeGenomicElementType(1, m1, 1);
+         [,0]     [,1]     [,2]     [,3]
+[0,]      0.0 1.04e-10 1.04e-10 1.04e-10
+[1,] 1.04e-10      0.0 1.04e-10 1.04e-10
+[2,] 1.04e-10 1.04e-10      0.0 1.04e-10
+[3,] 1.04e-10 1.04e-10 1.04e-10      0.0
+initializeGenomicElement(g0, 0, 737266);
+initializeGenomicElement(g1, 737267, 738148);
+initializeGenomicElement(g0, 738149, 1853604);
+initializeGenomicElement(g1, 1853605, 1854387);
+initializeGenomicElement(g0, 1854388, 3387073);
+initializeGenomicElement(g1, 3387074, 3388030);
+initializeGenomicElement(g0, 3388031, 3539844);
+initializeGenomicElement(g1, 3539845, 3540744);
+initializeGenomicElement(g0, 3540745, 3973587);
+initializeGenomicElement(g1, 3973588, 3974499);
+initializeGenomicElement(g0, 3974500, 4411531);
+
+// Starting run at tick <start>:
+1 
+
+"Scheduling block"
+2

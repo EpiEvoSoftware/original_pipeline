@@ -8,17 +8,17 @@ from seed_host_matcher import read_config_and_match
 from outbreak_simulator import all_slim_simulation_by_config
 
 
+
 header = r"""
 
-	 _______ .__   __.  __  ____    ____  ______    __      
-	|   ____||  \ |  | |  | \   \  /   / /  __  \  |  |     
-	|  |__   |   \|  | |  |  \   \/   / |  |  |  | |  |     
-	|   __|  |  . `  | |  |   \      /  |  |  |  | |  |     
-	|  |____ |  |\   | |  |    \    /   |  `--'  | |  `----.
-	|_______||__| \__| |__|     \__/     \______/  |_______|
-                                                        
-"""
+	 _____   _____   ____    ___   __  __ 
+	| ____| |___ /  / ___|  |_ _| |  \/  |
+	|  _|     |_ \  \___ \   | |  | |\/| |
+	| |___   ___) |  ___) |  | |  | |  | |
+	|_____| |____/  |____/  |___| |_|  |_|
+                                       
 
+"""
 
 def main():
 	parser = argparse.ArgumentParser(description='Run the whole simulation process by the configuration provided.')

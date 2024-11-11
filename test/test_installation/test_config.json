@@ -1,6 +1,6 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "/Users/px54/Documents/TB_software/V2_code/test/test_installation",
+    "cwdir": "/workdir/sl984/epievosoftware/original_pipeline/test/test_installation",
     "n_replicates": 3
   },
   "EvolutionModel": {
@@ -19,7 +19,7 @@
   },
   "GenomeElement": {
     "use_genetic_model": true,
-    "ref_path": "/Users/px54/Documents/TB_software/V2_code/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.fna",
+    "ref_path": "/workdir/sl984/epievosoftware/original_pipeline/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.fna",
     "traits_num": {
       "transmissibility": 1,
       "drug_resistance": 0
