@@ -12,12 +12,12 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
 
   1. Find a directory on your device for the software and clone the repository from the terminal.
       ```sh
-      git clone https://github.com/EpiEvoSoftware/original_pipeline
+      git clone https://github.com/EpiEvoSoftware/e3SIM
       ```
   
   2. Create a conda environment with the provided environment file. For MacOS users, replace `${ENV_YML}` with `e3SIM_mac.yml`. For Linux users, replace `${ENV_YML}` with `e3SIM_linux.yml`. This step took 2.5 minutes on a M2 pro macbook. 
       ```sh
-      cd original_pipeline
+      cd e3SIM
       conda env create --name e3SIM --file ${ENV_YML}
       ```
       <!-- If environment creation fails or you encounter errors about importing packages in testing (step 4), do `conda deactivate` to deactivate the environment and delete it by `conda remove --name e3SIM --all`, then repeat this step by using the no-builds options of the yml file (`mac_env_wo_builds.yml` for MacOS or `linux_env_wo_builds.yml` for Linux). -->
